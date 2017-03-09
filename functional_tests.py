@@ -18,19 +18,19 @@ class NewVisitorTest(unittest.TestCase):
 
         # She notices the page title and header mention
         # Neuroscience Experiments Database
-        set.assertIn('Neuroscience Experiments Database', self.browser.title)
-        self.fail ('Finish the test!')
+        self.assertIn('Neuroscience Experiments Database', self.browser.title)
+        self.fail('Finish the test!')
 
-    # She sees the home page have a list of experiments
-    # and click one one of that to check it out
+        # She sees the home page have a list of experiments
+        # and click one one of that to check it out
 
-    # She see that there is a search box in top of page.
-    # So, she types in input search box:
-    # "Brachial Plexus" and wait to see the results.
+        # She see that there is a search box in top of page.
+        # So, she types in input search box:
+        # "Brachial Plexus" and wait to see the results.
 
-    # Then she see that some entries returned that
-    # supposely has "Brachial Plexus" string in one
-    # or more fields
+        # Then she see that some entries returned that
+        # supposely has "Brachial Plexus" string in one
+        # or more fields
 
 if __name__ == '__main__':
     unittest.main(warnings='ignore')
