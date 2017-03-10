@@ -1,4 +1,7 @@
 from selenium import webdriver
+from selenium.webdriver.common.keys import Keys
+
+import time
 import unittest
 
 
@@ -20,7 +23,7 @@ class NewVisitorTest(unittest.TestCase):
         # She notices the page title and header mention
         # Neuroscience Experiments Database
         self.assertIn('Neuroscience Experiments Database', self.browser.title)
-        header_text = self.browser.find_element_by_tag_name('<h1>').text
+        header_text = self.browser.find_element_by_tag_name('h1').text
         self.assertIn('Neuroscience Experiments Database', header_text) 
 
         # She sees the home page have a list of experiments
@@ -45,8 +48,9 @@ class NewVisitorTest(unittest.TestCase):
         # the string "Brachial Plexus Experiment"
         table = self.browser.find_element_by_id('id_results_table')
         rows = table.find_elements_by_tag_name('tr')
-        self.assertIn(
-            any(row.text == 'Brachial Plexus Experiment' for row in rows)
+        self.assertTrue(
+            any(row.text == 'Brachial Plexus' for row in rows),
+            "It's supposed to appear at least one result for 'Brachial Plexus' search string"
         )
 
         self.fail('Finish the test!')
