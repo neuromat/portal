@@ -24,34 +24,10 @@ class NewVisitorTest(unittest.TestCase):
         # Neuroscience Experiments Database
         self.assertIn('Neuroscience Experiments Database', self.browser.title)
         header_text = self.browser.find_element_by_tag_name('h1').text
-        self.assertIn('Neuroscience Experiments Database', header_text) 
+        self.assertIn('Neuroscience Experiments Database', header_text)
 
         # She sees the home page have a list of experiments
-        # and click one one of that to check it out
-
-        # She sees that there is a search box in top of page.
-        searchbox = self.browser.find_element_by_id('id_searchbox')
-        self.assertEqual(
-            searchbox.get_attribute('placeholder'),
-            'Enter a search text'
-        )
-
-        # She types in input search box:
-        # "Brachial Plexus Experiment" and wait to see the results.
-        searchbox.send_keys('Brachial Plexus Experiment')
-        
-        # Then she hits enter, and wait for results
-        searchbox.send_keys(Keys.ENTER)
-        time.sleep(1)
-
-        # We consider, by now, that exists a row with one field containing
-        # the string "Brachial Plexus Experiment"
-        table = self.browser.find_element_by_id('id_results_table')
-        rows = table.find_elements_by_tag_name('tr')
-        self.assertTrue(
-            any(row.text == 'Brachial Plexus' for row in rows),
-            "It's supposed to appear at least one result for 'Brachial Plexus' search string"
-        )
+        # and click in one of that to check it out
 
         self.fail('Finish the test!')
 
