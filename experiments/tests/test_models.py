@@ -28,6 +28,13 @@ class ExperimentModelTest(TestCase):
         experiment.save()
         self.assertIn(experiment, study.experiment_set.all())
 
+    # def test_experiment_is_related_to_user(self):
+    #     user = User.objects.create()
+    #     experiment = Experiment()
+    #     experiment.user = user
+    #     experiment.save()
+    #     self.assertIn(experiment, user.experiment_set.all())
+
 
 class StudyModelTest(TestCase):
 
