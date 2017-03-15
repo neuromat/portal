@@ -1,5 +1,6 @@
 from django.test import TestCase
 from django.core.exceptions import ValidationError
+from django.contrib.auth.models import User
 from experiments.models import Experiment, Study
 from datetime import datetime
 
@@ -14,26 +15,23 @@ class ExperimentModelTest(TestCase):
         self.assertEqual(experiment.data_acquisition_done, False)
 
     def test_cannot_save_empty_attributes(self):
-        # TODO: is it necessary to test for one attribute at time too?
+        user = User.objects.create()
         study = Study.objects.create(start_date=datetime.utcnow())
-        experiment = Experiment(title='', description='', study=study)
+        experiment = Experiment(
+            title='', description='', study=study, user=user
+        )
         with self.assertRaises(ValidationError):
             experiment.save()
             experiment.full_clean()
 
-    def test_experiment_is_related_to_study(self):
+    def test_experiment_is_related_to_study_and_user(self):
+        user = User.objects.create()
         study = Study.objects.create(start_date=datetime.utcnow())
         experiment = Experiment()
+        experiment.user = user
         experiment.study = study
         experiment.save()
         self.assertIn(experiment, study.experiment_set.all())
-
-    # def test_experiment_is_related_to_user(self):
-    #     user = User.objects.create()
-    #     experiment = Experiment()
-    #     experiment.user = user
-    #     experiment.save()
-    #     self.assertIn(experiment, user.experiment_set.all())
 
 
 class StudyModelTest(TestCase):

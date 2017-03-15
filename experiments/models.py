@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib.auth.models import User
 
 
 class Study(models.Model):
@@ -14,4 +15,5 @@ class Experiment(models.Model):
     is_public = models.BooleanField(default=False)
     data_acquisition_done = models.BooleanField(default=False)
     study = models.ForeignKey(Study, default='')
+    user = models.ForeignKey(User, default='')
 
