@@ -15,7 +15,9 @@ class ExperimentModelTest(TestCase):
 
     def test_cannot_save_empty_attributes(self):
         user = User.objects.create()
-        study = Study.objects.create(start_date=datetime.utcnow())
+        researcher = Researcher.objects.create()
+        study = Study.objects.create(
+            start_date=datetime.utcnow(), researcher=researcher)
         experiment = Experiment(
             title='', description='', study=study, user=user
         )
@@ -25,7 +27,9 @@ class ExperimentModelTest(TestCase):
 
     def test_experiment_is_related_to_study_and_user(self):
         user = User.objects.create()
-        study = Study.objects.create(start_date=datetime.utcnow())
+        researcher = Researcher.objects.create()
+        study = Study.objects.create(
+            start_date=datetime.utcnow(), researcher=researcher)
         experiment = Experiment()
         experiment.user = user
         experiment.study = study
@@ -43,11 +47,19 @@ class StudyModelTest(TestCase):
         self.assertEqual(study.end_date, None)
 
     def test_cannot_save_empty_attributes(self):
-        # TODO: is it necessary to test for one attribute at time too?
         study = Study(title='', description='', start_date='')
         with self.assertRaises(ValidationError):
             study.save()
             study.full_clean()
+
+    def test_study_is_related_to_researcher(self):
+        researcher = Researcher.objects.create(
+            first_name='João', surname='da Silva'
+        )
+        study = Study(start_date=datetime.utcnow())
+        study.researcher = researcher
+        study.save()
+        self.assertIn(study, researcher.study_set.all())
 
 
 class ResearcherModelTest(TestCase):
@@ -57,3 +69,9 @@ class ResearcherModelTest(TestCase):
         self.assertEqual(researcher.first_name, '')
         self.assertEqual(researcher.surname, '')
         self.assertEqual(researcher.email, None)
+
+    def test_cannot_save_empty_attributes(self):
+        researcher = Researcher(first_name='', surname='')
+        with self.assertRaises(ValidationError):
+            researcher.save()
+            researcher.full_clean()
