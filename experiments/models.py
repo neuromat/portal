@@ -12,8 +12,12 @@ class Study(models.Model):
 class Experiment(models.Model):
     title = models.CharField(max_length=150, default='')
     description = models.TextField(default='')
-    is_public = models.BooleanField(default=False)
     data_acquisition_done = models.BooleanField(default=False)
     study = models.ForeignKey(Study, default='')
     user = models.ForeignKey(User, default='')
 
+
+class Researcher(models.Model):
+    first_name = models.CharField(max_length=150, default='')
+    surname = models.CharField(max_length=150, default='')
+    email = models.EmailField(null=True)

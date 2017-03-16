@@ -1,7 +1,7 @@
 from django.test import TestCase
 from django.core.exceptions import ValidationError
 from django.contrib.auth.models import User
-from experiments.models import Experiment, Study
+from experiments.models import Experiment, Study, Researcher
 from datetime import datetime
 
 
@@ -11,7 +11,6 @@ class ExperimentModelTest(TestCase):
         experiment = Experiment()
         self.assertEqual(experiment.title, '')
         self.assertEqual(experiment.description, '')
-        self.assertEqual(experiment.is_public, False)
         self.assertEqual(experiment.data_acquisition_done, False)
 
     def test_cannot_save_empty_attributes(self):
@@ -49,3 +48,12 @@ class StudyModelTest(TestCase):
         with self.assertRaises(ValidationError):
             study.save()
             study.full_clean()
+
+
+class ResearcherModelTest(TestCase):
+
+    def test_default_attributes(self):
+        researcher = Researcher()
+        self.assertEqual(researcher.first_name, '')
+        self.assertEqual(researcher.surname, '')
+        self.assertEqual(researcher.email, None)
