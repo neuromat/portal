@@ -1,10 +1,13 @@
 from django.http import HttpResponse
+from django.contrib.auth.models import User
 from rest_framework import status
+from rest_framework import serializers
 import json
 
-from experiments.models import Experiment, Study, User
+from experiments.models import Experiment, Study, User, Researcher
 
 
+# API Views
 def experiment(request):
     if request.method == 'POST':
         study = Study.objects.get(id=request.POST['study'])
@@ -27,3 +30,46 @@ def experiment(request):
         json.dumps(experiment_dicts),
         content_type='application/json'
     )
+
+
+# API Serializers
+class ExperimentSerializer(serializers.ModelSerializer):
+    study = serializers.ReadOnlyField(source='study.title')
+    user = serializers.ReadOnlyField(source='user.username')
+
+    class Meta:
+        model = Experiment
+        fields = ('id', 'title', 'description', 'data_acquisition_done',
+                  'study', 'user')
+
+
+class UserSerializer(serializers.ModelSerializer):
+    experiments = serializers.PrimaryKeyRelatedField(
+        many=True, queryset=Experiment.objects.all()
+    )
+
+    class Meta:
+        model = User
+        fields = ('id', 'username', 'experiments')
+
+
+class StudySerializer(serializers.ModelSerializer):
+    researcher = serializers.ReadOnlyField(source='researcher.first_name')
+    experiments = serializers.PrimaryKeyRelatedField(
+        many=True, queryset=Experiment.objects.all()
+    )
+
+    class Meta:
+        model = Study
+        fields = ('id', 'title', 'description', 'start_date', 'end_date',
+                  'researcher', 'experiments')
+
+
+class ResearcherSerializer(serializers.ModelSerializer):
+    studies = serializers.PrimaryKeyRelatedField(
+        many=True, queryset=Study.objects.all()
+    )
+
+    class Meta:
+        model = Researcher
+        fields = ('id', 'first_name', 'surname', 'email', 'studies')
