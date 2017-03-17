@@ -1,8 +1,9 @@
 from django.test import TestCase
 from django.core.exceptions import ValidationError
 from django.contrib.auth.models import User
-from experiments.models import Experiment, Study, Researcher
 from datetime import datetime
+
+from experiments.models import Experiment, Study, Researcher
 
 
 class ExperimentModelTest(TestCase):
