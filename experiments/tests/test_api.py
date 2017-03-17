@@ -58,3 +58,22 @@ class ExperimentAPITest(APITestCase):
                 }
             ]
         )
+
+    def test_POSTing_a_new_experiment(self):
+            researcher = Researcher.objects.create()
+            study = Study.objects.create(
+                start_date=datetime.utcnow(), researcher=researcher
+            )
+            user = User.objects.create(username='Pedro')
+            response = self.client.post(
+                self.base_url,
+                {
+                    'title': 'New experiment',
+                    'description': 'Some description',
+                    'study': study.id,
+                    'user': user.id,
+                }
+            )
+            self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+            new_experiment = Experiment.objects.first()
+            self.assertEqual(new_experiment.title, 'New experiment')
