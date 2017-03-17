@@ -77,3 +77,6 @@ class ExperimentAPITest(APITestCase):
             self.assertEqual(response.status_code, status.HTTP_201_CREATED)
             new_experiment = Experiment.objects.first()
             self.assertEqual(new_experiment.title, 'New experiment')
+
+    # TODO: os testes de validações ainda não foram implementados.
+    # Ver http://www.obeythetestinggoat.com/book/appendix_rest_api.html#_data_validation_an_exercise_for_the_reader
