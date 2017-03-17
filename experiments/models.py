@@ -22,4 +22,3 @@ class Experiment(models.Model):
     data_acquisition_done = models.BooleanField(default=False)
     study = models.ForeignKey(Study, default='')
     user = models.ForeignKey(User, default='')
-
