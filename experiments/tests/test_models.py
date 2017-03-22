@@ -60,7 +60,7 @@ class StudyModelTest(TestCase):
         study = Study(start_date=datetime.utcnow())
         study.researcher = researcher
         study.save()
-        self.assertIn(study, researcher.study_set.all())
+        self.assertIn(study, researcher.studies.all())
 
 
 class ResearcherModelTest(TestCase):

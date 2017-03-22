@@ -1,6 +1,5 @@
 from django.http import HttpResponse
-from rest_framework import status
-from rest_framework import serializers
+from rest_framework import status, serializers, generics, permissions
 import json
 
 from experiments.models import Experiment, Study, User, Researcher
@@ -72,3 +71,10 @@ def experiment(request):
         json.dumps(experiment_dicts),
         content_type='application/json'
     )
+
+
+class ResearcherList(generics.ListCreateAPIView):
+    queryset = Researcher.objects.all()
+    serializer_class = ResearcherSerializer
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
+

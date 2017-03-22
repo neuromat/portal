@@ -13,7 +13,8 @@ class Study(models.Model):
     description = models.TextField()
     start_date = models.DateField()
     end_date = models.DateField(null=True)
-    researcher = models.ForeignKey(Researcher, default='')
+    researcher = models.ForeignKey(Researcher, related_name='studies',
+                                   default='')
 
 
 class Experiment(models.Model):

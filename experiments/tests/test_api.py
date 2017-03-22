@@ -11,6 +11,8 @@ from experiments.models import Experiment, Researcher, Study
 class ExperimentAPITest(APITestCase):
     base_url = reverse('api_experiments')
 
+    # This test is following tutorial. Not necessary because is
+    # django-rest-framework. By default object returned is json.
     def test_get_returns_json_200(self):
         response = self.client.get(self.base_url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -79,4 +81,38 @@ class ExperimentAPITest(APITestCase):
             self.assertEqual(new_experiment.title, 'New experiment')
 
     # TODO: os testes de validações ainda não foram implementados.
-    # Ver http://www.obeythetestinggoat.com/book/appendix_rest_api.html#_data_validation_an_exercise_for_the_reader
+    # Ver:
+    # http://www.obeythetestinggoat.com/book/appendix_rest_api.html#_data_validation_an_exercise_for_the_reader
+
+
+class ResearcherAPITest(APITestCase):
+    base_url = reverse('api_researchers')
+
+    def test_get_returns_all_researchers(self):
+        researcher1 = Researcher.objects.create(
+            first_name='Researcher1', surname='dos Santos'
+        )
+        researcher2 = Researcher.objects.create(
+            first_name='Researcher2', surname='da Silva'
+        )
+
+        response = self.client.get(self.base_url)
+        self.assertEqual(
+            json.loads(response.content.decode('utf8')),
+            [
+                {
+                    'id': researcher1.id,
+                    'first_name': researcher1.first_name,
+                    'surname': researcher1.surname,
+                    'email': researcher1.email,
+                    'studies': []
+                },
+                {
+                    'id': researcher2.id,
+                    'first_name': researcher2.first_name,
+                    'surname': researcher2.surname,
+                    'email': researcher2.email,
+                    'studies': []
+                }
+            ]
+        )
