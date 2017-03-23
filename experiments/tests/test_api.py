@@ -173,3 +173,22 @@ class StudyAPITest(APITestCase):
                 },
             ]
         )
+
+    def test_POSTing_a_new_study(self):
+        researcher = Researcher.objects.create()
+        user = User.objects.create_user(username='Laboratório 1',
+                                        password='nep-lab1')
+        self.client.login(username=user.username, password='nep-lab1')
+        url = reverse('api_studies_post', args=[researcher.id])
+        response = self.client.post(
+            url,
+            {
+                'title': 'New study',
+                'description': 'Some description',
+                'start_date': datetime.utcnow().strftime('%Y-%m-%d'),
+            }
+        )
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.client.logout()
+        new_study = Study.objects.first()
+        self.assertEqual(new_study.title, 'New study')
