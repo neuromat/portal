@@ -21,5 +21,5 @@ class Experiment(models.Model):
     title = models.CharField(max_length=150, default='')
     description = models.TextField(default='')
     data_acquisition_done = models.BooleanField(default=False)
-    study = models.ForeignKey(Study, default=None)
+    study = models.ForeignKey(Study, default=None, related_name='experiments')
     user = models.ForeignKey(User, default=None)

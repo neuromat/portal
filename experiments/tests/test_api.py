@@ -134,3 +134,42 @@ class ResearcherAPITest(APITestCase):
         self.client.logout()
         new_researcher = Researcher.objects.first()
         self.assertEqual(new_researcher.first_name, 'João')
+
+
+class StudyAPITest(APITestCase):
+    base_url = reverse('api_studies')
+
+    def test_get_returns_all_studies(self):
+        researcher = Researcher.objects.create()
+        study1 = Study.objects.create(
+            title='Um estudo', description='Uma descrição',
+            start_date=datetime.utcnow(), researcher=researcher
+        )
+        study2 = Study.objects.create(
+            title='Outro estudo', description='Outra descrição',
+            start_date=datetime.utcnow(), researcher=researcher
+        )
+        response = self.client.get(self.base_url)
+        self.assertEqual(
+            json.loads(response.content.decode('utf8')),
+            [
+                {
+                    'id': study1.id,
+                    'title': study1.title,
+                    'description': study1.description,
+                    'start_date': study1.start_date.strftime('%Y-%m-%d'),
+                    'end_date': study1.end_date,
+                    'researcher': study1.researcher.first_name,
+                    'experiments': []
+                },
+                {
+                    'id': study2.id,
+                    'title': study2.title,
+                    'description': study2.description,
+                    'start_date': study2.start_date.strftime('%Y-%m-%d'),
+                    'end_date': study2.end_date,
+                    'researcher': study2.researcher.first_name,
+                    'experiments': []
+                },
+            ]
+        )

@@ -60,6 +60,12 @@ class ExperimentList(generics.ListCreateAPIView):
         serializer.save(study=study, user=self.request.user)
 
 
+class StudyList(generics.ListCreateAPIView):
+    queryset = Study.objects.all()
+    serializer_class = StudySerializer
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
+
+
 class ResearcherList(generics.ListCreateAPIView):
     queryset = Researcher.objects.all()
     serializer_class = ResearcherSerializer

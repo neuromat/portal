@@ -35,7 +35,7 @@ class ExperimentModelTest(TestCase):
         experiment.user = user
         experiment.study = study
         experiment.save()
-        self.assertIn(experiment, study.experiment_set.all())
+        self.assertIn(experiment, study.experiments.all())
         self.assertIn(experiment, user.experiment_set.all())
 
 
