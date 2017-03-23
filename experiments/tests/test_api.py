@@ -116,3 +116,18 @@ class ResearcherAPITest(APITestCase):
                 }
             ]
         )
+
+    def test_POSTing_a_new_researcher(self):
+        user = User.objects.create_user(username='lab1', password='nep-lab1')
+        self.client.login(username=user.username, password='nep-lab1')
+        response = self.client.post(
+            self.base_url,
+            {
+                'first_name': 'João',
+                'surname': 'das Rosas',
+            }
+        )
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.client.logout()
+        new_researcher = Researcher.objects.first()
+        self.assertEqual(new_researcher.first_name, 'João')
