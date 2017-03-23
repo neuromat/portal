@@ -21,13 +21,14 @@ class ExperimentAPITest(APITestCase):
     def test_get_returns_all_experiments(self):
         researcher = Researcher.objects.create()
         # TODO: What a strange behavior. Maybe post question in Stackoverflow.
-        # When trying to create our_user User instance without user name, test
+        # When trying to create our_user User instance without username, test
         # doesn't pass. But in the first User instance created (other_user
-        # above), without user name, test pass.
-        user = User.objects.create(username='João')
+        # above), without username, test pass.
+        user = User.objects.create(username='joao')
         study = Study.objects.create(
             start_date=datetime.utcnow(), researcher=researcher
         )
+
         experiment1 = Experiment.objects.create(
             title='Our title', description='Our description',
             study=study, user=user
@@ -46,8 +47,8 @@ class ExperimentAPITest(APITestCase):
                     'description': experiment1.description,
                     'data_acquisition_done':
                         experiment1.data_acquisition_done,
-                    'study': experiment1.study.id,
-                    'user': experiment1.user.id
+                    'study': experiment1.study.title,
+                    'user': experiment1.user.username
                 },
                 {
                     'id': experiment2.id,
@@ -55,28 +56,30 @@ class ExperimentAPITest(APITestCase):
                     'description': experiment2.description,
                     'data_acquisition_done':
                         experiment2.data_acquisition_done,
-                    'study': experiment2.study.id,
-                    'user': experiment2.user.id
+                    'study': experiment2.study.title,
+                    'user': experiment2.user.username
                 }
             ]
         )
 
-    def test_POSTing_a_new_experiment(self):
+    def test_POSTing_a_new_experiment_to_an_existing_study(self):
+            # url = reverse('api_experiments_post')
             researcher = Researcher.objects.create()
             study = Study.objects.create(
                 start_date=datetime.utcnow(), researcher=researcher
             )
-            user = User.objects.create(username='Pedro')
+            user = User.objects.create_user(username='Pedro',
+                                            password='nep-lab1')
+            self.client.login(username=user.username, password='nep-lab1')
             response = self.client.post(
-                self.base_url,
+                f'/api/studies/{study.id}/experiments/',
                 {
                     'title': 'New experiment',
-                    'description': 'Some description',
-                    'study': study.id,
-                    'user': user.id,
+                    'description': 'Some description'
                 }
             )
             self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+            self.client.logout()
             new_experiment = Experiment.objects.first()
             self.assertEqual(new_experiment.title, 'New experiment')
 

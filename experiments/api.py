@@ -49,28 +49,15 @@ class ResearcherSerializer(serializers.ModelSerializer):
 
 
 # API Views
-def experiment(request):
-    if request.method == 'POST':
-        study = Study.objects.get(id=request.POST['study'])
-        user = User.objects.get(id=request.POST['user'])
-        Experiment.objects.create(
-            title=request.POST['title'],
-            description=request.POST['description'],
-            study=study,
-            user=user
-        )
-        return HttpResponse(status=status.HTTP_201_CREATED)
-    experiment_dicts = [
-        {'id': experiment.id, 'title': experiment.title, 'description':
-            experiment.description, 'data_acquisition_done':
-            experiment.data_acquisition_done, 'study': experiment.study.id,
-         'user': experiment.user.id}
-        for experiment in Experiment.objects.all()
-        ]
-    return HttpResponse(
-        json.dumps(experiment_dicts),
-        content_type='application/json'
-    )
+class ExperimentList(generics.ListCreateAPIView):
+    queryset = Experiment.objects.all()
+    serializer_class = ExperimentSerializer
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
+
+    def perform_create(self, serializer):
+        study_id = self.kwargs.get('pk')
+        study = Study.objects.filter(id=study_id).get()
+        serializer.save(study=study, user=self.request.user)
 
 
 class ResearcherList(generics.ListCreateAPIView):

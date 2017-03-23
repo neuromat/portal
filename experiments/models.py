@@ -14,12 +14,12 @@ class Study(models.Model):
     start_date = models.DateField()
     end_date = models.DateField(null=True)
     researcher = models.ForeignKey(Researcher, related_name='studies',
-                                   default='')
+                                   default=None)
 
 
 class Experiment(models.Model):
     title = models.CharField(max_length=150, default='')
     description = models.TextField(default='')
     data_acquisition_done = models.BooleanField(default=False)
-    study = models.ForeignKey(Study, default='')
-    user = models.ForeignKey(User, default='')
+    study = models.ForeignKey(Study, default=None)
+    user = models.ForeignKey(User, default=None)
