@@ -63,7 +63,6 @@ class ExperimentAPITest(APITestCase):
         )
 
     def test_POSTing_a_new_experiment_to_an_existing_study(self):
-            # url = reverse('api_experiments_post')
             researcher = Researcher.objects.create()
             study = Study.objects.create(
                 start_date=datetime.utcnow(), researcher=researcher
@@ -71,8 +70,9 @@ class ExperimentAPITest(APITestCase):
             user = User.objects.create_user(username='Pedro',
                                             password='nep-lab1')
             self.client.login(username=user.username, password='nep-lab1')
+            url = reverse('api_experiments_post', args=[study.id])
             response = self.client.post(
-                f'/api/studies/{study.id}/experiments/',
+                url,
                 {
                     'title': 'New experiment',
                     'description': 'Some description'
