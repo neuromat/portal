@@ -29,7 +29,7 @@ class UserSerializer(serializers.ModelSerializer):
 class StudySerializer(serializers.ModelSerializer):
     researcher = serializers.ReadOnlyField(source='researcher.first_name')
     experiments = serializers.PrimaryKeyRelatedField(
-        many=True, queryset=Experiment.objects.all()
+        many=True, read_only=True
     )
 
     class Meta:
@@ -40,7 +40,7 @@ class StudySerializer(serializers.ModelSerializer):
 
 class ResearcherSerializer(serializers.ModelSerializer):
     studies = serializers.PrimaryKeyRelatedField(
-        many=True, queryset=Study.objects.all()
+        many=True, read_only=True
     )
 
     class Meta:
