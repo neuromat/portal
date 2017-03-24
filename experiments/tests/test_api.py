@@ -63,25 +63,29 @@ class ExperimentAPITest(APITestCase):
         )
 
     def test_POSTing_a_new_experiment_to_an_existing_study(self):
-            researcher = Researcher.objects.create()
-            study = Study.objects.create(
-                start_date=datetime.utcnow(), researcher=researcher
-            )
-            user = User.objects.create_user(username='Pedro',
-                                            password='nep-lab1')
-            self.client.login(username=user.username, password='nep-lab1')
-            url = reverse('api_experiments_post', args=[study.id])
-            response = self.client.post(
-                url,
-                {
-                    'title': 'New experiment',
-                    'description': 'Some description'
-                }
-            )
-            self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-            self.client.logout()
-            new_experiment = Experiment.objects.first()
-            self.assertEqual(new_experiment.title, 'New experiment')
+        # TODO: creates researches with only id. But in
+        # test_POSTing_a_new_researcher() validates.
+        researcher = Researcher.objects.create()
+        # TODO: Like commentary above
+        study = Study.objects.create(
+            start_date=datetime.utcnow(), researcher=researcher
+        )
+        user = User.objects.create_user(
+            username='Pedro', password='nep-lab1'
+        )
+        self.client.login(username=user.username, password='nep-lab1')
+        url = reverse('api_experiments_post', args=[study.id])
+        response = self.client.post(
+            url,
+            {
+                'title': 'New experiment',
+                'description': 'Some description'
+            }
+        )
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.client.logout()
+        new_experiment = Experiment.objects.first()
+        self.assertEqual(new_experiment.title, 'New experiment')
 
     # TODO: os testes de validações ainda não foram implementados.
     # Ver:
@@ -140,6 +144,8 @@ class StudyAPITest(APITestCase):
     base_url = reverse('api_studies')
 
     def test_get_returns_all_studies(self):
+        # TODO: creates researches with only id. But in
+        # test_POSTing_a_new_researcher() validates.
         researcher = Researcher.objects.create()
         study1 = Study.objects.create(
             title='Um estudo', description='Uma descrição',
@@ -175,6 +181,8 @@ class StudyAPITest(APITestCase):
         )
 
     def test_POSTing_a_new_study(self):
+        # TODO: creates researches with only id. But in
+        # test_POSTing_a_new_researcher() validates.
         researcher = Researcher.objects.create()
         user = User.objects.create_user(username='Laboratório 1',
                                         password='nep-lab1')
