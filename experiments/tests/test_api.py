@@ -200,3 +200,7 @@ class StudyAPITest(APITestCase):
         self.client.logout()
         new_study = Study.objects.first()
         self.assertEqual(new_study.title, 'New study')
+
+    # TODO: IMPORTANT! Test client can't POST (PUT etc.) to a model without
+        # been its owner. This requires adds, at first, an owner to all
+        # models, and ensure that only same client can POST to that model.
