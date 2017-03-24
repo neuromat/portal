@@ -3,13 +3,13 @@ from django.contrib.auth.models import User
 
 
 class Researcher(models.Model):
-    first_name = models.CharField(max_length=150, default='')
-    surname = models.CharField(max_length=150, default='')
+    first_name = models.CharField(max_length=150)
+    surname = models.CharField(max_length=150)
     email = models.EmailField(null=True)
 
 
 class Study(models.Model):
-    title = models.CharField(max_length=150, default='')
+    title = models.CharField(max_length=150)
     description = models.TextField()
     start_date = models.DateField()
     end_date = models.DateField(null=True)
@@ -18,8 +18,8 @@ class Study(models.Model):
 
 
 class Experiment(models.Model):
-    title = models.CharField(max_length=150, default='')
-    description = models.TextField(default='')
+    title = models.CharField(max_length=150)
+    description = models.TextField()
     data_acquisition_done = models.BooleanField(default=False)
-    study = models.ForeignKey(Study, default=None, related_name='experiments')
-    user = models.ForeignKey(User, default=None)
+    study = models.ForeignKey(Study, related_name='experiments')
+    user = models.ForeignKey(User)
