@@ -19,7 +19,7 @@ class ExperimentAPITest(APITestCase):
         self.assertEqual(response['content-type'], 'application/json')
 
     def test_get_returns_all_experiments(self):
-        researcher = Researcher.objects.create()
+        researcher = Researcher.objects.create(nes_id=1)
         # TODO: What a strange behavior. Maybe post question in Stackoverflow.
         # When trying to create our_user User instance without username, test
         # doesn't pass. But in the first User instance created (other_user
@@ -65,7 +65,7 @@ class ExperimentAPITest(APITestCase):
     def test_POSTing_a_new_experiment_to_an_existing_study(self):
         # TODO: creates researches with only id. But in
         # test_POSTing_a_new_researcher() validates.
-        researcher = Researcher.objects.create()
+        researcher = Researcher.objects.create(nes_id=1)
         # TODO: Like commentary above
         study = Study.objects.create(
             start_date=datetime.utcnow(), researcher=researcher
@@ -97,10 +97,10 @@ class ResearcherAPITest(APITestCase):
 
     def test_get_returns_all_researchers(self):
         researcher1 = Researcher.objects.create(
-            first_name='Researcher1', surname='dos Santos'
+            first_name='Researcher1', surname='dos Santos', nes_id=1
         )
         researcher2 = Researcher.objects.create(
-            first_name='Researcher2', surname='da Silva'
+            first_name='Researcher2', surname='da Silva', nes_id=2
         )
 
         response = self.client.get(self.base_url)
@@ -112,14 +112,16 @@ class ResearcherAPITest(APITestCase):
                     'first_name': researcher1.first_name,
                     'surname': researcher1.surname,
                     'email': researcher1.email,
-                    'studies': []
+                    'studies': [],
+                    'nes_id': 1
                 },
                 {
                     'id': researcher2.id,
                     'first_name': researcher2.first_name,
                     'surname': researcher2.surname,
                     'email': researcher2.email,
-                    'studies': []
+                    'studies': [],
+                    'nes_id': 2
                 }
             ]
         )
@@ -132,6 +134,8 @@ class ResearcherAPITest(APITestCase):
             {
                 'first_name': 'João',
                 'surname': 'das Rosas',
+                'email': 'joao@rosas.com',
+                'nes_id': 1
             }
         )
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
@@ -146,7 +150,7 @@ class StudyAPITest(APITestCase):
     def test_get_returns_all_studies(self):
         # TODO: creates researches with only id. But in
         # test_POSTing_a_new_researcher() validates.
-        researcher = Researcher.objects.create()
+        researcher = Researcher.objects.create(nes_id=1)
         study1 = Study.objects.create(
             title='Um estudo', description='Uma descrição',
             start_date=datetime.utcnow(), researcher=researcher
@@ -183,7 +187,7 @@ class StudyAPITest(APITestCase):
     def test_POSTing_a_new_study(self):
         # TODO: creates researches with only id. But in
         # test_POSTing_a_new_researcher() validates.
-        researcher = Researcher.objects.create()
+        researcher = Researcher.objects.create(nes_id=1)
         user = User.objects.create_user(username='Laboratório 1',
                                         password='nep-lab1')
         self.client.login(username=user.username, password='nep-lab1')

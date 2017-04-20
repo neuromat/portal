@@ -16,7 +16,7 @@ class ExperimentModelTest(TestCase):
 
     def test_cannot_save_empty_attributes(self):
         user = User.objects.create()
-        researcher = Researcher.objects.create()
+        researcher = Researcher.objects.create(nes_id=1)
         study = Study.objects.create(
             start_date=datetime.utcnow(), researcher=researcher)
         experiment = Experiment(
@@ -28,7 +28,7 @@ class ExperimentModelTest(TestCase):
 
     def test_experiment_is_related_to_study_and_user(self):
         user = User.objects.create()
-        researcher = Researcher.objects.create()
+        researcher = Researcher.objects.create(nes_id=1)
         study = Study.objects.create(
             start_date=datetime.utcnow(), researcher=researcher)
         experiment = Experiment()
@@ -56,7 +56,7 @@ class StudyModelTest(TestCase):
 
     def test_study_is_related_to_researcher(self):
         researcher = Researcher.objects.create(
-            first_name='João', surname='da Silva'
+            first_name='João', surname='da Silva', nes_id=1
         )
         study = Study(start_date=datetime.utcnow())
         study.researcher = researcher
@@ -70,10 +70,11 @@ class ResearcherModelTest(TestCase):
         researcher = Researcher()
         self.assertEqual(researcher.first_name, '')
         self.assertEqual(researcher.surname, '')
-        self.assertEqual(researcher.email, None)
+        self.assertEqual(researcher.email, '')
+        self.assertEqual(researcher.nes_id, None)
 
     def test_cannot_save_empty_attributes(self):
-        researcher = Researcher(first_name='', surname='')
+        researcher = Researcher(first_name='', surname='', nes_id=1)
         with self.assertRaises(ValidationError):
             researcher.save()
             researcher.full_clean()

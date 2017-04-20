@@ -45,7 +45,7 @@ class ResearcherSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Researcher
-        fields = ('id', 'first_name', 'surname', 'email', 'studies')
+        fields = ('id', 'first_name', 'surname', 'email', 'studies', 'nes_id')
 
 
 # API Views
