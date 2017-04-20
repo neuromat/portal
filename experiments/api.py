@@ -8,12 +8,12 @@ from experiments.models import Experiment, Study, User, Researcher
 # API Serializers
 class ExperimentSerializer(serializers.ModelSerializer):
     study = serializers.ReadOnlyField(source='study.title')
-    user = serializers.ReadOnlyField(source='user.username')
+    owner = serializers.ReadOnlyField(source='owner.username')
 
     class Meta:
         model = Experiment
         fields = ('id', 'title', 'description', 'data_acquisition_done',
-                  'study', 'user')
+                  'study', 'owner')
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -42,10 +42,12 @@ class ResearcherSerializer(serializers.ModelSerializer):
     studies = serializers.PrimaryKeyRelatedField(
         many=True, read_only=True
     )
+    owner = serializers.ReadOnlyField(source='owner.username')
 
     class Meta:
         model = Researcher
-        fields = ('id', 'first_name', 'surname', 'email', 'studies', 'nes_id')
+        fields = ('id', 'first_name', 'surname', 'email', 'studies',
+                  'nes_id', 'owner')
 
 
 # API Views
@@ -57,7 +59,7 @@ class ExperimentList(generics.ListCreateAPIView):
     def perform_create(self, serializer):
         study_id = self.kwargs.get('pk')
         study = Study.objects.filter(id=study_id).get()
-        serializer.save(study=study, user=self.request.user)
+        serializer.save(study=study, owner=self.request.user)
 
 
 class StudyList(generics.ListCreateAPIView):
@@ -75,3 +77,6 @@ class ResearcherList(generics.ListCreateAPIView):
     queryset = Researcher.objects.all()
     serializer_class = ResearcherSerializer
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
+
+    def perform_create(self, serializer):
+        serializer.save(owner=self.request.user)

@@ -3,10 +3,11 @@ from django.contrib.auth.models import User
 
 
 class Researcher(models.Model):
-    first_name = models.CharField(max_length=150)
-    surname = models.CharField(max_length=150)
-    email = models.EmailField()
+    first_name = models.CharField(max_length=150, blank=True)
+    surname = models.CharField(max_length=150, blank=True)
+    email = models.EmailField(blank=True)
     nes_id = models.PositiveIntegerField()
+    owner = models.ForeignKey(User)
 
 
 class Study(models.Model):
@@ -23,4 +24,4 @@ class Experiment(models.Model):
     description = models.TextField()
     data_acquisition_done = models.BooleanField(default=False)
     study = models.ForeignKey(Study, related_name='experiments')
-    user = models.ForeignKey(User)
+    owner = models.ForeignKey(User)
