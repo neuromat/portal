@@ -47,6 +47,7 @@ class StudyModelTest(TestCase):
         self.assertEqual(study.description, '')
         self.assertEqual(study.start_date, None)
         self.assertEqual(study.end_date, None)
+        self.assertEqual(study.nes_id, None)
 
     def test_cannot_save_empty_attributes(self):
         study = Study(title='', description='', start_date='')
@@ -57,7 +58,7 @@ class StudyModelTest(TestCase):
     def test_study_is_related_to_researcher_and_owner(self):
         owner = User.objects.create_user(username='lab1')
         researcher = Researcher.objects.create(nes_id=1, owner=owner)
-        study = Study(start_date=datetime.utcnow())
+        study = Study(nes_id=1, start_date=datetime.utcnow())
         study.researcher = researcher
         study.owner = owner
         study.save()
@@ -72,14 +73,18 @@ class ExperimentModelTest(TestCase):
         self.assertEqual(experiment.title, '')
         self.assertEqual(experiment.description, '')
         self.assertEqual(experiment.data_acquisition_done, False)
+        self.assertEqual(experiment.nes_id, None)
 
     def test_cannot_save_empty_attributes(self):
         owner = User.objects.create(username='lab1')
         researcher = Researcher.objects.create(nes_id=1, owner=owner)
         study = Study.objects.create(
-            start_date=datetime.utcnow(), researcher=researcher, owner=owner)
+            nes_id=1, start_date=datetime.utcnow(), researcher=researcher,
+            owner=owner)
+        # TODO: why we need to pass nes_id, study and owner and in
+        # StudyModelTest's test_cannot_save_empty_attributes not?
         experiment = Experiment(
-            title='', description='', study=study, owner=owner
+            nes_id=1, title='', description='', study=study, owner=owner
         )
         with self.assertRaises(ValidationError):
             experiment.save()
@@ -89,8 +94,9 @@ class ExperimentModelTest(TestCase):
         owner = User.objects.create(username='lab1')
         researcher = Researcher.objects.create(nes_id=1, owner=owner)
         study = Study.objects.create(
-            start_date=datetime.utcnow(), researcher=researcher, owner=owner)
-        experiment = Experiment()
+            nes_id=1, start_date=datetime.utcnow(), researcher=researcher,
+            owner=owner)
+        experiment = Experiment(nes_id=1)
         experiment.study = study
         experiment.owner = owner
         experiment.save()

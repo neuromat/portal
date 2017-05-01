@@ -13,7 +13,7 @@ class ExperimentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Experiment
         fields = ('id', 'title', 'description', 'data_acquisition_done',
-                  'study', 'owner')
+                  'nes_id', 'study', 'owner')
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -36,7 +36,7 @@ class StudySerializer(serializers.ModelSerializer):
     class Meta:
         model = Study
         fields = ('id', 'title', 'description', 'start_date', 'end_date',
-                  'researcher', 'owner', 'experiments')
+                  'nes_id', 'researcher', 'owner', 'experiments')
 
 
 class ResearcherSerializer(serializers.ModelSerializer):

@@ -15,6 +15,7 @@ class Study(models.Model):
     description = models.TextField()
     start_date = models.DateField()
     end_date = models.DateField(null=True)
+    nes_id = models.PositiveIntegerField()
     researcher = models.ForeignKey(Researcher, related_name='studies',
                                    default=None)
     owner = models.ForeignKey(User)
@@ -24,5 +25,6 @@ class Experiment(models.Model):
     title = models.CharField(max_length=150)
     description = models.TextField()
     data_acquisition_done = models.BooleanField(default=False)
+    nes_id = models.PositiveIntegerField()
     study = models.ForeignKey(Study, related_name='experiments')
     owner = models.ForeignKey(User)

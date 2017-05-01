@@ -66,11 +66,11 @@ class StudyAPITest(APITestCase):
         owner = User.objects.create_user(username='lab1')
         researcher = Researcher.objects.create(nes_id=1, owner=owner)
         study1 = Study.objects.create(
-            title='Um estudo', description='Uma descrição',
+            nes_id=1, title='Um estudo', description='Uma descrição',
             start_date=datetime.utcnow(), researcher=researcher, owner=owner
         )
         study2 = Study.objects.create(
-            title='Outro estudo', description='Outra descrição',
+            nes_id=2, title='Outro estudo', description='Outra descrição',
             start_date=datetime.utcnow(), researcher=researcher, owner=owner
         )
         response = self.client.get(self.base_url)
@@ -83,6 +83,7 @@ class StudyAPITest(APITestCase):
                     'description': study1.description,
                     'start_date': study1.start_date.strftime('%Y-%m-%d'),
                     'end_date': study1.end_date,
+                    'nes_id': study1.nes_id,
                     'researcher': study1.researcher.first_name,
                     'experiments': [],
                     'owner': study1.owner.username
@@ -93,6 +94,7 @@ class StudyAPITest(APITestCase):
                     'description': study2.description,
                     'start_date': study2.start_date.strftime('%Y-%m-%d'),
                     'end_date': study2.end_date,
+                    'nes_id': study2.nes_id,
                     'researcher': study2.researcher.first_name,
                     'experiments': [],
                     'owner': study1.owner.username
@@ -111,6 +113,7 @@ class StudyAPITest(APITestCase):
                 'title': 'New study',
                 'description': 'Some description',
                 'start_date': datetime.utcnow().strftime('%Y-%m-%d'),
+                'nes_id': 1
             }
         )
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
@@ -141,16 +144,17 @@ class ExperimentAPITest(APITestCase):
         # doesn't pass. But in the first User instance created (other_user
         # above), without username, test pass.
         study = Study.objects.create(
-            start_date=datetime.utcnow(), researcher=researcher, owner=owner
+            nes_id=1, start_date=datetime.utcnow(), researcher=researcher,
+            owner=owner
         )
 
         experiment1 = Experiment.objects.create(
-            title='Our title', description='Our description',
+            nes_id=1, title='Our title', description='Our description',
             study=study, owner=owner
         )
         experiment2 = Experiment.objects.create(
-            title='Our second title', description='Our second description',
-            study=study, owner=owner
+            nes_id=2, title='Our second title',
+            description='Our second description', study=study, owner=owner
         )
         response = self.client.get(self.base_url)
         self.assertEqual(
@@ -162,6 +166,7 @@ class ExperimentAPITest(APITestCase):
                     'description': experiment1.description,
                     'data_acquisition_done':
                         experiment1.data_acquisition_done,
+                    'nes_id': experiment1.nes_id,
                     'study': experiment1.study.title,
                     'owner': experiment1.owner.username
                 },
@@ -171,6 +176,7 @@ class ExperimentAPITest(APITestCase):
                     'description': experiment2.description,
                     'data_acquisition_done':
                         experiment2.data_acquisition_done,
+                    'nes_id': experiment2.nes_id,
                     'study': experiment2.study.title,
                     'owner': experiment2.owner.username
                 }
@@ -183,7 +189,8 @@ class ExperimentAPITest(APITestCase):
         )
         researcher = Researcher.objects.create(nes_id=1, owner=owner)
         study = Study.objects.create(
-            start_date=datetime.utcnow(), researcher=researcher, owner=owner
+            nes_id=1, start_date=datetime.utcnow(), researcher=researcher,
+            owner=owner
         )
         self.client.login(username=owner.username, password='nep-lab1')
         url = reverse('api_experiments_post', args=[study.id])
@@ -191,7 +198,8 @@ class ExperimentAPITest(APITestCase):
             url,
             {
                 'title': 'New experiment',
-                'description': 'Some description'
+                'description': 'Some description',
+                'nes_id': 1
             }
         )
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
