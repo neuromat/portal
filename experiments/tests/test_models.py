@@ -20,12 +20,19 @@ class ResearcherModelTest(TestCase):
         with self.assertRaises(ValidationError):
             researcher.full_clean()
 
-    def test_cannot_save_same_nes_id_and_owner(self):
+    def test_duplicate_researchers_are_invalid(self):
         owner = User.objects.create_user(username='lab1')
         Researcher.objects.create(nes_id=1, owner=owner)
         researcher = Researcher(nes_id=1, owner=owner)
         with self.assertRaises(ValidationError):
             researcher.full_clean()
+
+    def test_CAN_save_same_researcher_to_different_owners(self):
+        owner1 = User.objects.create_user(username='lab1')
+        owner2 = User.objects.create_user(username='lab2')
+        Researcher.objects.create(nes_id=1, owner=owner1)
+        researcher = Researcher(nes_id=1, owner=owner2)
+        researcher.full_clean()
 
     def test_researcher_is_related_to_owner(self):
         owner = User.objects.create_user(username='lab1')
