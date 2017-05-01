@@ -16,21 +16,16 @@ class ResearcherModelTest(TestCase):
         self.assertEqual(researcher.nes_id, None)
 
     def test_cannot_save_empty_attributes(self):
-        pass
-        # TODO: It's not possible test all fields empty because with a
-        # PositiveIntegerField the constructor does not allow to create the
-        # object without an allowed value.
-        # See other tests here and the tests in test_api.py that creates a
-        # Researcher object.
-        # With nes_id=None django generates error when calling
-        # Researcher constructor. With nes_id=1, the test fails (
-        # ValidationError not raised) because researcher was saved.
-        # By now commented.
-        #
-        # researcher = Researcher(nes_id=None)
-        # with self.assertRaises(ValidationError):
-        #     researcher.save()
-        #     researcher.full_clean()
+        researcher = Researcher(nes_id=None)
+        with self.assertRaises(ValidationError):
+            researcher.full_clean()
+
+    def test_cannot_save_same_nes_id_and_owner(self):
+        owner = User.objects.create_user(username='lab1')
+        Researcher.objects.create(nes_id=1, owner=owner)
+        researcher = Researcher(nes_id=1, owner=owner)
+        with self.assertRaises(ValidationError):
+            researcher.full_clean()
 
     def test_researcher_is_related_to_owner(self):
         owner = User.objects.create_user(username='lab1')

@@ -9,6 +9,9 @@ class Researcher(models.Model):
     nes_id = models.PositiveIntegerField()
     owner = models.ForeignKey(User)
 
+    class Meta:
+        unique_together = ('nes_id', 'owner')
+
 
 class Study(models.Model):
     title = models.CharField(max_length=150)
