@@ -75,9 +75,11 @@ class StudyModelTest(TestCase):
         researcher2 = Researcher.objects.create(nes_id=1, owner=owner2)
         Study.objects.create(nes_id=1, start_date=datetime.utcnow(),
                              researcher=researcher1, owner=owner1)
-        study = Study(nes_id=1, start_date=datetime.utcnow(),
+        study = Study(title='A title', description='A description', nes_id=1,
+                      start_date=datetime.utcnow(),
+                      end_date=datetime.utcnow(), 
                       researcher=researcher2, owner=owner2)
-        study.save()
+        study.full_clean()
 
     def test_study_is_related_to_researcher_and_owner(self):
         owner = User.objects.create_user(username='lab1')
@@ -113,6 +115,31 @@ class ExperimentModelTest(TestCase):
         with self.assertRaises(ValidationError):
             experiment.save()
             experiment.full_clean()
+
+    def test_duplicate_experiments_are_invalid(self):
+        owner = User.objects.create_user(username='lab1')
+        researcher = Researcher.objects.create(nes_id=1, owner=owner)
+        study = Study.objects.create(nes_id=1, start_date=datetime.utcnow(),
+                                     researcher=researcher, owner=owner)
+        Experiment.objects.create(nes_id=1, study=study, owner=owner)
+        experiment = Experiment(nes_id=1, study=study, owner=owner)
+        with self.assertRaises(ValidationError):
+            experiment.full_clean()
+
+    def test_CAN_save_same_experiment_to_different_owners(self):
+        owner1 = User.objects.create_user(username='lab1')
+        owner2 = User.objects.create_user(username='lab2')
+        researcher1 = Researcher.objects.create(nes_id=1, owner=owner1)
+        researcher2 = Researcher.objects.create(nes_id=1, owner=owner2)
+        study1 = Study.objects.create(nes_id=1, start_date=datetime.utcnow(),
+                                      researcher=researcher1, owner=owner1)
+        study2 = Study.objects.create(nes_id=1, start_date=datetime.utcnow(),
+                                      researcher=researcher2, owner=owner2)
+        Experiment.objects.create(nes_id=1, study=study1, owner=owner1)
+        experiment = Experiment(title='A title', description='A description',
+                                nes_id=1, study=study2, owner=owner2)
+        experiment.full_clean()
+
 
     def test_experiment_is_related_to_study_and_owner(self):
         owner = User.objects.create(username='lab1')
