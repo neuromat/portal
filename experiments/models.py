@@ -34,3 +34,6 @@ class Experiment(models.Model):
     nes_id = models.PositiveIntegerField()
     study = models.ForeignKey(Study, related_name='experiments')
     owner = models.ForeignKey(User)
+
+    class Meta:
+        unique_together = ('nes_id', 'owner')
