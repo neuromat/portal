@@ -17,6 +17,7 @@ class Study(models.Model):
     end_date = models.DateField(null=True)
     researcher = models.ForeignKey(Researcher, related_name='studies',
                                    default=None)
+    owner = models.ForeignKey(User)
 
 
 class Experiment(models.Model):

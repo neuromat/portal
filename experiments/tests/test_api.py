@@ -42,8 +42,8 @@ class ResearcherAPITest(APITestCase):
         )
 
     def test_POSTing_a_new_researcher(self):
-        user = User.objects.create_user(username='lab1', password='nep-lab1')
-        self.client.login(username=user.username, password='nep-lab1')
+        owner = User.objects.create_user(username='lab1', password='nep-lab1')
+        self.client.login(username=owner.username, password='nep-lab1')
         response = self.client.post(
             self.base_url,
             {
@@ -67,11 +67,11 @@ class StudyAPITest(APITestCase):
         researcher = Researcher.objects.create(nes_id=1, owner=owner)
         study1 = Study.objects.create(
             title='Um estudo', description='Uma descrição',
-            start_date=datetime.utcnow(), researcher=researcher
+            start_date=datetime.utcnow(), researcher=researcher, owner=owner
         )
         study2 = Study.objects.create(
             title='Outro estudo', description='Outra descrição',
-            start_date=datetime.utcnow(), researcher=researcher
+            start_date=datetime.utcnow(), researcher=researcher, owner=owner
         )
         response = self.client.get(self.base_url)
         self.assertEqual(
@@ -84,7 +84,8 @@ class StudyAPITest(APITestCase):
                     'start_date': study1.start_date.strftime('%Y-%m-%d'),
                     'end_date': study1.end_date,
                     'researcher': study1.researcher.first_name,
-                    'experiments': []
+                    'experiments': [],
+                    'owner': study1.owner.username
                 },
                 {
                     'id': study2.id,
@@ -93,15 +94,16 @@ class StudyAPITest(APITestCase):
                     'start_date': study2.start_date.strftime('%Y-%m-%d'),
                     'end_date': study2.end_date,
                     'researcher': study2.researcher.first_name,
-                    'experiments': []
+                    'experiments': [],
+                    'owner': study1.owner.username
                 },
             ]
         )
 
     def test_POSTing_a_new_study(self):
-        user = User.objects.create_user(username='lab1', password='nep-lab1')
-        researcher = Researcher.objects.create(nes_id=1, owner=user)
-        self.client.login(username=user.username, password='nep-lab1')
+        owner = User.objects.create_user(username='lab1', password='nep-lab1')
+        researcher = Researcher.objects.create(nes_id=1, owner=owner)
+        self.client.login(username=owner.username, password='nep-lab1')
         url = reverse('api_studies_post', args=[researcher.id])
         response = self.client.post(
             url,
@@ -139,7 +141,7 @@ class ExperimentAPITest(APITestCase):
         # doesn't pass. But in the first User instance created (other_user
         # above), without username, test pass.
         study = Study.objects.create(
-            start_date=datetime.utcnow(), researcher=researcher
+            start_date=datetime.utcnow(), researcher=researcher, owner=owner
         )
 
         experiment1 = Experiment.objects.create(
@@ -176,14 +178,14 @@ class ExperimentAPITest(APITestCase):
         )
 
     def test_POSTing_a_new_experiment_to_an_existing_study(self):
-        user = User.objects.create_user(
+        owner = User.objects.create_user(
             username='lab1', password='nep-lab1'
         )
-        researcher = Researcher.objects.create(nes_id=1, owner=user)
+        researcher = Researcher.objects.create(nes_id=1, owner=owner)
         study = Study.objects.create(
-            start_date=datetime.utcnow(), researcher=researcher
+            start_date=datetime.utcnow(), researcher=researcher, owner=owner
         )
-        self.client.login(username=user.username, password='nep-lab1')
+        self.client.login(username=owner.username, password='nep-lab1')
         url = reverse('api_experiments_post', args=[study.id])
         response = self.client.post(
             url,

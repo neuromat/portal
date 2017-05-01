@@ -23,7 +23,7 @@ class ResearcherModelTest(TestCase):
         # See other tests here and the tests in test_api.py that creates a
         # Researcher object.
         # With nes_id=None django generates error when calling
-        # Researcer constructor. With nes_id=1, the test fails (
+        # Researcher constructor. With nes_id=1, the test fails (
         # ValidationError not raised) because researcher was saved.
         # By now commented.
         #
@@ -36,7 +36,7 @@ class ResearcherModelTest(TestCase):
         owner = User.objects.create_user(username='lab1')
         researcher = Researcher(nes_id=1, owner=owner)
         researcher.save()
-        self.assertIn(owner, owner.researcher_set.all())
+        self.assertIn(researcher, owner.researcher_set.all())
 
 
 class StudyModelTest(TestCase):
@@ -54,13 +54,15 @@ class StudyModelTest(TestCase):
             study.save()
             study.full_clean()
 
-    def test_study_is_related_to_researcher(self):
+    def test_study_is_related_to_researcher_and_owner(self):
         owner = User.objects.create_user(username='lab1')
         researcher = Researcher.objects.create(nes_id=1, owner=owner)
         study = Study(start_date=datetime.utcnow())
         study.researcher = researcher
+        study.owner = owner
         study.save()
         self.assertIn(study, researcher.studies.all())
+        self.assertIn(study, owner.study_set.all())
 
 
 class ExperimentModelTest(TestCase):
@@ -75,7 +77,7 @@ class ExperimentModelTest(TestCase):
         owner = User.objects.create(username='lab1')
         researcher = Researcher.objects.create(nes_id=1, owner=owner)
         study = Study.objects.create(
-            start_date=datetime.utcnow(), researcher=researcher)
+            start_date=datetime.utcnow(), researcher=researcher, owner=owner)
         experiment = Experiment(
             title='', description='', study=study, owner=owner
         )
@@ -83,14 +85,14 @@ class ExperimentModelTest(TestCase):
             experiment.save()
             experiment.full_clean()
 
-    def test_experiment_is_related_to_study_and_user(self):
+    def test_experiment_is_related_to_study_and_owner(self):
         owner = User.objects.create(username='lab1')
         researcher = Researcher.objects.create(nes_id=1, owner=owner)
         study = Study.objects.create(
-            start_date=datetime.utcnow(), researcher=researcher)
+            start_date=datetime.utcnow(), researcher=researcher, owner=owner)
         experiment = Experiment()
-        experiment.owner = owner
         experiment.study = study
+        experiment.owner = owner
         experiment.save()
         self.assertIn(experiment, study.experiments.all())
         self.assertIn(experiment, owner.experiment_set.all())

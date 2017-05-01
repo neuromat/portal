@@ -28,6 +28,7 @@ class UserSerializer(serializers.ModelSerializer):
 
 class StudySerializer(serializers.ModelSerializer):
     researcher = serializers.ReadOnlyField(source='researcher.first_name')
+    owner = serializers.ReadOnlyField(source='owner.username')
     experiments = serializers.PrimaryKeyRelatedField(
         many=True, read_only=True
     )
@@ -35,7 +36,7 @@ class StudySerializer(serializers.ModelSerializer):
     class Meta:
         model = Study
         fields = ('id', 'title', 'description', 'start_date', 'end_date',
-                  'researcher', 'experiments')
+                  'researcher', 'owner', 'experiments')
 
 
 class ResearcherSerializer(serializers.ModelSerializer):
@@ -70,7 +71,7 @@ class StudyList(generics.ListCreateAPIView):
     def perform_create(self, serializer):
         researcher_id = self.kwargs.get('pk')
         researcher = Researcher.objects.filter(id=researcher_id).get()
-        serializer.save(researcher=researcher)
+        serializer.save(researcher=researcher, owner=self.request.user)
 
 
 class ResearcherList(generics.ListCreateAPIView):
