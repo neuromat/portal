@@ -77,7 +77,7 @@ class StudyModelTest(TestCase):
                              researcher=researcher1, owner=owner1)
         study = Study(title='A title', description='A description', nes_id=1,
                       start_date=datetime.utcnow(),
-                      end_date=datetime.utcnow(),
+                      end_date=datetime.utcnow(), 
                       researcher=researcher2, owner=owner2)
         study.full_clean()
 
