@@ -23,6 +23,9 @@ class Study(models.Model):
                                    default=None)
     owner = models.ForeignKey(User)
 
+    class Meta:
+        unique_together = ('nes_id', 'owner')
+
 
 class Experiment(models.Model):
     title = models.CharField(max_length=150)

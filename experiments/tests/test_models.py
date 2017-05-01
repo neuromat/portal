@@ -57,6 +57,28 @@ class StudyModelTest(TestCase):
             study.save()
             study.full_clean()
 
+    def test_duplicate_studies_are_invalid(self):
+        owner = User.objects.create_user(username='lab1')
+        researcher1 = Researcher.objects.create(nes_id=1, owner=owner)
+        researcher2 = Researcher.objects.create(nes_id=2, owner=owner)
+        Study.objects.create(nes_id=1, start_date=datetime.utcnow(),
+                             researcher=researcher1, owner=owner)
+        study = Study(nes_id=1, start_date=datetime.utcnow(),
+                      researcher=researcher2, owner=owner)
+        with self.assertRaises(ValidationError):
+            study.full_clean()
+
+    def test_CAN_save_same_study_to_different_owners(self):
+        owner1 = User.objects.create_user(username='lab1')
+        owner2 = User.objects.create_user(username='lab2')
+        researcher1 = Researcher.objects.create(nes_id=1, owner=owner1)
+        researcher2 = Researcher.objects.create(nes_id=1, owner=owner2)
+        Study.objects.create(nes_id=1, start_date=datetime.utcnow(),
+                             researcher=researcher1, owner=owner1)
+        study = Study(nes_id=1, start_date=datetime.utcnow(),
+                      researcher=researcher2, owner=owner2)
+        study.save()
+
     def test_study_is_related_to_researcher_and_owner(self):
         owner = User.objects.create_user(username='lab1')
         researcher = Researcher.objects.create(nes_id=1, owner=owner)
