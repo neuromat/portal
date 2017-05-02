@@ -199,3 +199,18 @@ class ProtocolComponentModelTest(TestCase):
         with self.assertRaises(ValidationError):
             protocol_component.save()
             protocol_component.full_clean()
+
+    def test_duplicate_protocol_components_are_invalid(self):
+        owner = User.objects.create(username='lab2')
+        experiment = create_experiment(nes_id=1)
+        ProtocolComponent.objects.create(nes_id=1, experiment=experiment,
+                                         owner=owner)
+        protocol_component = ProtocolComponent(
+            nes_id=1, identification='An identification',
+            duration_value=10, component_type='A component type',
+            experiment=experiment, owner=owner
+        )
+        with self.assertRaises(ValidationError):
+            protocol_component.save()
+            protocol_component.full_clean()
+

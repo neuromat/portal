@@ -48,3 +48,6 @@ class ProtocolComponent(models.Model):
     experiment = models.ForeignKey(Experiment,
                                    related_name='protocol_components')
     owner = models.ForeignKey(User)
+
+    class Meta:
+        unique_together = ('nes_id', 'owner')
