@@ -100,11 +100,10 @@ class StudyModelTest(TestCase):
         study.full_clean()
 
     def test_study_is_related_to_researcher_and_owner(self):
-        owner = User.objects.create_user(username='lab1')
-        researcher = Researcher.objects.create(nes_id=1, owner=owner)
-        study = Study(nes_id=1, start_date=datetime.utcnow())
-        study.researcher = researcher
-        study.owner = owner
+        owner = User.objects.create(username='lab1')
+        researcher = create_researcher(nes_id=1, username='lab2')
+        study = Study(nes_id=1, start_date=datetime.utcnow(),
+                      researcher=researcher, owner=owner)
         study.save()
         self.assertIn(study, researcher.studies.all())
         self.assertIn(study, owner.study_set.all())
@@ -162,14 +161,9 @@ class ExperimentModelTest(TestCase):
 
 
     def test_experiment_is_related_to_study_and_owner(self):
-        owner = User.objects.create(username='lab1')
-        researcher = Researcher.objects.create(nes_id=1, owner=owner)
-        study = Study.objects.create(
-            nes_id=1, start_date=datetime.utcnow(), researcher=researcher,
-            owner=owner)
-        experiment = Experiment(nes_id=1)
-        experiment.study = study
-        experiment.owner = owner
+        owner = User.objects.create(username='lab2')
+        study = create_study(nes_id=1)
+        experiment = Experiment(nes_id=1, study=study, owner=owner)
         experiment.save()
         self.assertIn(experiment, study.experiments.all())
         self.assertIn(experiment, owner.experiment_set.all())
@@ -186,16 +180,16 @@ class ProtocolComponentModelTest(TestCase):
         self.assertEqual(protocol_component.nes_id, None)
 
     def test_protocol_component_is_related_to_experiment_and_owner(self):
+        owner = User.objects.create(username='lab2')
         experiment = create_experiment(nes_id=1)
         protocolcomponent = ProtocolComponent(
             identification='An identification',
             component_type='A component type',
-            nes_id=1, experiment=experiment, owner=experiment.owner
+            nes_id=1, experiment=experiment, owner=owner
         )
         protocolcomponent.save()
         self.assertIn(protocolcomponent, experiment.protocol_components.all())
-        self.assertIn(protocolcomponent,
-                      experiment.owner.protocolcomponent_set.all())
+        self.assertIn(protocolcomponent, owner.protocolcomponent_set.all())
 
     # def test_cannot_save_empty_attributes(self):
     #     owner = User.objects.create_user(username='lab1')
