@@ -191,20 +191,13 @@ class ProtocolComponentModelTest(TestCase):
         self.assertIn(protocolcomponent, experiment.protocol_components.all())
         self.assertIn(protocolcomponent, owner.protocolcomponent_set.all())
 
-    # def test_cannot_save_empty_attributes(self):
-    #     owner = User.objects.create_user(username='lab1')
-    #     researcher = Researcher.objects.create(nes_id=1, owner=owner)
-    #     study = Study.objects.create(
-    #         nes_id=1, start_date=datetime.utcnow(), researcher=researcher,
-    #         owner=owner)
-    #     experiment = Experiment.objects.create(
-    #         nes_id=1, title='A title', description='A description',
-    #         study=study, owner=owner
-    #     )
-    #     protocol_component = ProtocolComponent(
-    #         identification='', component_type='', nes_id=None,
-    #         experiment=experiment
-    #     )
-    #     with self.assertRaises(ValidationError):
-    #         protocol_component.save()
-    #         protocol_component.full_clean()
+    def test_cannot_save_empty_attributes(self):
+        owner = User.objects.create(username='lab2')
+        experiment = create_experiment(nes_id=1)
+        protocol_component = ProtocolComponent(
+            identification='', component_type='', nes_id=1,
+            experiment=experiment, owner=owner
+        )
+        with self.assertRaises(ValidationError):
+            protocol_component.save()
+            protocol_component.full_clean()
