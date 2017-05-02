@@ -3,7 +3,7 @@ from django.core.exceptions import ValidationError
 from django.contrib.auth.models import User
 from datetime import datetime
 
-from experiments.models import Experiment, Study, Researcher
+from experiments.models import Experiment, Study, Researcher, ProtocolComponent
 
 
 class ResearcherModelTest(TestCase):
@@ -153,3 +153,51 @@ class ExperimentModelTest(TestCase):
         experiment.save()
         self.assertIn(experiment, study.experiments.all())
         self.assertIn(experiment, owner.experiment_set.all())
+
+
+class ProtocolComponentModelTest(TestCase):
+
+    def test_default_attributes(self):
+        protocol_component = ProtocolComponent()
+        self.assertEqual(protocol_component.identification, '')
+        self.assertEqual(protocol_component.description, '')
+        self.assertEqual(protocol_component.duration_value, None)
+        self.assertEqual(protocol_component.component_type, '')
+        self.assertEqual(protocol_component.nes_id, None)
+
+    def test_protocol_component_is_related_to_experiment_and_owner(self):
+        owner = User.objects.create_user(username='lab1')
+        researcher = Researcher.objects.create(nes_id=1, owner=owner)
+        study = Study.objects.create(
+            nes_id=1, start_date=datetime.utcnow(), researcher=researcher,
+            owner=owner)
+        experiment = Experiment.objects.create(
+            nes_id=1, title='A title', description='A description',
+            study=study, owner=owner
+        )
+        protocolcomponent = ProtocolComponent(
+            identification='An identification',
+            component_type='A component type',
+            nes_id=1, experiment=experiment, owner=owner
+        )
+        protocolcomponent.save()
+        self.assertIn(protocolcomponent, experiment.protocol_components.all())
+        self.assertIn(protocolcomponent, owner.protocolcomponent_set.all())
+
+    # def test_cannot_save_empty_attributes(self):
+    #     owner = User.objects.create_user(username='lab1')
+    #     researcher = Researcher.objects.create(nes_id=1, owner=owner)
+    #     study = Study.objects.create(
+    #         nes_id=1, start_date=datetime.utcnow(), researcher=researcher,
+    #         owner=owner)
+    #     experiment = Experiment.objects.create(
+    #         nes_id=1, title='A title', description='A description',
+    #         study=study, owner=owner
+    #     )
+    #     protocol_component = ProtocolComponent(
+    #         identification='', component_type='', nes_id=None,
+    #         experiment=experiment
+    #     )
+    #     with self.assertRaises(ValidationError):
+    #         protocol_component.save()
+    #         protocol_component.full_clean()

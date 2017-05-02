@@ -1,19 +1,21 @@
-from django.http import HttpResponse
-from rest_framework import status, serializers, generics, permissions
-import json
+from rest_framework import serializers, generics, permissions
 
-from experiments.models import Experiment, Study, User, Researcher
+from experiments.models import Experiment, Study, User, Researcher, \
+    ProtocolComponent
 
 
 # API Serializers
 class ExperimentSerializer(serializers.ModelSerializer):
     study = serializers.ReadOnlyField(source='study.title')
     owner = serializers.ReadOnlyField(source='owner.username')
+    protocol_components = serializers.PrimaryKeyRelatedField(
+        many=True, read_only=True
+    )
 
     class Meta:
         model = Experiment
         fields = ('id', 'title', 'description', 'data_acquisition_done',
-                  'nes_id', 'study', 'owner')
+                  'nes_id', 'study', 'owner', 'protocol_components')
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -51,6 +53,16 @@ class ResearcherSerializer(serializers.ModelSerializer):
                   'nes_id', 'owner')
 
 
+# class ProtocolComponentSerializer(serializers.ModelSerializer):
+#     owner = serializers.ReadOnlyField(source='owner.username')
+#     experiment = serializers.ReadOnlyField(source='experiment.title')
+#
+#     class Meta:
+#         model = ProtocolComponent
+#         fields = ('id', 'identification', 'description', 'duration_value',
+#                   'component_type', 'nes_id', 'experiment', 'owner')
+
+
 # API Views
 class ExperimentList(generics.ListCreateAPIView):
     queryset = Experiment.objects.all()
@@ -81,3 +93,14 @@ class ResearcherList(generics.ListCreateAPIView):
 
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
+
+
+# class ProtocolComponentList(generics.ListCreateAPIView):
+#     queryset = ProtocolComponent.objects.all()
+#     serializer_class = ProtocolComponentSerializer
+#     permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
+#
+#     def perform_create(self, serializer):
+#         experiment_id = self.kwargs.get('pk')
+#         experiment = Experiment.objects.filter(id=experiment_id).get()
+#         serializer.save(experiment=experiment, owner=self.request.user)

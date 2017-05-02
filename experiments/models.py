@@ -37,3 +37,14 @@ class Experiment(models.Model):
 
     class Meta:
         unique_together = ('nes_id', 'owner')
+
+
+class ProtocolComponent(models.Model):
+    identification = models.CharField(max_length=50)
+    description = models.TextField(blank=True)
+    duration_value = models.IntegerField(null=True)
+    component_type = models.CharField(max_length=30)
+    nes_id = models.PositiveIntegerField()
+    experiment = models.ForeignKey(Experiment,
+                                   related_name='protocol_components')
+    owner = models.ForeignKey(User)

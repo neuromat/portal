@@ -168,7 +168,8 @@ class ExperimentAPITest(APITestCase):
                         experiment1.data_acquisition_done,
                     'nes_id': experiment1.nes_id,
                     'study': experiment1.study.title,
-                    'owner': experiment1.owner.username
+                    'owner': experiment1.owner.username,
+                    'protocol_components': []
                 },
                 {
                     'id': experiment2.id,
@@ -178,7 +179,8 @@ class ExperimentAPITest(APITestCase):
                         experiment2.data_acquisition_done,
                     'nes_id': experiment2.nes_id,
                     'study': experiment2.study.title,
-                    'owner': experiment2.owner.username
+                    'owner': experiment2.owner.username,
+                    'protocol_components': []
                 }
             ]
         )
