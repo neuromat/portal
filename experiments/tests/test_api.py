@@ -129,7 +129,7 @@ class StudyAPITest(APITestCase):
 class ExperimentAPITest(APITestCase):
     base_url = reverse('api_experiments')
 
-    # This test is following tutorial. Not necessary because is
+    # TODO: This test is following tutorial. Not necessary because is
     # django-rest-framework. By default object returned is json.
     def test_get_returns_json_200(self):
         response = self.client.get(self.base_url)
@@ -209,7 +209,8 @@ class ExperimentAPITest(APITestCase):
         new_experiment = Experiment.objects.first()
         self.assertEqual(new_experiment.title, 'New experiment')
 
-    # TODO: os testes de validações ainda não foram implementados.
-    # Ver:
-    # http://www.obeythetestinggoat.com/book/appendix_rest_api.html#_data_validation_an_exercise_for_the_reader
+
+# TODO: os testes de validações ainda não foram implementados.
+# Ver:
+# http://www.obeythetestinggoat.com/book/appendix_rest_api.html#_data_validation_an_exercise_for_the_reader
 
