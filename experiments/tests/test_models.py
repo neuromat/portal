@@ -134,10 +134,8 @@ class ExperimentModelTest(TestCase):
             experiment.full_clean()
 
     def test_duplicate_experiments_are_invalid(self):
-        owner = User.objects.create_user(username='lab1')
-        researcher = Researcher.objects.create(nes_id=1, owner=owner)
-        study = Study.objects.create(nes_id=1, start_date=datetime.utcnow(),
-                                     researcher=researcher, owner=owner)
+        owner = User.objects.create_user(username='lab2')
+        study = create_study(nes_id=1)
         Experiment.objects.create(nes_id=1, study=study, owner=owner)
         experiment = Experiment(nes_id=1, study=study, owner=owner)
         with self.assertRaises(ValidationError):
