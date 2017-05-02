@@ -214,3 +214,11 @@ class ProtocolComponentModelTest(TestCase):
             protocol_component.save()
             protocol_component.full_clean()
 
+    def test_CAN_save_same_protocol_components_to_different_owners(self):
+        owner1 = User.objects.create(username='lab2')
+        owner2 = User.objects.create(username='lab3')
+        experiment = create_experiment(nes_id=1)
+        ProtocolComponent.objects.create(nes_id=1, experiment=experiment,
+                                         owner=owner1)
+        ProtocolComponent.objects.create(nes_id=1, experiment=experiment,
+                                         owner=owner2)
