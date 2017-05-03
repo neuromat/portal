@@ -228,7 +228,7 @@ class ProtocolComponentAPITest(APITestCase):
             component_type='Other component type',
             nes_id=2, experiment=experiment, owner=owner
         )
-        response = self.client.get(reverse('api_protocolcomponents_post'))
+        response = self.client.get(reverse('api_protocolcomponents'))
         self.assertEqual(
             json.loads(response.content.decode('utf8')),
             [
@@ -256,7 +256,25 @@ class ProtocolComponentAPITest(APITestCase):
         )
 
     def test_POSTing_a_new_protocolcomponent_to_an_existing_experiment(self):
-        pass
+        owner = User.objects.create_user(username='lab1', password='nep-lab1')
+        experiment = create_experiment(nes_id=1, owner=owner)
+        self.client.login(username=owner.username, password='nep-lab1')
+        url = reverse('api_protocolcomponents_post', args=[experiment.id])
+        response = self.client.post(
+            url,
+            {
+                'identification': 'An identification',
+                'description': 'A description',
+                'duration_value': 4,
+                'component_type': 'A component type',
+                'nes_id': 1,
+            }
+        )
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.client.logout()
+        new_protocolcomponent = ProtocolComponent.objects.first()
+        self.assertEqual(new_protocolcomponent.identification,
+                         'An identification')
 
 
 # TODO: os testes de validações ainda não foram implementados.
