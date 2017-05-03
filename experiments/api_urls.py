@@ -1,8 +1,13 @@
 from django.conf.urls import url
 from experiments import api
 
+api_researchers = api.ResearcherViewSet.as_view({
+    'get': 'list', 'post': 'create'
+})
+
+
 urlpatterns = [
-    url(r'^researchers/$', api.ResearcherList.as_view(),
+    url(r'^researchers/$', api_researchers,
         name='api_researchers'),
     url(r'^studies/$', api.StudyList.as_view(), name='api_studies'),
     url(r'^researchers/(?P<pk>[0-9]+)/studies/$', api.StudyList.as_view(),

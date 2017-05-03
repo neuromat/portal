@@ -1,4 +1,4 @@
-from rest_framework import serializers, generics, permissions
+from rest_framework import serializers, generics, permissions, viewsets
 
 from experiments.models import Experiment, Study, User, Researcher, \
     ProtocolComponent
@@ -64,7 +64,7 @@ class ProtocolComponentSerializer(serializers.ModelSerializer):
 
 
 # API Views
-class ResearcherList(generics.ListCreateAPIView):
+class ResearcherViewSet(viewsets.ModelViewSet):
     queryset = Researcher.objects.all()
     serializer_class = ResearcherSerializer
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
