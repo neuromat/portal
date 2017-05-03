@@ -1,14 +1,14 @@
-from django.conf.urls import url
+from django.conf.urls import url, include
+from rest_framework.routers import DefaultRouter
 from experiments import api
 
-api_researchers = api.ResearcherViewSet.as_view({
-    'get': 'list', 'post': 'create'
-})
-
+# Create a router and register our viewsets with it.
+router = DefaultRouter()
+router.register(r'researchers', api.ResearcherViewSet,
+                base_name='api_researchers')
 
 urlpatterns = [
-    url(r'^researchers/$', api_researchers,
-        name='api_researchers'),
+    url(r'^', include(router.urls)),
     url(r'^studies/$', api.StudyList.as_view(), name='api_studies'),
     url(r'^researchers/(?P<pk>[0-9]+)/studies/$', api.StudyList.as_view(),
         name='api_studies_post'),

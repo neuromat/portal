@@ -41,7 +41,7 @@ def create_experiment(nes_id, owner):
 
 
 class ResearcherAPITest(APITestCase):
-    base_url = reverse('api_researchers')
+    base_url = reverse('api_researchers-list')
 
     def test_get_returns_all_researchers(self):
         owner = User.objects.create_user(username='lab1')
