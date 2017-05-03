@@ -11,8 +11,8 @@ from experiments.models import Experiment, Researcher, Study, ProtocolComponent
 def create_study(nes_id, owner):
     """
     Create Study model object to be used to test classes below.
-    :param nes_id: 
-    :param owner: 
+    :param nes_id: client nes id
+    :param owner: client owner
     :return: 
     """
     researcher = Researcher.objects.create(nes_id=nes_id, owner=owner)
@@ -29,8 +29,8 @@ def create_study(nes_id, owner):
 def create_experiment(nes_id, owner):
     """
     Create Experiment model object to be used to test classes below.
-    :param nes_id: 
-    :param owner: 
+    :param nes_id: client nes id
+    :param owner: client owner 
     :return: 
     """
     study = create_study(nes_id=nes_id, owner=owner)
@@ -254,6 +254,9 @@ class ProtocolComponentAPITest(APITestCase):
                 }
             ]
         )
+
+    def test_POSTing_a_new_protocolcomponent_to_an_existing_experiment(self):
+        pass
 
 
 # TODO: os testes de validações ainda não foram implementados.
