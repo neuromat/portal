@@ -53,14 +53,14 @@ class ResearcherSerializer(serializers.ModelSerializer):
                   'nes_id', 'owner')
 
 
-# class ProtocolComponentSerializer(serializers.ModelSerializer):
-#     owner = serializers.ReadOnlyField(source='owner.username')
-#     experiment = serializers.ReadOnlyField(source='experiment.title')
-#
-#     class Meta:
-#         model = ProtocolComponent
-#         fields = ('id', 'identification', 'description', 'duration_value',
-#                   'component_type', 'nes_id', 'experiment', 'owner')
+class ProtocolComponentSerializer(serializers.ModelSerializer):
+    owner = serializers.ReadOnlyField(source='owner.username')
+    experiment = serializers.ReadOnlyField(source='experiment.title')
+
+    class Meta:
+        model = ProtocolComponent
+        fields = ('id', 'identification', 'description', 'duration_value',
+                  'component_type', 'nes_id', 'experiment', 'owner')
 
 
 # API Views
@@ -95,12 +95,12 @@ class ResearcherList(generics.ListCreateAPIView):
         serializer.save(owner=self.request.user)
 
 
-# class ProtocolComponentList(generics.ListCreateAPIView):
-#     queryset = ProtocolComponent.objects.all()
-#     serializer_class = ProtocolComponentSerializer
-#     permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
-#
-#     def perform_create(self, serializer):
-#         experiment_id = self.kwargs.get('pk')
-#         experiment = Experiment.objects.filter(id=experiment_id).get()
-#         serializer.save(experiment=experiment, owner=self.request.user)
+class ProtocolComponentList(generics.ListCreateAPIView):
+    queryset = ProtocolComponent.objects.all()
+    serializer_class = ProtocolComponentSerializer
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
+
+    def perform_create(self, serializer):
+        experiment_id = self.kwargs.get('pk')
+        experiment = Experiment.objects.filter(id=experiment_id).get()
+        serializer.save(experiment=experiment, owner=self.request.user)

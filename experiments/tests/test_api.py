@@ -5,7 +5,39 @@ from rest_framework.test import APITestCase
 from datetime import datetime
 import json
 
-from experiments.models import Experiment, Researcher, Study
+from experiments.models import Experiment, Researcher, Study, ProtocolComponent
+
+
+def create_study(nes_id, owner):
+    """
+    Create Study model object to be used to test classes below.
+    :param nes_id: 
+    :param owner: 
+    :return: 
+    """
+    researcher = Researcher.objects.create(nes_id=nes_id, owner=owner)
+    # TODO: What a strange behavior. Maybe post question in Stackoverflow.
+    # When trying to create our_user User instance without username, test
+    # doesn't pass. But in the first User instance created (other_user
+    # above), without username, test pass.
+    return Study.objects.create(
+        nes_id=nes_id, start_date=datetime.utcnow(), researcher=researcher,
+        owner=owner
+    )
+
+
+def create_experiment(nes_id, owner):
+    """
+    Create Experiment model object to be used to test classes below.
+    :param nes_id: 
+    :param owner: 
+    :return: 
+    """
+    study = create_study(nes_id=nes_id, owner=owner)
+    return Experiment.objects.create(
+            nes_id=nes_id, title='Our title', description='Our description',
+            study=study, owner=owner
+    )
 
 
 class ResearcherAPITest(APITestCase):
@@ -64,15 +96,8 @@ class StudyAPITest(APITestCase):
 
     def test_get_returns_all_studies(self):
         owner = User.objects.create_user(username='lab1')
-        researcher = Researcher.objects.create(nes_id=1, owner=owner)
-        study1 = Study.objects.create(
-            nes_id=1, title='Um estudo', description='Uma descrição',
-            start_date=datetime.utcnow(), researcher=researcher, owner=owner
-        )
-        study2 = Study.objects.create(
-            nes_id=2, title='Outro estudo', description='Outra descrição',
-            start_date=datetime.utcnow(), researcher=researcher, owner=owner
-        )
+        study1 = create_study(nes_id=1, owner=owner)
+        study2 = create_study(nes_id=2, owner=owner)
         response = self.client.get(self.base_url)
         self.assertEqual(
             json.loads(response.content.decode('utf8')),
@@ -138,24 +163,8 @@ class ExperimentAPITest(APITestCase):
 
     def test_get_returns_all_experiments(self):
         owner = User.objects.create_user(username='lab1')
-        researcher = Researcher.objects.create(nes_id=1, owner=owner)
-        # TODO: What a strange behavior. Maybe post question in Stackoverflow.
-        # When trying to create our_user User instance without username, test
-        # doesn't pass. But in the first User instance created (other_user
-        # above), without username, test pass.
-        study = Study.objects.create(
-            nes_id=1, start_date=datetime.utcnow(), researcher=researcher,
-            owner=owner
-        )
-
-        experiment1 = Experiment.objects.create(
-            nes_id=1, title='Our title', description='Our description',
-            study=study, owner=owner
-        )
-        experiment2 = Experiment.objects.create(
-            nes_id=2, title='Our second title',
-            description='Our second description', study=study, owner=owner
-        )
+        experiment1 = create_experiment(nes_id=1, owner=owner)
+        experiment2 = create_experiment(nes_id=2, owner=owner)
         response = self.client.get(self.base_url)
         self.assertEqual(
             json.loads(response.content.decode('utf8')),
@@ -186,14 +195,8 @@ class ExperimentAPITest(APITestCase):
         )
 
     def test_POSTing_a_new_experiment_to_an_existing_study(self):
-        owner = User.objects.create_user(
-            username='lab1', password='nep-lab1'
-        )
-        researcher = Researcher.objects.create(nes_id=1, owner=owner)
-        study = Study.objects.create(
-            nes_id=1, start_date=datetime.utcnow(), researcher=researcher,
-            owner=owner
-        )
+        owner = User.objects.create_user(username='lab1', password='nep-lab1')
+        study = create_study(nes_id=1, owner=owner)
         self.client.login(username=owner.username, password='nep-lab1')
         url = reverse('api_experiments_post', args=[study.id])
         response = self.client.post(
@@ -210,7 +213,49 @@ class ExperimentAPITest(APITestCase):
         self.assertEqual(new_experiment.title, 'New experiment')
 
 
+class ProtocolComponentAPITest(APITestCase):
+
+    def test_get_returns_all_protocolcomponents(self):
+        owner = User.objects.create_user(username='lab1')
+        experiment = create_experiment(nes_id=1, owner=owner)
+        protocol_component1 = ProtocolComponent.objects.create(
+            identification='An identification',
+            component_type='A component type',
+            nes_id=1, experiment=experiment, owner=owner
+        )
+        protocol_component2 = ProtocolComponent.objects.create(
+            identification='Other identification',
+            component_type='Other component type',
+            nes_id=2, experiment=experiment, owner=owner
+        )
+        response = self.client.get(reverse('api_protocolcomponents_post'))
+        self.assertEqual(
+            json.loads(response.content.decode('utf8')),
+            [
+                {
+                    'id': protocol_component1.id,
+                    'identification': protocol_component1.identification,
+                    'description': protocol_component1.description,
+                    'duration_value': protocol_component1.duration_value,
+                    'component_type': protocol_component1.component_type,
+                    'nes_id': protocol_component1.nes_id,
+                    'experiment': protocol_component1.experiment.title,
+                    'owner': protocol_component1.owner.username
+                },
+                {
+                    'id': protocol_component2.id,
+                    'identification': protocol_component2.identification,
+                    'description': protocol_component2.description,
+                    'duration_value': protocol_component2.duration_value,
+                    'component_type': protocol_component2.component_type,
+                    'nes_id': protocol_component2.nes_id,
+                    'experiment': protocol_component2.experiment.title,
+                    'owner': protocol_component2.owner.username
+                }
+            ]
+        )
+
+
 # TODO: os testes de validações ainda não foram implementados.
 # Ver:
 # http://www.obeythetestinggoat.com/book/appendix_rest_api.html#_data_validation_an_exercise_for_the_reader
-

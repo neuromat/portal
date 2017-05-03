@@ -11,4 +11,6 @@ urlpatterns = [
         name='api_studies_post'),
     url(r'^researchers/$', api.ResearcherList.as_view(),
         name='api_researchers'),
+    url(r'^protocol_components/$', api.ProtocolComponentList.as_view(),
+        name='api_protocolcomponents_post')
 ]
