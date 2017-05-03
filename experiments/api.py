@@ -64,15 +64,13 @@ class ProtocolComponentSerializer(serializers.ModelSerializer):
 
 
 # API Views
-class ExperimentList(generics.ListCreateAPIView):
-    queryset = Experiment.objects.all()
-    serializer_class = ExperimentSerializer
+class ResearcherList(generics.ListCreateAPIView):
+    queryset = Researcher.objects.all()
+    serializer_class = ResearcherSerializer
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
 
     def perform_create(self, serializer):
-        study_id = self.kwargs.get('pk')
-        study = Study.objects.filter(id=study_id).get()
-        serializer.save(study=study, owner=self.request.user)
+        serializer.save(owner=self.request.user)
 
 
 class StudyList(generics.ListCreateAPIView):
@@ -86,13 +84,15 @@ class StudyList(generics.ListCreateAPIView):
         serializer.save(researcher=researcher, owner=self.request.user)
 
 
-class ResearcherList(generics.ListCreateAPIView):
-    queryset = Researcher.objects.all()
-    serializer_class = ResearcherSerializer
+class ExperimentList(generics.ListCreateAPIView):
+    queryset = Experiment.objects.all()
+    serializer_class = ExperimentSerializer
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
 
     def perform_create(self, serializer):
-        serializer.save(owner=self.request.user)
+        study_id = self.kwargs.get('pk')
+        study = Study.objects.filter(id=study_id).get()
+        serializer.save(study=study, owner=self.request.user)
 
 
 class ProtocolComponentList(generics.ListCreateAPIView):
