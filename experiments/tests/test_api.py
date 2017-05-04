@@ -254,13 +254,13 @@ class StudyAPITest(APITestCase):
 
 
 class ExperimentAPITest(APITestCase):
-    base_url = reverse('api_experiments')
+    list_url = reverse('api_experiments-list')
 
     def test_get_returns_all_experiments(self):
         owner = User.objects.create_user(username='lab1')
         experiment1 = create_experiment(nes_id=1, owner=owner)
         experiment2 = create_experiment(nes_id=2, owner=owner)
-        response = self.client.get(self.base_url)
+        response = self.client.get(self.list_url)
         self.assertEqual(
             json.loads(response.content.decode('utf8')),
             [
@@ -289,17 +289,17 @@ class ExperimentAPITest(APITestCase):
             ]
         )
 
-    def test_POSTing_a_new_experiment_to_an_existing_study(self):
+    def test_POSTing_a_new_experiment(self):
         owner = User.objects.create_user(username='lab1', password='nep-lab1')
         study = create_study(nes_id=1, owner=owner)
         self.client.login(username=owner.username, password='nep-lab1')
-        url = reverse('api_experiments_post', args=[study.id])
         response = self.client.post(
-            url,
+            self.list_url,
             {
                 'title': 'New experiment',
                 'description': 'Some description',
-                'nes_id': 1
+                'nes_id': 1,
+                'study': study.id
             }
         )
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
@@ -311,6 +311,34 @@ class ExperimentAPITest(APITestCase):
         """
         First we post a new experiment then we test PUTing
         """
+        owner = User.objects.create_user(username='lab1', password='nep-lab1')
+        study = create_study(nes_id=2, owner=owner)
+        self.client.login(username=owner.username, password='nep-lab1')
+        self.client.post(
+            self.list_url,
+            {
+                'title': 'New experiment',
+                'description': 'Some description',
+                'nes_id': 1,
+                'study': study.id
+            }
+        )
+
+        # Now we test PUTing
+        new_experiment = Experiment.objects.first()
+        detail_url = reverse(
+            'api_experiments-detail', kwargs={'nes_id': new_experiment.nes_id}
+        )
+        resp_put = self.client.put(
+            detail_url,
+            {
+                'title': 'Changed experiment',
+                'description': 'Changed description',
+                'nes_id': new_experiment.nes_id,
+            }
+        )
+        self.assertEqual(resp_put.status_code, status.HTTP_200_OK)
+
 
 
 class ProtocolComponentAPITest(APITestCase):

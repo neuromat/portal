@@ -91,8 +91,8 @@ class StudyViewSet(viewsets.ModelViewSet):
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
 
     def get_queryset(self):
-        # TODO: don't filter by owner if not logged (gets TypeError
-        # exception when trying to get an individual researcher
+        # TODO: don't filter by owner if not logged (gets TypeError)
+        # exception when trying to get an individual study
         if 'nes_id' in self.kwargs:
             return Study.objects.filter(owner=self.request.user)
         else:
@@ -106,14 +106,22 @@ class StudyViewSet(viewsets.ModelViewSet):
         serializer.save(researcher=researcher, owner=self.request.user)
 
 
-class ExperimentList(generics.ListCreateAPIView):
-    queryset = Experiment.objects.all()
+class ExperimentViewSet(viewsets.ModelViewSet):
+    lookup_field = 'nes_id'
     serializer_class = ExperimentSerializer
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
 
+    def get_queryset(self):
+        # TODO: don't filter by owner if not logged (gets TypeError)
+        # exception when trying to get an individual experiment
+        if 'nes_id' in self.kwargs:
+            return Experiment.objects.filter(owner=self.request.user)
+        else:
+            return Experiment.objects.all()
+
     def perform_create(self, serializer):
-        study_id = self.kwargs.get('pk')
-        study = Study.objects.filter(id=study_id).get()
+        study_id = self.request.data['study']
+        study = Study.objects.get(id=study_id)
         serializer.save(study=study, owner=self.request.user)
 
 
