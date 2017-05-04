@@ -108,11 +108,11 @@ class ResearcherAPITest(APITestCase):
 
         # Now we test PUTing
         new_researcher = Researcher.objects.first()
-        detail_url1 = reverse(
-            'api_researchers-detail', kwargs={'pk': new_researcher.id}
+        detail_url = reverse(
+            'api_researchers-detail', kwargs={'nes_id': new_researcher.nes_id}
         )
         resp_put = self.client.put(
-            detail_url1,
+            detail_url,
             {
                 'first_name': 'João Maria',
                 'surname': 'das Rosas Vermelhas',
@@ -121,11 +121,10 @@ class ResearcherAPITest(APITestCase):
             }
         )
         self.assertEqual(resp_put.status_code, status.HTTP_200_OK)
-        self.client.logout()
 
         # And finally we test researcher updated
         updated_researcher = Researcher.objects.first()
-        resp_get = self.client.get(detail_url1)
+        resp_get = self.client.get(detail_url)
         self.assertEqual(
             json.loads(resp_get.content.decode('utf8')),
             {
@@ -138,6 +137,7 @@ class ResearcherAPITest(APITestCase):
                 'owner': updated_researcher.owner.username
             }
         )
+        self.client.logout()
 
 
 class StudyAPITest(APITestCase):
