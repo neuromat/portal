@@ -79,8 +79,8 @@ class StudyList(generics.ListCreateAPIView):
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
 
     def perform_create(self, serializer):
-        researcher_id = self.kwargs.get('pk')
-        researcher = Researcher.objects.filter(id=researcher_id).get()
+        researcher_id = self.request.data['researcher']
+        researcher = Researcher.objects.get(id=researcher_id)
         serializer.save(researcher=researcher, owner=self.request.user)
 
 

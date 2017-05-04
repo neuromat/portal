@@ -41,14 +41,14 @@ def create_experiment(nes_id, owner):
 
 
 class ResearcherAPITest(APITestCase):
-    base_url = reverse('api_researchers-list')
+    list_url = reverse('api_researchers-list')
+    detail_url = reverse('api_researchers-detail', kwargs={'pk': 1})
 
     def test_get_returns_all_researchers(self):
         owner = User.objects.create_user(username='lab1')
         researcher1 = Researcher.objects.create(nes_id=1, owner=owner)
         researcher2 = Researcher.objects.create(nes_id=2, owner=owner)
-
-        response = self.client.get(self.base_url)
+        response = self.client.get(self.list_url)
         self.assertEqual(
             json.loads(response.content.decode('utf8')),
             [
@@ -77,7 +77,7 @@ class ResearcherAPITest(APITestCase):
         owner = User.objects.create_user(username='lab1', password='nep-lab1')
         self.client.login(username=owner.username, password='nep-lab1')
         response = self.client.post(
-            self.base_url,
+            self.list_url,
             {
                 'first_name': 'João',
                 'surname': 'das Rosas',
@@ -89,6 +89,53 @@ class ResearcherAPITest(APITestCase):
         self.client.logout()
         new_researcher = Researcher.objects.first()
         self.assertEqual(new_researcher.first_name, 'João')
+
+    def test_PUTing_an_existing_researcher(self):
+        """
+        First we post a new researcher then we test PUTing
+        """
+        owner = User.objects.create_user(username='lab1', password='nep-lab1')
+        self.client.login(username=owner.username, password='nep-lab1')
+        resp_post = self.client.post(
+            self.list_url,
+            {
+                'first_name': 'João',
+                'surname': 'das Rosas',
+                'email': 'joao@rosas.com',
+                'nes_id': 1,
+            }
+        )
+
+        # Now we test PUTing
+        resp_put = self.client.put(
+            self.detail_url,
+            {
+                'id': 1,  # TODO: get id created when posting above
+                'first_name': 'João Maria',
+                'surname': 'das Rosas Vermelhas',
+                'email': 'joao13@dasrosas.com',
+                'nes_id': 1
+            }
+        )
+        self.assertEqual(resp_put.status_code, status.HTTP_200_OK)
+        self.client.logout()
+
+        # And finally we test researcher updated
+        # TODO: in two next lines, get id created when posting above
+        researcher = Researcher.objects.get(id=1)
+        resp_get = self.client.get(self.detail_url)
+        self.assertEqual(
+            json.loads(resp_get.content.decode('utf8')),
+            {
+                'id': researcher.id,
+                'first_name': researcher.first_name,
+                'surname': researcher.surname,
+                'email': researcher.email,
+                'studies': [],
+                'nes_id': researcher.nes_id,
+                'owner': researcher.owner.username
+            }
+        )
 
 
 class StudyAPITest(APITestCase):
@@ -138,7 +185,8 @@ class StudyAPITest(APITestCase):
                 'title': 'New study',
                 'description': 'Some description',
                 'start_date': datetime.utcnow().strftime('%Y-%m-%d'),
-                'nes_id': 1
+                'nes_id': 1,
+                'researcher': researcher.id
             }
         )
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
