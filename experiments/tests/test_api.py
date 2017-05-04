@@ -91,6 +91,8 @@ class ResearcherAPITest(APITestCase):
 
     def test_PUTing_an_existing_researcher(self):
         # TODO: very large test
+        # TODO: create another researcher with different owner to test
+        # get_queryset in API. (For other PUTing methods below too)
         """
         First we post a new researcher then we test PUTing
         """
@@ -108,11 +110,11 @@ class ResearcherAPITest(APITestCase):
 
         # Now we test PUTing
         new_researcher = Researcher.objects.first()
-        detail_url = reverse(
+        detail_url1 = reverse(
             'api_researchers-detail', kwargs={'nes_id': new_researcher.nes_id}
         )
         resp_put = self.client.put(
-            detail_url,
+            detail_url1,
             {
                 'first_name': 'João Maria',
                 'surname': 'das Rosas Vermelhas',
@@ -124,7 +126,11 @@ class ResearcherAPITest(APITestCase):
 
         # And finally we test researcher updated
         updated_researcher = Researcher.objects.first()
-        resp_get = self.client.get(detail_url)
+        detail_url2 = reverse(
+            'api_researchers-detail',
+            kwargs={'nes_id': updated_researcher.nes_id}
+        )
+        resp_get = self.client.get(detail_url2)
         self.assertEqual(
             json.loads(resp_get.content.decode('utf8')),
             {
@@ -169,8 +175,8 @@ class StudyAPITest(APITestCase):
                     'start_date': study2.start_date.strftime('%Y-%m-%d'),
                     'end_date': study2.end_date,
                     'nes_id': study2.nes_id,
-                    'researcher': study2.researcher.first_name,
                     'experiments': [],
+                    'researcher': study2.researcher.first_name,
                     'owner': study1.owner.username
                 },
             ]
@@ -200,6 +206,7 @@ class StudyAPITest(APITestCase):
         # models, and ensure that only same client can POST to that model.
 
     def test_PUTing_an_existing_study(self):
+        # TODO: very large test
         """
         First we post a new study then we test PUTing
         """
@@ -219,29 +226,31 @@ class StudyAPITest(APITestCase):
 
         # Now we test PUTing
         new_study = Study.objects.first()
-        detail_url = reverse(
+        detail_url1 = reverse(
             'api_studies-detail', kwargs={'nes_id': new_study.nes_id}
         )
-        resp_put = self.client.put(
-            detail_url,
+        resp_put = self.client.patch(
+            detail_url1,
             {
                 'title': 'Changed title',
                 'description': 'Changed description',
                 'start_date': datetime.utcnow().strftime('%Y-%m-%d'),
-                'nes_id': new_study.nes_id,
             }
         )
         self.assertEqual(resp_put.status_code, status.HTTP_200_OK)
 
         # And finally we test study updated
         updated_study = Study.objects.first()
-        resp_get = self.client.get(detail_url)
+        detail_url2 = reverse(
+            'api_studies-detail', kwargs={'nes_id': updated_study.nes_id}
+        )
+        resp_get = self.client.get(detail_url2)
         self.assertEqual(
             json.loads(resp_get.content.decode('utf8')),
             {
                 'id': updated_study.id,
-                'title': updated_study.title,
-                'description': updated_study.description,
+                'title': 'Changed title',
+                'description': 'Changed description',
                 'start_date': updated_study.start_date.strftime('%Y-%m-%d'),
                 'end_date': None,
                 'nes_id': updated_study.nes_id,
@@ -308,6 +317,7 @@ class ExperimentAPITest(APITestCase):
         self.assertEqual(new_experiment.title, 'New experiment')
 
     def test_PUTing_an_existing_experiment(self):
+        # TODO: very large test
         """
         First we post a new experiment then we test PUTing
         """
@@ -326,22 +336,44 @@ class ExperimentAPITest(APITestCase):
 
         # Now we test PUTing
         new_experiment = Experiment.objects.first()
-        detail_url = reverse(
+        detail_url1 = reverse(
             'api_experiments-detail', kwargs={'nes_id': new_experiment.nes_id}
         )
-        resp_put = self.client.put(
-            detail_url,
+        resp_put = self.client.patch(
+            detail_url1,
             {
                 'title': 'Changed experiment',
                 'description': 'Changed description',
-                'nes_id': new_experiment.nes_id,
             }
         )
         self.assertEqual(resp_put.status_code, status.HTTP_200_OK)
 
+        # And finally we test experiment updated
+        updated_experiment = Experiment.objects.first()
+        detail_url2 = reverse(
+            'api_experiments-detail',
+            kwargs={'nes_id': updated_experiment.nes_id}
+        )
+        resp_get = self.client.get(detail_url2)
+        self.assertEqual(
+            json.loads(resp_get.content.decode('utf8')),
+            {
+                'id': updated_experiment.id,
+                'title': 'Changed experiment',
+                'description': 'Changed description',
+                'data_acquisition_done':
+                    updated_experiment.data_acquisition_done,
+                'nes_id': updated_experiment.nes_id,
+                'study': updated_experiment.study.title,
+                'owner': updated_experiment.owner.username,
+                'protocol_components': []
+            }
+        )
+        self.client.logout()
 
 
 class ProtocolComponentAPITest(APITestCase):
+    list_url = reverse('api_protocol_components-list')
 
     def test_get_returns_all_protocolcomponents(self):
         owner = User.objects.create_user(username='lab1')
@@ -356,7 +388,7 @@ class ProtocolComponentAPITest(APITestCase):
             component_type='Other component type',
             nes_id=2, experiment=experiment, owner=owner
         )
-        response = self.client.get(reverse('api_protocolcomponents'))
+        response = self.client.get(self.list_url)
         self.assertEqual(
             json.loads(response.content.decode('utf8')),
             [
@@ -383,19 +415,19 @@ class ProtocolComponentAPITest(APITestCase):
             ]
         )
 
-    def test_POSTing_a_new_protocolcomponent_to_an_existing_experiment(self):
+    def test_POSTing_a_new_protocolcomponent(self):
         owner = User.objects.create_user(username='lab1', password='nep-lab1')
         experiment = create_experiment(nes_id=1, owner=owner)
         self.client.login(username=owner.username, password='nep-lab1')
-        url = reverse('api_protocolcomponents_post', args=[experiment.id])
         response = self.client.post(
-            url,
+            self.list_url,
             {
                 'identification': 'An identification',
                 'description': 'A description',
                 'duration_value': 4,
                 'component_type': 'A component type',
                 'nes_id': 1,
+                'experiment': experiment.id
             }
         )
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
@@ -404,7 +436,61 @@ class ProtocolComponentAPITest(APITestCase):
         self.assertEqual(new_protocolcomponent.identification,
                          'An identification')
 
+    def test_PUTing_an_existing_protocolcomponent(self):
+        # TODO: very large test
+        """
+        First we post a new protocol_component, then we test PUTing
+        """
+        owner = User.objects.create_user(username='lab1', password='nep-lab1')
+        experiment = create_experiment(nes_id=2, owner=owner)
+        self.client.login(username=owner.username, password='nep-lab1')
+        self.client.post(
+            self.list_url,
+            {
+                'identification': 'An identification',
+                'description': 'A description',
+                'duration_value': 4,
+                'component_type': 'A component type',
+                'nes_id': 1,
+                'experiment': experiment.id
+            }
+        )
 
-# TODO: os testes de validações ainda não foram implementados.
-# Ver:
-# http://www.obeythetestinggoat.com/book/appendix_rest_api.html#_data_validation_an_exercise_for_the_reader
+        # Now we test PUTing
+        new_protocol_component = ProtocolComponent.objects.first()
+        detail_url1 = reverse(
+            'api_protocol_components-detail',
+            kwargs={'nes_id': new_protocol_component.nes_id}
+        )
+        resp_put = self.client.patch(
+            detail_url1,
+            {
+                'identification': 'Changed identification',
+                'description': 'Changed description',
+                'duration_value': 2,
+                'component_type': 'Changed component type',
+            }
+        )
+        self.assertEqual(resp_put.status_code, status.HTTP_200_OK)
+
+        # And finally we test protocol_component updated
+        updated_protocol_component = ProtocolComponent.objects.first()
+        detail_url2 = reverse(
+            'api_protocol_components-detail',
+            kwargs={'nes_id': updated_protocol_component.nes_id}
+        )
+        resp_get = self.client.get(detail_url2)
+        self.assertEqual(
+            json.loads(resp_get.content.decode('utf8')),
+            {
+                'id': updated_protocol_component.id,
+                'identification': 'Changed identification',
+                'description': 'Changed description',
+                'duration_value': 2,
+                'component_type': 'Changed component type',
+                'nes_id': updated_protocol_component.nes_id,
+                'experiment': updated_protocol_component.experiment.title,
+                'owner': updated_protocol_component.owner.username
+            }
+        )
+        self.client.logout()

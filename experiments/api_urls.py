@@ -9,12 +9,9 @@ router.register(r'researchers', api.ResearcherViewSet,
 router.register(r'studies', api.StudyViewSet, base_name='api_studies')
 router.register(r'experiments', api.ExperimentViewSet,
                 base_name='api_experiments')
+router.register(r'protocol_components', api.ProtocolComponentViewSet,
+                base_name='api_protocol_components')
 
 urlpatterns = [
     url(r'^', include(router.urls)),
-    url(r'^protocol_components/$', api.ProtocolComponentList.as_view(),
-        name='api_protocolcomponents'),
-    url(r'^experiments/(?P<pk>[0-9]+)/protocol_components/$',
-        api.ProtocolComponentList.as_view(),
-        name='api_protocolcomponents_post')
 ]

@@ -125,12 +125,20 @@ class ExperimentViewSet(viewsets.ModelViewSet):
         serializer.save(study=study, owner=self.request.user)
 
 
-class ProtocolComponentList(generics.ListCreateAPIView):
-    queryset = ProtocolComponent.objects.all()
+class ProtocolComponentViewSet(viewsets.ModelViewSet):
+    lookup_field = 'nes_id'
     serializer_class = ProtocolComponentSerializer
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
 
+    def get_queryset(self):
+        # TODO: don't filter by owner if not logged (gets TypeError)
+        # exception when trying to get an individual experiment
+        if 'nes_id' in self.kwargs:
+            return ProtocolComponent.objects.filter(owner=self.request.user)
+        else:
+            return ProtocolComponent.objects.all()
+
     def perform_create(self, serializer):
-        experiment_id = self.kwargs.get('pk')
+        experiment_id = self.request.data['experiment']
         experiment = Experiment.objects.filter(id=experiment_id).get()
         serializer.save(experiment=experiment, owner=self.request.user)
