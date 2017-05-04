@@ -91,6 +91,7 @@ class ResearcherAPITest(APITestCase):
         self.assertEqual(new_researcher.first_name, 'João')
 
     def test_PUTing_an_existing_researcher(self):
+        # TODO: very large test
         """
         First we post a new researcher then we test PUTing
         """
