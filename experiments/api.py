@@ -4,7 +4,9 @@ from experiments.models import Experiment, Study, User, Researcher, \
     ProtocolComponent
 
 
-# API Serializers
+###################
+# API Serializers #
+###################
 class ExperimentSerializer(serializers.ModelSerializer):
     study = serializers.ReadOnlyField(source='study.title')
     owner = serializers.ReadOnlyField(source='owner.username')
@@ -63,9 +65,13 @@ class ProtocolComponentSerializer(serializers.ModelSerializer):
                   'component_type', 'nes_id', 'experiment', 'owner')
 
 
-# API Views
+#############
+# API Views #
+#############
 class ResearcherViewSet(viewsets.ModelViewSet):
     lookup_field = 'nes_id'
+    serializer_class = ResearcherSerializer
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
 
     def get_queryset(self):
         # TODO: don't filter by owner if not logged (gets TypeError
@@ -74,9 +80,6 @@ class ResearcherViewSet(viewsets.ModelViewSet):
             return Researcher.objects.filter(owner=self.request.user)
         else:
             return Researcher.objects.all()
-
-    serializer_class = ResearcherSerializer
-    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
 
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
