@@ -42,7 +42,6 @@ def create_experiment(nes_id, owner):
 
 class ResearcherAPITest(APITestCase):
     list_url = reverse('api_researchers-list')
-    detail_url = reverse('api_researchers-detail', kwargs={'pk': 1})
 
     def test_get_returns_all_researchers(self):
         owner = User.objects.create_user(username='lab1')
@@ -103,16 +102,18 @@ class ResearcherAPITest(APITestCase):
                 'first_name': 'João',
                 'surname': 'das Rosas',
                 'email': 'joao@rosas.com',
-                'nes_id': 1,
+                'nes_id': 2,
             }
         )
 
         # Now we test PUTing
         new_researcher = Researcher.objects.first()
+        detail_url1 = reverse(
+            'api_researchers-detail', kwargs={'pk': new_researcher.id}
+        )
         resp_put = self.client.put(
-            self.detail_url,
+            detail_url1,
             {
-                'id': new_researcher.id,
                 'first_name': 'João Maria',
                 'surname': 'das Rosas Vermelhas',
                 'email': 'joao13@dasrosas.com',
@@ -124,7 +125,7 @@ class ResearcherAPITest(APITestCase):
 
         # And finally we test researcher updated
         updated_researcher = Researcher.objects.first()
-        resp_get = self.client.get(self.detail_url)
+        resp_get = self.client.get(detail_url1)
         self.assertEqual(
             json.loads(resp_get.content.decode('utf8')),
             {
