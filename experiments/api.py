@@ -65,7 +65,16 @@ class ProtocolComponentSerializer(serializers.ModelSerializer):
 
 # API Views
 class ResearcherViewSet(viewsets.ModelViewSet):
-    queryset = Researcher.objects.all()
+    lookup_field = 'nes_id'
+
+    def get_queryset(self):
+        # TODO: don't filter by owner if not logged (gets TypeError
+        # exception when trying to get an individual researcher
+        if 'nes_id' in self.kwargs:
+            return Researcher.objects.filter(owner=self.request.user)
+        else:
+            return Researcher.objects.all()
+
     serializer_class = ResearcherSerializer
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
 
