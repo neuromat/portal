@@ -96,7 +96,7 @@ class ResearcherAPITest(APITestCase):
         """
         owner = User.objects.create_user(username='lab1', password='nep-lab1')
         self.client.login(username=owner.username, password='nep-lab1')
-        resp_post = self.client.post(
+        self.client.post(
             self.list_url,
             {
                 'first_name': 'João',
@@ -107,33 +107,33 @@ class ResearcherAPITest(APITestCase):
         )
 
         # Now we test PUTing
+        new_researcher = Researcher.objects.first()
         resp_put = self.client.put(
             self.detail_url,
             {
-                'id': 1,  # TODO: get id created when posting above
+                'id': new_researcher.id,
                 'first_name': 'João Maria',
                 'surname': 'das Rosas Vermelhas',
                 'email': 'joao13@dasrosas.com',
-                'nes_id': 1
+                'nes_id': new_researcher.nes_id
             }
         )
         self.assertEqual(resp_put.status_code, status.HTTP_200_OK)
         self.client.logout()
 
         # And finally we test researcher updated
-        # TODO: in two next lines, get id created when posting above
-        researcher = Researcher.objects.get(id=1)
+        updated_researcher = Researcher.objects.first()
         resp_get = self.client.get(self.detail_url)
         self.assertEqual(
             json.loads(resp_get.content.decode('utf8')),
             {
-                'id': researcher.id,
-                'first_name': researcher.first_name,
-                'surname': researcher.surname,
-                'email': researcher.email,
+                'id': updated_researcher.id,
+                'first_name': updated_researcher.first_name,
+                'surname': updated_researcher.surname,
+                'email': updated_researcher.email,
                 'studies': [],
-                'nes_id': researcher.nes_id,
-                'owner': researcher.owner.username
+                'nes_id': updated_researcher.nes_id,
+                'owner': updated_researcher.owner.username
             }
         )
 
