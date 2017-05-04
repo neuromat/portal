@@ -6,12 +6,10 @@ from experiments import api
 router = DefaultRouter()
 router.register(r'researchers', api.ResearcherViewSet,
                 base_name='api_researchers')
+router.register(r'studies', api.StudyViewSet, base_name='api_studies')
 
 urlpatterns = [
     url(r'^', include(router.urls)),
-    url(r'^studies/$', api.StudyList.as_view(), name='api_studies'),
-    url(r'^researchers/(?P<pk>[0-9]+)/studies/$', api.StudyList.as_view(),
-        name='api_studies_post'),
     url(r'^experiments/$', api.ExperimentList.as_view(),
         name='api_experiments'),
     url(r'^studies/(?P<pk>[0-9]+)/experiments/$',

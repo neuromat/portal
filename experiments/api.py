@@ -85,10 +85,18 @@ class ResearcherViewSet(viewsets.ModelViewSet):
         serializer.save(owner=self.request.user)
 
 
-class StudyList(generics.ListCreateAPIView):
-    queryset = Study.objects.all()
+class StudyViewSet(viewsets.ModelViewSet):
+    lookup_field = 'nes_id'
     serializer_class = StudySerializer
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
+
+    def get_queryset(self):
+        # TODO: don't filter by owner if not logged (gets TypeError
+        # exception when trying to get an individual researcher
+        if 'nes_id' in self.kwargs:
+            return Study.objects.filter(owner=self.request.user)
+        else:
+            return Study.objects.all()
 
     def perform_create(self, serializer):
         researcher_id = self.request.data['researcher']

@@ -141,13 +141,13 @@ class ResearcherAPITest(APITestCase):
 
 
 class StudyAPITest(APITestCase):
-    base_url = reverse('api_studies')
+    list_url = reverse('api_studies-list')
 
     def test_get_returns_all_studies(self):
         owner = User.objects.create_user(username='lab1')
         study1 = create_study(nes_id=1, owner=owner)
         study2 = create_study(nes_id=2, owner=owner)
-        response = self.client.get(self.base_url)
+        response = self.client.get(self.list_url)
         self.assertEqual(
             json.loads(response.content.decode('utf8')),
             [
@@ -180,9 +180,8 @@ class StudyAPITest(APITestCase):
         owner = User.objects.create_user(username='lab1', password='nep-lab1')
         researcher = Researcher.objects.create(nes_id=1, owner=owner)
         self.client.login(username=owner.username, password='nep-lab1')
-        url = reverse('api_studies_post', args=[researcher.id])
         response = self.client.post(
-            url,
+            self.list_url,
             {
                 'title': 'New study',
                 'description': 'Some description',
@@ -199,6 +198,59 @@ class StudyAPITest(APITestCase):
         # TODO: IMPORTANT! Test client can't POST (PUT etc.) to a model without
         # been its owner. This requires adds, at first, an owner to all
         # models, and ensure that only same client can POST to that model.
+
+    def test_PUTing_an_existing_study(self):
+        """
+        First we post a new study then we test PUTing
+        """
+        owner = User.objects.create_user(username='lab1', password='nep-lab1')
+        researcher = Researcher.objects.create(nes_id=1, owner=owner)
+        self.client.login(username=owner.username, password='nep-lab1')
+        self.client.post(
+            self.list_url,
+            {
+                'title': 'New study',
+                'description': 'Some description',
+                'start_date': datetime.utcnow().strftime('%Y-%m-%d'),
+                'nes_id': 2,
+                'researcher': researcher.id
+            }
+        )
+
+        # Now we test PUTing
+        new_study = Study.objects.first()
+        detail_url = reverse(
+            'api_studies-detail', kwargs={'nes_id': new_study.nes_id}
+        )
+        resp_put = self.client.put(
+            detail_url,
+            {
+                'title': 'Changed title',
+                'description': 'Changed description',
+                'start_date': datetime.utcnow().strftime('%Y-%m-%d'),
+                'nes_id': new_study.nes_id,
+            }
+        )
+        self.assertEqual(resp_put.status_code, status.HTTP_200_OK)
+
+        # And finally we test study updated
+        updated_study = Study.objects.first()
+        resp_get = self.client.get(detail_url)
+        self.assertEqual(
+            json.loads(resp_get.content.decode('utf8')),
+            {
+                'id': updated_study.id,
+                'title': updated_study.title,
+                'description': updated_study.description,
+                'start_date': updated_study.start_date.strftime('%Y-%m-%d'),
+                'end_date': None,
+                'nes_id': updated_study.nes_id,
+                'experiments': [],
+                'researcher': updated_study.researcher.first_name,
+                'owner': updated_study.owner.username
+            }
+        )
+        self.client.logout()
 
 
 class ExperimentAPITest(APITestCase):
