@@ -204,13 +204,6 @@ class StudyAPITest(APITestCase):
 class ExperimentAPITest(APITestCase):
     base_url = reverse('api_experiments')
 
-    # TODO: This test is following tutorial. Not necessary because is
-    # django-rest-framework. By default object returned is json.
-    def test_get_returns_json_200(self):
-        response = self.client.get(self.base_url)
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response['content-type'], 'application/json')
-
     def test_get_returns_all_experiments(self):
         owner = User.objects.create_user(username='lab1')
         experiment1 = create_experiment(nes_id=1, owner=owner)
