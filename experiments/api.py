@@ -99,6 +99,8 @@ class StudyViewSet(viewsets.ModelViewSet):
             return Study.objects.all()
 
     def perform_create(self, serializer):
+        # TODO: breaks when posting from the api template.
+        # Doesn't have researcher field to enter a valid reseacher.
         researcher_id = self.request.data['researcher']
         researcher = Researcher.objects.get(id=researcher_id)
         serializer.save(researcher=researcher, owner=self.request.user)

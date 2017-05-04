@@ -307,6 +307,11 @@ class ExperimentAPITest(APITestCase):
         new_experiment = Experiment.objects.first()
         self.assertEqual(new_experiment.title, 'New experiment')
 
+    def test_PUTing_an_existing_experiment(self):
+        """
+        First we post a new experiment then we test PUTing
+        """
+
 
 class ProtocolComponentAPITest(APITestCase):
 
