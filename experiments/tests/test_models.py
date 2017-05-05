@@ -242,3 +242,6 @@ class ExperimentVersionTest(TestCase):
     def test_version_is_related_to_experiment(self):
         owner = User.objects.create(username='lab1')
         experiment = create_experiment(nes_id=1, owner=owner)
+        version = ExperimentVersion(experiment=experiment, version=2)
+        version.save()
+        self.assertIn(version, experiment.versions.all())

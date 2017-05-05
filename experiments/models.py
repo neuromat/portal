@@ -41,6 +41,7 @@ class Experiment(models.Model):
 
 class ExperimentVersion(models.Model):
     version = models.PositiveIntegerField()
+    experiment = models.ForeignKey(Experiment, related_name='versions')
 
 
 class ProtocolComponent(models.Model):
