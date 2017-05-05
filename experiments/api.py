@@ -70,6 +70,7 @@ class ProtocolComponentSerializer(serializers.ModelSerializer):
 #############
 class ResearcherViewSet(viewsets.ModelViewSet):
     lookup_field = 'nes_id'
+    queryset = Researcher.objects.all()
     serializer_class = ResearcherSerializer
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
 

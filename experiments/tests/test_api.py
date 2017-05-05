@@ -91,13 +91,12 @@ class ResearcherAPITest(APITestCase):
 
     def test_PUTing_an_existing_researcher(self):
         # TODO: very large test
-        # TODO: create another researcher with different owner to test
-        # get_queryset in API. (For other PUTing methods below too)
-        """
-        First we post a new researcher then we test PUTing
-        """
-        owner = User.objects.create_user(username='lab1', password='nep-lab1')
-        self.client.login(username=owner.username, password='nep-lab1')
+        ###
+        # First we post a new researcher then we test PUTing
+        ###
+        # An owner post a researcher
+        owner1 = User.objects.create_user(username='lab1', password='nep-lab1')
+        self.client.login(username=owner1.username, password='nep-lab1')
         self.client.post(
             self.list_url,
             {
@@ -107,25 +106,46 @@ class ResearcherAPITest(APITestCase):
                 'nes_id': 2,
             }
         )
+        self.client.logout()
 
+        # Other owner post a researcher
+        owner2 = User.objects.create_user(username='lab2', password='nep-lab2')
+        self.client.login(username=owner2.username, password='nep-lab2')
+        self.client.post(
+            self.list_url,
+            {
+                'first_name': 'Pedro',
+                'surname': 'Santos',
+                'email': 'pedro@santos.com',
+                'nes_id': 2,
+            }
+        )
+        self.client.logout()
+
+        ###
         # Now we test PUTing
-        new_researcher = Researcher.objects.first()
+        ###
+        new_researcher = Researcher.objects.get(nes_id=2, owner=owner1)
         detail_url1 = reverse(
             'api_researchers-detail', kwargs={'nes_id': new_researcher.nes_id}
         )
-        resp_put = self.client.put(
+        self.client.login(username=owner1.username, password='nep-lab1')
+        resp_put = self.client.patch(
             detail_url1,
             {
                 'first_name': 'João Maria',
                 'surname': 'das Rosas Vermelhas',
                 'email': 'joao13@dasrosas.com',
-                'nes_id': new_researcher.nes_id
             }
         )
         self.assertEqual(resp_put.status_code, status.HTTP_200_OK)
 
-        # And finally we test researcher updated
-        updated_researcher = Researcher.objects.first()
+        ###
+        # Finally we test researcher updated
+        ###
+        updated_researcher = Researcher.objects.get(
+            nes_id=new_researcher.nes_id, owner=owner1
+        )
         detail_url2 = reverse(
             'api_researchers-detail',
             kwargs={'nes_id': updated_researcher.nes_id}
@@ -135,9 +155,9 @@ class ResearcherAPITest(APITestCase):
             json.loads(resp_get.content.decode('utf8')),
             {
                 'id': updated_researcher.id,
-                'first_name': updated_researcher.first_name,
-                'surname': updated_researcher.surname,
-                'email': updated_researcher.email,
+                'first_name': 'João Maria',
+                'surname': 'das Rosas Vermelhas',
+                'email': 'joao13@dasrosas.com',
                 'studies': [],
                 'nes_id': updated_researcher.nes_id,
                 'owner': updated_researcher.owner.username
@@ -207,12 +227,13 @@ class StudyAPITest(APITestCase):
 
     def test_PUTing_an_existing_study(self):
         # TODO: very large test
-        """
-        First we post a new study then we test PUTing
-        """
-        owner = User.objects.create_user(username='lab1', password='nep-lab1')
-        researcher = Researcher.objects.create(nes_id=1, owner=owner)
-        self.client.login(username=owner.username, password='nep-lab1')
+        ###
+        # First we post a new study then we test PUTing
+        ###
+        # An owner post a study
+        owner1 = User.objects.create_user(username='lab1', password='nep-lab1')
+        researcher = Researcher.objects.create(nes_id=1, owner=owner1)
+        self.client.login(username=owner1.username, password='nep-lab1')
         self.client.post(
             self.list_url,
             {
@@ -223,12 +244,32 @@ class StudyAPITest(APITestCase):
                 'researcher': researcher.id
             }
         )
+        self.client.logout()
 
+        # Other owner post a study
+        owner2 = User.objects.create_user(username='lab2', password='nep-lab2')
+        researcher = Researcher.objects.create(nes_id=1, owner=owner2)
+        self.client.login(username=owner2.username, password='nep-lab2')
+        self.client.post(
+            self.list_url,
+            {
+                'title': 'Other study',
+                'description': 'Other description',
+                'start_date': datetime.utcnow().strftime('%Y-%m-%d'),
+                'nes_id': 2,
+                'researcher': researcher.id
+            }
+        )
+        self.client.logout()
+
+        ###
         # Now we test PUTing
-        new_study = Study.objects.first()
+        ###
+        new_study = Study.objects.get(nes_id=2, owner=owner2)
         detail_url1 = reverse(
             'api_studies-detail', kwargs={'nes_id': new_study.nes_id}
         )
+        self.client.login(username=owner2.username, password='nep-lab2')
         resp_put = self.client.patch(
             detail_url1,
             {
@@ -239,8 +280,10 @@ class StudyAPITest(APITestCase):
         )
         self.assertEqual(resp_put.status_code, status.HTTP_200_OK)
 
-        # And finally we test study updated
-        updated_study = Study.objects.first()
+        # Finally we test study updated
+        updated_study = Study.objects.get(
+            nes_id=new_study.nes_id, owner=owner2
+        )
         detail_url2 = reverse(
             'api_studies-detail', kwargs={'nes_id': updated_study.nes_id}
         )
@@ -318,12 +361,13 @@ class ExperimentAPITest(APITestCase):
 
     def test_PUTing_an_existing_experiment(self):
         # TODO: very large test
-        """
-        First we post a new experiment then we test PUTing
-        """
-        owner = User.objects.create_user(username='lab1', password='nep-lab1')
-        study = create_study(nes_id=2, owner=owner)
-        self.client.login(username=owner.username, password='nep-lab1')
+        ###
+        # First we post a new experiment then we test PUTing
+        ###
+        # An owner post an experiment
+        owner1 = User.objects.create_user(username='lab1', password='nep-lab1')
+        study = create_study(nes_id=2, owner=owner1)
+        self.client.login(username=owner1.username, password='nep-lab1')
         self.client.post(
             self.list_url,
             {
@@ -333,12 +377,29 @@ class ExperimentAPITest(APITestCase):
                 'study': study.id
             }
         )
+        self.client.logout()
+
+        # Other owner post a study
+        owner2 = User.objects.create_user(username='lab2', password='nep-lab2')
+        study = create_study(nes_id=2, owner=owner2)
+        self.client.login(username=owner2.username, password='nep-lab2')
+        self.client.post(
+            self.list_url,
+            {
+                'title': 'Other experiment',
+                'description': 'Other description',
+                'nes_id': 1,
+                'study': study.id
+            }
+        )
+        self.client.logout()
 
         # Now we test PUTing
-        new_experiment = Experiment.objects.first()
+        new_experiment = Experiment.objects.get(nes_id=1, owner=owner2)
         detail_url1 = reverse(
             'api_experiments-detail', kwargs={'nes_id': new_experiment.nes_id}
         )
+        self.client.login(username=owner2.username, password='nep-lab2')
         resp_put = self.client.patch(
             detail_url1,
             {
@@ -348,8 +409,9 @@ class ExperimentAPITest(APITestCase):
         )
         self.assertEqual(resp_put.status_code, status.HTTP_200_OK)
 
-        # And finally we test experiment updated
-        updated_experiment = Experiment.objects.first()
+        # Finally we test experiment updated
+        updated_experiment = Experiment.objects.get(
+            nes_id=new_experiment.nes_id, owner=owner2)
         detail_url2 = reverse(
             'api_experiments-detail',
             kwargs={'nes_id': updated_experiment.nes_id}
@@ -438,12 +500,13 @@ class ProtocolComponentAPITest(APITestCase):
 
     def test_PUTing_an_existing_protocolcomponent(self):
         # TODO: very large test
-        """
-        First we post a new protocol_component, then we test PUTing
-        """
-        owner = User.objects.create_user(username='lab1', password='nep-lab1')
-        experiment = create_experiment(nes_id=2, owner=owner)
-        self.client.login(username=owner.username, password='nep-lab1')
+        ###
+        # First we post a new protocol_component, then we test PUTing
+        ###
+        # A owner post a protocol component
+        owner1 = User.objects.create_user(username='lab1', password='nep-lab1')
+        experiment = create_experiment(nes_id=2, owner=owner1)
+        self.client.login(username=owner1.username, password='nep-lab1')
         self.client.post(
             self.list_url,
             {
@@ -455,13 +518,34 @@ class ProtocolComponentAPITest(APITestCase):
                 'experiment': experiment.id
             }
         )
+        self.client.logout()
+
+        # Other owner post a protocol component
+        owner2 = User.objects.create_user(username='lab2', password='nep-lab2')
+        experiment = create_experiment(nes_id=2, owner=owner2)
+        self.client.login(username=owner2.username, password='nep-lab2')
+        self.client.post(
+            self.list_url,
+            {
+                'identification': 'Other identification',
+                'description': 'Other description',
+                'duration_value': 1,
+                'component_type': 'Other component type',
+                'nes_id': 1,
+                'experiment': experiment.id
+            }
+        )
+        self.client.logout()
 
         # Now we test PUTing
-        new_protocol_component = ProtocolComponent.objects.first()
+        new_protocol_component = ProtocolComponent.objects.get(
+            nes_id=1, owner=owner2
+        )
         detail_url1 = reverse(
             'api_protocol_components-detail',
             kwargs={'nes_id': new_protocol_component.nes_id}
         )
+        self.client.login(username=owner2.username, password='nep-lab2')
         resp_put = self.client.patch(
             detail_url1,
             {
@@ -474,7 +558,8 @@ class ProtocolComponentAPITest(APITestCase):
         self.assertEqual(resp_put.status_code, status.HTTP_200_OK)
 
         # And finally we test protocol_component updated
-        updated_protocol_component = ProtocolComponent.objects.first()
+        updated_protocol_component = ProtocolComponent.objects.get(
+            nes_id=new_protocol_component.nes_id, owner=owner2)
         detail_url2 = reverse(
             'api_protocol_components-detail',
             kwargs={'nes_id': updated_protocol_component.nes_id}
