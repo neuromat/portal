@@ -39,6 +39,10 @@ class Experiment(models.Model):
         unique_together = ('nes_id', 'owner')
 
 
+class ExperimentVersion(models.Model):
+    version = models.PositiveIntegerField()
+
+
 class ProtocolComponent(models.Model):
     identification = models.CharField(max_length=50)
     description = models.TextField(blank=True)

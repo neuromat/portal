@@ -3,7 +3,8 @@ from django.core.exceptions import ValidationError
 from django.contrib.auth.models import User
 from datetime import datetime
 
-from experiments.models import Experiment, Study, Researcher, ProtocolComponent
+from experiments.models import Experiment, Study, Researcher, \
+    ProtocolComponent, ExperimentVersion
 
 
 def create_researcher(nes_id, username):
@@ -157,7 +158,6 @@ class ExperimentModelTest(TestCase):
                                 owner=researcher2.owner)
         experiment.full_clean()
 
-
     def test_experiment_is_related_to_study_and_owner(self):
         owner = User.objects.create(username='lab2')
         study = create_study(nes_id=1)
@@ -211,7 +211,6 @@ class ProtocolComponentModelTest(TestCase):
             experiment=experiment, owner=owner
         )
         with self.assertRaises(ValidationError):
-            protocol_component.save()
             protocol_component.full_clean()
 
     def test_CAN_save_same_protocol_components_to_different_owners(self):
@@ -222,3 +221,10 @@ class ProtocolComponentModelTest(TestCase):
                                          owner=owner1)
         ProtocolComponent.objects.create(nes_id=1, experiment=experiment,
                                          owner=owner2)
+
+
+class ExperimentVersionTest(TestCase):
+
+    def test_default_attributes(self):
+        experiment_version = ExperimentVersion()
+        self.assertEqual(experiment_version.version, None)
