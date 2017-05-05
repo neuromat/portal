@@ -228,3 +228,8 @@ class ExperimentVersionTest(TestCase):
     def test_default_attributes(self):
         experiment_version = ExperimentVersion()
         self.assertEqual(experiment_version.version, None)
+
+    def test_cannot_save_empty_attributes(self):
+        experiment_version = ExperimentVersion(version=None)
+        with self.assertRaises(ValidationError):
+            experiment_version.full_clean()
