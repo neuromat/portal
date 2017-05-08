@@ -5,7 +5,8 @@ from rest_framework.test import APITestCase
 from datetime import datetime
 import json
 
-from experiments.models import Experiment, Researcher, Study, ProtocolComponent
+from experiments.models import Experiment, Researcher, Study, \
+    ProtocolComponent, ExperimentVersion
 
 
 def create_study(nes_id, owner):
@@ -433,7 +434,7 @@ class ExperimentAPITest(APITestCase):
         )
         self.client.logout()
 
-    def test_POSTing_new_experiment_creates_version_one(self):
+    def test_POSTing_experiments_creates_versions(self):
         owner = User.objects.create_user(username='lab1', password='nep-lab1')
         study = create_study(nes_id=1, owner=owner)
         self.client.login(username=owner.username, password='nep-lab1')
@@ -447,8 +448,12 @@ class ExperimentAPITest(APITestCase):
             }
         )
         self.client.logout()
-        # Assert version of the experiment created is 1
 
+        # Assert version of the experiment created is 1
+        experiment = Experiment.objects.first()
+        last_version = ExperimentVersion.objects.filter(
+            experiment=experiment).last()
+        self.assertEqual(1, last_version.version)
 
 
 class ProtocolComponentAPITest(APITestCase):

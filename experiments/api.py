@@ -1,7 +1,9 @@
+import reversion
 from rest_framework import serializers, generics, permissions, viewsets
 
+from experiments import appclasses
 from experiments.models import Experiment, Study, User, Researcher, \
-    ProtocolComponent
+    ProtocolComponent, ExperimentVersion, ExperimentVersionMeta
 
 
 ###################
@@ -123,7 +125,16 @@ class ExperimentViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         study_id = self.request.data['study']
         study = Study.objects.get(id=study_id)
-        serializer.save(study=study, owner=self.request.user)
+        with reversion.create_revision():
+            exp_serializer = serializer.save(study=study,
+                                             owner=self.request.user)
+            experiment = Experiment.objects.get(id=exp_serializer.id)
+            reversion.set_user(self.request.user)
+            exp_version = appclasses.ExperimentVersion(
+                experiment
+            ).create_version()
+            reversion.add_meta(ExperimentVersionMeta,
+                               experiment_version=exp_version)
 
 
 class ProtocolComponentViewSet(viewsets.ModelViewSet):
