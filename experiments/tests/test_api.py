@@ -31,7 +31,7 @@ def create_experiment(nes_id, owner):
     Create Experiment model object to be used to test classes below.
     :param nes_id: client nes id
     :param owner: client owner 
-    :return: 
+    :return: Experiment object model
     """
     study = create_study(nes_id=nes_id, owner=owner)
     return Experiment.objects.create(
@@ -433,6 +433,23 @@ class ExperimentAPITest(APITestCase):
         )
         self.client.logout()
 
+    def test_POSTing_new_experiment_creates_version_one(self):
+        owner = User.objects.create_user(username='lab1', password='nep-lab1')
+        study = create_study(nes_id=1, owner=owner)
+        self.client.login(username=owner.username, password='nep-lab1')
+        self.client.post(
+            self.list_url,
+            {
+                'title': 'New experiment',
+                'description': 'Some description',
+                'nes_id': 1,
+                'study': study.id
+            }
+        )
+        self.client.logout()
+        # Assert version of the experiment created is 1
+
+
 
 class ProtocolComponentAPITest(APITestCase):
     list_url = reverse('api_protocol_components-list')
@@ -579,3 +596,4 @@ class ProtocolComponentAPITest(APITestCase):
             }
         )
         self.client.logout()
+

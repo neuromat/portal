@@ -1,5 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
+from reversion.models import Revision
+import reversion
 
 
 class Researcher(models.Model):
@@ -27,6 +29,7 @@ class Study(models.Model):
         unique_together = ('nes_id', 'owner')
 
 
+@reversion.register()
 class Experiment(models.Model):
     title = models.CharField(max_length=150)
     description = models.TextField()
@@ -42,6 +45,12 @@ class Experiment(models.Model):
 class ExperimentVersion(models.Model):
     version = models.PositiveIntegerField()
     experiment = models.ForeignKey(Experiment, related_name='versions')
+
+
+class ExperimentVersionMeta(models.Model):
+    experiment_version = models.ForeignKey(ExperimentVersion,
+                                           related_name='versionsmeta')
+    revision = models.OneToOneField(Revision)
 
 
 class ProtocolComponent(models.Model):
