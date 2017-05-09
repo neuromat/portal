@@ -538,8 +538,21 @@ class ProtocolComponentAPITest(APITestCase):
 
     def test_POSTing_a_new_protocolcomponent(self):
         owner = User.objects.create_user(username='lab1', password='nep-lab1')
-        experiment = create_experiment(nes_id=1, owner=owner)
         self.client.login(username=owner.username, password='nep-lab1')
+
+        # The owner post an experiment
+        study = create_study(nes_id=1, owner=owner)
+        self.client.post(
+            reverse('api_experiments-list'),
+            {
+                'title': 'New experiment',
+                'description': 'Some description',
+                'nes_id': 1,
+                'study': study.id  # TODO: here is nes_id
+            }
+        )
+        experiment = Experiment.objects.first()
+        # The owner post a protocol component
         response = self.client.post(
             self.list_url,
             {
@@ -548,7 +561,7 @@ class ProtocolComponentAPITest(APITestCase):
                 'duration_value': 4,
                 'component_type': 'A component type',
                 'nes_id': 1,
-                'experiment': experiment.id
+                'experiment': experiment.nes_id
             }
         )
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
@@ -562,10 +575,24 @@ class ProtocolComponentAPITest(APITestCase):
         ###
         # First we post a new protocol_component, then we test PUTing
         ###
-        # A owner post a protocol component
+        # An owner login
         owner1 = User.objects.create_user(username='lab1', password='nep-lab1')
-        experiment1 = create_experiment(nes_id=2, owner=owner1)
         self.client.login(username=owner1.username, password='nep-lab1')
+
+        # An owner post an experiment
+        study1 = create_study(nes_id=1, owner=owner1)
+        self.client.post(
+            reverse('api_experiments-list'),
+            {
+                'title': 'New experiment',
+                'description': 'Some description',
+                'nes_id': 1,
+                'study': study1.id
+            }
+        )
+
+        # An owner post a protocol component
+        experiment1 = Experiment.objects.first()
         self.client.post(
             self.list_url,
             {
@@ -577,12 +604,26 @@ class ProtocolComponentAPITest(APITestCase):
                 'experiment': experiment1.nes_id
             }
         )
-        self.client.logout()
+
+        # Other owner login
+        owner2 = User.objects.create_user(username='lab2', password='nep-lab2')
+        self.client.login(username=owner2.username, password='nep-lab2')
+
+        # Other owner post an experiment
+        study2 = create_study(nes_id=1, owner=owner2)
+        self.client.post(
+            reverse('api_experiments-list'),
+            {
+                'title': 'Other experiment',
+                'description': 'Other description',
+                'nes_id': 1,
+                'study': study2.id  # TODO: here is nes_id (see other
+                                    # occurences)
+            }
+        )
 
         # Other owner post a protocol component
-        owner2 = User.objects.create_user(username='lab2', password='nep-lab2')
-        experiment2 = create_experiment(nes_id=2, owner=owner2)
-        self.client.login(username=owner2.username, password='nep-lab2')
+        experiment2 = Experiment.objects.last()
         self.client.post(
             self.list_url,
             {
@@ -672,11 +713,8 @@ class ProtocolComponentAPITest(APITestCase):
 
         pro_component = ProtocolComponent.objects.first()
 
-        # Assert pro_component revision created is in ExperimentVersionMeta
+        # Assert pro_component has correct experiment version associated
         version = Version.objects.get_for_object(pro_component).first()
         exp_version_meta = ExperimentVersionMeta.objects.filter(
-            revision_id=version.revision_id)
-        self.assertIn(exp_version_meta, ExperimentVersion.objects.all())
-
-        # Assert pro_component has correct experiment version associated
-        self.assertEqual(1, exp_version_meta.experiment_version_id)
+            revision_id=version.revision_id).get()
+        self.assertEqual(1, exp_version_meta.experiment_version.id)

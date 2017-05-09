@@ -130,9 +130,8 @@ class ExperimentViewSet(viewsets.ModelViewSet):
                                              owner=self.request.user)
             experiment = Experiment.objects.get(id=exp_serializer.id)
             reversion.set_user(self.request.user)
-            exp_version = appclasses.ExperimentVersion(
-                experiment
-            ).create_version()
+            exp_version = \
+                appclasses.ExperimentVersion(experiment).create_version()
             reversion.add_meta(ExperimentVersionMeta,
                                experiment_version=exp_version)
 
@@ -164,4 +163,11 @@ class ProtocolComponentViewSet(viewsets.ModelViewSet):
         experiment_id = self.request.data['experiment']
         experiment = Experiment.objects.filter(
             nes_id=experiment_id, owner=self.request.user).get()
-        serializer.save(experiment=experiment, owner=self.request.user)
+        with reversion.create_revision():
+            serializer.save(experiment=experiment, owner=self.request.user)
+            reversion.set_user(self.request.user)
+            last_version = ExperimentVersion.objects.filter(
+                experiment=experiment
+            ).last()
+            reversion.add_meta(ExperimentVersionMeta,
+                               experiment_version=last_version)
