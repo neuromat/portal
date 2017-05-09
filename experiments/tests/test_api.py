@@ -5,8 +5,10 @@ from rest_framework.test import APITestCase
 from datetime import datetime
 import json
 
+from reversion.models import Version
+
 from experiments.models import Experiment, Researcher, Study, \
-    ProtocolComponent, ExperimentVersion
+    ProtocolComponent, ExperimentVersion, ExperimentVersionMeta
 
 
 def create_study(nes_id, owner):
@@ -562,7 +564,7 @@ class ProtocolComponentAPITest(APITestCase):
         ###
         # A owner post a protocol component
         owner1 = User.objects.create_user(username='lab1', password='nep-lab1')
-        experiment = create_experiment(nes_id=2, owner=owner1)
+        experiment1 = create_experiment(nes_id=2, owner=owner1)
         self.client.login(username=owner1.username, password='nep-lab1')
         self.client.post(
             self.list_url,
@@ -572,14 +574,14 @@ class ProtocolComponentAPITest(APITestCase):
                 'duration_value': 4,
                 'component_type': 'A component type',
                 'nes_id': 1,
-                'experiment': experiment.id
+                'experiment': experiment1.nes_id
             }
         )
         self.client.logout()
 
         # Other owner post a protocol component
         owner2 = User.objects.create_user(username='lab2', password='nep-lab2')
-        experiment = create_experiment(nes_id=2, owner=owner2)
+        experiment2 = create_experiment(nes_id=2, owner=owner2)
         self.client.login(username=owner2.username, password='nep-lab2')
         self.client.post(
             self.list_url,
@@ -589,7 +591,7 @@ class ProtocolComponentAPITest(APITestCase):
                 'duration_value': 1,
                 'component_type': 'Other component type',
                 'nes_id': 1,
-                'experiment': experiment.id
+                'experiment': experiment2.nes_id
             }
         )
         self.client.logout()
@@ -636,3 +638,45 @@ class ProtocolComponentAPITest(APITestCase):
             }
         )
         self.client.logout()
+
+    def test_POSTing_protocolcomponent_associates_last_experiment_version(self):
+        # First we post a new experiment to creates version
+        owner = User.objects.create_user(username='lab1', password='nep-lab1')
+        study = create_study(nes_id=1, owner=owner)
+        self.client.login(username=owner.username, password='nep-lab1')
+        self.client.post(
+            reverse('api_experiments-list'),
+            {
+                'title': 'New experiment',
+                'description': 'Some description',
+                'nes_id': 1,
+                'study': study.id
+            }
+        )
+
+        # Now we post a protocol component to test association with last
+        # experiment version
+        experiment = Experiment.objects.first()
+        self.client.post(
+            self.list_url,
+            {
+                'identification': 'An identification',
+                'description': 'A description',
+                'duration_value': 4,
+                'component_type': 'A component type',
+                'nes_id': 1,
+                'experiment': experiment.nes_id
+            }
+        )
+        self.client.logout()
+
+        pro_component = ProtocolComponent.objects.first()
+
+        # Assert pro_component revision created is in ExperimentVersionMeta
+        version = Version.objects.get_for_object(pro_component).first()
+        exp_version_meta = ExperimentVersionMeta.objects.filter(
+            revision_id=version.revision_id)
+        self.assertIn(exp_version_meta, ExperimentVersion.objects.all())
+
+        # Assert pro_component has correct experiment version associated
+        self.assertEqual(1, exp_version_meta.experiment_version_id)

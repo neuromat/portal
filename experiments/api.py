@@ -162,5 +162,6 @@ class ProtocolComponentViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         experiment_id = self.request.data['experiment']
-        experiment = Experiment.objects.filter(id=experiment_id).get()
+        experiment = Experiment.objects.filter(
+            nes_id=experiment_id, owner=self.request.user).get()
         serializer.save(experiment=experiment, owner=self.request.user)

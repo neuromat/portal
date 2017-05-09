@@ -53,6 +53,7 @@ class ExperimentVersionMeta(models.Model):
     revision = models.OneToOneField(Revision)
 
 
+@reversion.register()
 class ProtocolComponent(models.Model):
     identification = models.CharField(max_length=50)
     description = models.TextField(blank=True)
