@@ -12,7 +12,7 @@ class ExperimentVersion:
         if not last_version:
             return 0
         else:
-            return last_version + 1
+            return last_version.version
 
     def create_version(self):
         last_version = self.get_last_version()

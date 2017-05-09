@@ -136,6 +136,16 @@ class ExperimentViewSet(viewsets.ModelViewSet):
             reversion.add_meta(ExperimentVersionMeta,
                                experiment_version=exp_version)
 
+    def perform_update(self, serializer):
+        with reversion.create_revision():
+            exp_serializer = serializer.save()
+            experiment = Experiment.objects.get(id=exp_serializer.id)
+            reversion.set_user(self.request.user)
+            exp_version = appclasses.ExperimentVersion(
+                experiment).create_version()
+            reversion.add_meta(ExperimentVersionMeta,
+                               experiment_version=exp_version)
+
 
 class ProtocolComponentViewSet(viewsets.ModelViewSet):
     lookup_field = 'nes_id'
