@@ -8,10 +8,23 @@
     <title>Neuroscience Experiments Database</title>
 </head>
 <body>
+{# Header start #}
 <h1>Neuroscience Experiments Database</h1>
-<input id="id_search_box" placeholder="Type key terms/words to be searhed">
+<input id="id_search_box" placeholder="Type key terms/words to be searched">
+{# Header end #}
 <hr>
+
+{# Body start #}
 <table id="id_experiments_table">
+    {% for experiment in experiments %}
+        <tr>
+        <td>{{ experiment.title }}</td>
+        </tr>
+    {% endfor %}
 </table>
+{# Body end #}
+
+{# Footer start #}
+{# Footer end #}
 </body>
 </html>
