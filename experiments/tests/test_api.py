@@ -653,6 +653,7 @@ class ProtocolComponentAPITest(APITestCase):
                 'description': 'Changed description',
                 'duration_value': 2,
                 'component_type': 'Changed component type',
+                'experiment': experiment2.nes_id
             }
         )
         self.assertEqual(resp_put.status_code, status.HTTP_200_OK)
@@ -681,7 +682,7 @@ class ProtocolComponentAPITest(APITestCase):
         self.client.logout()
 
     def test_POSTing_protocolcomponent_associates_last_experiment_version(self):
-        # First we post a new experiment to creates version
+        # First we post a new experiment to create version
         owner = User.objects.create_user(username='lab1', password='nep-lab1')
         study = create_study(nes_id=1, owner=owner)
         self.client.login(username=owner.username, password='nep-lab1')
@@ -716,5 +717,65 @@ class ProtocolComponentAPITest(APITestCase):
         # Assert pro_component has correct experiment version associated
         version = Version.objects.get_for_object(pro_component).first()
         exp_version_meta = ExperimentVersionMeta.objects.filter(
-            revision_id=version.revision_id).get()
+            revision_id=version.revision.id).get()
+        self.assertEqual(1, exp_version_meta.experiment_version.id)
+
+    def test_PUTing_protocolcomponent_associates_last_experiment_version(self):
+        # First we post a new experiment to create version
+        owner = User.objects.create_user(username='lab1', password='nep-lab1')
+        study = create_study(nes_id=1, owner=owner)
+        self.client.login(username=owner.username, password='nep-lab1')
+        self.client.post(
+            reverse('api_experiments-list'),
+            {
+                'title': 'New experiment',
+                'description': 'Some description',
+                'nes_id': 1,
+                'study': study.id
+            }
+        )
+
+        # We post a protocol component: creates first revision
+        experiment = Experiment.objects.first()
+        self.client.post(
+            self.list_url,
+            {
+                'identification': 'An identification',
+                'description': 'A description',
+                'duration_value': 4,
+                'component_type': 'A component type',
+                'nes_id': 1,
+                'experiment': experiment.nes_id
+            }
+        )
+        self.client.logout()
+
+        # Now we put the protocol component posted to create new revision
+        pro_component = ProtocolComponent.objects.first()
+        detail_url = reverse(
+            'api_protocol_components-detail',
+            kwargs={'nes_id': pro_component.nes_id}
+        )
+        self.client.login(username=owner.username, password='nep-lab1')
+        self.client.patch(
+            detail_url,
+            {
+                'identification': 'Changed identification',
+                'description': 'Changed description',
+                'duration_value': 2,
+                'component_type': 'Changed component type',
+                'experiment': experiment.nes_id
+            }
+        )
+        self.client.logout()
+
+        # Assert there are 2 versions of pro_component
+        versions = Version.objects.get_for_object(pro_component)
+        self.assertEqual(2, len(versions))
+
+        # Assert last revision is associated to version one of experiment -
+        # - version[1] exists because of last assertEqual.
+        last_revision = versions[1]
+        exp_version_meta = ExperimentVersionMeta.objects.filter(
+            revision_id=last_revision.revision.id).get()
         self.assertEqual(1, exp_version_meta.experiment_version.id)

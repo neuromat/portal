@@ -138,7 +138,8 @@ class ExperimentViewSet(viewsets.ModelViewSet):
     def perform_update(self, serializer):
         with reversion.create_revision():
             exp_serializer = serializer.save()
-            experiment = Experiment.objects.get(id=exp_serializer.id)
+            # TODO: serializer.nes_id
+            experiment = Experiment.objects.get(id=exp_serializer.id)  #
             reversion.set_user(self.request.user)
             exp_version = appclasses.ExperimentVersion(
                 experiment).create_version()
@@ -160,11 +161,25 @@ class ProtocolComponentViewSet(viewsets.ModelViewSet):
             return ProtocolComponent.objects.all()
 
     def perform_create(self, serializer):
-        experiment_id = self.request.data['experiment']
+        experiment_nes_id = self.request.data['experiment']
         experiment = Experiment.objects.filter(
-            nes_id=experiment_id, owner=self.request.user).get()
+            nes_id=experiment_nes_id, owner=self.request.user).get()
         with reversion.create_revision():
             serializer.save(experiment=experiment, owner=self.request.user)
+            reversion.set_user(self.request.user)
+            last_version = ExperimentVersion.objects.filter(
+                experiment=experiment
+            ).last()
+            reversion.add_meta(ExperimentVersionMeta,
+                               experiment_version=last_version)
+
+    def perform_update(self, serializer):
+        experiment_nes_id = self.request.data['experiment']
+        experiment = Experiment.objects.filter(
+            nes_id=experiment_nes_id, owner=self.request.user
+        ).get()
+        with reversion.create_revision():
+            serializer.save()
             reversion.set_user(self.request.user)
             last_version = ExperimentVersion.objects.filter(
                 experiment=experiment
