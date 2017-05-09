@@ -1,7 +1,5 @@
 from selenium import webdriver
-from selenium.webdriver.common.keys import Keys
 
-import time
 import unittest
 
 
@@ -26,7 +24,7 @@ class NewVisitorTest(unittest.TestCase):
         header_text = self.browser.find_element_by_tag_name('h1').text
         self.assertIn('Neuroscience Experiments Database', header_text)
 
-        # TODO: She sees the home page have a list of experiments
+        # She sees the home page have a list of experiments
         # and click in one of that to check it out
 
         self.fail('Finish the test!')
