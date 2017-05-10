@@ -8,7 +8,7 @@ from reversion.models import Version
 
 from experiments.models import Experiment, Study, Researcher, \
     ProtocolComponent, ExperimentVersion, ExperimentVersionMeta, \
-    ExperimentStatus
+    ExperimentStatus, Group
 
 
 def create_researcher(nes_id, owner):
@@ -295,3 +295,11 @@ class ExperimentVersionMetaTest(TestCase):
             experiment
         ).first().revision_id
         self.assertEqual(revision, exp_version_meta.revision_id)
+
+
+class GroupModelTest(TestCase):
+    def test_default_attributes(self):
+        group = Group()
+        self.assertEqual(group.title, '')
+        self.assertEqual(group.description, '')
+        self.assertEqual(group.nes_id, None)
