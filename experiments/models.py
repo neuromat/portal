@@ -41,6 +41,9 @@ class Experiment(models.Model):
     description = models.TextField()
     data_acquisition_done = models.BooleanField(default=False)
     nes_id = models.PositiveIntegerField()
+    ethics_committee_file = models.FileField(
+        'Project file approved by the ethics committee', blank=True
+    )
     study = models.ForeignKey(Study, related_name='experiments')
     owner = models.ForeignKey(User)
     status = models.ForeignKey(ExperimentStatus, related_name='experiments',

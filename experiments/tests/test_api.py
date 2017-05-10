@@ -1,3 +1,6 @@
+import io
+
+from PIL import Image
 from django.urls import reverse
 from django.contrib.auth.models import User
 from rest_framework import status
@@ -315,6 +318,18 @@ class StudyAPITest(APITestCase):
 class ExperimentAPITest(APITestCase):
     list_url = reverse('api_experiments-list')
 
+    def generate_image_file(self):
+        """
+        Generates an image file to test upload
+        :return: image file 
+        """
+        file = io.BytesIO()
+        image = Image.new('RGBA', size=(100, 100), color=(155, 0, 0))
+        image.save(file, 'png')
+        file.name = 'test.png'
+        file.seek(0)
+        return file
+
     def test_get_returns_all_experiments(self):
         owner = User.objects.create_user(username='lab1')
         experiment1 = create_experiment(nes_id=1, owner=owner)
@@ -330,6 +345,7 @@ class ExperimentAPITest(APITestCase):
                     'data_acquisition_done':
                         experiment1.data_acquisition_done,
                     'nes_id': experiment1.nes_id,
+                    'ethics_committee_file': None,
                     'study': experiment1.study.title,
                     'owner': experiment1.owner.username,
                     'status': experiment1.status.tag,
@@ -342,6 +358,7 @@ class ExperimentAPITest(APITestCase):
                     'data_acquisition_done':
                         experiment2.data_acquisition_done,
                     'nes_id': experiment2.nes_id,
+                    'ethics_committee_file': None,
                     'study': experiment2.study.title,
                     'owner': experiment2.owner.username,
                     'status': experiment2.status.tag,
@@ -353,6 +370,7 @@ class ExperimentAPITest(APITestCase):
     def test_POSTing_a_new_experiment(self):
         owner = User.objects.create_user(username='lab1', password='nep-lab1')
         study = create_study(nes_id=1, owner=owner)
+        image_file = self.generate_image_file()
         self.client.login(username=owner.username, password='nep-lab1')
         response = self.client.post(
             self.list_url,
@@ -360,8 +378,10 @@ class ExperimentAPITest(APITestCase):
                 'title': 'New experiment',
                 'description': 'Some description',
                 'nes_id': 1,
-                'study': study.id
-            }
+                'study': study.id,
+                'ethics_committee_file': image_file
+            },
+            format='multipart'
         )
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.client.logout()
@@ -435,6 +455,7 @@ class ExperimentAPITest(APITestCase):
                 'data_acquisition_done':
                     updated_experiment.data_acquisition_done,
                 'nes_id': updated_experiment.nes_id,
+                'ethics_committee_file': None,
                 'study': updated_experiment.study.title,
                 'owner': updated_experiment.owner.username,
                 'status': None,
