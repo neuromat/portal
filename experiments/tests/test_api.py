@@ -8,7 +8,8 @@ import json
 from reversion.models import Version
 
 from experiments.models import Experiment, Researcher, Study, \
-    ProtocolComponent, ExperimentVersion, ExperimentVersionMeta
+    ProtocolComponent, ExperimentVersion, ExperimentVersionMeta, \
+    ExperimentStatus
 
 
 def create_study(nes_id, owner):
@@ -37,9 +38,12 @@ def create_experiment(nes_id, owner):
     :return: Experiment object model
     """
     study = create_study(nes_id=nes_id, owner=owner)
+    # TODO: we are creating status but Experiment has a default status: see
+    # other cases. Perhaps create ExperimentStatus already poppulated.
+    st = ExperimentStatus.objects.create(tag='to_be_approved')
     return Experiment.objects.create(
             nes_id=nes_id, title='Our title', description='Our description',
-            study=study, owner=owner
+            study=study, owner=owner, status=st
     )
 
 
@@ -328,6 +332,7 @@ class ExperimentAPITest(APITestCase):
                     'nes_id': experiment1.nes_id,
                     'study': experiment1.study.title,
                     'owner': experiment1.owner.username,
+                    'status': experiment1.status.tag,
                     'protocol_components': []
                 },
                 {
@@ -339,6 +344,7 @@ class ExperimentAPITest(APITestCase):
                     'nes_id': experiment2.nes_id,
                     'study': experiment2.study.title,
                     'owner': experiment2.owner.username,
+                    'status': experiment2.status.tag,
                     'protocol_components': []
                 }
             ]
@@ -431,6 +437,7 @@ class ExperimentAPITest(APITestCase):
                 'nes_id': updated_experiment.nes_id,
                 'study': updated_experiment.study.title,
                 'owner': updated_experiment.owner.username,
+                'status': None,
                 'protocol_components': []
             }
         )
@@ -724,6 +731,7 @@ class ProtocolComponentAPITest(APITestCase):
         # First we post a new experiment to create version
         owner = User.objects.create_user(username='lab1', password='nep-lab1')
         study = create_study(nes_id=1, owner=owner)
+        st = ExperimentStatus.objects.create(tag='to_be_approved')
         self.client.login(username=owner.username, password='nep-lab1')
         self.client.post(
             reverse('api_experiments-list'),
@@ -731,7 +739,7 @@ class ProtocolComponentAPITest(APITestCase):
                 'title': 'New experiment',
                 'description': 'Some description',
                 'nes_id': 1,
-                'study': study.id
+                'study': study.id,
             }
         )
 

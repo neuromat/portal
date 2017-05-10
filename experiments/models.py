@@ -43,6 +43,9 @@ class Experiment(models.Model):
     nes_id = models.PositiveIntegerField()
     study = models.ForeignKey(Study, related_name='experiments')
     owner = models.ForeignKey(User)
+    status = models.ForeignKey(ExperimentStatus, related_name='experiments',
+                               default=1)  # TODO: requires 'to_be_approved'
+    # has id 1.
 
     class Meta:
         unique_together = ('nes_id', 'owner')
