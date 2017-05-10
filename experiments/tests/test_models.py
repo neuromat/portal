@@ -131,6 +131,12 @@ class ExperimentStatusModelTest(TestCase):
         self.assertEqual(experiment_st.name, '')
         self.assertEqual(experiment_st.description, '')
 
+    def test_cannot_save_empty_attributes(self):
+        experiment_st = ExperimentStatus(tag='')
+        with self.assertRaises(ValidationError):
+            experiment_st.save()
+            experiment_st.full_clean()
+
 
 class ExperimentModelTest(TestCase):
 
