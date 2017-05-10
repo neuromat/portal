@@ -7,7 +7,8 @@ from datetime import datetime
 from reversion.models import Version
 
 from experiments.models import Experiment, Study, Researcher, \
-    ProtocolComponent, ExperimentVersion, ExperimentVersionMeta
+    ProtocolComponent, ExperimentVersion, ExperimentVersionMeta, \
+    ExperimentStatus
 
 
 def create_researcher(nes_id, owner):
@@ -121,6 +122,14 @@ class StudyModelTest(TestCase):
         study.save()
         self.assertIn(study, researcher.studies.all())
         self.assertIn(study, owner.study_set.all())
+
+
+class ExperimentStatusModelTest(TestCase):
+    def test_default_attributes(self):
+        experiment_st = ExperimentStatus()
+        self.assertEqual(experiment_st.tag, '')
+        self.assertEqual(experiment_st.name, '')
+        self.assertEqual(experiment_st.description, '')
 
 
 class ExperimentModelTest(TestCase):

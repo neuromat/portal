@@ -29,6 +29,12 @@ class Study(models.Model):
         unique_together = ('nes_id', 'owner')
 
 
+class ExperimentStatus(models.Model):
+    tag = models.CharField(max_length=20)
+    name = models.CharField(max_length=50, blank=True)
+    description = models.TextField(blank=True)
+
+
 @reversion.register()
 class Experiment(models.Model):
     title = models.CharField(max_length=150)
