@@ -7,7 +7,8 @@ from datetime import datetime
 from reversion.models import Version
 
 from experiments.models import Experiment, Study, Researcher, \
-    ProtocolComponent, ExperimentVersion, ExperimentVersionMeta
+    ProtocolComponent, ExperimentVersion, ExperimentVersionMeta, \
+    ExperimentStatus, Group
 
 
 def create_researcher(nes_id, owner):
@@ -34,8 +35,9 @@ def create_experiment(nes_id, owner):
     in test classes that depends on it. 
     """
     study = create_study(nes_id=nes_id, owner=owner)
+    status = ExperimentStatus.objects.create(tag='to_be_approved')
     return Experiment.objects.create(nes_id=nes_id, study=study,
-                                     owner=study.owner)
+                                     owner=study.owner, status=status)
 
 
 class ResearcherModelTest(TestCase):
@@ -123,6 +125,20 @@ class StudyModelTest(TestCase):
         self.assertIn(study, owner.study_set.all())
 
 
+class ExperimentStatusModelTest(TestCase):
+    def test_default_attributes(self):
+        experiment_st = ExperimentStatus()
+        self.assertEqual(experiment_st.tag, '')
+        self.assertEqual(experiment_st.name, '')
+        self.assertEqual(experiment_st.description, '')
+
+    def test_cannot_save_empty_attributes(self):
+        experiment_st = ExperimentStatus(tag='')
+        with self.assertRaises(ValidationError):
+            experiment_st.save()
+            experiment_st.full_clean()
+
+
 class ExperimentModelTest(TestCase):
 
     def test_default_attributes(self):
@@ -131,6 +147,7 @@ class ExperimentModelTest(TestCase):
         self.assertEqual(experiment.description, '')
         self.assertEqual(experiment.data_acquisition_done, False)
         self.assertEqual(experiment.nes_id, None)
+        self.assertEqual(experiment.ethics_committee_file, '')
 
     def test_cannot_save_empty_attributes(self):
         owner = User.objects.create(username='lab1')
@@ -138,10 +155,12 @@ class ExperimentModelTest(TestCase):
         study = Study.objects.create(
             nes_id=1, start_date=datetime.utcnow(), researcher=researcher,
             owner=owner)
+        status = ExperimentStatus.objects.create(tag='to_be_approved')
         # TODO: why we need to pass nes_id, study and owner and in
         # StudyModelTest's test_cannot_save_empty_attributes not?
         experiment = Experiment(
-            nes_id=1, title='', description='', study=study, owner=owner
+            nes_id=1, title='', description='', study=study, owner=owner,
+            status=status
         )
         with self.assertRaises(ValidationError):
             experiment.save()
@@ -150,8 +169,11 @@ class ExperimentModelTest(TestCase):
     def test_duplicate_experiments_are_invalid(self):
         owner = User.objects.create_user(username='lab2')
         study = create_study(nes_id=1, owner=owner)
-        Experiment.objects.create(nes_id=1, study=study, owner=owner)
-        experiment = Experiment(nes_id=1, study=study, owner=owner)
+        status = ExperimentStatus.objects.create(tag='to_be_approved')
+        Experiment.objects.create(nes_id=1, study=study, owner=owner,
+                                  status=status)
+        experiment = Experiment(nes_id=1, study=study, owner=owner,
+                                status=status)
         with self.assertRaises(ValidationError):
             experiment.full_clean()
 
@@ -160,17 +182,22 @@ class ExperimentModelTest(TestCase):
         owner2 = User.objects.create_user(username='lab2')
         study2 = create_study(nes_id=1, owner=owner2)
         create_experiment(nes_id=1, owner=owner1)
+        status = ExperimentStatus.objects.create(tag='to_be_approved')
         experiment = Experiment(title='A title', description='A description',
-                                nes_id=1, study=study2, owner=owner2)
+                                nes_id=1, study=study2, owner=owner2,
+                                status=status)
         experiment.full_clean()
 
-    def test_experiment_is_related_to_study_and_owner(self):
+    def test_experiment_is_related_to_study_and_owner_and_status(self):
         owner = User.objects.create(username='lab2')
         study = create_study(nes_id=1, owner=owner)
-        experiment = Experiment(nes_id=1, study=study, owner=owner)
+        status = ExperimentStatus.objects.create(tag='to_be_approved')
+        experiment = Experiment(nes_id=1, study=study, owner=owner,
+                                status=status)
         experiment.save()
         self.assertIn(experiment, study.experiments.all())
         self.assertIn(experiment, owner.experiment_set.all())
+        self.assertIn(experiment, status.experiments.all())
 
 
 class ProtocolComponentModelTest(TestCase):
@@ -268,3 +295,11 @@ class ExperimentVersionMetaTest(TestCase):
             experiment
         ).first().revision_id
         self.assertEqual(revision, exp_version_meta.revision_id)
+
+
+class GroupModelTest(TestCase):
+    def test_default_attributes(self):
+        group = Group()
+        self.assertEqual(group.title, '')
+        self.assertEqual(group.description, '')
+        self.assertEqual(group.nes_id, None)

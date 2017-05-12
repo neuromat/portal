@@ -29,14 +29,26 @@ class Study(models.Model):
         unique_together = ('nes_id', 'owner')
 
 
+class ExperimentStatus(models.Model):
+    tag = models.CharField(max_length=20)
+    name = models.CharField(max_length=50, blank=True)
+    description = models.TextField(blank=True)
+
+
 @reversion.register()
 class Experiment(models.Model):
     title = models.CharField(max_length=150)
     description = models.TextField()
     data_acquisition_done = models.BooleanField(default=False)
     nes_id = models.PositiveIntegerField()
+    ethics_committee_file = models.FileField(
+        'Project file approved by the ethics committee', blank=True
+    )
     study = models.ForeignKey(Study, related_name='experiments')
     owner = models.ForeignKey(User)
+    status = models.ForeignKey(ExperimentStatus, related_name='experiments',
+                               default=1)  # TODO: requires 'to_be_approved'
+    # has id 1.
 
     class Meta:
         unique_together = ('nes_id', 'owner')
@@ -66,3 +78,11 @@ class ProtocolComponent(models.Model):
 
     class Meta:
         unique_together = ('nes_id', 'owner')
+
+
+class Group(models.Model):
+    title = models.CharField(max_length=50)
+    description = models.TextField()
+    protocol_component = models.ForeignKey(ProtocolComponent, blank=True)
+    nes_id = models.PositiveIntegerField()
+    owner = models.ForeignKey(User)

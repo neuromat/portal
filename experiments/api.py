@@ -12,6 +12,7 @@ from experiments.models import Experiment, Study, User, Researcher, \
 class ExperimentSerializer(serializers.ModelSerializer):
     study = serializers.ReadOnlyField(source='study.title')
     owner = serializers.ReadOnlyField(source='owner.username')
+    status = serializers.ReadOnlyField(source='status.tag')
     protocol_components = serializers.PrimaryKeyRelatedField(
         many=True, read_only=True
     )
@@ -19,7 +20,8 @@ class ExperimentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Experiment
         fields = ('id', 'title', 'description', 'data_acquisition_done',
-                  'nes_id', 'study', 'owner', 'protocol_components')
+                  'nes_id', 'ethics_committee_file', 'study',
+                  'owner', 'status', 'protocol_components')
 
 
 class UserSerializer(serializers.ModelSerializer):

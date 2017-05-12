@@ -1,5 +1,9 @@
 from django.shortcuts import render
 
+from experiments.models import Experiment
+
 
 def home_page(request):
-    return render(request, 'experiments/home.html')
+    experiments = Experiment.objects.all()
+    return render(request, 'experiments/home.html',
+                  {'experiments': experiments})
