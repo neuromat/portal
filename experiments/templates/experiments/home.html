@@ -14,17 +14,55 @@
 {# Header end #}
 <hr>
 
-{# Body start #}
+{# Content start #}
+<div id="id_table_title">
+    <h2>List of Experiments</h2>
+</div>
 <table id="id_experiments_table">
+<thead>
+<tr>
+    <th>Title</th>
+    <th>Description</th>
+</tr>
+</thead>
     {% for experiment in experiments %}
         <tr>
-        <td>{{ experiment.title }}</td>
+            <td>{{ experiment.title }}</td>
+            <td>{{ experiment.description }}</td>
         </tr>
     {% endfor %}
 </table>
-{# Body end #}
+{# Content end #}
 
 {# Footer start #}
+<section id="id_footer_section">
+    <h4>Contact</h4>
+    <div id="id_footer_content">
+        <p>
+            Address: <br>
+            Matão St., 1010 - Cidade Universitária - São Paulo - SP - Brasil. 05508-090.
+            Veja o mapa
+        </p>
+        <p>
+            Phone: <br>
+            +55 11 3091-1717
+        </p>
+        <p>
+            Email: <br>
+            neuromat@numec.prp.usp.br
+        </p>
+        <p>
+            Media contact: <br>
+            comunicacao@numec.prp.usp.br
+        </p>
+    </div>
+    <div id="id_license">
+        <p>
+            This site content is licensed with Creative Commons Attributions
+            3.0.
+        </p>
+    </div>
+</section>
 {# Footer end #}
 </body>
 </html>
