@@ -36,7 +36,8 @@ def create_experiment(nes_id, owner):
     study = create_study(nes_id=nes_id, owner=owner)
     status = ExperimentStatus.objects.create(tag='to_be_approved')
     return Experiment.objects.create(nes_id=nes_id, study=study,
-                                     owner=study.owner, status=status)
+                                     owner=study.owner, status=status,
+                                     version_number=1)
 
 
 class ResearcherModelTest(TestCase):
@@ -147,6 +148,7 @@ class ExperimentModelTest(TestCase):
         self.assertEqual(experiment.data_acquisition_done, False)
         self.assertEqual(experiment.nes_id, None)
         self.assertEqual(experiment.ethics_committee_file, '')
+        self.assertEqual(experiment.version_number, None)
 
     def test_cannot_save_empty_attributes(self):
         owner = User.objects.create(username='lab1')
@@ -159,7 +161,7 @@ class ExperimentModelTest(TestCase):
         # StudyModelTest's test_cannot_save_empty_attributes not?
         experiment = Experiment(
             nes_id=1, title='', description='', study=study, owner=owner,
-            status=status
+            status=status, version_number=1
         )
         with self.assertRaises(ValidationError):
             experiment.save()
@@ -170,9 +172,9 @@ class ExperimentModelTest(TestCase):
         study = create_study(nes_id=1, owner=owner)
         status = ExperimentStatus.objects.create(tag='to_be_approved')
         Experiment.objects.create(nes_id=1, study=study, owner=owner,
-                                  status=status)
+                                  status=status, version_number=1)
         experiment = Experiment(nes_id=1, study=study, owner=owner,
-                                status=status)
+                                status=status, version_number=1)
         with self.assertRaises(ValidationError):
             experiment.full_clean()
 
@@ -184,7 +186,7 @@ class ExperimentModelTest(TestCase):
         status = ExperimentStatus.objects.create(tag='to_be_approved')
         experiment = Experiment(title='A title', description='A description',
                                 nes_id=1, study=study2, owner=owner2,
-                                status=status)
+                                status=status, version_number=1)
         experiment.full_clean()
 
     def test_experiment_is_related_to_study_and_owner_and_status(self):
@@ -192,7 +194,7 @@ class ExperimentModelTest(TestCase):
         study = create_study(nes_id=1, owner=owner)
         status = ExperimentStatus.objects.create(tag='to_be_approved')
         experiment = Experiment(nes_id=1, study=study, owner=owner,
-                                status=status)
+                                status=status, version_number=1)
         experiment.save()
         self.assertIn(experiment, study.experiments.all())
         self.assertIn(experiment, owner.experiment_set.all())

@@ -126,7 +126,8 @@ class ExperimentViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         study_id = self.request.data['study']
         study = Study.objects.get(id=study_id)
-        serializer.save(study=study, owner=self.request.user)
+        # TODO: just for debug tests. Add real version_number
+        serializer.save(study=study, owner=self.request.user, version_number=1)
 
 
 class ProtocolComponentViewSet(viewsets.ModelViewSet):

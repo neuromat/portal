@@ -45,7 +45,7 @@ def create_experiment(nes_id, owner):
     st = ExperimentStatus.objects.create(tag='to_be_approved')
     return Experiment.objects.create(
             nes_id=nes_id, title='Our title', description='Our description',
-            study=study, owner=owner, status=st
+            study=study, owner=owner, status=st, version_number=1
     )
 
 
