@@ -12,9 +12,9 @@ class ExperimentVersion:
     def get_last_version(self):
         last_exp_version = models.Experiment.objects.filter(
             nes_id=self.nes_id, owner=self.owner
-        ).aggregate(Max('version_number'))
-        if not last_exp_version['version_number__max']:
+        ).aggregate(Max('version'))
+        if not last_exp_version['version__max']:
             return 0
         else:
-            return last_exp_version['version_number__max']
+            return last_exp_version['version__max']
 

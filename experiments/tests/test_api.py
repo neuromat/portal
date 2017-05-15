@@ -11,7 +11,7 @@ import json
 from reversion.models import Version
 
 from experiments.models import Experiment, Researcher, Study, \
-    ProtocolComponent, ExperimentStatus
+    ProtocolComponent, ExperimentStatus, Group
 
 
 def create_study(nes_id, owner):
@@ -32,20 +32,23 @@ def create_study(nes_id, owner):
     )
 
 
-def create_experiment(nes_id, owner):
+def create_experiment(nes_id, owner, version):
     """
     Create Experiment model object to be used to test classes below.
     :param nes_id: client nes id
-    :param owner: client owner 
+    :param owner: client owner
+    :param version: version number
     :return: Experiment object model
     """
-    study = create_study(nes_id=nes_id, owner=owner)
+    # We sum up nes_id+version to deal with creating experiments with same
+    # nes_id and owner
+    study = create_study(nes_id=nes_id+version, owner=owner)
     # TODO: we are creating status but Experiment has a default status: see
     # other cases. Perhaps create ExperimentStatus already poppulated.
     st = ExperimentStatus.objects.create(tag='to_be_approved')
     return Experiment.objects.create(
             nes_id=nes_id, title='Our title', description='Our description',
-            study=study, owner=owner, status=st, version_number=1
+            study=study, owner=owner, status=st, version=version
     )
 
 
@@ -331,8 +334,8 @@ class ExperimentAPITest(APITestCase):
 
     def test_get_returns_all_experiments(self):
         owner = User.objects.create_user(username='lab1')
-        experiment1 = create_experiment(nes_id=1, owner=owner)
-        experiment2 = create_experiment(nes_id=2, owner=owner)
+        experiment1 = create_experiment(nes_id=1, owner=owner, version=1)
+        experiment2 = create_experiment(nes_id=2, owner=owner, version=1)
         response = self.client.get(self.list_url)
         self.assertEqual(
             json.loads(response.content.decode('utf8')),
@@ -402,7 +405,7 @@ class ExperimentAPITest(APITestCase):
             },
         )
         new_experiment = Experiment.objects.first()
-        self.assertEqual(new_experiment.version_number, 1)
+        self.assertEqual(new_experiment.version, 1)
 
         # Post same experiment
         self.client.post(
@@ -415,7 +418,7 @@ class ExperimentAPITest(APITestCase):
             },
         )
         same_experiment = Experiment.objects.last()
-        self.assertEqual(same_experiment.version_number, 2)
+        self.assertEqual(same_experiment.version, 2)
 
         self.client.logout()
 
@@ -557,7 +560,7 @@ class ProtocolComponentAPITest(APITestCase):
 
     def test_get_returns_all_protocolcomponents(self):
         owner = User.objects.create_user(username='lab1')
-        experiment = create_experiment(nes_id=1, owner=owner)
+        experiment = create_experiment(nes_id=1, owner=owner, version=1)
         protocol_component1 = ProtocolComponent.objects.create(
             identification='An identification',
             component_type='A component type',
@@ -599,7 +602,8 @@ class ProtocolComponentAPITest(APITestCase):
         owner = User.objects.create_user(username='lab1', password='nep-lab1')
         self.client.login(username=owner.username, password='nep-lab1')
 
-        # The owner post an experiment
+        # The owner post an experiment. TODO: It's not necessary. Enough to
+        # create experiment directly.
         study = create_study(nes_id=1, owner=owner)
         self.client.post(
             reverse('api_experiments-list'),
@@ -611,6 +615,7 @@ class ProtocolComponentAPITest(APITestCase):
             }
         )
         experiment = Experiment.objects.first()
+
         # The owner post a protocol component
         response = self.client.post(
             self.list_url,
@@ -739,3 +744,80 @@ class ProtocolComponentAPITest(APITestCase):
             }
         )
         self.client.logout()
+
+
+class GroupAPITest(APITestCase):
+    list_url = reverse('api_groups-list')
+
+    def test_get_returns_all_groups(self):
+        owner = User.objects.create_user(username='lab1')
+        experiment = create_experiment(nes_id=1, owner=owner, version=1)
+        group1 = Group.objects.create(
+            title='A title', description='A description', nes_id=1,
+            owner=owner, experiment=experiment
+        )
+        group2 = Group.objects.create(
+            title='Other title', description='Other description', nes_id=2,
+            owner=owner,
+            experiment=experiment
+        )
+        response = self.client.get(self.list_url)
+        self.assertEqual(
+            json.loads(response.content.decode('utf8')),
+            [
+                {
+                    'id': group1.id,
+                    'title': group1.title,
+                    'description': group1.description,
+                    'experiment': group1.experiment.title,
+                    'nes_id': group1.nes_id,
+                    'owner': group1.owner.username
+                },
+                {
+                    'id': group2.id,
+                    'title': group2.title,
+                    'description': group2.description,
+                    'experiment': group2.experiment.title,
+                    'nes_id': group2.nes_id,
+                    'owner': group2.owner.username
+                }
+            ]
+        )
+
+    def test_POSTing_a_new_group(self):
+        owner = User.objects.create_user(username='lab1', password='nep-lab1')
+        experiment = create_experiment(1, owner, 1)
+        self.client.login(username=owner.username, password='nep-lab1')
+
+        response = self.client.post(
+            self.list_url,
+            {
+                'title': 'A title',
+                'description': 'A description',
+                'experiment': experiment.id,
+                'nes_id': 1,
+            }
+        )
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.client.logout()
+        new_group = Group.objects.first()
+        self.assertEqual(new_group.title, 'A title')
+
+    def test_POSTing_new_group_associates_with_last_experiment_version(self):
+        owner = User.objects.create_user(username='lab1', password='nep-lab1')
+        experiment_v1 = create_experiment(1, owner, 1)
+        experiment_v2 = create_experiment(1, owner, 2)
+        self.client.login(username=owner.username, password='nep-lab1')
+
+        self.client.post(
+            self.list_url,
+            {
+                'title': 'A title',
+                'description': 'A description',
+                'experiment': experiment_v1.nes_id,  # equals experiment_v2.nes_id
+                'nes_id': 1,
+            }
+        )
+        self.client.logout()
+        new_group = Group.objects.first()
+        self.assertEqual(new_group.experiment.id, experiment_v2.id)

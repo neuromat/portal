@@ -11,6 +11,8 @@ router.register(r'experiments', api.ExperimentViewSet,
                 base_name='api_experiments')
 router.register(r'protocol_components', api.ProtocolComponentViewSet,
                 base_name='api_protocol_components')
+router.register(r'groups', api.GroupViewSet,
+                base_name='api_groups')
 
 urlpatterns = [
     url(r'^', include(router.urls)),

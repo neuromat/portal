@@ -43,7 +43,7 @@ class Experiment(models.Model):
     ethics_committee_file = models.FileField(
         'Project file approved by the ethics committee', blank=True
     )
-    version_number = models.PositiveIntegerField()
+    version = models.PositiveIntegerField()
     study = models.ForeignKey(Study, related_name='experiments')
     status = models.ForeignKey(ExperimentStatus, related_name='experiments',
                                default=1)  # TODO: requires 'to_be_approved'
@@ -52,7 +52,7 @@ class Experiment(models.Model):
     owner = models.ForeignKey(User)
 
     class Meta:
-        unique_together = ('nes_id', 'owner', 'version_number')
+        unique_together = ('nes_id', 'owner', 'version')
 
 
 @reversion.register()
