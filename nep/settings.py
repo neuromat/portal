@@ -122,5 +122,6 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.10/howto/static-files/
 
 STATIC_URL = '/static/'
-
+STATIC_ROOT = '/home/caco/Workspace/nep-system/nep/static'  # TODO: for
+# development only. See: https://docs.djangoproject.com/en/1.11/howto/static-files/#serving-static-files-during-development
 MEDIA_ROOT = '/home/caco/Workspace/nep-system/nep/media'
