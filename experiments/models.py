@@ -67,12 +67,17 @@ class ProtocolComponent(models.Model):
     owner = models.ForeignKey(User)
 
     class Meta:
-        unique_together = ('nes_id', 'owner')
+        unique_together = ('nes_id', 'owner', 'experiment')
 
 
 class Group(models.Model):
     title = models.CharField(max_length=50)
     description = models.TextField()
-    protocol_component = models.ForeignKey(ProtocolComponent, blank=True)
+    protocol_component = models.ForeignKey(
+        ProtocolComponent, null=True, blank=True)
+    experiment = models.ForeignKey(Experiment, related_name='groups')
     nes_id = models.PositiveIntegerField()
     owner = models.ForeignKey(User)
+
+    class Meta:
+        unique_together = ('nes_id', 'owner', 'experiment')

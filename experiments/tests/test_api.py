@@ -387,6 +387,38 @@ class ExperimentAPITest(APITestCase):
         new_experiment = Experiment.objects.first()
         self.assertEqual(new_experiment.title, 'New experiment')
 
+    def test_POSTing_experiment_generates_new_version(self):
+        owner = User.objects.create_user(username='lab1', password='nep-lab1')
+        study = create_study(nes_id=1, owner=owner)
+        self.client.login(username=owner.username, password='nep-lab1')
+        # Post new experiment
+        self.client.post(
+            self.list_url,
+            {
+                'title': 'New experiment',
+                'description': 'Some description',
+                'nes_id': 1,
+                'study': study.id,
+            },
+        )
+        new_experiment = Experiment.objects.first()
+        self.assertEqual(new_experiment.version_number, 1)
+
+        # Post same experiment
+        self.client.post(
+            self.list_url,
+            {
+                'title': 'New experiment',
+                'description': 'Some description',
+                'nes_id': 1,
+                'study': study.id,
+            },
+        )
+        same_experiment = Experiment.objects.last()
+        self.assertEqual(same_experiment.version_number, 2)
+
+        self.client.logout()
+
     def test_PUTing_an_existing_experiment(self):
         # TODO: very large test
         ###
@@ -407,7 +439,7 @@ class ExperimentAPITest(APITestCase):
         )
         self.client.logout()
 
-        # Other owner post a study
+        # Other owner post an experiment
         owner2 = User.objects.create_user(username='lab2', password='nep-lab2')
         study = create_study(nes_id=2, owner=owner2)
         self.client.login(username=owner2.username, password='nep-lab2')

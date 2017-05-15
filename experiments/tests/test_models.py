@@ -252,11 +252,15 @@ class ProtocolComponentModelTest(TestCase):
         owner2 = User.objects.create(username='lab3')
         experiment1 = create_experiment(nes_id=1, owner=owner1)
         experiment2 = create_experiment(nes_id=1, owner=owner2)
-
-        ProtocolComponent.objects.create(nes_id=1, experiment=experiment1,
-                                         owner=owner1)
-        ProtocolComponent.objects.create(nes_id=1, experiment=experiment2,
-                                         owner=owner2)
+        ProtocolComponent.objects.create(
+            nes_id=1, experiment=experiment1, owner=owner1
+        )
+        protocol_component = ProtocolComponent(
+            nes_id=1, identification='An identification',
+            duration_value=10, component_type='A component type',
+            experiment=experiment2, owner=owner2,
+        )
+        protocol_component.full_clean()
 
 
 class GroupModelTest(TestCase):
@@ -265,3 +269,53 @@ class GroupModelTest(TestCase):
         self.assertEqual(group.title, '')
         self.assertEqual(group.description, '')
         self.assertEqual(group.nes_id, None)
+
+    def test_group_is_related_to_experiment_and_owner(self):
+        owner = User.objects.create(username='lab2')
+        experiment = create_experiment(nes_id=1, owner=owner)
+        group = Group.objects.create(
+            title='Group A', description='A description', nes_id=1,
+            experiment=experiment, owner=owner
+        )
+        self.assertIn(group, experiment.groups.all())
+        self.assertIn(group, owner.group_set.all())
+
+    def test_cannot_save_empty_attributes(self):
+        owner = User.objects.create(username='lab2')
+        experiment = create_experiment(nes_id=1, owner=owner)
+        group = Group.objects.create(
+            title='', description='', nes_id=1,
+            experiment=experiment, owner=owner
+        )
+        with self.assertRaises(ValidationError):
+            group.save()
+            group.full_clean()
+
+    def test_duplicate_groups_are_invalid(self):
+        owner = User.objects.create(username='lab2')
+        experiment = create_experiment(nes_id=1, owner=owner)
+        Group.objects.create(
+            title='Group A', description='A description', nes_id=1,
+            experiment=experiment, owner=owner
+        )
+        group = Group(
+            title='Group A', description='A description', nes_id=1,
+            experiment=experiment, owner=owner
+        )
+        with self.assertRaises(ValidationError):
+            group.full_clean()
+
+    def test_CAN_save_same_groups_to_different_owners(self):
+        owner1 = User.objects.create(username='lab2')
+        owner2 = User.objects.create(username='lab3')
+        experiment1 = create_experiment(nes_id=1, owner=owner1)
+        experiment2 = create_experiment(nes_id=1, owner=owner2)
+        Group.objects.create(
+            title='Group A', description='A description', nes_id=1,
+            experiment=experiment1, owner=owner1
+        )
+        group = Group(
+            title='Group A', description='A description', nes_id=1,
+            experiment=experiment2, owner=owner2
+        )
+        group.full_clean()
