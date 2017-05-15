@@ -6,12 +6,16 @@
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>{% block title %} Neuroscience Experiments Database {% endblock %}</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'experiments/normalize.css' %}">
 </head>
 <body>
 {% include 'experiments/header.html' %}
 <hr>
+<section>
 {% block content %}
 {% endblock %}
+</section>
 <hr>
 {% include 'experiments/footer.html' %}
 </body>
