@@ -4,11 +4,10 @@ from django.core.exceptions import ValidationError
 from django.contrib.auth.models import User
 from datetime import datetime
 
-from reversion.models import Version
+from reversion.models import Version  # TODO: uninstall reversion
 
 from experiments.models import Experiment, Study, Researcher, \
-    ProtocolComponent, ExperimentVersion, ExperimentVersionMeta, \
-    ExperimentStatus, Group
+    ProtocolComponent, ExperimentStatus, Group
 
 
 def create_researcher(nes_id, owner):
@@ -256,45 +255,6 @@ class ProtocolComponentModelTest(TestCase):
                                          owner=owner1)
         ProtocolComponent.objects.create(nes_id=1, experiment=experiment2,
                                          owner=owner2)
-
-
-class ExperimentVersionTest(TestCase):
-
-    def test_default_attributes(self):
-        experiment_version = ExperimentVersion()
-        self.assertEqual(experiment_version.version, None)
-
-    def test_cannot_save_empty_attributes(self):
-        experiment_version = ExperimentVersion(version=None)
-        with self.assertRaises(ValidationError):
-            experiment_version.full_clean()
-
-    def test_version_is_related_to_experiment(self):
-        owner = User.objects.create(username='lab1')
-        experiment = create_experiment(nes_id=1, owner=owner)
-        version = ExperimentVersion(experiment=experiment, version=2)
-        version.save()
-        self.assertIn(version, experiment.versions.all())
-
-
-class ExperimentVersionMetaTest(TestCase):
-
-    def test_version_meta_is_related_to_experiment_version_and_revision(self):
-        owner = User.objects.create(username='lab1')
-        with reversion.create_revision():
-            experiment = create_experiment(nes_id=1, owner=owner)
-            experiment_version = ExperimentVersion.objects.create(
-                version=1, experiment=experiment
-            )
-            reversion.add_meta(ExperimentVersionMeta,
-                               experiment_version=experiment_version)
-        exp_version_meta = ExperimentVersionMeta.objects.first()
-        self.assertIn(exp_version_meta,
-                      experiment_version.versionsmeta.all())
-        revision = Version.objects.get_for_object(
-            experiment
-        ).first().revision_id
-        self.assertEqual(revision, exp_version_meta.revision_id)
 
 
 class GroupModelTest(TestCase):

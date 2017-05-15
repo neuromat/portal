@@ -54,17 +54,6 @@ class Experiment(models.Model):
         unique_together = ('nes_id', 'owner')
 
 
-class ExperimentVersion(models.Model):
-    version = models.PositiveIntegerField()
-    experiment = models.ForeignKey(Experiment, related_name='versions')
-
-
-class ExperimentVersionMeta(models.Model):
-    experiment_version = models.ForeignKey(ExperimentVersion,
-                                           related_name='versionsmeta')
-    revision = models.OneToOneField(Revision)
-
-
 @reversion.register()
 class ProtocolComponent(models.Model):
     identification = models.CharField(max_length=50)
