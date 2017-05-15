@@ -8,15 +8,17 @@
     <title>{% block title %} Neuroscience Experiments Database {% endblock %}</title>
     {% load static %}
     <link rel="stylesheet" href="{% static 'experiments/normalize.css' %}">
+    <link rel="stylesheet" href="{% static 'experiments/bootstrap-3.3.7-dist/css/bootstrap.min.css' %}">
 </head>
 <body>
 {% include 'experiments/header.html' %}
 <hr>
-<section>
+<section class="container">
 {% block content %}
 {% endblock %}
 </section>
 <hr>
 {% include 'experiments/footer.html' %}
+<script src="{% static 'experiments/bootstrap-3.3.7-dist/js/bootstrap.min.js' %}"></script>
 </body>
 </html>
