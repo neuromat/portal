@@ -40,29 +40,19 @@ class Experiment(models.Model):
     title = models.CharField(max_length=150)
     description = models.TextField()
     data_acquisition_done = models.BooleanField(default=False)
-    nes_id = models.PositiveIntegerField()
     ethics_committee_file = models.FileField(
         'Project file approved by the ethics committee', blank=True
     )
+    version = models.PositiveIntegerField()
     study = models.ForeignKey(Study, related_name='experiments')
-    owner = models.ForeignKey(User)
     status = models.ForeignKey(ExperimentStatus, related_name='experiments',
                                default=1)  # TODO: requires 'to_be_approved'
     # has id 1.
+    nes_id = models.PositiveIntegerField()
+    owner = models.ForeignKey(User)
 
     class Meta:
-        unique_together = ('nes_id', 'owner')
-
-
-class ExperimentVersion(models.Model):
-    version = models.PositiveIntegerField()
-    experiment = models.ForeignKey(Experiment, related_name='versions')
-
-
-class ExperimentVersionMeta(models.Model):
-    experiment_version = models.ForeignKey(ExperimentVersion,
-                                           related_name='versionsmeta')
-    revision = models.OneToOneField(Revision)
+        unique_together = ('nes_id', 'owner', 'version')
 
 
 @reversion.register()
@@ -77,12 +67,17 @@ class ProtocolComponent(models.Model):
     owner = models.ForeignKey(User)
 
     class Meta:
-        unique_together = ('nes_id', 'owner')
+        unique_together = ('nes_id', 'owner', 'experiment')
 
 
 class Group(models.Model):
     title = models.CharField(max_length=50)
     description = models.TextField()
-    protocol_component = models.ForeignKey(ProtocolComponent, blank=True)
+    protocol_component = models.ForeignKey(
+        ProtocolComponent, null=True, blank=True)
+    experiment = models.ForeignKey(Experiment, related_name='groups')
     nes_id = models.PositiveIntegerField()
     owner = models.ForeignKey(User)
+
+    class Meta:
+        unique_together = ('nes_id', 'owner', 'experiment')

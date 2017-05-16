@@ -1,9 +1,8 @@
-import reversion
-from rest_framework import serializers, generics, permissions, viewsets
+from rest_framework import serializers, permissions, viewsets
 
 from experiments import appclasses
 from experiments.models import Experiment, Study, User, Researcher, \
-    ProtocolComponent, ExperimentVersion, ExperimentVersionMeta
+    ProtocolComponent, Group
 
 
 ###################
@@ -69,6 +68,16 @@ class ProtocolComponentSerializer(serializers.ModelSerializer):
                   'component_type', 'nes_id', 'experiment', 'owner')
 
 
+class GroupSerializer(serializers.ModelSerializer):
+    owner = serializers.ReadOnlyField(source='owner.username')
+    experiment = serializers.ReadOnlyField(source='experiment.title')
+
+    class Meta:
+        model = Group
+        fields = ('id', 'title', 'description', 'experiment', 'nes_id',
+                  'owner')
+
+
 #############
 # API Views #
 #############
@@ -127,26 +136,13 @@ class ExperimentViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         study_id = self.request.data['study']
         study = Study.objects.get(id=study_id)
-        with reversion.create_revision():
-            exp_serializer = serializer.save(study=study,
-                                             owner=self.request.user)
-            experiment = Experiment.objects.get(id=exp_serializer.id)
-            reversion.set_user(self.request.user)
-            exp_version = \
-                appclasses.ExperimentVersion(experiment).create_version()
-            reversion.add_meta(ExperimentVersionMeta,
-                               experiment_version=exp_version)
-
-    def perform_update(self, serializer):
-        with reversion.create_revision():
-            exp_serializer = serializer.save()
-            # TODO: serializer.nes_id
-            experiment = Experiment.objects.get(id=exp_serializer.id)  #
-            reversion.set_user(self.request.user)
-            exp_version = appclasses.ExperimentVersion(
-                experiment).create_version()
-            reversion.add_meta(ExperimentVersionMeta,
-                               experiment_version=exp_version)
+        nes_id = self.request.data['nes_id']
+        owner = self.request.user
+        exp_version = appclasses.ExperimentVersion(nes_id, owner)
+        serializer.save(
+            study=study, owner=owner,
+            version=exp_version.get_last_version() + 1
+        )
 
 
 class ProtocolComponentViewSet(viewsets.ModelViewSet):
@@ -163,28 +159,43 @@ class ProtocolComponentViewSet(viewsets.ModelViewSet):
             return ProtocolComponent.objects.all()
 
     def perform_create(self, serializer):
+        # TODO: we must create protocol_component for the last experiment
+        # version
         experiment_nes_id = self.request.data['experiment']
         experiment = Experiment.objects.filter(
             nes_id=experiment_nes_id, owner=self.request.user).get()
-        with reversion.create_revision():
-            serializer.save(experiment=experiment, owner=self.request.user)
-            reversion.set_user(self.request.user)
-            last_version = ExperimentVersion.objects.filter(
-                experiment=experiment
-            ).last()
-            reversion.add_meta(ExperimentVersionMeta,
-                               experiment_version=last_version)
+        serializer.save(experiment=experiment, owner=self.request.user)
 
     def perform_update(self, serializer):
         experiment_nes_id = self.request.data['experiment']
         experiment = Experiment.objects.filter(
             nes_id=experiment_nes_id, owner=self.request.user
         ).get()
-        with reversion.create_revision():
-            serializer.save()
-            reversion.set_user(self.request.user)
-            last_version = ExperimentVersion.objects.filter(
-                experiment=experiment
-            ).last()
-            reversion.add_meta(ExperimentVersionMeta,
-                               experiment_version=last_version)
+        serializer.save()
+
+
+class GroupViewSet(viewsets.ModelViewSet):
+    lookup_field = 'nes_id'
+    serializer_class = GroupSerializer
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
+
+    def get_queryset(self):
+        # TODO: don't filter by owner if not logged (gets TypeError)
+        # exception when trying to get an individual experiment
+        if 'nes_id' in self.kwargs:
+            return Group.objects.filter(owner=self.request.user)
+        else:
+            return Group.objects.all()
+
+    def perform_create(self, serializer):
+        exp_nes_id = self.request.data['experiment']
+        owner = self.request.user
+        last_version = appclasses.ExperimentVersion(
+            exp_nes_id, owner
+        ).get_last_version()
+        # TODO: if last_version == 0 generates exception: "no experiment was
+        # created yet"
+        experiment = Experiment.objects.get(
+            nes_id=exp_nes_id, owner=owner, version=last_version
+        )
+        serializer.save(experiment=experiment, owner=owner)
