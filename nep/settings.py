@@ -121,7 +121,10 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.10/howto/static-files/
 
+# TODO: see settings for deployment in django docs.
 STATIC_URL = '/static/'
-STATIC_ROOT = '/home/caco/Workspace/nep-system/nep/static'  # TODO: for
-# development only. See: https://docs.djangoproject.com/en/1.11/howto/static-files/#serving-static-files-during-development
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, "static"),
+    '/home/caco/Workspace/nep-system/nep',
+]
 MEDIA_ROOT = '/home/caco/Workspace/nep-system/nep/media'
