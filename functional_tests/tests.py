@@ -40,7 +40,7 @@ def create_experiments(quantity, owner):
     for i in range(0, quantity):
         Experiment.objects.create(
             title=titles[i], description=descriptions[i], nes_id=i+1,
-            owner=owner, study=study
+            owner=owner, study=study, version=1
         )
 
     return Experiment.objects.all()
