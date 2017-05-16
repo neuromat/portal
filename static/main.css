@@ -1,0 +1,96 @@
+/*
+  ========================================
+  Typography
+  ========================================
+*/
+
+h1, h3, h4, h5, p {
+  margin-bottom: 22px;
+}
+
+/*
+  ========================================
+  Top
+  ========================================
+ */
+
+.nep-top {
+  height: 60px;
+}
+.top-neuromat {
+  font-weight: bold;
+  position: relative;
+  top: 30%; /* TODO: make relative, try does not use magic number */
+  float: left;
+  margin-right: 10px;
+}
+.top-small {
+  font-size: smaller;
+  display: inline-block;
+  width: 13%; /* TODO: make relative, try does not use magic number */
+  margin-top: 5px;
+  margin-left: 10px;
+  border-left: 2px solid #000;
+  padding-left: 10px;
+}
+.top-language {
+  font-size: small;
+  float: right;
+  position: relative;
+  top: 30%;
+}
+
+/*
+  ========================================
+  Header
+  ========================================
+ */
+
+.nep-header {
+  background: #a6aaad;
+  text-align: center;
+  border-radius: 3px;
+  border-bottom: 5px solid #60c8a3;
+}
+
+.search-box {
+  margin-bottom: 20px;
+}
+
+/*
+  ========================================
+  Body
+  ========================================
+*/
+
+.table-title {
+  text-align: center;
+}
+
+/*
+  ========================================
+  Footer
+  ========================================
+*/
+
+.nep-footer {
+  color: #fff;
+  background: #80868a;
+  border-radius: 3px;
+}
+
+.footer-license {
+  float: right;
+}
+
+
+/*
+  ========================================
+  Bootstrap overrides
+  ========================================
+ */
+/* overrides bootstrap class */
+.list-group-item {
+  background: #80868a;
+  border: none;
+}

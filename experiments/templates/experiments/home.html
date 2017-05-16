@@ -1,21 +1,23 @@
 {% extends 'experiments/base.html' %}
 
 {% block content %}
-<div id="id_table_title">
-    <h2>List of Experiments</h2>
-</div>
-<table id="id_experiments_table">
-<thead>
-<tr>
-    <th>Title</th>
-    <th>Description</th>
-</tr>
-</thead>
-    {% for experiment in experiments %}
+    <section class="container">
+    <div id="id_table_title" class="table-title">
+        <h2>List of Experiments</h2>
+    </div>
+    <table id="id_experiments_table" class="table table-hover">
+        <thead>
         <tr>
-            <td>{{ experiment.title }}</td>
-            <td>{{ experiment.description }}</td>
+            <th>Title</th>
+            <th>Description</th>
         </tr>
-    {% endfor %}
-</table>
+        </thead>
+        {% for experiment in experiments %}
+            <tr>
+                <td>{{ experiment.title }}</td>
+                <td>{{ experiment.description }}</td>
+            </tr>
+        {% endfor %}
+    </table>
+    </section>
 {% endblock %}
