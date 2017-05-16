@@ -120,7 +120,7 @@ class NewVisitorTest(LiveServerTestCase):
         footer_header_text = footer_section.find_element_by_tag_name('h4').text
         self.assertIn('Contact', footer_header_text)
         footer_content = footer_section.find_element_by_id(
-            'id_footer_content').text
+            'id_footer_contact').text
         self.assertIn('Address:', footer_content)
         self.assertIn('Matão St., 1010 - Cidade Universitária - São Paulo - '
                       'SP - Brasil. 05508-090. Veja o mapa', footer_content)
