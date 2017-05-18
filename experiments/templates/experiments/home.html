@@ -2,22 +2,31 @@
 
 {% block content %}
     <section class="container">
-    <div id="id_table_title" class="table-title">
-        <h2>List of Experiments</h2>
-    </div>
-    <table id="id_experiments_table" class="table table-hover">
-        <thead>
-        <tr>
-            <th>Title</th>
-            <th>Description</th>
-        </tr>
-        </thead>
-        {% for experiment in experiments %}
+        <div id="id_table_title" class="table-title">
+            <h2>List of Experiments</h2>
+        </div>
+        {% if experiments %}
+        <table id="id_experiments_table" class="table table-hover
+        experiment-table">
+            <thead>
             <tr>
-                <td>{{ experiment.title }}</td>
-                <td>{{ experiment.description }}</td>
+                <th>Title</th>
+                <th>Description</th>
+                <th>Groups</th>
+                <th>Version</th>
             </tr>
-        {% endfor %}
-    </table>
+            </thead>
+            {% for experiment in experiments %}
+                <tr>
+                    <td>{{ experiment.title }}</td>
+                    <td>{{ experiment.description }}</td>
+                    <td>{{ experiment.groups.count }}</td>
+                    <td>{{ experiment.version }}</td>
+                </tr>
+            {% endfor %}
+        </table>
+        {% else %}
+        <p>There's no experiments yet.</p>
+    {% endif %}
     </section>
 {% endblock %}
