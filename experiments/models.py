@@ -1,7 +1,5 @@
 from django.db import models
 from django.contrib.auth.models import User
-from reversion.models import Revision
-import reversion
 
 
 class Researcher(models.Model):
@@ -35,7 +33,6 @@ class ExperimentStatus(models.Model):
     description = models.TextField(blank=True)
 
 
-@reversion.register()
 class Experiment(models.Model):
     title = models.CharField(max_length=150)
     description = models.TextField()
@@ -55,7 +52,6 @@ class Experiment(models.Model):
         unique_together = ('nes_id', 'owner', 'version')
 
 
-@reversion.register()
 class ProtocolComponent(models.Model):
     identification = models.CharField(max_length=50)
     description = models.TextField(blank=True)
@@ -74,7 +70,8 @@ class Group(models.Model):
     title = models.CharField(max_length=50)
     description = models.TextField()
     protocol_component = models.ForeignKey(
-        ProtocolComponent, null=True, blank=True)
+        ProtocolComponent, null=True, blank=True
+    )
     experiment = models.ForeignKey(Experiment, related_name='groups')
     nes_id = models.PositiveIntegerField()
     owner = models.ForeignKey(User)
