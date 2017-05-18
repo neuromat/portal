@@ -6,5 +6,6 @@ from experiments import api_urls
 urlpatterns = [
     url(r'^$', views.home_page, name='home'),
     url(r'^admin/', admin.site.urls),
+    url(r'^api-auth/', include('rest_framework.urls')),
     url(r'^api/', include(api_urls)),
 ]
