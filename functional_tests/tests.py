@@ -63,6 +63,8 @@ class NewVisitorTest(LiveServerTestCase):
         # A neuroscience researcher discovered a new site that
         # provides a data base with neuroscience experiments.
         # She goes to checkout its home page
+        # TODO: see why it is gettin error:
+        # TypeError: expected str, bytes or os.PathLike object, not NoneType
         self.browser.get(self.live_server_url)
 
         # She notices the page title and header mention
@@ -116,10 +118,10 @@ class NewVisitorTest(LiveServerTestCase):
         ##
         # She notices that in the footer there is information
         # about ways of contact institution.
-        footer_section = self.browser.find_element_by_id('id_footer_section')
-        footer_header_text = footer_section.find_element_by_tag_name('h4').text
+        footer_contact = self.browser.find_element_by_id('id_footer_contact')
+        footer_header_text = footer_contact.find_element_by_tag_name('h4').text
         self.assertIn('Contact', footer_header_text)
-        footer_content = footer_section.find_element_by_id(
+        footer_content = footer_contact.find_element_by_id(
             'id_footer_contact').text
         self.assertIn('Address:', footer_content)
         self.assertIn('Matão St., 1010 - Cidade Universitária - São Paulo - '
@@ -130,9 +132,10 @@ class NewVisitorTest(LiveServerTestCase):
         self.assertIn('neuromat@numec.prp.usp.br', footer_content)
         self.assertIn('Media contact:', footer_content)
         self.assertIn('comunicacao@numec.prp.usp.br', footer_content)
-        footer_license = footer_section.find_element_by_id('id_license').text
+        footer_license_text = self.browser.find_element_by_id(
+            'id_footer_license').text
         self.assertIn('This site content is licensed with Creative Commons '
-                      'Attributions 3.0.', footer_license)
+                      'Attributions 3.0', footer_license_text)
 
         self.fail('Finish the test!')
 
