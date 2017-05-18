@@ -83,6 +83,21 @@ h1, h3, h4, h5, p {
   float: right;
 }
 
+/*
+  ========================================
+  Experiment table
+  ========================================
+ */
+
+.experiment-table table {
+  border-color: #a6aaad;
+  border-spacing: 20px;
+  border-collapse: separate;
+}
+
+.experiment-table thead{
+  background: #60c8a3;
+}
 
 /*
   ========================================
