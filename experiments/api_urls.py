@@ -13,13 +13,17 @@ router.register(r'experiments', api.ExperimentViewSet,
                 base_name='api_experiments')
 router.register(r'protocol_components', api.ProtocolComponentViewSet,
                 base_name='api_protocol_components')
-router.register(r'groups', api.GroupViewSet,
-                base_name='api_groups')
 
+api_groups_list = api.GroupViewSet.as_view({
+    'get': 'list',
+    'post': 'create',
+})
 # Get rest framework schema view
 schema_view = get_schema_view(title='NEP API')
 
 urlpatterns = [
     url(r'^schema/$', schema_view),
     url(r'^', include(router.urls)),
+    url(r'^experiments/(?P<nes_id>[0-9]+)/groups/$', api_groups_list,
+        name='api_groups-list')
 ]
