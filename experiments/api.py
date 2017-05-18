@@ -134,6 +134,7 @@ class ExperimentViewSet(viewsets.ModelViewSet):
             return Experiment.objects.all()
 
     def perform_create(self, serializer):
+        # TODO: wrong! Get study by self.kwargs not request data
         study_id = self.request.data['study']
         study = Study.objects.get(id=study_id)
         nes_id = self.request.data['nes_id']
@@ -167,6 +168,7 @@ class ProtocolComponentViewSet(viewsets.ModelViewSet):
         serializer.save(experiment=experiment, owner=self.request.user)
 
     def perform_update(self, serializer):
+        # TODO: save in with last experiment version
         experiment_nes_id = self.request.data['experiment']
         experiment = Experiment.objects.filter(
             nes_id=experiment_nes_id, owner=self.request.user
