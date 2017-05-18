@@ -178,16 +178,17 @@ class ProtocolComponentViewSet(viewsets.ModelViewSet):
 
 class GroupViewSet(viewsets.ModelViewSet):
     lookup_field = 'nes_id'
+    queryset = Group.objects.all()
     serializer_class = GroupSerializer
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
 
-    def get_queryset(self):
-        # TODO: don't filter by owner if not logged (gets TypeError)
-        # exception when trying to get an individual experiment
-        if 'nes_id' in self.kwargs:
-            return Group.objects.filter(owner=self.request.user)
-        else:
-            return Group.objects.all()
+    # def get_queryset(self):
+    #     # TODO: don't filter by owner if not logged (gets TypeError)
+    #     # exception when trying to get an individual experiment
+    #     if 'nes_id' in self.kwargs:
+    #         return Group.objects.filter(owner=self.request.user)
+    #     else:
+    #         return Group.objects.all()
 
     def perform_create(self, serializer):
         exp_nes_id = self.request.data['experiment']

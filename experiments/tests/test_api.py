@@ -747,7 +747,6 @@ class ProtocolComponentAPITest(APITestCase):
 
 
 class GroupAPITest(APITestCase):
-    list_url = reverse('api_groups-list')
 
     def test_get_returns_all_groups(self):
         owner = User.objects.create_user(username='lab1')
@@ -761,7 +760,9 @@ class GroupAPITest(APITestCase):
             owner=owner,
             experiment=experiment
         )
-        response = self.client.get(self.list_url)
+        list_url = reverse('api_groups-list',
+                           kwargs={'nes_id': experiment.nes_id})
+        response = self.client.get(list_url)
         self.assertEqual(
             json.loads(response.content.decode('utf8')),
             [
@@ -788,9 +789,10 @@ class GroupAPITest(APITestCase):
         owner = User.objects.create_user(username='lab1', password='nep-lab1')
         experiment = create_experiment(1, owner, 1)
         self.client.login(username=owner.username, password='nep-lab1')
-
+        list_url = reverse('api_groups-list',
+                           kwargs={'nes_id': experiment.nes_id})
         response = self.client.post(
-            self.list_url,
+            list_url,
             {
                 'title': 'A title',
                 'description': 'A description',
@@ -808,9 +810,10 @@ class GroupAPITest(APITestCase):
         experiment_v1 = create_experiment(1, owner, 1)
         experiment_v2 = create_experiment(1, owner, 2)
         self.client.login(username=owner.username, password='nep-lab1')
-
+        list_url1 = reverse('api_groups-list',
+                            kwargs={'nes_id': experiment_v1.nes_id})
         self.client.post(
-            self.list_url,
+            list_url1,
             {
                 'title': 'A title',
                 'description': 'A description',
