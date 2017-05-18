@@ -34,18 +34,19 @@ class ExperimentStatus(models.Model):
 
 
 class Experiment(models.Model):
+    nes_id = models.PositiveIntegerField()
     title = models.CharField(max_length=150)
     description = models.TextField()
     data_acquisition_done = models.BooleanField(default=False)
     ethics_committee_file = models.FileField(
         'Project file approved by the ethics committee', blank=True
     )
+    sent_date = models.DateField()
     version = models.PositiveIntegerField()
     study = models.ForeignKey(Study, related_name='experiments')
     status = models.ForeignKey(ExperimentStatus, related_name='experiments',
                                default=1)  # TODO: requires 'to_be_approved'
     # has id 1.
-    nes_id = models.PositiveIntegerField()
     owner = models.ForeignKey(User)
 
     class Meta:

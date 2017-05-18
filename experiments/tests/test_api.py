@@ -47,8 +47,9 @@ def create_experiment(nes_id, owner, version):
     # other cases. Perhaps create ExperimentStatus already poppulated.
     st = ExperimentStatus.objects.create(tag='to_be_approved')
     return Experiment.objects.create(
-            nes_id=nes_id, title='Our title', description='Our description',
-            study=study, owner=owner, status=st, version=version
+        nes_id=nes_id, title='Our title', description='Our description',
+        study=study, owner=owner, status=st, sent_date=datetime.utcnow(),
+        version=version
     )
 
 
@@ -351,7 +352,8 @@ class ExperimentAPITest(APITestCase):
                     'study': experiment1.study.title,
                     'owner': experiment1.owner.username,
                     'status': experiment1.status.tag,
-                    'protocol_components': []
+                    'protocol_components': [],
+                    'sent_date': experiment1.sent_date.strftime('%Y-%m-%d')
                 },
                 {
                     'id': experiment2.id,
@@ -364,7 +366,8 @@ class ExperimentAPITest(APITestCase):
                     'study': experiment2.study.title,
                     'owner': experiment2.owner.username,
                     'status': experiment2.status.tag,
-                    'protocol_components': []
+                    'protocol_components': [],
+                    'sent_date': experiment2.sent_date.strftime('%Y-%m-%d')
                 }
             ]
         )
@@ -381,7 +384,8 @@ class ExperimentAPITest(APITestCase):
                 'description': 'Some description',
                 'nes_id': 1,
                 'study': study.id,
-                'ethics_committee_file': image_file
+                'ethics_committee_file': image_file,
+                'sent_date': datetime.utcnow().strftime('%Y-%m-%d')
             },
             format='multipart'
         )
@@ -402,6 +406,7 @@ class ExperimentAPITest(APITestCase):
                 'description': 'Some description',
                 'nes_id': 1,
                 'study': study.id,
+                'sent_date': datetime.utcnow().strftime('%Y-%m-%d')
             },
         )
         new_experiment = Experiment.objects.first()
@@ -415,6 +420,7 @@ class ExperimentAPITest(APITestCase):
                 'description': 'Some description',
                 'nes_id': 1,
                 'study': study.id,
+                'sent_date': datetime.utcnow().strftime('%Y-%m-%d')
             },
         )
         same_experiment = Experiment.objects.last()
@@ -452,7 +458,8 @@ class ExperimentAPITest(APITestCase):
                 'title': 'Other experiment',
                 'description': 'Other description',
                 'nes_id': 1,
-                'study': study.id
+                'study': study.id,
+                'sent_date': datetime.utcnow().strftime('%Y-%m-%d')
             }
         )
         self.client.logout()
@@ -493,7 +500,8 @@ class ExperimentAPITest(APITestCase):
                 'study': updated_experiment.study.title,
                 'owner': updated_experiment.owner.username,
                 'status': None,
-                'protocol_components': []
+                'protocol_components': [],
+                'sent_date': updated_experiment.sent_date.strftime('%Y-%m-%d')
             }
         )
         self.client.logout()
@@ -611,7 +619,8 @@ class ProtocolComponentAPITest(APITestCase):
                 'title': 'New experiment',
                 'description': 'Some description',
                 'nes_id': 1,
-                'study': study.id  # TODO: here is nes_id
+                'study': study.id,  # TODO: here is nes_id
+                'sent_date': datetime.utcnow().strftime('%Y-%m-%d')
             }
         )
         experiment = Experiment.objects.first()
@@ -651,7 +660,8 @@ class ProtocolComponentAPITest(APITestCase):
                 'title': 'New experiment',
                 'description': 'Some description',
                 'nes_id': 1,
-                'study': study1.id
+                'study': study1.id,
+                'sent_date': datetime.utcnow().strftime('%Y-%m-%d')
             }
         )
 
@@ -681,8 +691,9 @@ class ProtocolComponentAPITest(APITestCase):
                 'title': 'Other experiment',
                 'description': 'Other description',
                 'nes_id': 1,
-                'study': study2.id  # TODO: here is nes_id (see other
-                                    # occurences)
+                'study': study2.id,  # TODO: here is nes_id (see other
+                                     # occurences)
+                'sent_date': datetime.utcnow().strftime('%Y-%m-%d')
             }
         )
 
