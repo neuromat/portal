@@ -25,7 +25,7 @@ SECRET_KEY = 'w&hkq685h_b37nsph31m@t$^5bf3^q98+2!chqno+#@89y%ah9'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['127.0.0.1', '192.168.59.61']  # TODO: for tests
 
 
 # Application definition
@@ -37,7 +37,10 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'experiments',
+    'rest_framework',
+    'django_extensions',
+    'reversion',
+    'experiments.apps.ExperimentsConfig',
 ]
 
 MIDDLEWARE = [
@@ -118,4 +121,10 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.10/howto/static-files/
 
+# TODO: see settings for deployment in django docs.
 STATIC_URL = '/static/'
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, "static"),
+    '/home/caco/Workspace/nep-system/nep',
+]
+MEDIA_ROOT = '/home/caco/Workspace/nep-system/nep/media'
