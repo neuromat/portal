@@ -53,6 +53,19 @@ def create_experiment(nes_id, owner, version):
     )
 
 
+def post_experiment(nes_id, study_id, url, client):
+    client.post(
+        url,
+        {
+            'title': 'New experiment',
+            'description': 'Some description',
+            'nes_id': nes_id,
+            'study': study_id,
+            'sent_date': datetime.utcnow().strftime('%Y-%m-%d')
+        },
+    )
+
+
 class ResearcherAPITest(APITestCase):
     list_url = reverse('api_researchers-list')
 
@@ -399,30 +412,15 @@ class ExperimentAPITest(APITestCase):
         study = create_study(nes_id=1, owner=owner)
         self.client.login(username=owner.username, password='nep-lab1')
         # Post new experiment
-        self.client.post(
-            self.list_url,
-            {
-                'title': 'New experiment',
-                'description': 'Some description',
-                'nes_id': 1,
-                'study': study.id,
-                'sent_date': datetime.utcnow().strftime('%Y-%m-%d')
-            },
-        )
+        post_experiment(1, study.id, self.list_url, self.client)
+
+
+
         new_experiment = Experiment.objects.first()
         self.assertEqual(new_experiment.version, 1)
 
         # Post same experiment
-        self.client.post(
-            self.list_url,
-            {
-                'title': 'New experiment',
-                'description': 'Some description',
-                'nes_id': 1,
-                'study': study.id,
-                'sent_date': datetime.utcnow().strftime('%Y-%m-%d')
-            },
-        )
+        post_experiment(1, study.id, self.list_url, self.client)
         same_experiment = Experiment.objects.last()
         self.assertEqual(same_experiment.version, 2)
 
@@ -437,31 +435,16 @@ class ExperimentAPITest(APITestCase):
         owner1 = User.objects.create_user(username='lab1', password='nep-lab1')
         study = create_study(nes_id=2, owner=owner1)
         self.client.login(username=owner1.username, password='nep-lab1')
-        self.client.post(
-            self.list_url,
-            {
-                'title': 'New experiment',
-                'description': 'Some description',
-                'nes_id': 1,
-                'study': study.id
-            }
-        )
+        post_experiment(1, study.id, self.list_url, self.client)
+
+
         self.client.logout()
 
         # Other owner post an experiment
         owner2 = User.objects.create_user(username='lab2', password='nep-lab2')
         study = create_study(nes_id=2, owner=owner2)
         self.client.login(username=owner2.username, password='nep-lab2')
-        self.client.post(
-            self.list_url,
-            {
-                'title': 'Other experiment',
-                'description': 'Other description',
-                'nes_id': 1,
-                'study': study.id,
-                'sent_date': datetime.utcnow().strftime('%Y-%m-%d')
-            }
-        )
+        post_experiment(1, study.id, self.list_url, self.client)
         self.client.logout()
 
         # Now we test PUTing
@@ -510,16 +493,9 @@ class ExperimentAPITest(APITestCase):
         owner = User.objects.create_user(username='lab1', password='nep-lab1')
         study = create_study(nes_id=1, owner=owner)
         self.client.login(username=owner.username, password='nep-lab1')
-        self.client.post(
-            self.list_url,
-            {
-                'title': 'New experiment',
-                'description': 'Some description',
-                'nes_id': 1,
-                'study': study.id,
-                'sent_date': datetime.utcnow().strftime('%Y-%m-%d')
-            }
-        )
+        post_experiment(1, study.id, self.list_url, self.client)
+
+
         self.client.logout()
 
         # Assert version of the experiment created is 1
@@ -572,24 +548,18 @@ class ProtocolComponentAPITest(APITestCase):
 
     def test_POSTing_a_new_protocolcomponent(self):
         owner = User.objects.create_user(username='lab1', password='nep-lab1')
-        self.client.login(username=owner.username, password='nep-lab1')
+        study = create_study(nes_id=1, owner=owner)
 
         # The owner post an experiment. TODO: It's not necessary. Enough to
         # create experiment directly.
-        study = create_study(nes_id=1, owner=owner)
-        self.client.post(
-            reverse('api_experiments-list'),
-            {
-                'title': 'New experiment',
-                'description': 'Some description',
-                'nes_id': 1,
-                'study': study.id,  # TODO: here is nes_id
-                'sent_date': datetime.utcnow().strftime('%Y-%m-%d')
-            }
-        )
+        self.client.login(username=owner.username, password='nep-lab1')
+        experiment_list_url = reverse('api_experiments-list')
+        post_experiment(1, study.id, experiment_list_url, self.client)
+        self.client.logout()
         experiment = Experiment.objects.first()
 
         # The owner post a protocol component
+        self.client.login(username=owner.username, password='nep-lab1')
         response = self.client.post(
             self.list_url,
             {
@@ -598,11 +568,11 @@ class ProtocolComponentAPITest(APITestCase):
                 'duration_value': 4,
                 'component_type': 'A component type',
                 'nes_id': 1,
-                'experiment': experiment.nes_id
+                    'experiment': experiment.nes_id
             }
         )
-        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.client.logout()
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         new_protocolcomponent = ProtocolComponent.objects.first()
         self.assertEqual(new_protocolcomponent.identification,
                          'An identification')
@@ -614,20 +584,12 @@ class ProtocolComponentAPITest(APITestCase):
         ###
         # An owner login
         owner1 = User.objects.create_user(username='lab1', password='nep-lab1')
-        self.client.login(username=owner1.username, password='nep-lab1')
+        study1 = create_study(nes_id=1, owner=owner1)
 
         # An owner post an experiment
-        study1 = create_study(nes_id=1, owner=owner1)
-        self.client.post(
-            reverse('api_experiments-list'),
-            {
-                'title': 'New experiment',
-                'description': 'Some description',
-                'nes_id': 1,
-                'study': study1.id,
-                'sent_date': datetime.utcnow().strftime('%Y-%m-%d')
-            }
-        )
+        self.client.login(username=owner1.username, password='nep-lab1')
+        experiment_list_url = reverse('api_experiments-list')
+        post_experiment(1, study1.id, experiment_list_url, self.client)
 
         # An owner post a protocol component
         experiment1 = Experiment.objects.first()
@@ -642,24 +604,16 @@ class ProtocolComponentAPITest(APITestCase):
                 'experiment': experiment1.nes_id
             }
         )
+        self.client.logout()
 
         # Other owner login
         owner2 = User.objects.create_user(username='lab2', password='nep-lab2')
-        self.client.login(username=owner2.username, password='nep-lab2')
+        study2 = create_study(nes_id=1, owner=owner2)
 
         # Other owner post an experiment
-        study2 = create_study(nes_id=1, owner=owner2)
-        self.client.post(
-            reverse('api_experiments-list'),
-            {
-                'title': 'Other experiment',
-                'description': 'Other description',
-                'nes_id': 1,
-                'study': study2.id,  # TODO: here is nes_id (see other
-                                     # occurences)
-                'sent_date': datetime.utcnow().strftime('%Y-%m-%d')
-            }
-        )
+        self.client.login(username=owner2.username, password='nep-lab2')
+        experiment_list_url = reverse('api_experiments-list')
+        post_experiment(1, study2.id, experiment_list_url, self.client)
 
         # Other owner post a protocol component
         experiment2 = Experiment.objects.last()
