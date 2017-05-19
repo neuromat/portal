@@ -1,15 +1,14 @@
 from rest_framework import serializers, permissions, viewsets
 
 from experiments import appclasses
-from experiments.models import Experiment, Study, User, Researcher, \
-    ProtocolComponent, Group
+from experiments.models import Experiment, Study, User, ProtocolComponent, \
+    Group
 
 
 ###################
 # API Serializers #
 ###################
 class ExperimentSerializer(serializers.ModelSerializer):
-    study = serializers.ReadOnlyField(source='study.title')
     owner = serializers.ReadOnlyField(source='owner.username')
     status = serializers.ReadOnlyField(source='status.tag')
     protocol_components = serializers.PrimaryKeyRelatedField(
@@ -19,8 +18,8 @@ class ExperimentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Experiment
         fields = ('id', 'title', 'description', 'data_acquisition_done',
-                  'nes_id', 'ethics_committee_file', 'study',
-                  'owner', 'status', 'protocol_components')
+                  'nes_id', 'ethics_committee_file', 'owner', 'status',
+                  'protocol_components', 'sent_date')
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -34,28 +33,24 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class StudySerializer(serializers.ModelSerializer):
-    researcher = serializers.ReadOnlyField(source='researcher.first_name')
     owner = serializers.ReadOnlyField(source='owner.username')
-    experiments = serializers.PrimaryKeyRelatedField(
-        many=True, read_only=True
-    )
 
     class Meta:
         model = Study
         fields = ('id', 'title', 'description', 'start_date', 'end_date',
-                  'nes_id', 'researcher', 'owner', 'experiments')
-
-
-class ResearcherSerializer(serializers.ModelSerializer):
-    studies = serializers.PrimaryKeyRelatedField(
-        many=True, read_only=True
-    )
-    owner = serializers.ReadOnlyField(source='owner.username')
-
-    class Meta:
-        model = Researcher
-        fields = ('id', 'first_name', 'surname', 'email', 'studies',
                   'nes_id', 'owner')
+
+
+# class ResearcherSerializer(serializers.ModelSerializer):
+#     studies = serializers.PrimaryKeyRelatedField(
+#         many=True, read_only=True
+#     )
+#     owner = serializers.ReadOnlyField(source='owner.username')
+#
+#     class Meta:
+#         model = Researcher
+#         fields = ('id', 'first_name', 'surname', 'email', 'studies',
+#                   'nes_id', 'owner')
 
 
 class ProtocolComponentSerializer(serializers.ModelSerializer):
@@ -81,22 +76,22 @@ class GroupSerializer(serializers.ModelSerializer):
 #############
 # API Views #
 #############
-class ResearcherViewSet(viewsets.ModelViewSet):
-    lookup_field = 'nes_id'
-    queryset = Researcher.objects.all()
-    serializer_class = ResearcherSerializer
-    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
-
-    def get_queryset(self):
-        # TODO: don't filter by owner if not logged (gets TypeError
-        # exception when trying to get an individual researcher
-        if 'nes_id' in self.kwargs:
-            return Researcher.objects.filter(owner=self.request.user)
-        else:
-            return Researcher.objects.all()
-
-    def perform_create(self, serializer):
-        serializer.save(owner=self.request.user)
+# class ResearcherViewSet(viewsets.ModelViewSet):
+#     lookup_field = 'nes_id'
+#     queryset = Researcher.objects.all()
+#     serializer_class = ResearcherSerializer
+#     permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
+#
+#     def get_queryset(self):
+#         # TODO: don't filter by owner if not logged (gets TypeError
+#         # exception when trying to get an individual researcher
+#         if 'nes_id' in self.kwargs:
+#             return Researcher.objects.filter(owner=self.request.user)
+#         else:
+#             return Researcher.objects.all()
+#
+#     def perform_create(self, serializer):
+#         serializer.save(owner=self.request.user)
 
 
 class StudyViewSet(viewsets.ModelViewSet):
@@ -115,9 +110,7 @@ class StudyViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         # TODO: breaks when posting from the api template.
         # Doesn't have researcher field to enter a valid reseacher.
-        researcher_id = self.request.data['researcher']
-        researcher = Researcher.objects.get(id=researcher_id)
-        serializer.save(researcher=researcher, owner=self.request.user)
+        serializer.save(owner=self.request.user)
 
 
 class ExperimentViewSet(viewsets.ModelViewSet):
@@ -134,15 +127,11 @@ class ExperimentViewSet(viewsets.ModelViewSet):
             return Experiment.objects.all()
 
     def perform_create(self, serializer):
-        # TODO: wrong! Get study by self.kwargs not request data
-        study_id = self.request.data['study']
-        study = Study.objects.get(id=study_id)
         nes_id = self.request.data['nes_id']
         owner = self.request.user
         exp_version = appclasses.ExperimentVersion(nes_id, owner)
         serializer.save(
-            study=study, owner=owner,
-            version=exp_version.get_last_version() + 1
+            owner=owner, version=exp_version.get_last_version() + 1
         )
 
 
@@ -191,7 +180,7 @@ class GroupViewSet(viewsets.ModelViewSet):
     #         return Group.objects.all()
 
     def perform_create(self, serializer):
-        exp_nes_id = self.request.data['experiment']
+        exp_nes_id = self.kwargs['nes_id']
         owner = self.request.user
         last_version = appclasses.ExperimentVersion(
             exp_nes_id, owner
