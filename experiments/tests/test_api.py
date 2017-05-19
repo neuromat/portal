@@ -10,7 +10,7 @@ import json
 
 from reversion.models import Version
 
-from experiments.models import Experiment, Researcher, Study, \
+from experiments.models import Experiment, Study, \
     ProtocolComponent, ExperimentStatus, Group
 
 
@@ -21,14 +21,12 @@ def create_study(nes_id, owner):
     :param owner: client owner
     :return: 
     """
-    researcher = Researcher.objects.create(nes_id=nes_id, owner=owner)
     # TODO: What a strange behavior. Maybe post question in Stackoverflow.
     # When trying to create our_user User instance without username, test
     # doesn't pass. But in the first User instance created (other_user
     # above), without username, test pass.
     return Study.objects.create(
-        nes_id=nes_id, start_date=datetime.utcnow(), researcher=researcher,
-        owner=owner
+        nes_id=nes_id, start_date=datetime.utcnow(), owner=owner
     )
 
 
@@ -66,130 +64,130 @@ def post_experiment(nes_id, study_id, url, client):
     )
 
 
-class ResearcherAPITest(APITestCase):
-    list_url = reverse('api_researchers-list')
-
-    def test_get_returns_all_researchers(self):
-        owner = User.objects.create_user(username='lab1')
-        researcher1 = Researcher.objects.create(nes_id=1, owner=owner)
-        researcher2 = Researcher.objects.create(nes_id=2, owner=owner)
-        response = self.client.get(self.list_url)
-        self.assertEqual(
-            json.loads(response.content.decode('utf8')),
-            [
-                {
-                    'id': researcher1.id,
-                    'first_name': researcher1.first_name,
-                    'surname': researcher1.surname,
-                    'email': researcher1.email,
-                    'studies': [],
-                    'nes_id': researcher1.nes_id,
-                    'owner': researcher1.owner.username
-                },
-                {
-                    'id': researcher2.id,
-                    'first_name': researcher2.first_name,
-                    'surname': researcher2.surname,
-                    'email': researcher2.email,
-                    'studies': [],
-                    'nes_id': researcher2.nes_id,
-                    'owner': researcher2.owner.username
-                }
-            ]
-        )
-
-    def test_POSTing_a_new_researcher(self):
-        owner = User.objects.create_user(username='lab1', password='nep-lab1')
-        self.client.login(username=owner.username, password='nep-lab1')
-        response = self.client.post(
-            self.list_url,
-            {
-                'first_name': 'João',
-                'surname': 'das Rosas',
-                'email': 'joao@rosas.com',
-                'nes_id': 1,
-            }
-        )
-        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        self.client.logout()
-        new_researcher = Researcher.objects.first()
-        self.assertEqual(new_researcher.first_name, 'João')
-
-    def test_PUTing_an_existing_researcher(self):
-        # TODO: very large test
-        ###
-        # First we post a new researcher then we test PUTing
-        ###
-        # An owner post a researcher
-        owner1 = User.objects.create_user(username='lab1', password='nep-lab1')
-        self.client.login(username=owner1.username, password='nep-lab1')
-        self.client.post(
-            self.list_url,
-            {
-                'first_name': 'João',
-                'surname': 'das Rosas',
-                'email': 'joao@rosas.com',
-                'nes_id': 2,
-            }
-        )
-        self.client.logout()
-
-        # Other owner post a researcher
-        owner2 = User.objects.create_user(username='lab2', password='nep-lab2')
-        self.client.login(username=owner2.username, password='nep-lab2')
-        self.client.post(
-            self.list_url,
-            {
-                'first_name': 'Pedro',
-                'surname': 'Santos',
-                'email': 'pedro@santos.com',
-                'nes_id': 2,
-            }
-        )
-        self.client.logout()
-
-        ###
-        # Now we test PUTing
-        ###
-        new_researcher = Researcher.objects.get(nes_id=2, owner=owner1)
-        detail_url1 = reverse(
-            'api_researchers-detail', kwargs={'nes_id': new_researcher.nes_id}
-        )
-        self.client.login(username=owner1.username, password='nep-lab1')
-        resp_put = self.client.patch(
-            detail_url1,
-            {
-                'first_name': 'João Maria',
-                'surname': 'das Rosas Vermelhas',
-                'email': 'joao13@dasrosas.com',
-            }
-        )
-        self.assertEqual(resp_put.status_code, status.HTTP_200_OK)
-
-        ###
-        # Finally we test researcher updated
-        ###
-        updated_researcher = Researcher.objects.get(
-            nes_id=new_researcher.nes_id, owner=owner1
-        )
-        detail_url2 = reverse(
-            'api_researchers-detail',
-            kwargs={'nes_id': updated_researcher.nes_id}
-        )
-        resp_get = self.client.get(detail_url2)
-        self.assertEqual(
-            json.loads(resp_get.content.decode('utf8')),
-            {
-                'id': updated_researcher.id,
-                'first_name': 'João Maria',
-                'surname': 'das Rosas Vermelhas',
-                'email': 'joao13@dasrosas.com',
-                'studies': [],
-                'nes_id': updated_researcher.nes_id,
-                'owner': updated_researcher.owner.username
-            }
-        )
-        self.client.logout()
+# class ResearcherAPITest(APITestCase):
+#     list_url = reverse('api_researchers-list')
+#
+#     def test_get_returns_all_researchers(self):
+#         owner = User.objects.create_user(username='lab1')
+#         researcher1 = Researcher.objects.create(nes_id=1, owner=owner)
+#         researcher2 = Researcher.objects.create(nes_id=2, owner=owner)
+#         response = self.client.get(self.list_url)
+#         self.assertEqual(
+#             json.loads(response.content.decode('utf8')),
+#             [
+#                 {
+#                     'id': researcher1.id,
+#                     'first_name': researcher1.first_name,
+#                     'surname': researcher1.surname,
+#                     'email': researcher1.email,
+#                     'studies': [],
+#                     'nes_id': researcher1.nes_id,
+#                     'owner': researcher1.owner.username
+#                 },
+#                 {
+#                     'id': researcher2.id,
+#                     'first_name': researcher2.first_name,
+#                     'surname': researcher2.surname,
+#                     'email': researcher2.email,
+#                     'studies': [],
+#                     'nes_id': researcher2.nes_id,
+#                     'owner': researcher2.owner.username
+#                 }
+#             ]
+#         )
+#
+#     def test_POSTing_a_new_researcher(self):
+#         owner = User.objects.create_user(username='lab1', password='nep-lab1')
+#         self.client.login(username=owner.username, password='nep-lab1')
+#         response = self.client.post(
+#             self.list_url,
+#             {
+#                 'first_name': 'João',
+#                 'surname': 'das Rosas',
+#                 'email': 'joao@rosas.com',
+#                 'nes_id': 1,
+#             }
+#         )
+#         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+#         self.client.logout()
+#         new_researcher = Researcher.objects.first()
+#         self.assertEqual(new_researcher.first_name, 'João')
+#
+#     def test_PUTing_an_existing_researcher(self):
+#         # TODO: very large test
+#         ###
+#         # First we post a new researcher then we test PUTing
+#         ###
+#         # An owner post a researcher
+#         owner1 = User.objects.create_user(username='lab1', password='nep-lab1')
+#         self.client.login(username=owner1.username, password='nep-lab1')
+#         self.client.post(
+#             self.list_url,
+#             {
+#                 'first_name': 'João',
+#                 'surname': 'das Rosas',
+#                 'email': 'joao@rosas.com',
+#                 'nes_id': 2,
+#             }
+#         )
+#         self.client.logout()
+#
+#         # Other owner post a researcher
+#         owner2 = User.objects.create_user(username='lab2', password='nep-lab2')
+#         self.client.login(username=owner2.username, password='nep-lab2')
+#         self.client.post(
+#             self.list_url,
+#             {
+#                 'first_name': 'Pedro',
+#                 'surname': 'Santos',
+#                 'email': 'pedro@santos.com',
+#                 'nes_id': 2,
+#             }
+#         )
+#         self.client.logout()
+#
+#         ###
+#         # Now we test PUTing
+#         ###
+#         new_researcher = Researcher.objects.get(nes_id=2, owner=owner1)
+#         detail_url1 = reverse(
+#             'api_researchers-detail', kwargs={'nes_id': new_researcher.nes_id}
+#         )
+#         self.client.login(username=owner1.username, password='nep-lab1')
+#         resp_put = self.client.patch(
+#             detail_url1,
+#             {
+#                 'first_name': 'João Maria',
+#                 'surname': 'das Rosas Vermelhas',
+#                 'email': 'joao13@dasrosas.com',
+#             }
+#         )
+#         self.assertEqual(resp_put.status_code, status.HTTP_200_OK)
+#
+#         ###
+#         # Finally we test researcher updated
+#         ###
+#         updated_researcher = Researcher.objects.get(
+#             nes_id=new_researcher.nes_id, owner=owner1
+#         )
+#         detail_url2 = reverse(
+#             'api_researchers-detail',
+#             kwargs={'nes_id': updated_researcher.nes_id}
+#         )
+#         resp_get = self.client.get(detail_url2)
+#         self.assertEqual(
+#             json.loads(resp_get.content.decode('utf8')),
+#             {
+#                 'id': updated_researcher.id,
+#                 'first_name': 'João Maria',
+#                 'surname': 'das Rosas Vermelhas',
+#                 'email': 'joao13@dasrosas.com',
+#                 'studies': [],
+#                 'nes_id': updated_researcher.nes_id,
+#                 'owner': updated_researcher.owner.username
+#             }
+#         )
+#         self.client.logout()
 
 
 class StudyAPITest(APITestCase):
@@ -210,7 +208,6 @@ class StudyAPITest(APITestCase):
                     'start_date': study1.start_date.strftime('%Y-%m-%d'),
                     'end_date': study1.end_date,
                     'nes_id': study1.nes_id,
-                    'researcher': study1.researcher.first_name,
                     'experiments': [],
                     'owner': study1.owner.username
                 },
@@ -222,7 +219,6 @@ class StudyAPITest(APITestCase):
                     'end_date': study2.end_date,
                     'nes_id': study2.nes_id,
                     'experiments': [],
-                    'researcher': study2.researcher.first_name,
                     'owner': study1.owner.username
                 },
             ]
@@ -230,7 +226,6 @@ class StudyAPITest(APITestCase):
 
     def test_POSTing_a_new_study(self):
         owner = User.objects.create_user(username='lab1', password='nep-lab1')
-        researcher = Researcher.objects.create(nes_id=1, owner=owner)
         self.client.login(username=owner.username, password='nep-lab1')
         response = self.client.post(
             self.list_url,
@@ -239,7 +234,6 @@ class StudyAPITest(APITestCase):
                 'description': 'Some description',
                 'start_date': datetime.utcnow().strftime('%Y-%m-%d'),
                 'nes_id': 1,
-                'researcher': researcher.id
             }
         )
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
@@ -258,7 +252,6 @@ class StudyAPITest(APITestCase):
         ###
         # An owner post a study
         owner1 = User.objects.create_user(username='lab1', password='nep-lab1')
-        researcher = Researcher.objects.create(nes_id=1, owner=owner1)
         self.client.login(username=owner1.username, password='nep-lab1')
         self.client.post(
             self.list_url,
@@ -267,14 +260,12 @@ class StudyAPITest(APITestCase):
                 'description': 'Some description',
                 'start_date': datetime.utcnow().strftime('%Y-%m-%d'),
                 'nes_id': 2,
-                'researcher': researcher.id
             }
         )
         self.client.logout()
 
         # Other owner post a study
         owner2 = User.objects.create_user(username='lab2', password='nep-lab2')
-        researcher = Researcher.objects.create(nes_id=1, owner=owner2)
         self.client.login(username=owner2.username, password='nep-lab2')
         self.client.post(
             self.list_url,
@@ -283,7 +274,6 @@ class StudyAPITest(APITestCase):
                 'description': 'Other description',
                 'start_date': datetime.utcnow().strftime('%Y-%m-%d'),
                 'nes_id': 2,
-                'researcher': researcher.id
             }
         )
         self.client.logout()
@@ -324,7 +314,6 @@ class StudyAPITest(APITestCase):
                 'end_date': None,
                 'nes_id': updated_study.nes_id,
                 'experiments': [],
-                'researcher': updated_study.researcher.first_name,
                 'owner': updated_study.owner.username
             }
         )

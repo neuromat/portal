@@ -5,16 +5,8 @@ from datetime import datetime
 
 from reversion.models import Version  # TODO: uninstall reversion
 
-from experiments.models import Experiment, Study, Researcher, \
+from experiments.models import Experiment, Study, \
     ProtocolComponent, ExperimentStatus, Group
-
-
-def create_researcher(nes_id, owner):
-    """
-    Creates researcher model object that are used
-    in test classes that depends on it. 
-    """
-    return Researcher.objects.create(nes_id=nes_id, owner=owner)
 
 
 def create_study(nes_id, owner):
@@ -22,9 +14,8 @@ def create_study(nes_id, owner):
     Creates study model object that are used
     in test classes that depends on it. 
     """
-    researcher = create_researcher(nes_id=nes_id, owner=owner)
     return Study.objects.create(nes_id=nes_id, start_date=datetime.utcnow(),
-                                researcher=researcher, owner=researcher.owner)
+                                owner=owner)
 
 
 def create_experiment(nes_id, owner):
@@ -74,6 +65,20 @@ def create_experiment(nes_id, owner):
 #         self.assertIn(researcher, owner.researcher_set.all())
 
 
+class ExperimentStatusModelTest(TestCase):
+    def test_default_attributes(self):
+        experiment_st = ExperimentStatus()
+        self.assertEqual(experiment_st.tag, '')
+        self.assertEqual(experiment_st.name, '')
+        self.assertEqual(experiment_st.description, '')
+
+    def test_cannot_save_empty_attributes(self):
+        experiment_st = ExperimentStatus(tag='')
+        with self.assertRaises(ValidationError):
+            experiment_st.save()
+            experiment_st.full_clean()
+
+
 class StudyModelTest(TestCase):
 
     def test_default_attributes(self):
@@ -92,26 +97,20 @@ class StudyModelTest(TestCase):
 
     def test_duplicate_studies_are_invalid(self):
         owner = User.objects.create_user(username='lab1')
-        researcher1 = Researcher.objects.create(nes_id=1, owner=owner)
-        researcher2 = Researcher.objects.create(nes_id=2, owner=owner)
         Study.objects.create(nes_id=1, start_date=datetime.utcnow(),
-                             researcher=researcher1, owner=owner)
-        study = Study(nes_id=1, start_date=datetime.utcnow(),
-                      researcher=researcher2, owner=owner)
+                             owner=owner)
+        study = Study(nes_id=1, start_date=datetime.utcnow(), owner=owner)
         with self.assertRaises(ValidationError):
             study.full_clean()
 
     def test_CAN_save_same_study_to_different_owners(self):
         owner1 = User.objects.create(username='lab1')
         owner2 = User.objects.create(username='lab2')
-        researcher1 = create_researcher(nes_id=1, owner=owner1)
-        researcher2 = create_researcher(nes_id=1, owner=owner2)
         Study.objects.create(nes_id=1, start_date=datetime.utcnow(),
-                             researcher=researcher1, owner=researcher1.owner)
+                             owner=owner1)
         study = Study(title='A title', description='A description', nes_id=1,
-                      start_date=datetime.utcnow(),
-                      end_date=datetime.utcnow(),
-                      researcher=researcher2, owner=researcher2.owner)
+                      start_date=datetime.utcnow(), end_date=datetime.utcnow(),
+                      owner=owner2)
         study.full_clean()
 
     def test_study_is_related_to_owner(self):
@@ -119,20 +118,6 @@ class StudyModelTest(TestCase):
         study = Study(nes_id=1, start_date=datetime.utcnow(), owner=owner)
         study.save()
         self.assertIn(study, owner.study_set.all())
-
-
-class ExperimentStatusModelTest(TestCase):
-    def test_default_attributes(self):
-        experiment_st = ExperimentStatus()
-        self.assertEqual(experiment_st.tag, '')
-        self.assertEqual(experiment_st.name, '')
-        self.assertEqual(experiment_st.description, '')
-
-    def test_cannot_save_empty_attributes(self):
-        experiment_st = ExperimentStatus(tag='')
-        with self.assertRaises(ValidationError):
-            experiment_st.save()
-            experiment_st.full_clean()
 
 
 class ExperimentModelTest(TestCase):
@@ -149,10 +134,8 @@ class ExperimentModelTest(TestCase):
 
     def test_cannot_save_empty_attributes(self):
         owner = User.objects.create(username='lab1')
-        researcher = Researcher.objects.create(nes_id=1, owner=owner)
         study = Study.objects.create(
-            nes_id=1, start_date=datetime.utcnow(), researcher=researcher,
-            owner=owner)
+            nes_id=1, start_date=datetime.utcnow(), owner=owner)
         status = ExperimentStatus.objects.create(tag='to_be_approved')
         # TODO: why we need to pass nes_id, study and owner and in
         # StudyModelTest's test_cannot_save_empty_attributes not?

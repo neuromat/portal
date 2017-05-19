@@ -34,7 +34,6 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class StudySerializer(serializers.ModelSerializer):
-    researcher = serializers.ReadOnlyField(source='researcher.first_name')
     owner = serializers.ReadOnlyField(source='owner.username')
     experiments = serializers.PrimaryKeyRelatedField(
         many=True, read_only=True
@@ -43,7 +42,7 @@ class StudySerializer(serializers.ModelSerializer):
     class Meta:
         model = Study
         fields = ('id', 'title', 'description', 'start_date', 'end_date',
-                  'nes_id', 'researcher', 'owner', 'experiments')
+                  'nes_id', 'owner', 'experiments')
 
 
 # class ResearcherSerializer(serializers.ModelSerializer):
@@ -115,9 +114,7 @@ class StudyViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         # TODO: breaks when posting from the api template.
         # Doesn't have researcher field to enter a valid reseacher.
-        researcher_id = self.request.data['researcher']
-        researcher = Researcher.objects.get(id=researcher_id)
-        serializer.save(researcher=researcher, owner=self.request.user)
+        serializer.save(owner=self.request.user)
 
 
 class ExperimentViewSet(viewsets.ModelViewSet):
