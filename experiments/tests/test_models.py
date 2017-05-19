@@ -39,39 +39,39 @@ def create_experiment(nes_id, owner):
                                      version=1, sent_date=datetime.utcnow())
 
 
-class ResearcherModelTest(TestCase):
-
-    def test_default_attributes(self):
-        researcher = Researcher()
-        self.assertEqual(researcher.first_name, '')
-        self.assertEqual(researcher.surname, '')
-        self.assertEqual(researcher.email, '')
-        self.assertEqual(researcher.nes_id, None)
-
-    def test_cannot_save_empty_attributes(self):
-        researcher = Researcher(nes_id=None)
-        with self.assertRaises(ValidationError):
-            researcher.full_clean()
-
-    def test_duplicate_researchers_are_invalid(self):
-        owner = User.objects.create_user(username='lab1')
-        create_researcher(nes_id=1, owner=owner)
-        researcher2 = Researcher(nes_id=1, owner=owner)
-        with self.assertRaises(ValidationError):
-            researcher2.full_clean()
-
-    def test_CAN_save_same_researcher_to_different_owners(self):
-        owner1 = User.objects.create_user(username='lab1')
-        owner2 = User.objects.create_user(username='lab2')
-        Researcher.objects.create(nes_id=1, owner=owner1)
-        researcher = Researcher(nes_id=1, owner=owner2)
-        researcher.full_clean()
-
-    def test_researcher_is_related_to_owner(self):
-        owner = User.objects.create_user(username='lab1')
-        researcher = Researcher(nes_id=1, owner=owner)
-        researcher.save()
-        self.assertIn(researcher, owner.researcher_set.all())
+# class ResearcherModelTest(TestCase):
+#
+#     def test_default_attributes(self):
+#         researcher = Researcher()
+#         self.assertEqual(researcher.first_name, '')
+#         self.assertEqual(researcher.surname, '')
+#         self.assertEqual(researcher.email, '')
+#         self.assertEqual(researcher.nes_id, None)
+#
+#     def test_cannot_save_empty_attributes(self):
+#         researcher = Researcher(nes_id=None)
+#         with self.assertRaises(ValidationError):
+#             researcher.full_clean()
+#
+#     def test_duplicate_researchers_are_invalid(self):
+#         owner = User.objects.create_user(username='lab1')
+#         create_researcher(nes_id=1, owner=owner)
+#         researcher2 = Researcher(nes_id=1, owner=owner)
+#         with self.assertRaises(ValidationError):
+#             researcher2.full_clean()
+#
+#     def test_CAN_save_same_researcher_to_different_owners(self):
+#         owner1 = User.objects.create_user(username='lab1')
+#         owner2 = User.objects.create_user(username='lab2')
+#         Researcher.objects.create(nes_id=1, owner=owner1)
+#         researcher = Researcher(nes_id=1, owner=owner2)
+#         researcher.full_clean()
+#
+#     def test_researcher_is_related_to_owner(self):
+#         owner = User.objects.create_user(username='lab1')
+#         researcher = Researcher(nes_id=1, owner=owner)
+#         researcher.save()
+#         self.assertIn(researcher, owner.researcher_set.all())
 
 
 class StudyModelTest(TestCase):
@@ -114,13 +114,10 @@ class StudyModelTest(TestCase):
                       researcher=researcher2, owner=researcher2.owner)
         study.full_clean()
 
-    def test_study_is_related_to_researcher_and_owner(self):
+    def test_study_is_related_to_owner(self):
         owner = User.objects.create(username='lab1')
-        researcher = create_researcher(nes_id=1, owner=owner)
-        study = Study(nes_id=1, start_date=datetime.utcnow(),
-                      researcher=researcher, owner=owner)
+        study = Study(nes_id=1, start_date=datetime.utcnow(), owner=owner)
         study.save()
-        self.assertIn(study, researcher.studies.all())
         self.assertIn(study, owner.study_set.all())
 
 
