@@ -9,7 +9,6 @@ from experiments.models import Experiment, Study, User, ProtocolComponent, \
 # API Serializers #
 ###################
 class ExperimentSerializer(serializers.ModelSerializer):
-    study = serializers.ReadOnlyField(source='study.title')
     owner = serializers.ReadOnlyField(source='owner.username')
     status = serializers.ReadOnlyField(source='status.tag')
     protocol_components = serializers.PrimaryKeyRelatedField(
@@ -19,8 +18,8 @@ class ExperimentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Experiment
         fields = ('id', 'title', 'description', 'data_acquisition_done',
-                  'nes_id', 'ethics_committee_file', 'study',
-                  'owner', 'status', 'protocol_components', 'sent_date')
+                  'nes_id', 'ethics_committee_file', 'owner', 'status',
+                  'protocol_components', 'sent_date')
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -35,14 +34,11 @@ class UserSerializer(serializers.ModelSerializer):
 
 class StudySerializer(serializers.ModelSerializer):
     owner = serializers.ReadOnlyField(source='owner.username')
-    experiments = serializers.PrimaryKeyRelatedField(
-        many=True, read_only=True
-    )
 
     class Meta:
         model = Study
         fields = ('id', 'title', 'description', 'start_date', 'end_date',
-                  'nes_id', 'owner', 'experiments')
+                  'nes_id', 'owner')
 
 
 # class ResearcherSerializer(serializers.ModelSerializer):
@@ -131,15 +127,11 @@ class ExperimentViewSet(viewsets.ModelViewSet):
             return Experiment.objects.all()
 
     def perform_create(self, serializer):
-        # TODO: wrong! Get study by self.kwargs not request data
-        study_id = self.request.data['study']
-        study = Study.objects.get(id=study_id)
         nes_id = self.request.data['nes_id']
         owner = self.request.user
         exp_version = appclasses.ExperimentVersion(nes_id, owner)
         serializer.save(
-            study=study, owner=owner,
-            version=exp_version.get_last_version() + 1
+            owner=owner, version=exp_version.get_last_version() + 1
         )
 
 
@@ -188,7 +180,7 @@ class GroupViewSet(viewsets.ModelViewSet):
     #         return Group.objects.all()
 
     def perform_create(self, serializer):
-        exp_nes_id = self.request.data['experiment']
+        exp_nes_id = self.kwargs['nes_id']
         owner = self.request.user
         last_version = appclasses.ExperimentVersion(
             exp_nes_id, owner

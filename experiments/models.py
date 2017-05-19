@@ -13,18 +13,6 @@ from django.contrib.auth.models import User
 #         unique_together = ('nes_id', 'owner')
 
 
-class Study(models.Model):
-    title = models.CharField(max_length=150)
-    description = models.TextField()
-    start_date = models.DateField()
-    end_date = models.DateField(null=True)
-    nes_id = models.PositiveIntegerField()
-    owner = models.ForeignKey(User)
-
-    class Meta:
-        unique_together = ('nes_id', 'owner')
-
-
 class ExperimentStatus(models.Model):
     tag = models.CharField(max_length=20)
     name = models.CharField(max_length=50, blank=True)
@@ -41,7 +29,6 @@ class Experiment(models.Model):
     )
     sent_date = models.DateField()
     version = models.PositiveIntegerField()
-    study = models.ForeignKey(Study, related_name='experiments')
     status = models.ForeignKey(ExperimentStatus, related_name='experiments',
                                default=1)  # TODO: requires 'to_be_approved'
     # has id 1.
@@ -49,6 +36,18 @@ class Experiment(models.Model):
 
     class Meta:
         unique_together = ('nes_id', 'owner', 'version')
+
+
+class Study(models.Model):
+    title = models.CharField(max_length=150)
+    description = models.TextField()
+    start_date = models.DateField()
+    end_date = models.DateField(null=True)
+    nes_id = models.PositiveIntegerField()
+    owner = models.ForeignKey(User)
+
+    class Meta:
+        unique_together = ('nes_id', 'owner')
 
 
 class ProtocolComponent(models.Model):
@@ -70,7 +69,7 @@ class Group(models.Model):
     description = models.TextField()
     protocol_component = models.ForeignKey(
         ProtocolComponent, null=True, blank=True
-    )
+    )  # TODO: define if Group has ProtocolComponent
     experiment = models.ForeignKey(Experiment, related_name='groups')
     nes_id = models.PositiveIntegerField()
     owner = models.ForeignKey(User)
