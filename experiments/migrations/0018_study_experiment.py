@@ -16,6 +16,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='study',
             name='experiment',
-            field=models.OneToOneField(default=None, on_delete=django.db.models.deletion.CASCADE, to='experiments.Experiment'),
+            field=models.OneToOneField(default=1,
+                                       on_delete=django.db.models.deletion.CASCADE, to='experiments.Experiment'),
         ),
     ]

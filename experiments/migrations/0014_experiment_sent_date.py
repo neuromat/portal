@@ -15,6 +15,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='experiment',
             name='sent_date',
-            field=models.DateField(default=None),
+            field=models.DateField(default='2017-05-22'),
         ),
     ]
