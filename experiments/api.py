@@ -38,8 +38,8 @@ class StudySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Study
-        fields = ('id', 'title', 'description', 'start_date', 'end_date',
-                  'nes_id', 'experiment', 'owner')
+        fields = ('id', 'nes_id', 'title', 'description', 'start_date',
+                  'end_date', 'experiment', 'owner')
 
 
 # class ResearcherSerializer(serializers.ModelSerializer):
@@ -60,8 +60,8 @@ class ProtocolComponentSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ProtocolComponent
-        fields = ('id', 'identification', 'description', 'duration_value',
-                  'component_type', 'nes_id', 'experiment', 'owner')
+        fields = ('id', 'nes_id', 'identification', 'description',
+                  'duration_value', 'component_type', 'experiment', 'owner')
 
 
 class GroupSerializer(serializers.ModelSerializer):
@@ -70,7 +70,7 @@ class GroupSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Group
-        fields = ('id', 'title', 'description', 'experiment', 'nes_id',
+        fields = ('id', 'nes_id', 'title', 'description', 'experiment',
                   'owner')
 
 
