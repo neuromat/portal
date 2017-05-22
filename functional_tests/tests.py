@@ -4,28 +4,28 @@ from django.test import LiveServerTestCase
 from loremipsum import get_sentences, get_paragraphs
 from selenium import webdriver
 
-from experiments.models import Experiment, Study, Researcher
+from experiments.models import Experiment, Study
 
 
-def create_researcher(quantity, owner):
-    first_names = get_sentences(quantity)
-
-    for i in range(0, quantity):
-        Researcher.objects.create(first_name=first_names[i], nes_id=i+1,
-                                  owner=owner)
-
-    return Researcher.objects.all()
+# def create_researcher(quantity, owner):
+#     first_names = get_sentences(quantity)
+#
+#     for i in range(0, quantity):
+#         Researcher.objects.create(first_name=first_names[i], nes_id=i+1,
+#                                   owner=owner)
+#
+#     return Researcher.objects.all()
 
 
 def create_studies(quantity, owner):
-    researcher = create_researcher(1, owner).first()
+    # researcher = create_researcher(1, owner).first()
     titles = get_sentences(quantity)
     descriptions = get_paragraphs(quantity)
 
     for i in range(0, quantity):
         Study.objects.create(
             title=titles[i], description=descriptions[i],
-            start_date=datetime.utcnow(), nes_id=i+1, researcher=researcher,
+            start_date=datetime.utcnow(), nes_id=i+1,
             owner=owner
         )
 
@@ -33,14 +33,13 @@ def create_studies(quantity, owner):
 
 
 def create_experiments(quantity, owner):
-    study = create_studies(1, owner).first()
     titles = get_sentences(quantity)
     descriptions = get_paragraphs(quantity)
 
     for i in range(0, quantity):
         Experiment.objects.create(
             title=titles[i], description=descriptions[i], nes_id=i+1,
-            owner=owner, study=study, version=1
+            owner=owner, version=1, sent_date=datetime.utcnow()
         )
 
     return Experiment.objects.all()
