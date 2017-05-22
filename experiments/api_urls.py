@@ -11,8 +11,8 @@ router = DefaultRouter()
 # router.register(r'studies', api.StudyViewSet, base_name='api_studies')
 router.register(r'experiments', api.ExperimentViewSet,
                 base_name='api_experiments')
-router.register(r'protocol_components', api.ProtocolComponentViewSet,
-                base_name='api_protocol_components')
+# router.register(r'protocol_components', api.ProtocolComponentViewSet,
+#                 base_name='api_protocol_components')
 
 api_groups_list = api.GroupViewSet.as_view({
     'get': 'list',
