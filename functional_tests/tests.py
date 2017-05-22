@@ -4,7 +4,7 @@ from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 from djipsum.faker import FakerModel
 from selenium import webdriver
 
-from experiments.models import Experiment, Study, ExperimentStatus
+from experiments.models import Experiment, Study, ExperimentStatus, Group
 
 
 def global_setup(self):
@@ -35,6 +35,11 @@ def global_setup(self):
             nes_id=i+1, start_date=datetime.utcnow(),
             experiment=experiment_owner1, owner=owner1
         )
+        Group.objects.create(
+            nes_id=i+1, title=faker.fake.text(max_nb_chars=50),
+            description=faker.fake.text(max_nb_chars=150),
+            experiment=experiment_owner1, owner=owner1
+        )
 
     for i in range(3, 5):
         experiment_owner2 = Experiment.objects.create(
@@ -47,6 +52,11 @@ def global_setup(self):
         Study.objects.create(
             nes_id=i + 1, start_date=datetime.utcnow(),
             experiment=experiment_owner2, owner=owner1
+        )
+        Group.objects.create(
+            nes_id=i+1, title=faker.fake.text(max_nb_chars=50),
+            description=faker.fake.text(max_nb_chars=150),
+            experiment=experiment_owner2, owner=owner2
         )
 
 
@@ -111,10 +121,12 @@ class NewVisitorTest(StaticLiveServerTestCase):
         col_headers = row_headers.find_elements_by_tag_name('th')
         self.assertTrue(col_headers[0].text == 'Title')
         self.assertTrue(col_headers[1].text == 'Description')
+        self.assertTrue(col_headers[2].text == 'Groups')
+        self.assertTrue(col_headers[3].text == 'Version')
         # She sees the content of the list
         experiment = Experiment.objects.first()
-        rows = table.find_element_by_tag_name(
-            'tbody').find_elements_by_tag_name('tr')
+        rows = table.find_element_by_tag_name('tbody')\
+            .find_elements_by_tag_name('tr')
         self.assertTrue(
             any(row.find_elements_by_tag_name('td')[0].text ==
                 experiment.title for row in rows)
@@ -122,6 +134,14 @@ class NewVisitorTest(StaticLiveServerTestCase):
         self.assertTrue(
             any(row.find_elements_by_tag_name('td')[1].text ==
                 experiment.description for row in rows)
+        )
+        self.assertTrue(
+            any(row.find_elements_by_tag_name('td')[2].text ==
+                str(experiment.groups.count()) for row in rows)
+        )
+        self.assertTrue(
+            any(row.find_elements_by_tag_name('td')[3].text ==
+                str(experiment.version) for row in rows)
         )
 
         ##
@@ -149,23 +169,33 @@ class NewVisitorTest(StaticLiveServerTestCase):
                       'Attributions 3.0', footer_license_text)
 
 
-# @apply_setup(global_setup)
-# class ExperimentDetailTest(StaticLiveServerTestCase):
-#     def setUp(self):
-#         global_setup(self)
-#         self.browser = webdriver.Firefox()
-#
-#     def tearDown(self):
-#         self.browser.quit()
-#
-#     def test_can_view_experiment_detail_page(self):
-#         self.browser.get(self.live_server_url)
-#
-#         # After clicking in an experiment in home page experiment's table
-#         # She sees a new page with title: Open Database for Experiments in
-#         # Neuroscience.
-#         page_header_text = self.browser.find_element_by_tag_name('h2').text
-#         self.assertIn('Open Database for Experiments in Neuroscience',
-#                       page_header_text)
+@apply_setup(global_setup)
+class ExperimentDetailTest(StaticLiveServerTestCase):
+    def setUp(self):
+        global_setup(self)
+        self.browser = webdriver.Firefox()
+
+    def tearDown(self):
+        self.browser.quit()
+
+    def test_can_view_experiment_detail_page(self):
+        self.browser.get(self.live_server_url)
+
+        # She sees that in last column of experiments list there is a button
+        # that it reads "View"
+        table = self.browser.find_element_by_id('id_experiments_table')
+        rows = table.find_element_by_tag_name('tbody')\
+            .find_elements_by_tag_name('tr')
+        self.assertTrue(
+            all(row.find_elements_by_tag_name('td')[4].text ==
+                'View' for row in rows)
+        )
+
+        # After clicking in an experiment in home page experiment's table
+        # She sees a new page with title: Open Database for Experiments in
+        # Neuroscience.
+        # page_header_text = self.browser.find_element_by_tag_name('h2').text
+        # self.assertIn('Open Database for Experiments in Neuroscience',
+        #               page_header_text)
 
         self.fail('Finish the test!')
