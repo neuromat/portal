@@ -1,64 +1,76 @@
 from datetime import datetime
 from django.contrib.auth.models import User
+from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 from django.test import LiveServerTestCase
 from loremipsum import get_sentences, get_paragraphs
 from selenium import webdriver
 
-from experiments.models import Experiment, Study
+from experiments.models import Experiment, Study, ExperimentStatus
 
 
-# def create_researcher(quantity, owner):
-#     first_names = get_sentences(quantity)
-#
-#     for i in range(0, quantity):
-#         Researcher.objects.create(first_name=first_names[i], nes_id=i+1,
-#                                   owner=owner)
-#
-#     return Researcher.objects.all()
+def global_setup(self):
+    """
+    This setup creates basic object models that are used in tests bellow.
+    :param self:
+    """
+    owner1 = User.objects.create_user(username='lab1', password='nep-lab1')
+    owner2 = User.objects.create_user(username='lab2', password='nep-lab2')
 
+    exp_status1 = ExperimentStatus.objects.create(tag='to_be_approved')
+    exp_status2 = ExperimentStatus.objects.create(tag='approved')
+    exp_status3 = ExperimentStatus.objects.create(tag='rejected')
 
-def create_studies(quantity, owner):
-    # researcher = create_researcher(1, owner).first()
-    titles = get_sentences(quantity)
-    descriptions = get_paragraphs(quantity)
+    # Create 3 experiments for owner 1 and 2 for owner 2, and studies
+    # associated
+    titles = get_sentences(5)
+    descriptions = get_paragraphs(5)
 
-    for i in range(0, quantity):
-        Study.objects.create(
-            title=titles[i], description=descriptions[i],
-            start_date=datetime.utcnow(), nes_id=i+1,
-            owner=owner
-        )
-
-    return Study.objects.all()
-
-
-def create_experiments(quantity, owner):
-    titles = get_sentences(quantity)
-    descriptions = get_paragraphs(quantity)
-
-    for i in range(0, quantity):
-        Experiment.objects.create(
+    for i in range(0, 3):
+        experiment_owner1 = Experiment.objects.create(
             title=titles[i], description=descriptions[i], nes_id=i+1,
-            owner=owner, version=1, sent_date=datetime.utcnow()
+            owner=owner1, version=1, status=exp_status2,
+            sent_date=datetime.utcnow()
+        )
+        Study.objects.create(
+            nes_id=i+1, start_date=datetime.utcnow(),
+            experiment=experiment_owner1, owner=owner1
         )
 
-    return Experiment.objects.all()
+    for i in range(3, 5):
+        experiment_owner2 = Experiment.objects.create(
+            title=titles[i], description=descriptions[i], nes_id=i + 1,
+            owner=owner2, version=1, status=exp_status2,
+            sent_date=datetime.utcnow()
+        )
+        Study.objects.create(
+            nes_id=i + 1, start_date=datetime.utcnow(),
+            experiment=experiment_owner2, owner=owner1
+        )
 
 
-class NewVisitorTest(LiveServerTestCase):
+def apply_setup(setup_func):
+    """
+    Defines a decorator that uses my_setup method.
+    :param setup_func: my_setup function
+    :return: wrapper 
+    """
+    def wrap(cls):
+        cls.setup = setup_func
+        return cls
+    return wrap
+
+
+@apply_setup(global_setup)
+class NewVisitorTest(StaticLiveServerTestCase):
 
     def setUp(self):
+        global_setup(self)
         self.browser = webdriver.Firefox()
 
     def tearDown(self):
         self.browser.quit()
 
     def test_can_view_initial_page(self):
-        # We post some experiments to test list experiments to the new visitor.
-        # TODO: test for no experiments approved
-        owner = User.objects.create_user(username='lab1', password='nep-lab1')
-        create_experiments(3, owner)
-
         # A neuroscience researcher discovered a new site that
         # provides a data base with neuroscience experiments.
         # She goes to checkout its home page
@@ -136,6 +148,24 @@ class NewVisitorTest(LiveServerTestCase):
         self.assertIn('This site content is licensed with Creative Commons '
                       'Attributions 3.0', footer_license_text)
 
-        self.fail('Finish the test!')
 
-
+@apply_setup(global_setup)
+class ExperimentDetailTest(LiveServerTestCase):
+    pass
+    # def setUp(self):
+    #     self.browser = webdriver.Firefox()
+    #
+    # def tearDown(self):
+    #     self.browser.quit()
+    #
+    # def test_can_view_experiment_detail_page(self):
+    #     self.browser.get(self.live_server_url)
+    #
+    #     # After clicking in an experiment in home page experiment's table
+    #     # She sees a new page with title: Open Database for Experiments in
+    #     # Neuroscience.
+    #     page_header_text = self.browser.find_element_by_tag_name('h2').text
+    #     self.assertIn('Open Database for Experiments in Neuroscience',
+    #                   page_header_text)
+    #
+    #     self.fail('Finish the test!')
