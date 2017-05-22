@@ -16,14 +16,17 @@ def global_setup(self):
     owner1 = User.objects.create_user(username='lab1')
     owner2 = User.objects.create_user(username='lab2')
 
-    Study.objects.create(nes_id=1, start_date=datetime.utcnow(), owner=owner1)
-
     status = ExperimentStatus.objects.create(tag='to_be_approved')
 
-    Experiment.objects.create(nes_id=1, owner=owner1, status=status,
-                              version=1, sent_date=datetime.utcnow())
+    experiment1 = Experiment.objects.create(
+        nes_id=1, owner=owner1, status=status, version=1,
+        sent_date=datetime.utcnow()
+    )
     Experiment.objects.create(nes_id=1, owner=owner2, status=status,
                               version=1, sent_date=datetime.utcnow())
+
+    Study.objects.create(nes_id=1, start_date=datetime.utcnow(),
+                         experiment=experiment1, owner=owner1)
 
 
 def apply_setup(setup_func):
@@ -86,7 +89,11 @@ class ExperimentStatusModelTest(TestCase):
             experiment_st.full_clean()
 
 
+@apply_setup(global_setup)
 class StudyModelTest(TestCase):
+
+    def setUp(self):
+        global_setup(self)
 
     def test_default_attributes(self):
         study = Study()
@@ -103,28 +110,35 @@ class StudyModelTest(TestCase):
             study.full_clean()
 
     def test_duplicate_studies_are_invalid(self):
-        owner = User.objects.create_user(username='lab1')
-        Study.objects.create(nes_id=1, start_date=datetime.utcnow(),
-                             owner=owner)
-        study = Study(nes_id=1, start_date=datetime.utcnow(), owner=owner)
+        owner = User.objects.first()
+        experiment = Experiment.objects.last()
+        study = Study(nes_id=1, start_date=datetime.utcnow(),
+                      experiment=experiment, owner=owner)
         with self.assertRaises(ValidationError):
             study.full_clean()
 
     def test_CAN_save_same_study_to_different_owners(self):
-        owner1 = User.objects.create(username='lab1')
-        owner2 = User.objects.create(username='lab2')
-        Study.objects.create(nes_id=1, start_date=datetime.utcnow(),
-                             owner=owner1)
+        owner2 = User.objects.last()
+        experiment = Experiment.objects.last()
         study = Study(title='A title', description='A description', nes_id=1,
                       start_date=datetime.utcnow(), end_date=datetime.utcnow(),
-                      owner=owner2)
+                      experiment=experiment, owner=owner2)
         study.full_clean()
 
     def test_study_is_related_to_owner(self):
-        owner = User.objects.create(username='lab1')
-        study = Study(nes_id=1, start_date=datetime.utcnow(), owner=owner)
+        owner = User.objects.first()
+        experiment = Experiment.objects.last()
+        study = Study(nes_id=17, start_date=datetime.utcnow(),
+                      experiment=experiment, owner=owner)
         study.save()
         self.assertIn(study, owner.study_set.all())
+
+    def test_study_has_one_experiment(self):
+        owner = User.objects.first()
+        experiment = Experiment.objects.first()
+        study1 = Study.objects.first()
+        study2 = Study(nes_id=17, start_date=datetime.utcnow(),
+                       experiment=experiment, owner=owner)
 
 
 @apply_setup(global_setup)
@@ -188,9 +202,6 @@ class ExperimentModelTest(TestCase):
         experiment.save()
         self.assertIn(experiment, owner.experiment_set.all())
         self.assertIn(experiment, status.experiments.all())
-
-    def test_experiment_has_one_study(self):
-        pass  # TODO
 
 
 @apply_setup(global_setup)
