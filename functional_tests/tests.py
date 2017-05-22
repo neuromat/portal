@@ -1,8 +1,7 @@
 from datetime import datetime
 from django.contrib.auth.models import User
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
-from django.test import LiveServerTestCase
-from loremipsum import get_sentences, get_paragraphs
+from djipsum.faker import FakerModel
 from selenium import webdriver
 
 from experiments.models import Experiment, Study, ExperimentStatus
@@ -22,12 +21,13 @@ def global_setup(self):
 
     # Create 3 experiments for owner 1 and 2 for owner 2, and studies
     # associated
-    titles = get_sentences(5)
-    descriptions = get_paragraphs(5)
+    faker = FakerModel(app='experiments', model='Experiment')
 
     for i in range(0, 3):
         experiment_owner1 = Experiment.objects.create(
-            title=titles[i], description=descriptions[i], nes_id=i+1,
+            title=faker.fake.text(max_nb_chars=100),
+            description=faker.fake.text(max_nb_chars=200),
+            nes_id=i+1,
             owner=owner1, version=1, status=exp_status2,
             sent_date=datetime.utcnow()
         )
@@ -38,7 +38,9 @@ def global_setup(self):
 
     for i in range(3, 5):
         experiment_owner2 = Experiment.objects.create(
-            title=titles[i], description=descriptions[i], nes_id=i + 1,
+            title=faker.fake.text(max_nb_chars=100),
+            description=faker.fake.text(max_nb_chars=200),
+            nes_id=i + 1,
             owner=owner2, version=1, status=exp_status2,
             sent_date=datetime.utcnow()
         )
@@ -74,8 +76,6 @@ class NewVisitorTest(StaticLiveServerTestCase):
         # A neuroscience researcher discovered a new site that
         # provides a data base with neuroscience experiments.
         # She goes to checkout its home page
-        # TODO: see why it is gettin error:
-        # TypeError: expected str, bytes or os.PathLike object, not NoneType
         self.browser.get(self.live_server_url)
 
         # She notices the page title and header mention
@@ -149,23 +149,23 @@ class NewVisitorTest(StaticLiveServerTestCase):
                       'Attributions 3.0', footer_license_text)
 
 
-@apply_setup(global_setup)
-class ExperimentDetailTest(LiveServerTestCase):
-    pass
-    # def setUp(self):
-    #     self.browser = webdriver.Firefox()
-    #
-    # def tearDown(self):
-    #     self.browser.quit()
-    #
-    # def test_can_view_experiment_detail_page(self):
-    #     self.browser.get(self.live_server_url)
-    #
-    #     # After clicking in an experiment in home page experiment's table
-    #     # She sees a new page with title: Open Database for Experiments in
-    #     # Neuroscience.
-    #     page_header_text = self.browser.find_element_by_tag_name('h2').text
-    #     self.assertIn('Open Database for Experiments in Neuroscience',
-    #                   page_header_text)
-    #
-    #     self.fail('Finish the test!')
+# @apply_setup(global_setup)
+# class ExperimentDetailTest(StaticLiveServerTestCase):
+#     def setUp(self):
+#         global_setup(self)
+#         self.browser = webdriver.Firefox()
+#
+#     def tearDown(self):
+#         self.browser.quit()
+#
+#     def test_can_view_experiment_detail_page(self):
+#         self.browser.get(self.live_server_url)
+#
+#         # After clicking in an experiment in home page experiment's table
+#         # She sees a new page with title: Open Database for Experiments in
+#         # Neuroscience.
+#         page_header_text = self.browser.find_element_by_tag_name('h2').text
+#         self.assertIn('Open Database for Experiments in Neuroscience',
+#                       page_header_text)
+
+        self.fail('Finish the test!')
