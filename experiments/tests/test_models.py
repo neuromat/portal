@@ -180,7 +180,7 @@ class ExperimentModelTest(TestCase):
                                  sent_date=datetime.utcnow())
         experiment2.full_clean()
 
-    def test_experiment_is_related_owner_and_status(self):
+    def test_experiment_is_related_to_owner_and_status(self):
         owner = User.objects.first()
         status = ExperimentStatus.objects.get(tag='to_be_approved')
         experiment = Experiment(nes_id=17, owner=owner, status=status,
