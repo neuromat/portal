@@ -3,3 +3,12 @@
 {% block header %}
     {% include 'experiments/header_detail.html' %}
 {% endblock %}
+{% block content %}
+    <section class="container toggable-tabs">
+        <ul class="nav nav-tabs">
+            <li role="presentation" class="active"><a href="#">Statistics</a></li>
+            <li role="presentation"><a href="#">Groups</a></li>
+            <li role="presentation"><a href="#">Settings</a></li>
+        </ul>
+    </section>
+{% endblock %}

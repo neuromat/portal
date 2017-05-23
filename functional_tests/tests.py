@@ -27,31 +27,35 @@ def global_setup(self):
 
     for i in range(0, 3):
         experiment_owner1 = Experiment.objects.create(
-            title=faker.fake.text(max_nb_chars=100),
+            title=faker.fake.text(max_nb_chars=15),
             description=faker.fake.text(max_nb_chars=200),
             nes_id=i+1,
             owner=owner1, version=1, status=exp_status2,
             sent_date=datetime.utcnow()
         )
         Study.objects.create(
+            title=faker.fake.text(max_nb_chars=15),
+            description=faker.fake.text(max_nb_chars=200),
             nes_id=i+1, start_date=datetime.utcnow(),
             experiment=experiment_owner1, owner=owner1
         )
         Group.objects.create(
-            nes_id=i+1, title=faker.fake.text(max_nb_chars=50),
+            nes_id=i+1, title=faker.fake.text(max_nb_chars=15),
             description=faker.fake.text(max_nb_chars=150),
             experiment=experiment_owner1, owner=owner1
         )
 
     for i in range(3, 5):
         experiment_owner2 = Experiment.objects.create(
-            title=faker.fake.text(max_nb_chars=100),
+            title=faker.fake.text(max_nb_chars=15),
             description=faker.fake.text(max_nb_chars=200),
             nes_id=i + 1,
             owner=owner2, version=1, status=exp_status2,
             sent_date=datetime.utcnow()
         )
         Study.objects.create(
+            title=faker.fake.text(max_nb_chars=15),
+            description=faker.fake.text(max_nb_chars=200),
             nes_id=i + 1, start_date=datetime.utcnow(),
             experiment=experiment_owner2, owner=owner1
         )
@@ -187,9 +191,28 @@ class NewVisitorTest(StaticLiveServerTestCase):
         # In header she notices three elements besides header title:
         # Experiment title, experiment detail, and a button to go back home
         # page.
-        experiment_title_text = self.browser.find_element_by_id(
+        experiment_title = self.browser.find_element_by_id(
             'id_detail_title').text
-        print(experiment.title)  # DEBUG
-        self.assertEqual(experiment.title, experiment_title_text)
+        self.assertEqual(experiment.title, experiment_title)
+        link_home = self.browser.find_element_by_id('id_link_home').text
+        self.assertIn('Back Search', link_home)
+        experiment_description = self.browser.find_element_by_id(
+            'id_detail_description').text
+        self.assertEqual(experiment.description, experiment_description)
+
+        # Right bellow she sees the study that the experiment belongs to
+        # at left, and if data acquisition was finished, at right
+        study_text = self.browser.find_element_by_id('id_detail_study').text
+        self.assertIn('Related study: ' + experiment.study.title, study_text)
+        data_acquisition_text = self.browser.find_element_by_id(
+            'id_detail_acquisition').text
+        self.assertIn('Data acquisition not finished yet',
+                      data_acquisition_text)
+
+        # In right side bellow the data acquisition alert, she sees a link
+        # to download of data
+        link_download = self.browser.find_element_by_id(
+            'id_link_download').text
+        self.assertIn('Download data', link_download)
 
         self.fail('Finish the test!')

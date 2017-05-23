@@ -1,3 +1,15 @@
-<header class="container nep-header-detail">
+<header class="container detail-header">
     <h2>Open Database for Experiments in Neuroscience</h2>
+    <div id="id_detail_title" class="detail-title">{{ experiment.title }}</div>
+    <div id="id_link_home" class="detail-back-search">
+        <a href="{% url 'home' %}">Back Search</a>
+    </div>
+    <div id="id_detail_description" class="detail-description">{{ experiment.description }}</div>
+    <hr class="detail-header-hr">
+    <div id="id_detail_study" class="detail-study">Related study:
+        {{ experiment.study.title }}</div>
+    <div id="id_detail_acquisition" class="detail-acquisition">Data
+        acquisition not finished yet</div>
+    <div id="id_link_download" class="detail-donwload"><a
+            href="#">Download data</a></div>
 </header>
