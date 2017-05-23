@@ -172,14 +172,24 @@ class NewVisitorTest(StaticLiveServerTestCase):
                 'View' for row in rows)
         )
 
-        # She clicks in "View" link and is redirected to experiment detail page
-        self.browser.find_element_by_link_text('View').click()
+        # She clicks in first "View" link and is redirected to experiment
+        # detail page
+        self.browser.find_element_by_link_text('View').click()  # TODO:
+        # really gets first element?
         time.sleep(1)
 
-        # She sees a new page with title: Open Database for Experiments in
-        # Neuroscience.
+        # She sees a new page with a header title: Open Database
+        # for Experiments in Neuroscience.
         page_header_text = self.browser.find_element_by_tag_name('h2').text
         self.assertIn('Open Database for Experiments in Neuroscience',
                       page_header_text)
+
+        # In header she notices three elements besides header title:
+        # Experiment title, experiment detail, and a button to go back home
+        # page.
+        experiment_title_text = self.browser.find_element_by_id(
+            'id_detail_title').text
+        print(experiment.title)  # DEBUG
+        self.assertEqual(experiment.title, experiment_title_text)
 
         self.fail('Finish the test!')
