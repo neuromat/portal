@@ -25,4 +25,7 @@ def home_page(request):
 
 
 def experiment_detail(request, experiment_id):
-    return render(request, 'experiments/detail.html')
+    experiment = Experiment.objects.get(pk=experiment_id)
+    return render(
+        request, 'experiments/detail.html', {'experiment': experiment}
+    )
