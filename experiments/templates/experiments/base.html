@@ -13,7 +13,8 @@
 </head>
 <body>
 {% include 'experiments/top.html' %}
-{% include 'experiments/header.html' %}
+{% block header %}
+{% endblock %}
 <hr>
 {% block content %}
 {% endblock %}

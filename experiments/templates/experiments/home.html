@@ -1,5 +1,9 @@
 {% extends 'experiments/base.html' %}
 
+{% block header %}
+    {% include 'experiments/header_home.html' %}
+{% endblock %}
+
 {% block content %}
     <section class="container">
         <div id="id_table_title" class="table-title">
@@ -23,7 +27,7 @@
                     <td>{{ experiment.description }}</td>
                     <td>{{ experiment.groups.count }}</td>
                     <td>{{ experiment.version }}</td>
-                    <td>View</td>
+                    <td><a href="{% url 'experiment-detail' experiment.id %}">View</a></td>
                 </tr>
             {% endfor %}
         </table>

@@ -22,3 +22,7 @@ def home_page(request):
 
     return render(request, 'experiments/home.html',
                   {'experiments': experiments})
+
+
+def experiment_detail(request, experiment_id):
+    return render(request, 'experiments/detail.html')

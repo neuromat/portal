@@ -1,4 +1,6 @@
 from datetime import datetime
+import time
+
 from django.contrib.auth.models import User
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 from djipsum.faker import FakerModel
@@ -94,9 +96,6 @@ class NewVisitorTest(StaticLiveServerTestCase):
         header_text = self.browser.find_element_by_tag_name('h1').text
         self.assertIn('Neuroscience Experiments Database', header_text)
 
-        ##
-        # Tests for header
-        ##
         # She sees that in header bunner there is a search box invited her
         # to type terms/words that will be searched in the portal
         searchbox = self.browser.find_element_by_id('id_search_box')
@@ -105,15 +104,13 @@ class NewVisitorTest(StaticLiveServerTestCase):
             'Type key terms/words to be searched'
         )
 
-        ##
-        # Tests for content
-        ##
         # As there are experiments sended to Portal, she sees the home
         # page have a list of experiments in a table.
         # She reads in "List of Experiments" in the table title
         table_title = self.browser.find_element_by_id(
             'id_table_title').find_element_by_tag_name('h2').text
         self.assertEqual('List of Experiments', table_title)
+
         # She sees a list of experiments with columns: Title, Description
         table = self.browser.find_element_by_id('id_experiments_table')
         row_headers = table.find_element_by_tag_name(
@@ -123,6 +120,7 @@ class NewVisitorTest(StaticLiveServerTestCase):
         self.assertTrue(col_headers[1].text == 'Description')
         self.assertTrue(col_headers[2].text == 'Groups')
         self.assertTrue(col_headers[3].text == 'Version')
+
         # She sees the content of the list
         experiment = Experiment.objects.first()
         rows = table.find_element_by_tag_name('tbody')\
@@ -144,9 +142,6 @@ class NewVisitorTest(StaticLiveServerTestCase):
                 str(experiment.version) for row in rows)
         )
 
-        ##
-        # Tests for footer
-        ##
         # She notices that in the footer there is information
         # about ways of contact institution.
         footer_contact = self.browser.find_element_by_id('id_footer_contact')
@@ -168,21 +163,7 @@ class NewVisitorTest(StaticLiveServerTestCase):
         self.assertIn('This site content is licensed with Creative Commons '
                       'Attributions 3.0', footer_license_text)
 
-
-@apply_setup(global_setup)
-class ExperimentDetailTest(StaticLiveServerTestCase):
-    def setUp(self):
-        global_setup(self)
-        self.browser = webdriver.Firefox()
-
-    def tearDown(self):
-        self.browser.quit()
-
-    def test_can_view_experiment_detail_page(self):
-        self.browser.get(self.live_server_url)
-
-        # She sees that in last column of experiments list there is a button
-        # that it reads "View"
+        # She notices "View" link, in last column
         table = self.browser.find_element_by_id('id_experiments_table')
         rows = table.find_element_by_tag_name('tbody')\
             .find_elements_by_tag_name('tr')
@@ -191,11 +172,14 @@ class ExperimentDetailTest(StaticLiveServerTestCase):
                 'View' for row in rows)
         )
 
-        # After clicking in an experiment in home page experiment's table
+        # She clicks in "View" link and is redirected to experiment detail page
+        self.browser.find_element_by_link_text('View').click()
+        time.sleep(1)
+
         # She sees a new page with title: Open Database for Experiments in
         # Neuroscience.
-        # page_header_text = self.browser.find_element_by_tag_name('h2').text
-        # self.assertIn('Open Database for Experiments in Neuroscience',
-        #               page_header_text)
+        page_header_text = self.browser.find_element_by_tag_name('h2').text
+        self.assertIn('Open Database for Experiments in Neuroscience',
+                      page_header_text)
 
         self.fail('Finish the test!')
