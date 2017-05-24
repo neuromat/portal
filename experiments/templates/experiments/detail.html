@@ -1,0 +1,22 @@
+{% extends 'experiments/base.html' %}
+
+{% block header %}
+    {% include 'experiments/header_detail.html' %}
+{% endblock %}
+{% block content %}
+    <section class="container toggable-tabs">
+        <ul class="nav nav-tabs" role="tablist">
+            <li role="presentation" class="active"><a href="#statistics" role="tab" data-toggle="tab">Statistics</a></li>
+            <li role="presentation"><a href="#groups" role="tab" data-toggle="tab">Groups</a></li>
+            <li role="presentation"><a href="#settings" role="tab" data-toggle="tab">Settings</a></li>
+        </ul>
+
+        <!-- Tab panes -->
+        <div class="tab-content">
+            <div role="tabpanel" class="tab-pane active"
+                 id="statistics">Statistics</div>
+            <div role="tabpanel" class="tab-pane" id="groups">Groups</div>
+            <div role="tabpanel" class="tab-pane" id="settings">Settings</div>
+        </div>
+    </section>
+{% endblock %}

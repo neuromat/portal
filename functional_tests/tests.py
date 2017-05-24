@@ -1,69 +1,97 @@
 from datetime import datetime
+import time
+
 from django.contrib.auth.models import User
-from django.test import LiveServerTestCase
-from loremipsum import get_sentences, get_paragraphs
+from django.contrib.staticfiles.testing import StaticLiveServerTestCase
+from djipsum.faker import FakerModel
 from selenium import webdriver
 
-from experiments.models import Experiment, Study
+from experiments.models import Experiment, Study, ExperimentStatus, Group
 
 
-# def create_researcher(quantity, owner):
-#     first_names = get_sentences(quantity)
-#
-#     for i in range(0, quantity):
-#         Researcher.objects.create(first_name=first_names[i], nes_id=i+1,
-#                                   owner=owner)
-#
-#     return Researcher.objects.all()
+def global_setup(self):
+    """
+    This setup creates basic object models that are used in tests bellow.
+    :param self:
+    """
+    owner1 = User.objects.create_user(username='lab1', password='nep-lab1')
+    owner2 = User.objects.create_user(username='lab2', password='nep-lab2')
 
+    exp_status1 = ExperimentStatus.objects.create(tag='to_be_approved')
+    exp_status2 = ExperimentStatus.objects.create(tag='approved')
+    exp_status3 = ExperimentStatus.objects.create(tag='rejected')
 
-def create_studies(quantity, owner):
-    # researcher = create_researcher(1, owner).first()
-    titles = get_sentences(quantity)
-    descriptions = get_paragraphs(quantity)
+    # Create 3 experiments for owner 1 and 2 for owner 2, and studies
+    # associated
+    faker = FakerModel(app='experiments', model='Experiment')
 
-    for i in range(0, quantity):
+    for i in range(0, 3):
+        experiment_owner1 = Experiment.objects.create(
+            title=faker.fake.text(max_nb_chars=15),
+            description=faker.fake.text(max_nb_chars=200),
+            nes_id=i+1,
+            owner=owner1, version=1, status=exp_status2,
+            sent_date=datetime.utcnow()
+        )
         Study.objects.create(
-            title=titles[i], description=descriptions[i],
-            start_date=datetime.utcnow(), nes_id=i+1,
-            owner=owner
+            title=faker.fake.text(max_nb_chars=15),
+            description=faker.fake.text(max_nb_chars=200),
+            nes_id=i+1, start_date=datetime.utcnow(),
+            experiment=experiment_owner1, owner=owner1
+        )
+        Group.objects.create(
+            nes_id=i+1, title=faker.fake.text(max_nb_chars=15),
+            description=faker.fake.text(max_nb_chars=150),
+            experiment=experiment_owner1, owner=owner1
         )
 
-    return Study.objects.all()
-
-
-def create_experiments(quantity, owner):
-    titles = get_sentences(quantity)
-    descriptions = get_paragraphs(quantity)
-
-    for i in range(0, quantity):
-        Experiment.objects.create(
-            title=titles[i], description=descriptions[i], nes_id=i+1,
-            owner=owner, version=1, sent_date=datetime.utcnow()
+    for i in range(3, 5):
+        experiment_owner2 = Experiment.objects.create(
+            title=faker.fake.text(max_nb_chars=15),
+            description=faker.fake.text(max_nb_chars=200),
+            nes_id=i + 1,
+            owner=owner2, version=1, status=exp_status2,
+            sent_date=datetime.utcnow()
+        )
+        Study.objects.create(
+            title=faker.fake.text(max_nb_chars=15),
+            description=faker.fake.text(max_nb_chars=200),
+            nes_id=i + 1, start_date=datetime.utcnow(),
+            experiment=experiment_owner2, owner=owner1
+        )
+        Group.objects.create(
+            nes_id=i+1, title=faker.fake.text(max_nb_chars=50),
+            description=faker.fake.text(max_nb_chars=150),
+            experiment=experiment_owner2, owner=owner2
         )
 
-    return Experiment.objects.all()
+
+def apply_setup(setup_func):
+    """
+    Defines a decorator that uses my_setup method.
+    :param setup_func: my_setup function
+    :return: wrapper 
+    """
+    def wrap(cls):
+        cls.setup = setup_func
+        return cls
+    return wrap
 
 
-class NewVisitorTest(LiveServerTestCase):
+@apply_setup(global_setup)
+class NewVisitorTest(StaticLiveServerTestCase):
 
     def setUp(self):
+        global_setup(self)
         self.browser = webdriver.Firefox()
 
     def tearDown(self):
         self.browser.quit()
 
     def test_can_view_initial_page(self):
-        # We post some experiments to test list experiments to the new visitor.
-        # TODO: test for no experiments approved
-        owner = User.objects.create_user(username='lab1', password='nep-lab1')
-        create_experiments(3, owner)
-
         # A neuroscience researcher discovered a new site that
         # provides a data base with neuroscience experiments.
         # She goes to checkout its home page
-        # TODO: see why it is gettin error:
-        # TypeError: expected str, bytes or os.PathLike object, not NoneType
         self.browser.get(self.live_server_url)
 
         # She notices the page title and header mention
@@ -72,9 +100,6 @@ class NewVisitorTest(LiveServerTestCase):
         header_text = self.browser.find_element_by_tag_name('h1').text
         self.assertIn('Neuroscience Experiments Database', header_text)
 
-        ##
-        # Tests for header
-        ##
         # She sees that in header bunner there is a search box invited her
         # to type terms/words that will be searched in the portal
         searchbox = self.browser.find_element_by_id('id_search_box')
@@ -83,15 +108,13 @@ class NewVisitorTest(LiveServerTestCase):
             'Type key terms/words to be searched'
         )
 
-        ##
-        # Tests for content
-        ##
         # As there are experiments sended to Portal, she sees the home
         # page have a list of experiments in a table.
         # She reads in "List of Experiments" in the table title
         table_title = self.browser.find_element_by_id(
             'id_table_title').find_element_by_tag_name('h2').text
         self.assertEqual('List of Experiments', table_title)
+
         # She sees a list of experiments with columns: Title, Description
         table = self.browser.find_element_by_id('id_experiments_table')
         row_headers = table.find_element_by_tag_name(
@@ -99,10 +122,13 @@ class NewVisitorTest(LiveServerTestCase):
         col_headers = row_headers.find_elements_by_tag_name('th')
         self.assertTrue(col_headers[0].text == 'Title')
         self.assertTrue(col_headers[1].text == 'Description')
+        self.assertTrue(col_headers[2].text == 'Groups')
+        self.assertTrue(col_headers[3].text == 'Version')
+
         # She sees the content of the list
         experiment = Experiment.objects.first()
-        rows = table.find_element_by_tag_name(
-            'tbody').find_elements_by_tag_name('tr')
+        rows = table.find_element_by_tag_name('tbody')\
+            .find_elements_by_tag_name('tr')
         self.assertTrue(
             any(row.find_elements_by_tag_name('td')[0].text ==
                 experiment.title for row in rows)
@@ -111,10 +137,15 @@ class NewVisitorTest(LiveServerTestCase):
             any(row.find_elements_by_tag_name('td')[1].text ==
                 experiment.description for row in rows)
         )
+        self.assertTrue(
+            any(row.find_elements_by_tag_name('td')[2].text ==
+                str(experiment.groups.count()) for row in rows)
+        )
+        self.assertTrue(
+            any(row.find_elements_by_tag_name('td')[3].text ==
+                str(experiment.version) for row in rows)
+        )
 
-        ##
-        # Tests for footer
-        ##
         # She notices that in the footer there is information
         # about ways of contact institution.
         footer_contact = self.browser.find_element_by_id('id_footer_contact')
@@ -136,6 +167,52 @@ class NewVisitorTest(LiveServerTestCase):
         self.assertIn('This site content is licensed with Creative Commons '
                       'Attributions 3.0', footer_license_text)
 
+        # She notices "View" link, in last column
+        table = self.browser.find_element_by_id('id_experiments_table')
+        rows = table.find_element_by_tag_name('tbody')\
+            .find_elements_by_tag_name('tr')
+        self.assertTrue(
+            all(row.find_elements_by_tag_name('td')[4].text ==
+                'View' for row in rows)
+        )
+
+        # She clicks in first "View" link and is redirected to experiment
+        # detail page
+        self.browser.find_element_by_link_text('View').click()  # TODO:
+        # really gets first element?
+        time.sleep(1)
+
+        # She sees a new page with a header title: Open Database
+        # for Experiments in Neuroscience.
+        page_header_text = self.browser.find_element_by_tag_name('h2').text
+        self.assertIn('Open Database for Experiments in Neuroscience',
+                      page_header_text)
+
+        # In header she notices three elements besides header title:
+        # Experiment title, experiment detail, and a button to go back home
+        # page.
+        experiment_title = self.browser.find_element_by_id(
+            'id_detail_title').text
+        self.assertEqual(experiment.title, experiment_title)
+        link_home = self.browser.find_element_by_id('id_link_home').text
+        self.assertIn('Back Search', link_home)
+        experiment_description = self.browser.find_element_by_id(
+            'id_detail_description').text
+        self.assertEqual(experiment.description, experiment_description)
+
+        # Right bellow she sees the study that the experiment belongs to
+        # at left, and if data acquisition was finished, at right
+        study_text = self.browser.find_element_by_id('id_detail_study').text
+        self.assertIn('Related study: ' + experiment.study.title, study_text)
+        data_acquisition_text = self.browser.find_element_by_id(
+            'id_detail_acquisition').text
+        self.assertIn('Data acquisition not finished yet',
+                      data_acquisition_text)
+
+        # In right side bellow the data acquisition alert, she sees a link
+        # to download of data
+        link_download = self.browser.find_element_by_id(
+            'id_link_download').text
+        self.assertIn('Download data', link_download)
+
         self.fail('Finish the test!')
-
-

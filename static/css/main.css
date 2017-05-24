@@ -46,7 +46,7 @@ h1, h3, h4, h5, p {
   ========================================
  */
 
-.nep-header {
+.header-home {
   background: #a6aaad;
   text-align: center;
   border-radius: 3px;
@@ -57,6 +57,49 @@ h1, h3, h4, h5, p {
   margin-bottom: 20px;
 }
 
+.detail-header {
+  border-left: 1px solid #a6aaad;
+  border-top: 1px solid #a6aaad;
+  border-right: 1px solid #a6aaad;
+  border-top-left-radius: 7px;
+  border-top-right-radius: 7px;
+}
+
+.detail-header h2{
+  text-align: center;
+}
+
+.detail-title {
+  float: left;
+  margin: 10px 5px;
+}
+.detail-back-search {
+  float: right;
+  margin: 10px 5px;
+}
+
+.detail-description {
+  clear: both;
+  margin: 10px 5px;
+}
+
+.detail-header-hr {
+  margin-bottom: 2px;
+}
+
+.detail-study {
+  float: left;
+}
+
+.detail-acquisition {
+  float: right;
+}
+
+.detail-donwload {
+  clear: both;
+  float:right;
+}
+
 /*
   ========================================
   Body
@@ -65,6 +108,27 @@ h1, h3, h4, h5, p {
 
 .table-title {
   text-align: center;
+}
+
+.toggable-tabs {
+  height: 400px;
+  border-left: 1px solid #a6aaad;
+  border-right: 1px solid #a6aaad;
+  border-bottom: 1px solid #a6aaad;
+  border-bottom-left-radius: 7px;
+  border-bottom-right-radius: 7px;
+  margin-bottom: 5px;
+}
+
+
+/*
+  ========================================
+  Container Detail Experiment
+  ========================================
+*/
+
+.detail-container {
+  border: 1px solid #a6aaad;
 }
 
 /*

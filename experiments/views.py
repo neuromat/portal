@@ -4,13 +4,7 @@ from django.db.models import Max, Q
 from experiments.models import Experiment
 
 
-def home_page(request):
-    experiments = get_current_experiments()
-
-    return render(request, 'experiments/home.html',
-                  {'experiments': experiments})
-
-
+# TODO: make method in appclasses.ExperimentVersion
 def get_current_experiments():
     experiment_max_version_set = \
         Experiment.objects.values('owner', 'nes_id').annotate(
@@ -21,3 +15,17 @@ def get_current_experiments():
                         Q(nes_id=experiment['nes_id']) &
                         Q(version=experiment['max_version']))
     return Experiment.objects.filter(q_statement)
+
+
+def home_page(request):
+    experiments = get_current_experiments()
+
+    return render(request, 'experiments/home.html',
+                  {'experiments': experiments})
+
+
+def experiment_detail(request, experiment_id):
+    experiment = Experiment.objects.get(pk=experiment_id)
+    return render(
+        request, 'experiments/detail.html', {'experiment': experiment}
+    )
