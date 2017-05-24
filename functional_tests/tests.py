@@ -215,4 +215,12 @@ class NewVisitorTest(StaticLiveServerTestCase):
             'id_link_download').text
         self.assertIn('Download data', link_download)
 
+        # She clicks in Related study link and see a modal with Study data
+        # TODO: how to test modals? Below the modal is in the page,
+        # so we are not testing the modal action.
+        self.browser.find_element_by_link_text(experiment.study.title).click()
+        time.sleep(1)
+        study_title = self.browser.find_element_by_id('modal_study_title').text
+        self.assertIn(experiment.study.title, study_title)
+
         self.fail('Finish the test!')
