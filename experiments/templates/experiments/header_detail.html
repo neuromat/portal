@@ -19,15 +19,39 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                    <h4 id="modal_study_title" class="modal-title">
-                        {{ experiment.study.title }}</h4>
+                    <h3 id="modal_study_title" class="modal-title">
+                        {{ experiment.study.title }}</h3>
                 </div>
                 <div class="modal-body">
-                    <p>One fine body&hellip;</p>
+                    <p id="modal_study_description">{{ experiment.study.description }}</p>
+                    <section>
+                        <div id="modal_study_researcher" class="col-md-6"
+                        ><strong>Researcher:</strong></div>
+                        <div id="modal_study_startdate"
+                             class="col-md-3"><strong>Start
+                            date:</strong><br>
+                            {{ experiment.study.start_date }}</div>
+                        <div id="modal_study_enddate"
+                             class="col-md-3"><strong>End
+                            date:</strong><br>
+                            {{ experiment.study.end_date }}</div>
+                    </section>
+                    <section>
+                        <div id="modal_contributors"><strong>Contributors:</strong></div>
+                        <table id="table_contributors" class="table">
+                            <thead>
+                            <tr>
+                                <th>Person</th>
+                                <th>Team</th>
+                                <th>Coordinator</th>
+                            </tr>
+                            </thead>
+                        </table>
+                    </section>
                 </div>
+
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary">Save changes</button>
                 </div>
             </div><!-- /.modal-content -->
         </div><!-- /.modal-dialog -->
