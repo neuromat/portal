@@ -215,4 +215,41 @@ class NewVisitorTest(StaticLiveServerTestCase):
             'id_link_download').text
         self.assertIn('Download data', link_download)
 
+        # She clicks in Related study link and see a modal with Study data
+        self.browser.find_element_by_link_text(experiment.study.title).click()
+        time.sleep(1)
+        study_title = self.browser.find_element_by_id('modal_study_title').text
+        self.assertIn(experiment.study.title, study_title)
+        study_description = self.browser.find_element_by_id(
+            'modal_study_description').text
+        self.assertIn(experiment.study.description, study_description)
+        study_researcher = self.browser.find_element_by_id(
+            'modal_study_researcher').text
+        self.assertIn('Researcher:', study_researcher)
+        study_start_date = self.browser.find_element_by_id(
+            'modal_study_startdate').text
+        self.assertIn('Start date:', study_start_date)
+        self.assertIn(experiment.study.start_date.strftime("%B %d, %Y"),
+                      study_start_date)
+        study_end_date = self.browser.find_element_by_id(
+            'modal_study_enddate').text
+        self.assertIn('End date:', study_end_date)
+        if experiment.study.end_date:
+            self.assertIn(experiment.study.end_date.strftime("%B %d, %Y"),
+                          study_end_date)
+        else:
+            self.assertIn(str(None), study_end_date)
+        study_contributors = self.browser.find_element_by_id(
+            'modal_contributors').text
+        self.assertIn('Contributors:', study_contributors)
+        table_contributors = self.browser.find_element_by_id(
+            'table_contributors')
+        row_headers_contrib = table_contributors.find_element_by_tag_name(
+            'thead').find_element_by_tag_name('tr')
+        col_headers_contrib = row_headers_contrib.find_elements_by_tag_name(
+            'th')
+        self.assertTrue(col_headers_contrib[0].text == 'Person')
+        self.assertTrue(col_headers_contrib[1].text == 'Team')
+        self.assertTrue(col_headers_contrib[2].text == 'Coordinator')
+
         self.fail('Finish the test!')
