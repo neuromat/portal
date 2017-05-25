@@ -380,7 +380,7 @@ class StudyAPITest(APITestCase):
         study1 = Study.objects.first()
         study2 = Study.objects.last()
         list_url = reverse('api_experiment_studies-list',
-                           kwargs={'nes_id': experiment.nes_id})
+                           kwargs={'experiment_nes_id': experiment.nes_id})
         response = self.client.get(list_url)
         self.assertEqual(
             json.loads(response.content.decode('utf8')),
@@ -413,7 +413,7 @@ class StudyAPITest(APITestCase):
         study = Study.objects.get(nes_id=1, owner=owner)
         experiment = Experiment.objects.get(nes_id=1, owner=owner)
         list_url = reverse('api_experiment_studies-list',
-                           kwargs={'nes_id': experiment.nes_id})
+                           kwargs={'experiment_nes_id': experiment.nes_id})
         self.client.login(username=owner.username, password='nep-lab2')
         response = self.client.get(list_url)
         self.assertEqual(
@@ -441,7 +441,7 @@ class StudyAPITest(APITestCase):
         )
         self.client.login(username=owner.username, password='nep-lab1')
         list_url = reverse('api_experiment_studies-list',
-                           kwargs={'nes_id': experiment.nes_id})
+                           kwargs={'experiment_nes_id': experiment.nes_id})
         response = self.client.post(
             list_url,
             {
@@ -564,7 +564,7 @@ class GroupAPITest(APITestCase):
         group2 = Group.objects.get(nes_id=2, owner=owner1)
         group3 = Group.objects.get(nes_id=1, owner=owner2)
         list_url = reverse('api_experiment_groups-list',
-                           kwargs={'nes_id': experiment.nes_id})
+                           kwargs={'experiment_nes_id': experiment.nes_id})
         response = self.client.get(list_url)
         self.assertEqual(
             json.loads(response.content.decode('utf8')),
@@ -602,7 +602,7 @@ class GroupAPITest(APITestCase):
         group1 = Group.objects.get(nes_id=1, owner=owner)
         group2 = Group.objects.get(nes_id=2, owner=owner)
         list_url = reverse('api_experiment_groups-list',
-                           kwargs={'nes_id': experiment.nes_id})
+                           kwargs={'experiment_nes_id': experiment.nes_id})
         self.client.login(username=owner.username, password='nep-lab1')
         response = self.client.get(list_url)
         self.assertEqual(
@@ -633,7 +633,7 @@ class GroupAPITest(APITestCase):
         experiment = Experiment.objects.get(nes_id=1, owner=owner)
         self.client.login(username=owner.username, password='nep-lab1')
         list_url = reverse('api_experiment_groups-list',
-                           kwargs={'nes_id': experiment.nes_id})
+                           kwargs={'experiment_nes_id': experiment.nes_id})
         response = self.client.post(
             list_url,
             {
@@ -658,7 +658,7 @@ class GroupAPITest(APITestCase):
         )
         self.client.login(username=owner.username, password='nep-lab1')
         list_url = reverse('api_experiment_groups-list',
-                           kwargs={'nes_id': experiment_v1.nes_id})
+                           kwargs={'experiment_nes_id': experiment_v1.nes_id})
         self.client.post(
             list_url,
             {
