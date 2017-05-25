@@ -48,7 +48,7 @@ class Study(models.Model):
     owner = models.ForeignKey(User)
 
     class Meta:
-        unique_together = ('nes_id', 'owner')
+        unique_together = ('nes_id', 'owner', 'experiment')
 
 
 class ProtocolComponent(models.Model):
