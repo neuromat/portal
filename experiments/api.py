@@ -1,3 +1,4 @@
+from django.contrib.auth.models import AnonymousUser
 from rest_framework import serializers, permissions, viewsets
 
 from experiments import appclasses
@@ -179,17 +180,20 @@ class ProtocolComponentViewSet(viewsets.ModelViewSet):
 
 class GroupViewSet(viewsets.ModelViewSet):
     lookup_field = 'nes_id'
-    queryset = Group.objects.all()
     serializer_class = GroupSerializer
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
 
-    # def get_queryset(self):
-    #     # TODO: don't filter by owner if not logged (gets TypeError)
-    #     # exception when trying to get an individual experiment
-    #     if 'nes_id' in self.kwargs:
-    #         return Group.objects.filter(owner=self.request.user)
-    #     else:
-    #         return Group.objects.all()
+    def get_queryset(self):
+        # TODO: don't filter by owner if not logged (gets TypeError)
+        # exception when trying to get an individual experiment
+        if 'nes_id' in self.kwargs and (self.request.user != AnonymousUser()):
+            experiment = Experiment.objects.filter(
+                nes_id=self.kwargs['nes_id'], owner=self.request.user
+            )
+            return Group.objects.filter(experiment=experiment,
+                                        owner=self.request.user)
+        else:
+            return Group.objects.all()
 
     def perform_create(self, serializer):
         exp_nes_id = self.kwargs['nes_id']

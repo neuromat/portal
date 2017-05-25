@@ -461,7 +461,7 @@ class GroupAPITest(APITestCase):
             owner=owner2, experiment=experiment2
         )
 
-    def test_get_returns_all_groups(self):
+    def test_get_returns_all_groups_short_url(self):
         owner1 = User.objects.get(username='lab1')
         owner2 = User.objects.get(username='lab2')
         group1 = Group.objects.get(nes_id=1, owner=owner1)
@@ -499,8 +499,77 @@ class GroupAPITest(APITestCase):
             ]
         )
 
+    def test_get_returns_all_groups_long_url(self):
+        owner1 = User.objects.get(username='lab1')
+        owner2 = User.objects.get(username='lab2')
+        experiment = Experiment.objects.last()  # can be anyone
+        group1 = Group.objects.get(nes_id=1, owner=owner1)
+        group2 = Group.objects.get(nes_id=2, owner=owner1)
+        group3 = Group.objects.get(nes_id=1, owner=owner2)
+        list_url = reverse('api_experiment_groups-list',
+                           kwargs={'nes_id': experiment.nes_id})
+        response = self.client.get(list_url)
+        self.assertEqual(
+            json.loads(response.content.decode('utf8')),
+            [
+                {
+                    'id': group1.id,
+                    'title': group1.title,
+                    'description': group1.description,
+                    'experiment': group1.experiment.title,
+                    'nes_id': group1.nes_id,
+                    'owner': group1.owner.username
+                },
+                {
+                    'id': group2.id,
+                    'title': group2.title,
+                    'description': group2.description,
+                    'experiment': group2.experiment.title,
+                    'nes_id': group2.nes_id,
+                    'owner': group2.owner.username
+                },
+                {
+                    'id': group3.id,
+                    'title': group3.title,
+                    'description': group3.description,
+                    'experiment': group3.experiment.title,
+                    'nes_id': group3.nes_id,
+                    'owner': group3.owner.username
+                }
+            ]
+        )
+
     def test_get_returns_groups_of_an_experiment(self):
-        pass
+        owner = User.objects.get(username='lab1')
+        experiment = Experiment.objects.get(nes_id=1, owner=owner)
+        group1 = Group.objects.get(nes_id=1, owner=owner)
+        group2 = Group.objects.get(nes_id=2, owner=owner)
+        list_url = reverse('api_experiment_groups-list',
+                           kwargs={'nes_id': experiment.nes_id})
+        self.client.login(username=owner.username, password='nep-lab1')
+        response = self.client.get(list_url)
+        self.assertEqual(
+            json.loads(response.content.decode('utf8')),
+            [
+                {
+                    'id': group1.id,
+                    'title': group1.title,
+                    'description': group1.description,
+                    'experiment': group1.experiment.title,
+                    'nes_id': group1.nes_id,
+                    'owner': group1.owner.username
+                },
+                {
+                    'id': group2.id,
+                    'title': group2.title,
+                    'description': group2.description,
+                    'experiment': group2.experiment.title,
+                    'nes_id': group2.nes_id,
+                    'owner': group2.owner.username
+                }
+            ]
+        )
+        self.client.logout()
 
     def test_POSTing_a_new_group(self):
         owner = User.objects.get(username='lab1')
