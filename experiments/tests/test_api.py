@@ -444,24 +444,30 @@ class GroupAPITest(APITestCase):
 
     def setUp(self):
         global_setup(self)
-        owner = User.objects.get(username='lab1')
-        experiment = Experiment.objects.get(owner=owner)
+        owner1 = User.objects.get(username='lab1')
+        owner2 = User.objects.get(username='lab2')
+        experiment1 = Experiment.objects.get(nes_id=1, owner=owner1)
+        experiment2 = Experiment.objects.get(nes_id=1, owner=owner2)
         Group.objects.create(
             title='A title', description='A description', nes_id=1,
-            owner=owner, experiment=experiment
+            owner=owner1, experiment=experiment1
         )
         Group.objects.create(
             title='Other title', description='Other description', nes_id=2,
-            owner=owner, experiment=experiment
+            owner=owner1, experiment=experiment1
+        )
+        Group.objects.create(
+            title='A title', description='A description', nes_id=1,
+            owner=owner2, experiment=experiment2
         )
 
     def test_get_returns_all_groups(self):
-        owner = User.objects.get(username='lab1')
-        experiment = Experiment.objects.get(owner=owner)
-        group1 = Group.objects.get(nes_id=1, owner=owner)
-        group2 = Group.objects.get(nes_id=2, owner=owner)
-        list_url = reverse('api_groups-list',
-                           kwargs={'nes_id': experiment.nes_id})
+        owner1 = User.objects.get(username='lab1')
+        owner2 = User.objects.get(username='lab2')
+        group1 = Group.objects.get(nes_id=1, owner=owner1)
+        group2 = Group.objects.get(nes_id=2, owner=owner1)
+        group3 = Group.objects.get(nes_id=1, owner=owner2)
+        list_url = reverse('api_groups-list')
         response = self.client.get(list_url)
         self.assertEqual(
             json.loads(response.content.decode('utf8')),
@@ -481,15 +487,26 @@ class GroupAPITest(APITestCase):
                     'experiment': group2.experiment.title,
                     'nes_id': group2.nes_id,
                     'owner': group2.owner.username
+                },
+                {
+                    'id': group3.id,
+                    'title': group3.title,
+                    'description': group3.description,
+                    'experiment': group3.experiment.title,
+                    'nes_id': group3.nes_id,
+                    'owner': group3.owner.username
                 }
             ]
         )
+
+    def test_get_returns_groups_of_an_experiment(self):
+        pass
 
     def test_POSTing_a_new_group(self):
         owner = User.objects.get(username='lab1')
         experiment = Experiment.objects.get(nes_id=1, owner=owner)
         self.client.login(username=owner.username, password='nep-lab1')
-        list_url = reverse('api_groups-list',
+        list_url = reverse('api_experiment_groups-list',
                            kwargs={'nes_id': experiment.nes_id})
         response = self.client.post(
             list_url,
@@ -514,7 +531,7 @@ class GroupAPITest(APITestCase):
             sent_date=datetime.utcnow(), owner=owner
         )
         self.client.login(username=owner.username, password='nep-lab1')
-        list_url = reverse('api_groups-list',
+        list_url = reverse('api_experiment_groups-list',
                            kwargs={'nes_id': experiment_v1.nes_id})
         self.client.post(
             list_url,

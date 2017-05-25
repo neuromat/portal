@@ -13,9 +13,13 @@ router.register(r'experiments', api.ExperimentViewSet,
 router.register(r'protocol_components', api.ProtocolComponentViewSet,
                 base_name='api_protocol_components')
 
-api_groups_list = api.GroupViewSet.as_view({
+api_experiment_groups_list = api.GroupViewSet.as_view({
     'get': 'list',
     'post': 'create',
+})
+
+api_groups_list = api.GroupViewSet.as_view({
+    'get': 'list',
 })
 
 api_studies_list = api.StudyViewSet.as_view({
@@ -31,6 +35,7 @@ urlpatterns = [
     url(r'^', include(router.urls)),
     url(r'^experiments/(?P<nes_id>[0-9]+)/studies/$', api_studies_list,
         name='api_studies-list'),
-    url(r'^experiments/(?P<nes_id>[0-9]+)/groups/$', api_groups_list,
-        name='api_groups-list')
+    url(r'^groups/$', api_groups_list, name='api_groups-list'),
+    url(r'^experiments/(?P<nes_id>[0-9]+)/groups/$',
+        api_experiment_groups_list, name='api_experiment_groups-list')
 ]
