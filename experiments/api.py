@@ -119,15 +119,17 @@ class ExperimentViewSet(viewsets.ModelViewSet):
 
 
 class StudyViewSet(viewsets.ModelViewSet):
-    lookup_field = 'nes_id'
-    queryset = Study.objects.all()
+    lookup_field = 'experiment_nes_id'  # TODO: see if not more used
     serializer_class = StudySerializer
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
 
     def get_queryset(self):
-        if 'nes_id' in self.kwargs and (self.request.user != AnonymousUser()):
+        if 'experiment_nes_id' in \
+                self.kwargs and \
+                (self.request.user != AnonymousUser()):
             experiment = Experiment.objects.filter(
-                nes_id=self.kwargs['nes_id'], owner=self.request.user
+                nes_id=self.kwargs['experiment_nes_id'],
+                owner=self.request.user
             )
             return Study.objects.filter(experiment=experiment,
                                         owner=self.request.user)
@@ -135,7 +137,7 @@ class StudyViewSet(viewsets.ModelViewSet):
             return Study.objects.all()
 
     def perform_create(self, serializer):
-        exp_nes_id = self.kwargs['nes_id']
+        exp_nes_id = self.kwargs['experiment_nes_id']
         owner = self.request.user
         last_version = appclasses.ExperimentVersion(
             exp_nes_id, owner
@@ -151,14 +153,17 @@ class StudyViewSet(viewsets.ModelViewSet):
 
 
 class GroupViewSet(viewsets.ModelViewSet):
-    lookup_field = 'nes_id'
+    lookup_field = 'experiment_nes_id'  # TODO: see if not more used
     serializer_class = GroupSerializer
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
 
     def get_queryset(self):
-        if 'nes_id' in self.kwargs and (self.request.user != AnonymousUser()):
+        if 'experiment_nes_id' in \
+                self.kwargs and \
+                (self.request.user != AnonymousUser()):
             experiment = Experiment.objects.filter(
-                nes_id=self.kwargs['nes_id'], owner=self.request.user
+                nes_id=self.kwargs['experiment_nes_id'],
+                owner=self.request.user
             )
             return Group.objects.filter(experiment=experiment,
                                         owner=self.request.user)
@@ -166,7 +171,7 @@ class GroupViewSet(viewsets.ModelViewSet):
             return Group.objects.all()
 
     def perform_create(self, serializer):
-        exp_nes_id = self.kwargs['nes_id']
+        exp_nes_id = self.kwargs['experiment_nes_id']
         owner = self.request.user
         last_version = appclasses.ExperimentVersion(
             exp_nes_id, owner

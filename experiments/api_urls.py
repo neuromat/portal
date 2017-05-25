@@ -39,10 +39,10 @@ urlpatterns = [
     url(r'^', include(router.urls)),
     # Studies
     url(r'^studies/$', api_studies_list, name='api_studies-list'),
-    url(r'^experiments/(?P<nes_id>[0-9]+)/studies/$',
+    url(r'^experiments/(?P<experiment_nes_id>[0-9]+)/studies/$',
         api_experiment_studies_list, name='api_experiment_studies-list'),
     # Groups
     url(r'^groups/$', api_groups_list, name='api_groups-list'),
-    url(r'^experiments/(?P<nes_id>[0-9]+)/groups/$',
+    url(r'^experiments/(?P<experiment_nes_id>[0-9]+)/groups/$',
         api_experiment_groups_list, name='api_experiment_groups-list')
 ]
