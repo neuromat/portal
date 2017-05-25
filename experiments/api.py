@@ -96,36 +96,6 @@ class GroupSerializer(serializers.ModelSerializer):
 #         serializer.save(owner=self.request.user)
 
 
-class StudyViewSet(viewsets.ModelViewSet):
-    lookup_field = 'nes_id'
-    queryset = Study.objects.all()
-    serializer_class = StudySerializer
-    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
-
-    # def get_queryset(self):
-    #     # TODO: don't filter by owner if not logged (gets TypeError)
-    #     # exception when trying to get an individual study
-    #     if 'nes_id' in self.kwargs:
-    #         return Study.objects.filter(owner=self.request.user)
-    #     else:
-    #         return Study.objects.all()
-
-    def perform_create(self, serializer):
-        exp_nes_id = self.kwargs['nes_id']
-        owner = self.request.user
-        last_version = appclasses.ExperimentVersion(
-            exp_nes_id, owner
-        ).get_last_version()
-        # TODO: if last_version == 0 generates exception: "no experiment was
-        # created yet"
-        experiment = Experiment.objects.get(
-            nes_id=exp_nes_id, owner=owner, version=last_version
-        )
-        # TODO: breaks when posting from the api template.
-        # Doesn't have researcher field to enter a valid reseacher.
-        serializer.save(owner=self.request.user, experiment=experiment)
-
-
 class ExperimentViewSet(viewsets.ModelViewSet):
     lookup_field = 'nes_id'
     serializer_class = ExperimentSerializer
@@ -146,6 +116,67 @@ class ExperimentViewSet(viewsets.ModelViewSet):
         serializer.save(
             owner=owner, version=exp_version.get_last_version() + 1
         )
+
+
+class StudyViewSet(viewsets.ModelViewSet):
+    lookup_field = 'nes_id'
+    queryset = Study.objects.all()
+    serializer_class = StudySerializer
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
+
+    def get_queryset(self):
+        if 'nes_id' in self.kwargs and (self.request.user != AnonymousUser()):
+            experiment = Experiment.objects.filter(
+                nes_id=self.kwargs['nes_id'], owner=self.request.user
+            )
+            return Study.objects.filter(experiment=experiment,
+                                        owner=self.request.user)
+        else:
+            return Study.objects.all()
+
+    def perform_create(self, serializer):
+        exp_nes_id = self.kwargs['nes_id']
+        owner = self.request.user
+        last_version = appclasses.ExperimentVersion(
+            exp_nes_id, owner
+        ).get_last_version()
+        # TODO: if last_version == 0 generates exception: "no experiment was
+        # created yet"
+        experiment = Experiment.objects.get(
+            nes_id=exp_nes_id, owner=owner, version=last_version
+        )
+        # TODO: breaks when posting from the api template.
+        # Doesn't have researcher field to enter a valid reseacher.
+        serializer.save(owner=self.request.user, experiment=experiment)
+
+
+class GroupViewSet(viewsets.ModelViewSet):
+    lookup_field = 'nes_id'
+    serializer_class = GroupSerializer
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
+
+    def get_queryset(self):
+        if 'nes_id' in self.kwargs and (self.request.user != AnonymousUser()):
+            experiment = Experiment.objects.filter(
+                nes_id=self.kwargs['nes_id'], owner=self.request.user
+            )
+            return Group.objects.filter(experiment=experiment,
+                                        owner=self.request.user)
+        else:
+            return Group.objects.all()
+
+    def perform_create(self, serializer):
+        exp_nes_id = self.kwargs['nes_id']
+        owner = self.request.user
+        last_version = appclasses.ExperimentVersion(
+            exp_nes_id, owner
+        ).get_last_version()
+        # TODO: if last_version == 0 generates exception: "no experiment was
+        # created yet"
+        experiment = Experiment.objects.get(
+            nes_id=exp_nes_id, owner=owner, version=last_version
+        )
+        serializer.save(experiment=experiment, owner=owner)
 
 
 class ProtocolComponentViewSet(viewsets.ModelViewSet):
@@ -176,34 +207,3 @@ class ProtocolComponentViewSet(viewsets.ModelViewSet):
             nes_id=experiment_nes_id, owner=self.request.user
         ).get()
         serializer.save()
-
-
-class GroupViewSet(viewsets.ModelViewSet):
-    lookup_field = 'nes_id'
-    serializer_class = GroupSerializer
-    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
-
-    def get_queryset(self):
-        # TODO: don't filter by owner if not logged (gets TypeError)
-        # exception when trying to get an individual experiment
-        if 'nes_id' in self.kwargs and (self.request.user != AnonymousUser()):
-            experiment = Experiment.objects.filter(
-                nes_id=self.kwargs['nes_id'], owner=self.request.user
-            )
-            return Group.objects.filter(experiment=experiment,
-                                        owner=self.request.user)
-        else:
-            return Group.objects.all()
-
-    def perform_create(self, serializer):
-        exp_nes_id = self.kwargs['nes_id']
-        owner = self.request.user
-        last_version = appclasses.ExperimentVersion(
-            exp_nes_id, owner
-        ).get_last_version()
-        # TODO: if last_version == 0 generates exception: "no experiment was
-        # created yet"
-        experiment = Experiment.objects.get(
-            nes_id=exp_nes_id, owner=owner, version=last_version
-        )
-        serializer.save(experiment=experiment, owner=owner)

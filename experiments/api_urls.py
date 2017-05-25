@@ -15,16 +15,20 @@ router.register(r'protocol_components', api.ProtocolComponentViewSet,
 
 api_experiment_groups_list = api.GroupViewSet.as_view({
     'get': 'list',
-    'post': 'create',
+    'post': 'create'
 })
 
 api_groups_list = api.GroupViewSet.as_view({
     'get': 'list',
 })
 
+api_experiment_studies_list = api.StudyViewSet.as_view({
+    'get': 'list',
+    'post': 'create'
+})
+
 api_studies_list = api.StudyViewSet.as_view({
     'get': 'list',
-    'post': 'create',
 })
 
 # Get rest framework schema view
@@ -33,8 +37,11 @@ schema_view = get_schema_view(title='NEP API')
 urlpatterns = [
     url(r'^schema/$', schema_view),
     url(r'^', include(router.urls)),
-    url(r'^experiments/(?P<nes_id>[0-9]+)/studies/$', api_studies_list,
-        name='api_studies-list'),
+    # Studies
+    url(r'^studies/$', api_studies_list, name='api_studies-list'),
+    url(r'^experiments/(?P<nes_id>[0-9]+)/studies/$',
+        api_experiment_studies_list, name='api_experiment_studies-list'),
+    # Groups
     url(r'^groups/$', api_groups_list, name='api_groups-list'),
     url(r'^experiments/(?P<nes_id>[0-9]+)/groups/$',
         api_experiment_groups_list, name='api_experiment_groups-list')
