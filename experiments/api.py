@@ -108,7 +108,7 @@ class ExperimentViewSet(viewsets.ModelViewSet):
             owner = self.request.user
             exp_version = appclasses.ExperimentVersion(nes_id, owner)
 
-            return Experiment.objects.filter(id=exp_version.get_last_version())
+            return Experiment.objects.filter(nes_id=nes_id, version=exp_version.get_last_version())
         else:
             return Experiment.objects.all()
 
