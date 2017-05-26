@@ -127,4 +127,5 @@ STATICFILES_DIRS = [
     os.path.join(BASE_DIR, "static"),
     '/home/caco/Workspace/nep-system/nep',
 ]
-MEDIA_ROOT = '/home/caco/Workspace/nep-system/nep/media'
+# MEDIA_ROOT = '/home/caco/Workspace/nep-system/nep/media'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')

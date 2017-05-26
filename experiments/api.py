@@ -11,7 +11,6 @@ from experiments.models import Experiment, Study, User, ProtocolComponent, \
 ###################
 class ExperimentSerializer(serializers.ModelSerializer):
     owner = serializers.ReadOnlyField(source='owner.username')
-    status = serializers.ReadOnlyField(source='status.tag')
     protocol_components = serializers.PrimaryKeyRelatedField(
         many=True, read_only=True
     )
@@ -105,7 +104,11 @@ class ExperimentViewSet(viewsets.ModelViewSet):
         # TODO: don't filter by owner if not logged (gets TypeError)
         # exception when trying to get an individual experiment
         if 'nes_id' in self.kwargs:
-            return Experiment.objects.filter(owner=self.request.user)
+            nes_id = self.kwargs['nes_id']
+            owner = self.request.user
+            exp_version = appclasses.ExperimentVersion(nes_id, owner)
+
+            return Experiment.objects.filter(id=exp_version.get_last_version())
         else:
             return Experiment.objects.all()
 

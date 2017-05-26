@@ -13,24 +13,25 @@ from django.contrib.auth.models import User
 #         unique_together = ('nes_id', 'owner')
 
 
-class ExperimentStatus(models.Model):
-    tag = models.CharField(max_length=20)
-    name = models.CharField(max_length=50, blank=True)
-    description = models.TextField(blank=True)
-
-
 class Experiment(models.Model):
+    STATUS_OPTIONS = (
+        ("receiving", "receiving"),
+        ("to_be_analysed", "to be analysed"),
+        ("under_analysis", "under analysis"),
+        ("approved", "approved"),
+        ("not_approved", "not approved"),
+    )
+
     nes_id = models.PositiveIntegerField()
     title = models.CharField(max_length=150)
     description = models.TextField()
     data_acquisition_done = models.BooleanField(default=False)
-    ethics_committee_file = models.FileField(
-        'Project file approved by the ethics committee', blank=True
-    )
-    sent_date = models.DateField()
+    ethics_committee_file = models.FileField('Project file approved by the ethics committee', blank=True)
+    sent_date = models.DateField(auto_now=True, blank=True)
     version = models.PositiveIntegerField()
-    status = models.ForeignKey(ExperimentStatus, related_name='experiments',
-                               default=1)  # TODO: requires 'to_be_approved'
+
+    status = models.CharField(max_length=20, default="receiving")
+
     # has id 1.
     owner = models.ForeignKey(User)
 
