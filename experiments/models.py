@@ -26,18 +26,17 @@ class Experiment(models.Model):
         (APPROVED, 'approved'),
         (NOT_APPROVED, 'not_approved'),
     )
+
+    owner = models.ForeignKey(User)
     nes_id = models.PositiveIntegerField()
+    version = models.PositiveIntegerField()
+
     title = models.CharField(max_length=150)
     description = models.TextField()
     data_acquisition_done = models.BooleanField(default=False)
-    ethics_committee_file = models.FileField(
-        'Project file approved by the ethics committee', blank=True
-    )
+    ethics_committee_file = models.FileField('Project file approved by the ethics committee', blank=True)
     sent_date = models.DateField(auto_now=True)
-    version = models.PositiveIntegerField()
-    status = models.CharField(max_length=20, choices=STATUS_OPTIONS,
-                              default=RECEIVING)
-    owner = models.ForeignKey(User)
+    status = models.CharField(max_length=20, choices=STATUS_OPTIONS, default=RECEIVING)
 
     class Meta:
         unique_together = ('nes_id', 'owner', 'version')
@@ -45,7 +44,6 @@ class Experiment(models.Model):
 
 class Study(models.Model):
     experiment = models.OneToOneField(Experiment)
-    nes_id = models.PositiveIntegerField()
 
     title = models.CharField(max_length=150)
     description = models.TextField()
@@ -56,8 +54,6 @@ class Study(models.Model):
 class ProtocolComponent(models.Model):
     experiment = models.ForeignKey(Experiment, related_name='protocol_components')
     nes_id = models.PositiveIntegerField()
-
-    # owner = models.ForeignKey(User)
 
     identification = models.CharField(max_length=50)
     description = models.TextField(blank=True)
@@ -72,15 +68,11 @@ class Group(models.Model):
     experiment = models.ForeignKey(Experiment, related_name='groups')
     nes_id = models.PositiveIntegerField()
 
-    # owner = models.ForeignKey(User)
-
     title = models.CharField(max_length=50)
     description = models.TextField()
     protocol_component = models.ForeignKey(
         ProtocolComponent, null=True, blank=True
     )  # TODO: define if Group has ProtocolComponent
-    experiment = models.ForeignKey(Experiment, related_name='groups')
-    nes_id = models.PositiveIntegerField()
 
     class Meta:
         unique_together = ('nes_id', 'experiment')
