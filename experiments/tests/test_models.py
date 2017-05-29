@@ -22,8 +22,8 @@ def global_setup(self):
     Experiment.objects.create(nes_id=1, owner=owner2,
                               version=1, sent_date=datetime.utcnow())
 
-    Study.objects.create(nes_id=1, start_date=datetime.utcnow(),
-                         experiment=experiment1, owner=owner1)
+    Study.objects.create(start_date=datetime.utcnow(),
+                         experiment=experiment1)
 
 
 def apply_setup(setup_func):
@@ -98,7 +98,6 @@ class StudyModelTest(TestCase):
         self.assertEqual(study.description, '')
         self.assertEqual(study.start_date, None)
         self.assertEqual(study.end_date, None)
-        self.assertEqual(study.nes_id, None)
 
     def test_cannot_save_empty_attributes(self):
         study = Study(title='', description='', start_date='')
@@ -107,35 +106,36 @@ class StudyModelTest(TestCase):
             study.full_clean()
 
     def test_duplicate_studies_are_invalid(self):
-        owner = User.objects.first()
         experiment = Experiment.objects.last()
-        study = Study(nes_id=1, start_date=datetime.utcnow(),
-                      experiment=experiment, owner=owner)
+        study = Study(start_date=datetime.utcnow(),
+                      experiment=experiment)
         with self.assertRaises(ValidationError):
             study.full_clean()
 
-    def test_CAN_save_same_study_to_different_owners(self):
-        owner2 = User.objects.last()
-        experiment = Experiment.objects.last()
-        study = Study(title='A title', description='A description', nes_id=1,
-                      start_date=datetime.utcnow(), end_date=datetime.utcnow(),
-                      experiment=experiment, owner=owner2)
-        study.full_clean()
+    # def test_CAN_save_same_study_to_different_owners(self):
+    #     # TODO: maybe not necessary anymore
+    #     owner2 = User.objects.last()
+    #     experiment = Experiment.objects.last()
+    #     study = Study(title='A title', description='A description', nes_id=1,
+    #                   start_date=datetime.utcnow(), end_date=datetime.utcnow(),
+    #                   experiment=experiment, owner=owner2)
+    #     study.full_clean()
 
-    def test_study_is_related_to_owner(self):
-        owner = User.objects.first()
-        experiment = Experiment.objects.last()
-        study = Study(nes_id=17, start_date=datetime.utcnow(),
-                      experiment=experiment, owner=owner)
-        study.save()
-        self.assertIn(study, owner.study_set.all())
+    # TODO: adapt test so we see if study is related to experiment owner
+    # def test_study_is_related_to_owner(self):
+    #     owner = User.objects.first()
+    #     experiment = Experiment.objects.last()
+    #     study = Study(start_date=datetime.utcnow(), experiment=experiment)
+    #     study.save()
+    #     self.assertIn(study, owner.study_set.all())
 
     def test_study_has_one_experiment(self):
+        # TODO: this test is incomplete. Finish it!
         owner = User.objects.first()
         experiment = Experiment.objects.first()
         study1 = Study.objects.first()
-        study2 = Study(nes_id=17, start_date=datetime.utcnow(),
-                       experiment=experiment, owner=owner)
+        study2 = Study(start_date=datetime.utcnow(),
+                       experiment=experiment)
 
 
 @apply_setup(global_setup)
@@ -275,52 +275,49 @@ class GroupModelTest(TestCase):
         self.assertEqual(group.description, '')
         self.assertEqual(group.nes_id, None)
 
-    def test_group_is_related_to_experiment_and_owner(self):
-        owner = User.objects.first()
+    def test_group_is_related_to_experiment(self):
         experiment = Experiment.objects.first()
         group = Group.objects.create(
             title='Group A', description='A description', nes_id=1,
-            experiment=experiment, owner=owner
+            experiment=experiment
         )
         self.assertIn(group, experiment.groups.all())
-        self.assertIn(group, owner.group_set.all())
 
     def test_cannot_save_empty_attributes(self):
-        owner = User.objects.first()
         experiment = Experiment.objects.first()
         group = Group.objects.create(
             title='', description='', nes_id=1,
-            experiment=experiment, owner=owner
+            experiment=experiment
         )
         with self.assertRaises(ValidationError):
             group.save()
             group.full_clean()
 
     def test_duplicate_groups_are_invalid(self):
-        owner = User.objects.first()
         experiment = Experiment.objects.first()
         Group.objects.create(
             title='Group A', description='A description', nes_id=1,
-            experiment=experiment, owner=owner
+            experiment=experiment
         )
         group = Group(
             title='Group A', description='A description', nes_id=1,
-            experiment=experiment, owner=owner
+            experiment=experiment
         )
         with self.assertRaises(ValidationError):
             group.full_clean()
 
-    def test_CAN_save_same_groups_to_different_owners(self):
-        owner1 = User.objects.first()
-        owner2 = User.objects.last()
-        experiment1 = Experiment.objects.first()
-        experiment2 = Experiment.objects.last()
-        Group.objects.create(
-            title='Group A', description='A description', nes_id=1,
-            experiment=experiment1, owner=owner1
-        )
-        group = Group(
-            title='Group A', description='A description', nes_id=1,
-            experiment=experiment2, owner=owner2
-        )
-        group.full_clean()
+    # def test_CAN_save_same_groups_to_different_owners(self):
+    #     # TODO: maybe not necessary anymore
+    #     owner1 = User.objects.first()
+    #     owner2 = User.objects.last()
+    #     experiment1 = Experiment.objects.first()
+    #     experiment2 = Experiment.objects.last()
+    #     Group.objects.create(
+    #         title='Group A', description='A description', nes_id=1,
+    #         experiment=experiment1, owner=owner1
+    #     )
+    #     group = Group(
+    #         title='Group A', description='A description', nes_id=1,
+    #         experiment=experiment2, owner=owner2
+    #     )
+    #     group.full_clean()

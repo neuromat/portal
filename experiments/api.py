@@ -33,13 +33,12 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class StudySerializer(serializers.ModelSerializer):
-    owner = serializers.ReadOnlyField(source='owner.username')
     experiment = serializers.ReadOnlyField(source='experiment.title')
 
     class Meta:
         model = Study
-        fields = ('id', 'nes_id', 'title', 'description', 'start_date',
-                  'end_date', 'experiment', 'owner')
+        fields = ('id', 'title', 'description', 'start_date',
+                  'end_date', 'experiment')
 
 
 # class ResearcherSerializer(serializers.ModelSerializer):
@@ -65,13 +64,11 @@ class StudySerializer(serializers.ModelSerializer):
 
 
 class GroupSerializer(serializers.ModelSerializer):
-    owner = serializers.ReadOnlyField(source='owner.username')
     experiment = serializers.ReadOnlyField(source='experiment.title')
 
     class Meta:
         model = Group
-        fields = ('id', 'nes_id', 'title', 'description',
-                  'experiment', 'owner')
+        fields = ('id', 'nes_id', 'title', 'description', 'experiment')
 
 
 #############
@@ -146,8 +143,7 @@ class StudyViewSet(viewsets.ModelViewSet):
                 nes_id=self.kwargs['experiment_nes_id'],
                 owner=self.request.user
             )
-            return Study.objects.filter(experiment=experiment,
-                                        owner=self.request.user)
+            return Study.objects.filter(experiment=experiment)
         else:
             return Study.objects.all()
 
@@ -164,7 +160,7 @@ class StudyViewSet(viewsets.ModelViewSet):
         )
         # TODO: breaks when posting from the api template.
         # Doesn't have researcher field to enter a valid reseacher.
-        serializer.save(owner=self.request.user, experiment=experiment)
+        serializer.save(experiment=experiment)
 
 
 class GroupViewSet(viewsets.ModelViewSet):
@@ -180,8 +176,7 @@ class GroupViewSet(viewsets.ModelViewSet):
                 nes_id=self.kwargs['experiment_nes_id'],
                 owner=self.request.user
             )
-            return Group.objects.filter(experiment=experiment,
-                                        owner=self.request.user)
+            return Group.objects.filter(experiment=experiment)
         else:
             return Group.objects.all()
 
@@ -196,7 +191,7 @@ class GroupViewSet(viewsets.ModelViewSet):
         experiment = Experiment.objects.get(
             nes_id=exp_nes_id, owner=owner, version=last_version
         )
-        serializer.save(experiment=experiment, owner=owner)
+        serializer.save(experiment=experiment)
 
 
 # class ProtocolComponentViewSet(viewsets.ModelViewSet):

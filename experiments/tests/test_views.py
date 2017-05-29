@@ -23,10 +23,8 @@ def global_setup(self):
         version=1, sent_date=datetime.utcnow()
     )
 
-    Study.objects.create(nes_id=1, start_date=datetime.utcnow(),
-                         experiment=experiment1, owner=owner1)
-    Study.objects.create(nes_id=1, start_date=datetime.utcnow(),
-                         experiment=experiment2, owner=owner2)
+    Study.objects.create(start_date=datetime.utcnow(), experiment=experiment1)
+    Study.objects.create(start_date=datetime.utcnow(), experiment=experiment2)
 
 
 def apply_setup(setup_func):

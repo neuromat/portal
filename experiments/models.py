@@ -49,11 +49,6 @@ class Study(models.Model):
     start_date = models.DateField()
     end_date = models.DateField(null=True)
     experiment = models.OneToOneField(Experiment)
-    nes_id = models.PositiveIntegerField()
-    owner = models.ForeignKey(User)
-
-    class Meta:
-        unique_together = ('nes_id', 'owner', 'experiment')
 
 
 class ProtocolComponent(models.Model):
@@ -78,7 +73,6 @@ class Group(models.Model):
     )  # TODO: define if Group has ProtocolComponent
     experiment = models.ForeignKey(Experiment, related_name='groups')
     nes_id = models.PositiveIntegerField()
-    owner = models.ForeignKey(User)
 
     class Meta:
-        unique_together = ('nes_id', 'owner', 'experiment')
+        unique_together = ('nes_id', 'experiment')

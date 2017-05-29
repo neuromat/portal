@@ -32,13 +32,13 @@ def global_setup(self):
         Study.objects.create(
             title=faker.fake.text(max_nb_chars=15),
             description=faker.fake.text(max_nb_chars=200),
-            nes_id=i+1, start_date=datetime.utcnow(),
-            experiment=experiment_owner1, owner=owner1
+            start_date=datetime.utcnow(),
+            experiment=experiment_owner1
         )
         Group.objects.create(
             nes_id=i+1, title=faker.fake.text(max_nb_chars=15),
             description=faker.fake.text(max_nb_chars=150),
-            experiment=experiment_owner1, owner=owner1
+            experiment=experiment_owner1
         )
 
     for i in range(3, 5):
@@ -52,13 +52,12 @@ def global_setup(self):
         Study.objects.create(
             title=faker.fake.text(max_nb_chars=15),
             description=faker.fake.text(max_nb_chars=200),
-            nes_id=i + 1, start_date=datetime.utcnow(),
-            experiment=experiment_owner2, owner=owner1
+            start_date=datetime.utcnow(), experiment=experiment_owner2
         )
         Group.objects.create(
             nes_id=i+1, title=faker.fake.text(max_nb_chars=50),
             description=faker.fake.text(max_nb_chars=150),
-            experiment=experiment_owner2, owner=owner2
+            experiment=experiment_owner2
         )
 
 
