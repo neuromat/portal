@@ -33,13 +33,12 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class StudySerializer(serializers.ModelSerializer):
-    owner = serializers.ReadOnlyField(source='owner.username')
     experiment = serializers.ReadOnlyField(source='experiment.title')
 
     class Meta:
         model = Study
         fields = ('id', 'nes_id', 'title', 'description', 'start_date',
-                  'end_date', 'experiment', 'owner')
+                  'end_date', 'experiment')
 
 
 # class ResearcherSerializer(serializers.ModelSerializer):
@@ -55,23 +54,20 @@ class StudySerializer(serializers.ModelSerializer):
 
 
 class ProtocolComponentSerializer(serializers.ModelSerializer):
-    owner = serializers.ReadOnlyField(source='owner.username')
     experiment = serializers.ReadOnlyField(source='experiment.title')
 
     class Meta:
         model = ProtocolComponent
         fields = ('id', 'nes_id', 'identification', 'description',
-                  'duration_value', 'component_type', 'experiment', 'owner')
+                  'duration_value', 'component_type', 'experiment')
 
 
 class GroupSerializer(serializers.ModelSerializer):
-    owner = serializers.ReadOnlyField(source='owner.username')
     experiment = serializers.ReadOnlyField(source='experiment.title')
 
     class Meta:
         model = Group
-        fields = ('id', 'nes_id', 'title', 'description', 'experiment',
-                  'owner')
+        fields = ('id', 'nes_id', 'title', 'description', 'experiment')
 
 
 #############
@@ -134,8 +130,7 @@ class StudyViewSet(viewsets.ModelViewSet):
                 nes_id=self.kwargs['experiment_nes_id'],
                 owner=self.request.user
             )
-            return Study.objects.filter(experiment=experiment,
-                                        owner=self.request.user)
+            return Study.objects.filter(experiment=experiment)
         else:
             return Study.objects.all()
 
@@ -152,7 +147,7 @@ class StudyViewSet(viewsets.ModelViewSet):
         )
         # TODO: breaks when posting from the api template.
         # Doesn't have researcher field to enter a valid reseacher.
-        serializer.save(owner=self.request.user, experiment=experiment)
+        serializer.save(experiment=experiment)
 
 
 class GroupViewSet(viewsets.ModelViewSet):
@@ -168,8 +163,7 @@ class GroupViewSet(viewsets.ModelViewSet):
                 nes_id=self.kwargs['experiment_nes_id'],
                 owner=self.request.user
             )
-            return Group.objects.filter(experiment=experiment,
-                                        owner=self.request.user)
+            return Group.objects.filter(experiment=experiment)
         else:
             return Group.objects.all()
 
@@ -184,7 +178,7 @@ class GroupViewSet(viewsets.ModelViewSet):
         experiment = Experiment.objects.get(
             nes_id=exp_nes_id, owner=owner, version=last_version
         )
-        serializer.save(experiment=experiment, owner=owner)
+        serializer.save(experiment=experiment)
 
 
 class ProtocolComponentViewSet(viewsets.ModelViewSet):
@@ -196,7 +190,7 @@ class ProtocolComponentViewSet(viewsets.ModelViewSet):
         # TODO: don't filter by owner if not logged (gets TypeError)
         # exception when trying to get an individual experiment
         if 'nes_id' in self.kwargs:
-            return ProtocolComponent.objects.filter(owner=self.request.user)
+            return ProtocolComponent.objects.filter(experiment__owner=self.request.user, nes_id=self.kwargs['nes_id'])
         else:
             return ProtocolComponent.objects.all()
 
@@ -206,7 +200,7 @@ class ProtocolComponentViewSet(viewsets.ModelViewSet):
         experiment_nes_id = self.request.data['experiment']
         experiment = Experiment.objects.filter(
             nes_id=experiment_nes_id, owner=self.request.user).get()
-        serializer.save(experiment=experiment, owner=self.request.user)
+        serializer.save(experiment=experiment)
 
     def perform_update(self, serializer):
         # TODO: save in with last experiment version
