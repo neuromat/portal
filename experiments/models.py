@@ -44,28 +44,36 @@ class Experiment(models.Model):
 
 
 class Study(models.Model):
+    experiment = models.OneToOneField(Experiment)
+    nes_id = models.PositiveIntegerField()
+
     title = models.CharField(max_length=150)
     description = models.TextField()
     start_date = models.DateField()
     end_date = models.DateField(null=True)
-    experiment = models.OneToOneField(Experiment)
 
 
 class ProtocolComponent(models.Model):
+    experiment = models.ForeignKey(Experiment, related_name='protocol_components')
+    nes_id = models.PositiveIntegerField()
+
+    # owner = models.ForeignKey(User)
+
     identification = models.CharField(max_length=50)
     description = models.TextField(blank=True)
     duration_value = models.IntegerField(null=True)
     component_type = models.CharField(max_length=30)
-    nes_id = models.PositiveIntegerField()
-    experiment = models.ForeignKey(Experiment,
-                                   related_name='protocol_components')
-    owner = models.ForeignKey(User)
 
     class Meta:
-        unique_together = ('nes_id', 'owner', 'experiment')
+        unique_together = ('nes_id', 'experiment')
 
 
 class Group(models.Model):
+    experiment = models.ForeignKey(Experiment, related_name='groups')
+    nes_id = models.PositiveIntegerField()
+
+    # owner = models.ForeignKey(User)
+
     title = models.CharField(max_length=50)
     description = models.TextField()
     protocol_component = models.ForeignKey(
