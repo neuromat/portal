@@ -3,8 +3,7 @@ from django.core.exceptions import ValidationError
 from django.contrib.auth.models import User
 from datetime import datetime
 
-from experiments.models import Experiment, Study, ProtocolComponent, \
-    ExperimentStatus, Group
+from experiments.models import Experiment, Study, ProtocolComponent, Group
 
 
 def global_setup(self):
@@ -16,13 +15,11 @@ def global_setup(self):
     owner1 = User.objects.create_user(username='lab1')
     owner2 = User.objects.create_user(username='lab2')
 
-    status = ExperimentStatus.objects.create(tag='to_be_approved')
-
     experiment1 = Experiment.objects.create(
-        nes_id=1, owner=owner1, status=status, version=1,
+        nes_id=1, owner=owner1, version=1,
         sent_date=datetime.utcnow()
     )
-    Experiment.objects.create(nes_id=1, owner=owner2, status=status,
+    Experiment.objects.create(nes_id=1, owner=owner2,
                               version=1, sent_date=datetime.utcnow())
 
     Study.objects.create(nes_id=1, start_date=datetime.utcnow(),
@@ -75,18 +72,18 @@ def apply_setup(setup_func):
 #         self.assertIn(researcher, owner.researcher_set.all())
 
 
-class ExperimentStatusModelTest(TestCase):
-    def test_default_attributes(self):
-        experiment_st = ExperimentStatus()
-        self.assertEqual(experiment_st.tag, '')
-        self.assertEqual(experiment_st.name, '')
-        self.assertEqual(experiment_st.description, '')
-
-    def test_cannot_save_empty_attributes(self):
-        experiment_st = ExperimentStatus(tag='')
-        with self.assertRaises(ValidationError):
-            experiment_st.save()
-            experiment_st.full_clean()
+# class ExperimentStatusModelTest(TestCase):
+#     def test_default_attributes(self):
+#         experiment_st = ExperimentStatus()
+#         self.assertEqual(experiment_st.tag, '')
+#         self.assertEqual(experiment_st.name, '')
+#         self.assertEqual(experiment_st.description, '')
+#
+#     def test_cannot_save_empty_attributes(self):
+#         experiment_st = ExperimentStatus(tag='')
+#         with self.assertRaises(ValidationError):
+#             experiment_st.save()
+#             experiment_st.full_clean()
 
 
 @apply_setup(global_setup)
@@ -159,11 +156,10 @@ class ExperimentModelTest(TestCase):
 
     def test_cannot_save_empty_attributes(self):
         owner = User.objects.first()
-        status = ExperimentStatus.objects.first()
-        # version=17 to avoid conflicts with global setup
+        # version=17: large number to avoid conflicts with global setup
         experiment = Experiment(
             nes_id=1, title='', description='', owner=owner,
-            status=status, version=17, sent_date=datetime.utcnow()
+            version=17, sent_date=datetime.utcnow()
         )
         with self.assertRaises(ValidationError):
             experiment.save()
@@ -171,10 +167,9 @@ class ExperimentModelTest(TestCase):
 
     def test_duplicate_experiments_are_invalid(self):
         owner = User.objects.first()
-        status = ExperimentStatus.objects.first()
-        Experiment.objects.create(nes_id=17, owner=owner, status=status,
+        Experiment.objects.create(nes_id=17, owner=owner,
                                   version=1, sent_date=datetime.utcnow())
-        experiment = Experiment(nes_id=17, owner=owner, status=status,
+        experiment = Experiment(nes_id=17, owner=owner,
                                 version=1, sent_date=datetime.utcnow())
         with self.assertRaises(ValidationError):
             experiment.full_clean()
@@ -182,26 +177,23 @@ class ExperimentModelTest(TestCase):
     def test_CAN_save_same_experiment_to_different_owners(self):
         owner1 = User.objects.get(username='lab1')
         owner2 = User.objects.get(username='lab2')
-        status = ExperimentStatus.objects.get(tag='to_be_approved')
         Experiment.objects.create(
             title='A title', description='A description', nes_id=1,
-            owner=owner1, status=status, version=17,
+            owner=owner1, version=17,
             sent_date=datetime.utcnow()
         )
         experiment2 = Experiment(title='A title', description='A description',
                                  nes_id=1, owner=owner2,
-                                 status=status, version=17,
+                                 version=17,
                                  sent_date=datetime.utcnow())
         experiment2.full_clean()
 
-    def test_experiment_is_related_to_owner_and_status(self):
+    def test_experiment_is_related_to_owner(self):
         owner = User.objects.first()
-        status = ExperimentStatus.objects.get(tag='to_be_approved')
-        experiment = Experiment(nes_id=17, owner=owner, status=status,
+        experiment = Experiment(nes_id=17, owner=owner,
                                 version=1, sent_date=datetime.utcnow())
         experiment.save()
         self.assertIn(experiment, owner.experiment_set.all())
-        self.assertIn(experiment, status.experiments.all())
 
 
 @apply_setup(global_setup)

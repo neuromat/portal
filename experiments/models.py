@@ -13,10 +13,10 @@ from django.contrib.auth.models import User
 #         unique_together = ('nes_id', 'owner')
 
 
-class ExperimentStatus(models.Model):
-    tag = models.CharField(max_length=20)
-    name = models.CharField(max_length=50, blank=True)
-    description = models.TextField(blank=True)
+# class ExperimentStatus(models.Model):
+#     tag = models.CharField(max_length=20)
+#     name = models.CharField(max_length=50, blank=True)
+#     description = models.TextField(blank=True)
 
 
 class Experiment(models.Model):
@@ -29,8 +29,8 @@ class Experiment(models.Model):
     )
     sent_date = models.DateField()
     version = models.PositiveIntegerField()
-    status = models.ForeignKey(ExperimentStatus, related_name='experiments',
-                               default=1)  # TODO: requires 'to_be_approved'
+    # status = models.ForeignKey(ExperimentStatus, related_name='experiments',
+    #                            default=1)  # TODO: requires 'to_be_approved'
     # has id 1.
     owner = models.ForeignKey(User)
 

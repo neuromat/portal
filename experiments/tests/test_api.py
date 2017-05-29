@@ -8,8 +8,7 @@ from rest_framework.test import APITestCase
 from datetime import datetime
 import json
 
-from experiments.models import Experiment, Study, \
-    ProtocolComponent, ExperimentStatus, Group
+from experiments.models import Experiment, Study, ProtocolComponent, Group
 
 
 def global_setup(self):
@@ -20,14 +19,12 @@ def global_setup(self):
     owner1 = User.objects.create_user(username='lab1', password='nep-lab1')
     owner2 = User.objects.create_user(username='lab2', password='nep-lab2')
 
-    exp_status = ExperimentStatus.objects.create(tag='to_be_approved')
-
     experiment1 = Experiment.objects.create(
-        title='Experiment 1', nes_id=1, owner=owner1, status=exp_status,
+        title='Experiment 1', nes_id=1, owner=owner1,
         version=1, sent_date=datetime.utcnow()
     )
     experiment2 = Experiment.objects.create(
-        title='Experiment 2', nes_id=1, owner=owner2, status=exp_status,
+        title='Experiment 2', nes_id=1, owner=owner2,
         version=1, sent_date=datetime.utcnow()
     )
 
@@ -212,7 +209,6 @@ class ExperimentAPITest(APITestCase):
                     'nes_id': experiment1.nes_id,
                     'ethics_committee_file': None,
                     'owner': experiment1.owner.username,
-                    'status': experiment1.status.tag,
                     'protocol_components': [],
                     'sent_date': experiment1.sent_date.strftime('%Y-%m-%d')
                 },
@@ -225,7 +221,6 @@ class ExperimentAPITest(APITestCase):
                     'nes_id': experiment2.nes_id,
                     'ethics_committee_file': None,
                     'owner': experiment2.owner.username,
-                    'status': experiment2.status.tag,
                     'protocol_components': [],
                     'sent_date': experiment2.sent_date.strftime('%Y-%m-%d')
                 }
@@ -311,7 +306,6 @@ class ExperimentAPITest(APITestCase):
                 'nes_id': updated_experiment.nes_id,
                 'ethics_committee_file': None,
                 'owner': updated_experiment.owner.username,
-                'status': updated_experiment.status.tag,
                 'protocol_components': [],
                 'sent_date': updated_experiment.sent_date.strftime('%Y-%m-%d')
             }
@@ -434,9 +428,8 @@ class StudyAPITest(APITestCase):
 
     def test_POSTing_a_new_study(self):
         owner = User.objects.get(username='lab1')
-        exp_status = ExperimentStatus.objects.create(tag='to_be_approved')
         experiment = Experiment.objects.create(
-            title='An experiment', nes_id=17, owner=owner, status=exp_status,
+            title='An experiment', nes_id=17, owner=owner,
             version=1, sent_date=datetime.utcnow()
         )
         self.client.login(username=owner.username, password='nep-lab1')
@@ -651,9 +644,8 @@ class GroupAPITest(APITestCase):
         owner = User.objects.get(username='lab1')
         experiment_v1 = Experiment.objects.get(owner=owner, nes_id=1,
                                                version=1)
-        exp_status = ExperimentStatus.objects.get(tag='to_be_approved')
         experiment_v2 = Experiment.objects.create(
-            nes_id=experiment_v1.nes_id, status=exp_status, version=2,
+            nes_id=experiment_v1.nes_id, version=2,
             sent_date=datetime.utcnow(), owner=owner
         )
         self.client.login(username=owner.username, password='nep-lab1')

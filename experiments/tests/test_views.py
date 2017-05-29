@@ -3,7 +3,7 @@ from datetime import datetime
 from django.contrib.auth.models import User
 from django.test import TestCase
 
-from experiments.models import ExperimentStatus, Experiment, Study
+from experiments.models import Experiment, Study
 
 
 def global_setup(self):
@@ -14,14 +14,12 @@ def global_setup(self):
     owner1 = User.objects.create_user(username='lab1', password='nep-lab1')
     owner2 = User.objects.create_user(username='lab2', password='nep-lab2')
 
-    exp_status = ExperimentStatus.objects.create(tag='to_be_approved')
-
     experiment1 = Experiment.objects.create(
-        title='Experiment 1', nes_id=1, owner=owner1, status=exp_status,
+        title='Experiment 1', nes_id=1, owner=owner1,
         version=1, sent_date=datetime.utcnow()
     )
     experiment2 = Experiment.objects.create(
-        title='Experiment 2', nes_id=1, owner=owner2, status=exp_status,
+        title='Experiment 2', nes_id=1, owner=owner2,
         version=1, sent_date=datetime.utcnow()
     )
 
