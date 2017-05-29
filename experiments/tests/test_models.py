@@ -153,6 +153,7 @@ class ExperimentModelTest(TestCase):
         self.assertEqual(experiment.ethics_committee_file, '')
         self.assertEqual(experiment.sent_date, None)
         self.assertEqual(experiment.version, None)
+        self.assertEqual(experiment.status, experiment.RECEIVING)
 
     def test_cannot_save_empty_attributes(self):
         owner = User.objects.first()
@@ -196,70 +197,70 @@ class ExperimentModelTest(TestCase):
         self.assertIn(experiment, owner.experiment_set.all())
 
 
-@apply_setup(global_setup)
-class ProtocolComponentModelTest(TestCase):
-
-    def setUp(self):
-        global_setup(self)
-
-    def test_default_attributes(self):
-        protocol_component = ProtocolComponent()
-        self.assertEqual(protocol_component.identification, '')
-        self.assertEqual(protocol_component.description, '')
-        self.assertEqual(protocol_component.duration_value, None)
-        self.assertEqual(protocol_component.component_type, '')
-        self.assertEqual(protocol_component.nes_id, None)
-
-    def test_protocol_component_is_related_to_experiment_and_owner(self):
-        owner = User.objects.first()
-        experiment = Experiment.objects.first()
-        protocolcomponent = ProtocolComponent(
-            identification='An identification',
-            component_type='A component type',
-            nes_id=1, experiment=experiment, owner=owner
-        )
-        protocolcomponent.save()
-        self.assertIn(protocolcomponent, experiment.protocol_components.all())
-        self.assertIn(protocolcomponent, owner.protocolcomponent_set.all())
-
-    def test_cannot_save_empty_attributes(self):
-        owner = User.objects.last()
-        experiment = Experiment.objects.first()
-        protocol_component = ProtocolComponent(
-            identification='', component_type='', nes_id=1,
-            experiment=experiment, owner=owner
-        )
-        with self.assertRaises(ValidationError):
-            protocol_component.save()
-            protocol_component.full_clean()
-
-    def test_duplicate_protocol_components_are_invalid(self):
-        owner = User.objects.last()
-        experiment = Experiment.objects.first()
-        ProtocolComponent.objects.create(nes_id=1, experiment=experiment,
-                                         owner=owner)
-        protocol_component = ProtocolComponent(
-            nes_id=1, identification='An identification',
-            duration_value=10, component_type='A component type',
-            experiment=experiment, owner=owner
-        )
-        with self.assertRaises(ValidationError):
-            protocol_component.full_clean()
-
-    def test_CAN_save_same_protocol_components_to_different_owners(self):
-        owner1 = User.objects.get(username='lab1')
-        owner2 = User.objects.get(username='lab2')
-        experiment1 = Experiment.objects.get(owner=owner1)
-        experiment2 = Experiment.objects.get(owner=owner2)
-        ProtocolComponent.objects.create(
-            nes_id=1, experiment=experiment1, owner=owner1
-        )
-        protocol_component = ProtocolComponent(
-            nes_id=1, identification='An identification',
-            duration_value=10, component_type='A component type',
-            experiment=experiment2, owner=owner2,
-        )
-        protocol_component.full_clean()
+# @apply_setup(global_setup)
+# class ProtocolComponentModelTest(TestCase):
+#
+#     def setUp(self):
+#         global_setup(self)
+#
+#     def test_default_attributes(self):
+#         protocol_component = ProtocolComponent()
+#         self.assertEqual(protocol_component.identification, '')
+#         self.assertEqual(protocol_component.description, '')
+#         self.assertEqual(protocol_component.duration_value, None)
+#         self.assertEqual(protocol_component.component_type, '')
+#         self.assertEqual(protocol_component.nes_id, None)
+#
+#     def test_protocol_component_is_related_to_experiment_and_owner(self):
+#         owner = User.objects.first()
+#         experiment = Experiment.objects.first()
+#         protocolcomponent = ProtocolComponent(
+#             identification='An identification',
+#             component_type='A component type',
+#             nes_id=1, experiment=experiment, owner=owner
+#         )
+#         protocolcomponent.save()
+#         self.assertIn(protocolcomponent, experiment.protocol_components.all())
+#         self.assertIn(protocolcomponent, owner.protocolcomponent_set.all())
+#
+#     def test_cannot_save_empty_attributes(self):
+#         owner = User.objects.last()
+#         experiment = Experiment.objects.first()
+#         protocol_component = ProtocolComponent(
+#             identification='', component_type='', nes_id=1,
+#             experiment=experiment, owner=owner
+#         )
+#         with self.assertRaises(ValidationError):
+#             protocol_component.save()
+#             protocol_component.full_clean()
+#
+#     def test_duplicate_protocol_components_are_invalid(self):
+#         owner = User.objects.last()
+#         experiment = Experiment.objects.first()
+#         ProtocolComponent.objects.create(nes_id=1, experiment=experiment,
+#                                          owner=owner)
+#         protocol_component = ProtocolComponent(
+#             nes_id=1, identification='An identification',
+#             duration_value=10, component_type='A component type',
+#             experiment=experiment, owner=owner
+#         )
+#         with self.assertRaises(ValidationError):
+#             protocol_component.full_clean()
+#
+#     def test_CAN_save_same_protocol_components_to_different_owners(self):
+#         owner1 = User.objects.get(username='lab1')
+#         owner2 = User.objects.get(username='lab2')
+#         experiment1 = Experiment.objects.get(owner=owner1)
+#         experiment2 = Experiment.objects.get(owner=owner2)
+#         ProtocolComponent.objects.create(
+#             nes_id=1, experiment=experiment1, owner=owner1
+#         )
+#         protocol_component = ProtocolComponent(
+#             nes_id=1, identification='An identification',
+#             duration_value=10, component_type='A component type',
+#             experiment=experiment2, owner=owner2,
+#         )
+#         protocol_component.full_clean()
 
 
 @apply_setup(global_setup)

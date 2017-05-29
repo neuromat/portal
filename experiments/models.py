@@ -13,13 +13,19 @@ from django.contrib.auth.models import User
 #         unique_together = ('nes_id', 'owner')
 
 
-# class ExperimentStatus(models.Model):
-#     tag = models.CharField(max_length=20)
-#     name = models.CharField(max_length=50, blank=True)
-#     description = models.TextField(blank=True)
-
-
 class Experiment(models.Model):
+    RECEIVING = 'receiving'
+    TO_BE_ANALYSED = 'to_be_analysed'
+    UNDER_ANALYSIS = 'under_analysis'
+    APPROVED = 'approved'
+    NOT_APPROVED = 'not_approved'
+    STATUS_OPTIONS = (
+        (RECEIVING, 'receiving'),
+        (TO_BE_ANALYSED, 'to_be_analysed'),
+        (UNDER_ANALYSIS, 'under_analysis'),
+        (APPROVED, 'approved'),
+        (NOT_APPROVED, 'not_approved'),
+    )
     nes_id = models.PositiveIntegerField()
     title = models.CharField(max_length=150)
     description = models.TextField()
@@ -27,11 +33,10 @@ class Experiment(models.Model):
     ethics_committee_file = models.FileField(
         'Project file approved by the ethics committee', blank=True
     )
-    sent_date = models.DateField()
+    sent_date = models.DateField(auto_now=True)
     version = models.PositiveIntegerField()
-    # status = models.ForeignKey(ExperimentStatus, related_name='experiments',
-    #                            default=1)  # TODO: requires 'to_be_approved'
-    # has id 1.
+    status = models.CharField(max_length=20, choices=STATUS_OPTIONS,
+                              default=RECEIVING)
     owner = models.ForeignKey(User)
 
     class Meta:
