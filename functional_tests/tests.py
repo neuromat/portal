@@ -6,7 +6,7 @@ from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 from djipsum.faker import FakerModel
 from selenium import webdriver
 
-from experiments.models import Experiment, Study, ExperimentStatus, Group
+from experiments.models import Experiment, Study, Group
 
 
 def global_setup(self):
@@ -17,10 +17,6 @@ def global_setup(self):
     owner1 = User.objects.create_user(username='lab1', password='nep-lab1')
     owner2 = User.objects.create_user(username='lab2', password='nep-lab2')
 
-    exp_status1 = ExperimentStatus.objects.create(tag='to_be_approved')
-    exp_status2 = ExperimentStatus.objects.create(tag='approved')
-    exp_status3 = ExperimentStatus.objects.create(tag='rejected')
-
     # Create 3 experiments for owner 1 and 2 for owner 2, and studies
     # associated
     faker = FakerModel(app='experiments', model='Experiment')
@@ -30,7 +26,7 @@ def global_setup(self):
             title=faker.fake.text(max_nb_chars=15),
             description=faker.fake.text(max_nb_chars=200),
             nes_id=i+1,
-            owner=owner1, version=1, status=exp_status2,
+            owner=owner1, version=1,
             sent_date=datetime.utcnow()
         )
         Study.objects.create(
@@ -50,7 +46,7 @@ def global_setup(self):
             title=faker.fake.text(max_nb_chars=15),
             description=faker.fake.text(max_nb_chars=200),
             nes_id=i + 1,
-            owner=owner2, version=1, status=exp_status2,
+            owner=owner2, version=1,
             sent_date=datetime.utcnow()
         )
         Study.objects.create(
