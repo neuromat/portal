@@ -13,9 +13,19 @@
 
         <!-- Tab panes -->
         <div class="tab-content">
+
             <div role="tabpanel" class="tab-pane active"
                  id="statistics">Statistics</div>
-            <div role="tabpanel" class="tab-pane" id="groups">Groups</div>
+
+            <div role="tabpanel" class="tab-pane" id="groups">
+                {% for group in experiment.groups.all %}
+                    <div class="panel panel-default">
+                        <h5>{{ group.title }}</h5>
+                        <h6>{{ group.description }}</h6>
+                    </div>
+                {% endfor %}
+            </div>
+
             <div role="tabpanel" class="tab-pane" id="settings">Settings</div>
         </div>
     </section>
