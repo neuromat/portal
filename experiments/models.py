@@ -34,9 +34,13 @@ class Experiment(models.Model):
     title = models.CharField(max_length=150)
     description = models.TextField()
     data_acquisition_done = models.BooleanField(default=False)
-    ethics_committee_file = models.FileField('Project file approved by the ethics committee', blank=True)
+    ethics_committee_file = models.FileField(
+        'Project file approved by the ethics committee', blank=True
+    )
     sent_date = models.DateField(auto_now=True)
-    status = models.CharField(max_length=20, choices=STATUS_OPTIONS, default=RECEIVING)
+    status = models.CharField(
+        max_length=20, choices=STATUS_OPTIONS, default=RECEIVING
+    )
 
     class Meta:
         unique_together = ('nes_id', 'owner', 'version')
@@ -52,7 +56,9 @@ class Study(models.Model):
 
 
 class ProtocolComponent(models.Model):
-    experiment = models.ForeignKey(Experiment, related_name='protocol_components')
+    experiment = models.ForeignKey(
+        Experiment, related_name='protocol_components'
+    )
     nes_id = models.PositiveIntegerField()
 
     identification = models.CharField(max_length=50)
