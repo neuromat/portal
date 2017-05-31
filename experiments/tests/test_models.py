@@ -3,78 +3,94 @@ from django.core.exceptions import ValidationError
 from django.contrib.auth.models import User
 from datetime import datetime
 
-from reversion.models import Version  # TODO: uninstall reversion
-
-from experiments.models import Experiment, Study, Researcher, \
-    ProtocolComponent, ExperimentStatus, Group
+from experiments.models import Experiment, Study, ProtocolComponent, Group
 
 
-def create_researcher(nes_id, owner):
+def global_setup(self):
     """
-    Creates researcher model object that are used
-    in test classes that depends on it. 
+    This setup creates basic object models that are used in tests bellow.
+    :param self: 
     """
-    return Researcher.objects.create(nes_id=nes_id, owner=owner)
+    # Create two owners
+    owner1 = User.objects.create_user(username='lab1')
+    owner2 = User.objects.create_user(username='lab2')
+
+    experiment1 = Experiment.objects.create(
+        nes_id=1, owner=owner1, version=1,
+        sent_date=datetime.utcnow()
+    )
+    Experiment.objects.create(nes_id=1, owner=owner2,
+                              version=1, sent_date=datetime.utcnow())
+
+    Study.objects.create(start_date=datetime.utcnow(),
+                         experiment=experiment1)
 
 
-def create_study(nes_id, owner):
+def apply_setup(setup_func):
     """
-    Creates study model object that are used
-    in test classes that depends on it. 
+    Defines a decorator that uses my_setup method.
+    :param setup_func: my_setup function
+    :return: wrapper 
     """
-    researcher = create_researcher(nes_id=nes_id, owner=owner)
-    return Study.objects.create(nes_id=nes_id, start_date=datetime.utcnow(),
-                                researcher=researcher, owner=researcher.owner)
+    def wrap(cls):
+        cls.setup = setup_func
+        return cls
+    return wrap
+
+# class ResearcherModelTest(TestCase):
+#
+#     def test_default_attributes(self):
+#         researcher = Researcher()
+#         self.assertEqual(researcher.first_name, '')
+#         self.assertEqual(researcher.surname, '')
+#         self.assertEqual(researcher.email, '')
+#         self.assertEqual(researcher.nes_id, None)
+#
+#     def test_cannot_save_empty_attributes(self):
+#         researcher = Researcher(nes_id=None)
+#         with self.assertRaises(ValidationError):
+#             researcher.full_clean()
+#
+#     def test_duplicate_researchers_are_invalid(self):
+#         owner = User.objects.create_user(username='lab1')
+#         create_researcher(nes_id=1, owner=owner)
+#         researcher2 = Researcher(nes_id=1, owner=owner)
+#         with self.assertRaises(ValidationError):
+#             researcher2.full_clean()
+#
+#     def test_CAN_save_same_researcher_to_different_owners(self):
+#         owner1 = User.objects.create_user(username='lab1')
+#         owner2 = User.objects.create_user(username='lab2')
+#         Researcher.objects.create(nes_id=1, owner=owner1)
+#         researcher = Researcher(nes_id=1, owner=owner2)
+#         researcher.full_clean()
+#
+#     def test_researcher_is_related_to_owner(self):
+#         owner = User.objects.create_user(username='lab1')
+#         researcher = Researcher(nes_id=1, owner=owner)
+#         researcher.save()
+#         self.assertIn(researcher, owner.researcher_set.all())
 
 
-def create_experiment(nes_id, owner):
-    """
-    Creates experiment model object that are used
-    in test classes that depends on it. 
-    """
-    study = create_study(nes_id=nes_id, owner=owner)
-    status = ExperimentStatus.objects.create(tag='to_be_approved')
-    return Experiment.objects.create(nes_id=nes_id, study=study,
-                                     owner=study.owner, status=status,
-                                     version=1)
+# class ExperimentStatusModelTest(TestCase):
+#     def test_default_attributes(self):
+#         experiment_st = ExperimentStatus()
+#         self.assertEqual(experiment_st.tag, '')
+#         self.assertEqual(experiment_st.name, '')
+#         self.assertEqual(experiment_st.description, '')
+#
+#     def test_cannot_save_empty_attributes(self):
+#         experiment_st = ExperimentStatus(tag='')
+#         with self.assertRaises(ValidationError):
+#             experiment_st.save()
+#             experiment_st.full_clean()
 
 
-class ResearcherModelTest(TestCase):
-
-    def test_default_attributes(self):
-        researcher = Researcher()
-        self.assertEqual(researcher.first_name, '')
-        self.assertEqual(researcher.surname, '')
-        self.assertEqual(researcher.email, '')
-        self.assertEqual(researcher.nes_id, None)
-
-    def test_cannot_save_empty_attributes(self):
-        researcher = Researcher(nes_id=None)
-        with self.assertRaises(ValidationError):
-            researcher.full_clean()
-
-    def test_duplicate_researchers_are_invalid(self):
-        owner = User.objects.create_user(username='lab1')
-        create_researcher(nes_id=1, owner=owner)
-        researcher2 = Researcher(nes_id=1, owner=owner)
-        with self.assertRaises(ValidationError):
-            researcher2.full_clean()
-
-    def test_CAN_save_same_researcher_to_different_owners(self):
-        owner1 = User.objects.create_user(username='lab1')
-        owner2 = User.objects.create_user(username='lab2')
-        Researcher.objects.create(nes_id=1, owner=owner1)
-        researcher = Researcher(nes_id=1, owner=owner2)
-        researcher.full_clean()
-
-    def test_researcher_is_related_to_owner(self):
-        owner = User.objects.create_user(username='lab1')
-        researcher = Researcher(nes_id=1, owner=owner)
-        researcher.save()
-        self.assertIn(researcher, owner.researcher_set.all())
-
-
+@apply_setup(global_setup)
 class StudyModelTest(TestCase):
+
+    def setUp(self):
+        global_setup(self)
 
     def test_default_attributes(self):
         study = Study()
@@ -82,7 +98,6 @@ class StudyModelTest(TestCase):
         self.assertEqual(study.description, '')
         self.assertEqual(study.start_date, None)
         self.assertEqual(study.end_date, None)
-        self.assertEqual(study.nes_id, None)
 
     def test_cannot_save_empty_attributes(self):
         study = Study(title='', description='', start_date='')
@@ -91,230 +106,218 @@ class StudyModelTest(TestCase):
             study.full_clean()
 
     def test_duplicate_studies_are_invalid(self):
-        owner = User.objects.create_user(username='lab1')
-        researcher1 = Researcher.objects.create(nes_id=1, owner=owner)
-        researcher2 = Researcher.objects.create(nes_id=2, owner=owner)
-        Study.objects.create(nes_id=1, start_date=datetime.utcnow(),
-                             researcher=researcher1, owner=owner)
-        study = Study(nes_id=1, start_date=datetime.utcnow(),
-                      researcher=researcher2, owner=owner)
+        experiment = Experiment.objects.last()
+        study = Study(start_date=datetime.utcnow(),
+                      experiment=experiment)
         with self.assertRaises(ValidationError):
             study.full_clean()
 
-    def test_CAN_save_same_study_to_different_owners(self):
-        owner1 = User.objects.create(username='lab1')
-        owner2 = User.objects.create(username='lab2')
-        researcher1 = create_researcher(nes_id=1, owner=owner1)
-        researcher2 = create_researcher(nes_id=1, owner=owner2)
-        Study.objects.create(nes_id=1, start_date=datetime.utcnow(),
-                             researcher=researcher1, owner=researcher1.owner)
-        study = Study(title='A title', description='A description', nes_id=1,
-                      start_date=datetime.utcnow(),
-                      end_date=datetime.utcnow(),
-                      researcher=researcher2, owner=researcher2.owner)
-        study.full_clean()
+    # def test_CAN_save_same_study_to_different_owners(self):
+    #     # TODO: maybe not necessary anymore
+    #     owner2 = User.objects.last()
+    #     experiment = Experiment.objects.last()
+    #     study = Study(title='A title', description='A description', nes_id=1,
+    #                   start_date=datetime.utcnow(), end_date=datetime.utcnow(),
+    #                   experiment=experiment, owner=owner2)
+    #     study.full_clean()
 
-    def test_study_is_related_to_researcher_and_owner(self):
-        owner = User.objects.create(username='lab1')
-        researcher = create_researcher(nes_id=1, owner=owner)
-        study = Study(nes_id=1, start_date=datetime.utcnow(),
-                      researcher=researcher, owner=owner)
-        study.save()
-        self.assertIn(study, researcher.studies.all())
-        self.assertIn(study, owner.study_set.all())
+    # TODO: adapt test so we see if study is related to experiment owner
+    # def test_study_is_related_to_owner(self):
+    #     owner = User.objects.first()
+    #     experiment = Experiment.objects.last()
+    #     study = Study(start_date=datetime.utcnow(), experiment=experiment)
+    #     study.save()
+    #     self.assertIn(study, owner.study_set.all())
 
-
-class ExperimentStatusModelTest(TestCase):
-    def test_default_attributes(self):
-        experiment_st = ExperimentStatus()
-        self.assertEqual(experiment_st.tag, '')
-        self.assertEqual(experiment_st.name, '')
-        self.assertEqual(experiment_st.description, '')
-
-    def test_cannot_save_empty_attributes(self):
-        experiment_st = ExperimentStatus(tag='')
-        with self.assertRaises(ValidationError):
-            experiment_st.save()
-            experiment_st.full_clean()
+    def test_study_has_one_experiment(self):
+        # TODO: this test is incomplete. Finish it!
+        owner = User.objects.first()
+        experiment = Experiment.objects.first()
+        study1 = Study.objects.first()
+        study2 = Study(start_date=datetime.utcnow(),
+                       experiment=experiment)
 
 
+@apply_setup(global_setup)
 class ExperimentModelTest(TestCase):
+
+    def setUp(self):
+        global_setup(self)
 
     def test_default_attributes(self):
         experiment = Experiment()
+        self.assertEqual(experiment.nes_id, None)
         self.assertEqual(experiment.title, '')
         self.assertEqual(experiment.description, '')
         self.assertEqual(experiment.data_acquisition_done, False)
-        self.assertEqual(experiment.nes_id, None)
         self.assertEqual(experiment.ethics_committee_file, '')
+        self.assertEqual(experiment.sent_date, None)
         self.assertEqual(experiment.version, None)
+        self.assertEqual(experiment.status, experiment.RECEIVING)
 
     def test_cannot_save_empty_attributes(self):
-        owner = User.objects.create(username='lab1')
-        researcher = Researcher.objects.create(nes_id=1, owner=owner)
-        study = Study.objects.create(
-            nes_id=1, start_date=datetime.utcnow(), researcher=researcher,
-            owner=owner)
-        status = ExperimentStatus.objects.create(tag='to_be_approved')
-        # TODO: why we need to pass nes_id, study and owner and in
-        # StudyModelTest's test_cannot_save_empty_attributes not?
+        owner = User.objects.first()
+        # version=17: large number to avoid conflicts with global setup
         experiment = Experiment(
-            nes_id=1, title='', description='', study=study, owner=owner,
-            status=status, version=1
+            nes_id=1, title='', description='', owner=owner,
+            version=17, sent_date=datetime.utcnow()
         )
         with self.assertRaises(ValidationError):
             experiment.save()
             experiment.full_clean()
 
     def test_duplicate_experiments_are_invalid(self):
-        owner = User.objects.create_user(username='lab2')
-        study = create_study(nes_id=1, owner=owner)
-        status = ExperimentStatus.objects.create(tag='to_be_approved')
-        Experiment.objects.create(nes_id=1, study=study, owner=owner,
-                                  status=status, version=1)
-        experiment = Experiment(nes_id=1, study=study, owner=owner,
-                                status=status, version=1)
+        owner = User.objects.first()
+        Experiment.objects.create(nes_id=17, owner=owner,
+                                  version=1, sent_date=datetime.utcnow())
+        experiment = Experiment(nes_id=17, owner=owner,
+                                version=1, sent_date=datetime.utcnow())
         with self.assertRaises(ValidationError):
             experiment.full_clean()
 
     def test_CAN_save_same_experiment_to_different_owners(self):
-        owner1 = User.objects.create_user(username='lab1')
-        owner2 = User.objects.create_user(username='lab2')
-        study2 = create_study(nes_id=1, owner=owner2)
-        create_experiment(nes_id=1, owner=owner1)
-        status = ExperimentStatus.objects.create(tag='to_be_approved')
-        experiment = Experiment(title='A title', description='A description',
-                                nes_id=1, study=study2, owner=owner2,
-                                status=status, version=1)
-        experiment.full_clean()
+        owner1 = User.objects.get(username='lab1')
+        owner2 = User.objects.get(username='lab2')
+        Experiment.objects.create(
+            title='A title', description='A description', nes_id=1,
+            owner=owner1, version=17,
+            sent_date=datetime.utcnow()
+        )
+        experiment2 = Experiment(title='A title', description='A description',
+                                 nes_id=1, owner=owner2,
+                                 version=17,
+                                 sent_date=datetime.utcnow())
+        experiment2.full_clean()
 
-    def test_experiment_is_related_to_study_and_owner_and_status(self):
-        owner = User.objects.create(username='lab2')
-        study = create_study(nes_id=1, owner=owner)
-        status = ExperimentStatus.objects.create(tag='to_be_approved')
-        experiment = Experiment(nes_id=1, study=study, owner=owner,
-                                status=status, version=1)
+    def test_experiment_is_related_to_owner(self):
+        owner = User.objects.first()
+        experiment = Experiment(nes_id=17, owner=owner,
+                                version=1, sent_date=datetime.utcnow())
         experiment.save()
-        self.assertIn(experiment, study.experiments.all())
         self.assertIn(experiment, owner.experiment_set.all())
-        self.assertIn(experiment, status.experiments.all())
 
 
-class ProtocolComponentModelTest(TestCase):
+# @apply_setup(global_setup)
+# class ProtocolComponentModelTest(TestCase):
+#
+#     def setUp(self):
+#         global_setup(self)
+#
+#     def test_default_attributes(self):
+#         protocol_component = ProtocolComponent()
+#         self.assertEqual(protocol_component.identification, '')
+#         self.assertEqual(protocol_component.description, '')
+#         self.assertEqual(protocol_component.duration_value, None)
+#         self.assertEqual(protocol_component.component_type, '')
+#         self.assertEqual(protocol_component.nes_id, None)
+#
+#     def test_protocol_component_is_related_to_experiment_and_owner(self):
+#         owner = User.objects.first()
+#         experiment = Experiment.objects.first()
+#         protocolcomponent = ProtocolComponent(
+#             identification='An identification',
+#             component_type='A component type',
+#             nes_id=1, experiment=experiment, owner=owner
+#         )
+#         protocolcomponent.save()
+#         self.assertIn(protocolcomponent, experiment.protocol_components.all())
+#         self.assertIn(protocolcomponent, owner.protocolcomponent_set.all())
+#
+#     def test_cannot_save_empty_attributes(self):
+#         owner = User.objects.last()
+#         experiment = Experiment.objects.first()
+#         protocol_component = ProtocolComponent(
+#             identification='', component_type='', nes_id=1,
+#             experiment=experiment, owner=owner
+#         )
+#         with self.assertRaises(ValidationError):
+#             protocol_component.save()
+#             protocol_component.full_clean()
+#
+#     def test_duplicate_protocol_components_are_invalid(self):
+#         owner = User.objects.last()
+#         experiment = Experiment.objects.first()
+#         ProtocolComponent.objects.create(nes_id=1, experiment=experiment,
+#                                          owner=owner)
+#         protocol_component = ProtocolComponent(
+#             nes_id=1, identification='An identification',
+#             duration_value=10, component_type='A component type',
+#             experiment=experiment, owner=owner
+#         )
+#         with self.assertRaises(ValidationError):
+#             protocol_component.full_clean()
+#
+#     def test_CAN_save_same_protocol_components_to_different_owners(self):
+#         owner1 = User.objects.get(username='lab1')
+#         owner2 = User.objects.get(username='lab2')
+#         experiment1 = Experiment.objects.get(owner=owner1)
+#         experiment2 = Experiment.objects.get(owner=owner2)
+#         ProtocolComponent.objects.create(
+#             nes_id=1, experiment=experiment1, owner=owner1
+#         )
+#         protocol_component = ProtocolComponent(
+#             nes_id=1, identification='An identification',
+#             duration_value=10, component_type='A component type',
+#             experiment=experiment2, owner=owner2,
+#         )
+#         protocol_component.full_clean()
 
-    def test_default_attributes(self):
-        protocol_component = ProtocolComponent()
-        self.assertEqual(protocol_component.identification, '')
-        self.assertEqual(protocol_component.description, '')
-        self.assertEqual(protocol_component.duration_value, None)
-        self.assertEqual(protocol_component.component_type, '')
-        self.assertEqual(protocol_component.nes_id, None)
 
-    def test_protocol_component_is_related_to_experiment_and_owner(self):
-        owner = User.objects.create(username='lab2')
-        experiment = create_experiment(nes_id=1, owner=owner)
-        protocolcomponent = ProtocolComponent(
-            identification='An identification',
-            component_type='A component type',
-            nes_id=1, experiment=experiment, owner=owner
-        )
-        protocolcomponent.save()
-        self.assertIn(protocolcomponent, experiment.protocol_components.all())
-        self.assertIn(protocolcomponent, owner.protocolcomponent_set.all())
-
-    def test_cannot_save_empty_attributes(self):
-        owner = User.objects.create(username='lab2')
-        experiment = create_experiment(nes_id=1, owner=owner)
-        protocol_component = ProtocolComponent(
-            identification='', component_type='', nes_id=1,
-            experiment=experiment, owner=owner
-        )
-        with self.assertRaises(ValidationError):
-            protocol_component.save()
-            protocol_component.full_clean()
-
-    def test_duplicate_protocol_components_are_invalid(self):
-        owner = User.objects.create(username='lab2')
-        experiment = create_experiment(nes_id=1, owner=owner)
-        ProtocolComponent.objects.create(nes_id=1, experiment=experiment,
-                                         owner=owner)
-        protocol_component = ProtocolComponent(
-            nes_id=1, identification='An identification',
-            duration_value=10, component_type='A component type',
-            experiment=experiment, owner=owner
-        )
-        with self.assertRaises(ValidationError):
-            protocol_component.full_clean()
-
-    def test_CAN_save_same_protocol_components_to_different_owners(self):
-        owner1 = User.objects.create(username='lab2')
-        owner2 = User.objects.create(username='lab3')
-        experiment1 = create_experiment(nes_id=1, owner=owner1)
-        experiment2 = create_experiment(nes_id=1, owner=owner2)
-        ProtocolComponent.objects.create(
-            nes_id=1, experiment=experiment1, owner=owner1
-        )
-        protocol_component = ProtocolComponent(
-            nes_id=1, identification='An identification',
-            duration_value=10, component_type='A component type',
-            experiment=experiment2, owner=owner2,
-        )
-        protocol_component.full_clean()
-
-
+@apply_setup(global_setup)
 class GroupModelTest(TestCase):
+
+    def setUp(self):
+        global_setup(self)
+
     def test_default_attributes(self):
         group = Group()
         self.assertEqual(group.title, '')
         self.assertEqual(group.description, '')
         self.assertEqual(group.nes_id, None)
 
-    def test_group_is_related_to_experiment_and_owner(self):
-        owner = User.objects.create(username='lab2')
-        experiment = create_experiment(nes_id=1, owner=owner)
+    def test_group_is_related_to_experiment(self):
+        experiment = Experiment.objects.first()
         group = Group.objects.create(
             title='Group A', description='A description', nes_id=1,
-            experiment=experiment, owner=owner
+            experiment=experiment
         )
         self.assertIn(group, experiment.groups.all())
-        self.assertIn(group, owner.group_set.all())
 
     def test_cannot_save_empty_attributes(self):
-        owner = User.objects.create(username='lab2')
-        experiment = create_experiment(nes_id=1, owner=owner)
+        experiment = Experiment.objects.first()
         group = Group.objects.create(
             title='', description='', nes_id=1,
-            experiment=experiment, owner=owner
+            experiment=experiment
         )
         with self.assertRaises(ValidationError):
             group.save()
             group.full_clean()
 
     def test_duplicate_groups_are_invalid(self):
-        owner = User.objects.create(username='lab2')
-        experiment = create_experiment(nes_id=1, owner=owner)
+        experiment = Experiment.objects.first()
         Group.objects.create(
             title='Group A', description='A description', nes_id=1,
-            experiment=experiment, owner=owner
+            experiment=experiment
         )
         group = Group(
             title='Group A', description='A description', nes_id=1,
-            experiment=experiment, owner=owner
+            experiment=experiment
         )
         with self.assertRaises(ValidationError):
             group.full_clean()
 
-    def test_CAN_save_same_groups_to_different_owners(self):
-        owner1 = User.objects.create(username='lab2')
-        owner2 = User.objects.create(username='lab3')
-        experiment1 = create_experiment(nes_id=1, owner=owner1)
-        experiment2 = create_experiment(nes_id=1, owner=owner2)
-        Group.objects.create(
-            title='Group A', description='A description', nes_id=1,
-            experiment=experiment1, owner=owner1
-        )
-        group = Group(
-            title='Group A', description='A description', nes_id=1,
-            experiment=experiment2, owner=owner2
-        )
-        group.full_clean()
+    # def test_CAN_save_same_groups_to_different_owners(self):
+    #     # TODO: maybe not necessary anymore
+    #     owner1 = User.objects.first()
+    #     owner2 = User.objects.last()
+    #     experiment1 = Experiment.objects.first()
+    #     experiment2 = Experiment.objects.last()
+    #     Group.objects.create(
+    #         title='Group A', description='A description', nes_id=1,
+    #         experiment=experiment1, owner=owner1
+    #     )
+    #     group = Group(
+    #         title='Group A', description='A description', nes_id=1,
+    #         experiment=experiment2, owner=owner2
+    #     )
+    #     group.full_clean()

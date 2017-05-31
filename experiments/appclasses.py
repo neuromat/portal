@@ -17,4 +17,3 @@ class ExperimentVersion:
             return 0
         else:
             return last_exp_version['version__max']
-
