@@ -3,6 +3,6 @@ geckodriver.log
 __pycache__
 *.pyc
 *.swp
-
+nep/wsgi.py
 # IDE's
 .idea
