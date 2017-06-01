@@ -4,5 +4,7 @@ __pycache__
 *.pyc
 *.swp
 nep/wsgi.py
+nep/local_settings.py
+
 # IDE's
 .idea
