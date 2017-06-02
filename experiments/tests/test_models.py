@@ -6,37 +6,6 @@ from datetime import datetime
 from experiments.models import Experiment, Study, ProtocolComponent, Group
 
 
-def global_setup(self):
-    """
-    This setup creates basic object models that are used in tests bellow.
-    :param self: 
-    """
-    # Create two owners
-    owner1 = User.objects.create_user(username='lab1')
-    owner2 = User.objects.create_user(username='lab2')
-
-    experiment1 = Experiment.objects.create(
-        nes_id=1, owner=owner1, version=1,
-        sent_date=datetime.utcnow()
-    )
-    Experiment.objects.create(nes_id=1, owner=owner2,
-                              version=1, sent_date=datetime.utcnow())
-
-    Study.objects.create(start_date=datetime.utcnow(),
-                         experiment=experiment1)
-
-
-def apply_setup(setup_func):
-    """
-    Defines a decorator that uses my_setup method.
-    :param setup_func: my_setup function
-    :return: wrapper 
-    """
-    def wrap(cls):
-        cls.setup = setup_func
-        return cls
-    return wrap
-
 # class ResearcherModelTest(TestCase):
 #
 #     def test_default_attributes(self):
@@ -84,13 +53,14 @@ def apply_setup(setup_func):
 #         with self.assertRaises(ValidationError):
 #             experiment_st.save()
 #             experiment_st.full_clean()
+from experiments.tests.tests_helper import global_setup_ut, apply_setup
 
 
-@apply_setup(global_setup)
+@apply_setup(global_setup_ut)
 class StudyModelTest(TestCase):
 
     def setUp(self):
-        global_setup(self)
+        global_setup_ut()
 
     def test_default_attributes(self):
         study = Study()
@@ -138,11 +108,11 @@ class StudyModelTest(TestCase):
                        experiment=experiment)
 
 
-@apply_setup(global_setup)
+@apply_setup(global_setup_ut)
 class ExperimentModelTest(TestCase):
 
     def setUp(self):
-        global_setup(self)
+        global_setup_ut()
 
     def test_default_attributes(self):
         experiment = Experiment()
@@ -197,11 +167,11 @@ class ExperimentModelTest(TestCase):
         self.assertIn(experiment, owner.experiment_set.all())
 
 
-# @apply_setup(global_setup)
+# @apply_setup(global_setup_ut)
 # class ProtocolComponentModelTest(TestCase):
 #
 #     def setUp(self):
-#         global_setup(self)
+#         global_setup_ut()
 #
 #     def test_default_attributes(self):
 #         protocol_component = ProtocolComponent()
@@ -263,11 +233,11 @@ class ExperimentModelTest(TestCase):
 #         protocol_component.full_clean()
 
 
-@apply_setup(global_setup)
+@apply_setup(global_setup_ut)
 class GroupModelTest(TestCase):
 
     def setUp(self):
-        global_setup(self)
+        global_setup_ut()
 
     def test_default_attributes(self):
         group = Group()

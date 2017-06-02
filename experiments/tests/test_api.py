@@ -9,41 +9,8 @@ from datetime import datetime
 import json
 
 from experiments.models import Experiment, Study, ProtocolComponent, Group
+from experiments.tests.tests_helper import global_setup_ut, apply_setup
 
-
-def global_setup(self):
-    """
-    This setup creates basic object models that are used in tests bellow.
-    :param self: 
-    """
-    owner1 = User.objects.create_user(username='lab1', password='nep-lab1')
-    owner2 = User.objects.create_user(username='lab2', password='nep-lab2')
-
-    experiment1 = Experiment.objects.create(
-        title='Experiment 1', nes_id=1, owner=owner1,
-        version=1, sent_date=datetime.utcnow()
-    )
-    experiment2 = Experiment.objects.create(
-        title='Experiment 2', nes_id=1, owner=owner2,
-        version=1, sent_date=datetime.utcnow()
-    )
-
-    Study.objects.create(start_date=datetime.utcnow(),
-                         experiment=experiment1)
-    Study.objects.create(start_date=datetime.utcnow(),
-                         experiment=experiment2)
-
-
-def apply_setup(setup_func):
-    """
-    Defines a decorator that uses my_setup method.
-    :param setup_func: my_setup function
-    :return: wrapper 
-    """
-    def wrap(cls):
-        cls.setup = setup_func
-        return cls
-    return wrap
 
 # class ResearcherAPITest(APITestCase):
 #     list_url = reverse('api_researchers-list')
@@ -171,12 +138,12 @@ def apply_setup(setup_func):
 #         self.client.logout()
 
 
-@apply_setup(global_setup)
+@apply_setup(global_setup_ut)
 class ExperimentAPITest(APITestCase):
     list_url = reverse('api_experiments-list')
 
     def setUp(self):
-        global_setup(self)
+        global_setup_ut()
 
     def generate_image_file(self):
         """
@@ -337,11 +304,11 @@ class ExperimentAPITest(APITestCase):
         self.assertEqual(1, experiment.version)
 
 
-@apply_setup(global_setup)
+@apply_setup(global_setup_ut)
 class StudyAPITest(APITestCase):
 
     def setUp(self):
-        global_setup(self)
+        global_setup_ut()
 
     def test_get_returns_all_studies_short_url(self):
         study1 = Study.objects.first()
@@ -483,11 +450,11 @@ class StudyAPITest(APITestCase):
     #     self.client.logout()
 
 
-@apply_setup(global_setup)
+@apply_setup(global_setup_ut)
 class GroupAPITest(APITestCase):
 
     def setUp(self):
-        global_setup(self)
+        global_setup_ut()
         owner1 = User.objects.get(username='lab1')
         owner2 = User.objects.get(username='lab2')
         experiment1 = Experiment.objects.get(nes_id=1, owner=owner1)
@@ -655,12 +622,12 @@ class GroupAPITest(APITestCase):
         self.assertEqual(new_group.experiment.id, experiment_v2.id)
 
 
-# @apply_setup(global_setup)
+# @apply_setup(global_setup_ut)
 # class ProtocolComponentAPITest(APITestCase):
 #     list_url = reverse('api_protocol_components-list')
 #
 #     def setUp(self):
-#         global_setup(self)
+#         global_setup_ut()
 #         owner = User.objects.get(username='lab1')
 #         experiment = Experiment.objects.get(owner=owner)
 #         ProtocolComponent.objects.create(
