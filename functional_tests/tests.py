@@ -1,29 +1,16 @@
 import time
-
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 from selenium import webdriver
 
 from experiments.models import Experiment
-from experiments.tests.tests_helper import global_setup
+from experiments.tests.tests_helper import global_setup_ft, apply_setup
 
 
-def apply_setup(setup_func):
-    """
-    Defines a decorator that uses global setup method.
-    :param setup_func: my_setup function
-    :return: wrapper 
-    """
-    def wrap(cls):
-        cls.setup = setup_func
-        return cls
-    return wrap
-
-
-@apply_setup(global_setup)
+@apply_setup(global_setup_ft)
 class NewVisitorTest(StaticLiveServerTestCase):
 
     def setUp(self):
-        global_setup()
+        global_setup_ft()
         self.browser = webdriver.Firefox()
 
     def tearDown(self):
@@ -170,7 +157,7 @@ class NewVisitorTest(StaticLiveServerTestCase):
         study_start_date = self.browser.find_element_by_id(
             'modal_study_startdate').text
         self.assertIn('Start date:', study_start_date)
-        # This is only to conform to study_start_date format in browser
+        # Obs.: this is only to conform to study_start_date format in browser
         self.assertIn(experiment.study.start_date.strftime("%B %d, %Y")
                       .lstrip("0").replace(" 0", " "), study_start_date)
         study_end_date = self.browser.find_element_by_id(
