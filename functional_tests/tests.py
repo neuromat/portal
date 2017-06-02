@@ -1,69 +1,15 @@
-from datetime import datetime
 import time
 
-from django.contrib.auth.models import User
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
-from djipsum.faker import FakerModel
 from selenium import webdriver
 
-from experiments.models import Experiment, Study, Group
-
-
-def global_setup(self):
-    """
-    This setup creates basic object models that are used in tests bellow.
-    :param self:
-    """
-    owner1 = User.objects.create_user(username='lab1', password='nep-lab1')
-    owner2 = User.objects.create_user(username='lab2', password='nep-lab2')
-
-    # Create 3 experiments for owner 1 and 2 for owner 2, and studies
-    # associated
-    faker = FakerModel(app='experiments', model='Experiment')
-
-    for i in range(0, 3):
-        experiment_owner1 = Experiment.objects.create(
-            title=faker.fake.text(max_nb_chars=15),
-            description=faker.fake.text(max_nb_chars=200),
-            nes_id=i+1,
-            owner=owner1, version=1,
-            sent_date=datetime.utcnow()
-        )
-        Study.objects.create(
-            title=faker.fake.text(max_nb_chars=15),
-            description=faker.fake.text(max_nb_chars=200),
-            start_date=datetime.utcnow(),
-            experiment=experiment_owner1
-        )
-        Group.objects.create(
-            nes_id=i+1, title=faker.fake.text(max_nb_chars=15),
-            description=faker.fake.text(max_nb_chars=150),
-            experiment=experiment_owner1
-        )
-
-    for i in range(3, 5):
-        experiment_owner2 = Experiment.objects.create(
-            title=faker.fake.text(max_nb_chars=15),
-            description=faker.fake.text(max_nb_chars=200),
-            nes_id=i + 1,
-            owner=owner2, version=1,
-            sent_date=datetime.utcnow()
-        )
-        Study.objects.create(
-            title=faker.fake.text(max_nb_chars=15),
-            description=faker.fake.text(max_nb_chars=200),
-            start_date=datetime.utcnow(), experiment=experiment_owner2
-        )
-        Group.objects.create(
-            nes_id=i+1, title=faker.fake.text(max_nb_chars=50),
-            description=faker.fake.text(max_nb_chars=150),
-            experiment=experiment_owner2
-        )
+from experiments.models import Experiment
+from experiments.tests.tests_helper import global_setup
 
 
 def apply_setup(setup_func):
     """
-    Defines a decorator that uses my_setup method.
+    Defines a decorator that uses global setup method.
     :param setup_func: my_setup function
     :return: wrapper 
     """
@@ -77,7 +23,7 @@ def apply_setup(setup_func):
 class NewVisitorTest(StaticLiveServerTestCase):
 
     def setUp(self):
-        global_setup(self)
+        global_setup()
         self.browser = webdriver.Firefox()
 
     def tearDown(self):
@@ -224,8 +170,9 @@ class NewVisitorTest(StaticLiveServerTestCase):
         study_start_date = self.browser.find_element_by_id(
             'modal_study_startdate').text
         self.assertIn('Start date:', study_start_date)
-        self.assertIn(experiment.study.start_date.strftime("%B %d, %Y"),
-                      study_start_date)
+        # This is only to conform to study_start_date format in browser
+        self.assertIn(experiment.study.start_date.strftime("%B %d, %Y")
+                      .lstrip("0").replace(" 0", " "), study_start_date)
         study_end_date = self.browser.find_element_by_id(
             'modal_study_enddate').text
         self.assertIn('End date:', study_end_date)
