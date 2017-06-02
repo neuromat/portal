@@ -3,8 +3,9 @@ from django.core.exceptions import ValidationError
 from django.contrib.auth.models import User
 from datetime import datetime
 
-from experiments.models import Experiment, Study, ProtocolComponent, Group
+from experiments.models import Experiment, Study, Group
 from experiments.tests.tests_helper import global_setup_ut, apply_setup
+
 
 # class ResearcherModelTest(TestCase):
 #
@@ -13,7 +14,13 @@ from experiments.tests.tests_helper import global_setup_ut, apply_setup
 #         self.assertEqual(researcher.first_name, '')
 #         self.assertEqual(researcher.surname, '')
 #         self.assertEqual(researcher.email, '')
-#         self.assertEqual(researcher.nes_id, None)
+#
+#     def test_researcher_is_related_to_study(self):
+#         study = Study.objects.first()
+#         researcher = Researcher(study=study)
+#         researcher.save()
+#         self.assertEqual(researcher, study.researcher)
+#         self.assertEqual(researcher, study.researcher)
 #
 #     def test_cannot_save_empty_attributes(self):
 #         researcher = Researcher(nes_id=None)
@@ -34,11 +41,6 @@ from experiments.tests.tests_helper import global_setup_ut, apply_setup
 #         researcher = Researcher(nes_id=1, owner=owner2)
 #         researcher.full_clean()
 #
-#     def test_researcher_is_related_to_owner(self):
-#         owner = User.objects.create_user(username='lab1')
-#         researcher = Researcher(nes_id=1, owner=owner)
-#         researcher.save()
-#         self.assertIn(researcher, owner.researcher_set.all())
 
 
 # class ExperimentStatusModelTest(TestCase):

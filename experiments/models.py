@@ -6,8 +6,7 @@ from django.contrib.auth.models import User
 #     first_name = models.CharField(max_length=150, blank=True)
 #     surname = models.CharField(max_length=150, blank=True)
 #     email = models.EmailField(blank=True)
-#     nes_id = models.PositiveIntegerField()
-#     owner = models.ForeignKey(User)
+#     study = models.OneToOneField(Study)
 #
 #     class Meta:
 #         unique_together = ('nes_id', 'owner')
