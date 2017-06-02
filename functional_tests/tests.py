@@ -1,22 +1,14 @@
 import time
-from django.contrib.staticfiles.testing import StaticLiveServerTestCase
-from selenium import webdriver
 
 from experiments.models import Experiment
-from experiments.tests.tests_helper import global_setup_ft, apply_setup
+from functional_tests.base import FunctionalTest
 
 
-@apply_setup(global_setup_ft)
-class NewVisitorTest(StaticLiveServerTestCase):
-
-    def setUp(self):
-        global_setup_ft()
-        self.browser = webdriver.Firefox()
-
-    def tearDown(self):
-        self.browser.quit()
+class NewVisitorTest(FunctionalTest):
 
     def test_can_view_initial_page(self):
+        experiment = Experiment.objects.first()
+
         # A neuroscience researcher discovered a new site that
         # provides a data base with neuroscience experiments.
         # She goes to checkout its home page
@@ -54,7 +46,6 @@ class NewVisitorTest(StaticLiveServerTestCase):
         self.assertTrue(col_headers[3].text == 'Version')
 
         # She sees the content of the list
-        experiment = Experiment.objects.first()
         rows = table.find_element_by_tag_name('tbody')\
             .find_elements_by_tag_name('tr')
         self.assertTrue(
@@ -95,14 +86,10 @@ class NewVisitorTest(StaticLiveServerTestCase):
         self.assertIn('This site content is licensed with Creative Commons '
                       'Attributions 3.0', footer_license_text)
 
-        # She notices "View" link, in last column
-        table = self.browser.find_element_by_id('id_experiments_table')
-        rows = table.find_element_by_tag_name('tbody')\
-            .find_elements_by_tag_name('tr')
-        self.assertTrue(
-            all(row.find_elements_by_tag_name('td')[4].text ==
-                'View' for row in rows)
-        )
+    def test_can_view_detail_page(self):
+
+        experiment = Experiment.objects.first()
+        self.browser.get(self.live_server_url)
 
         # She clicks in first "View" link and is redirected to experiment
         # detail page
@@ -142,6 +129,15 @@ class NewVisitorTest(StaticLiveServerTestCase):
         link_download = self.browser.find_element_by_id(
             'id_link_download').text
         self.assertIn('Download data', link_download)
+
+    def test_can_view_experiment_related_study(self):
+
+        experiment = Experiment.objects.first()
+        self.browser.get(self.live_server_url)
+
+        self.browser.find_element_by_link_text('View').click()  # TODO:
+        # really gets first element?
+        time.sleep(1)
 
         # She clicks in Related study link and see a modal with Study data
         self.browser.find_element_by_link_text(experiment.study.title).click()
