@@ -242,12 +242,11 @@ class GroupModelTest(TestCase):
         group = Group()
         self.assertEqual(group.title, '')
         self.assertEqual(group.description, '')
-        self.assertEqual(group.nes_id, None)
 
     def test_group_is_related_to_experiment(self):
         experiment = Experiment.objects.first()
         group = Group.objects.create(
-            title='Group A', description='A description', nes_id=1,
+            title='Group A', description='A description',
             experiment=experiment
         )
         self.assertIn(group, experiment.groups.all())
@@ -255,24 +254,11 @@ class GroupModelTest(TestCase):
     def test_cannot_save_empty_attributes(self):
         experiment = Experiment.objects.first()
         group = Group.objects.create(
-            title='', description='', nes_id=1,
+            title='', description='',
             experiment=experiment
         )
         with self.assertRaises(ValidationError):
             group.save()
-            group.full_clean()
-
-    def test_duplicate_groups_are_invalid(self):
-        experiment = Experiment.objects.first()
-        Group.objects.create(
-            title='Group A', description='A description', nes_id=1,
-            experiment=experiment
-        )
-        group = Group(
-            title='Group A', description='A description', nes_id=1,
-            experiment=experiment
-        )
-        with self.assertRaises(ValidationError):
             group.full_clean()
 
     # def test_CAN_save_same_groups_to_different_owners(self):

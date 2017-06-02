@@ -461,15 +461,15 @@ class GroupAPITest(APITestCase):
         experiment2 = Experiment.objects.get(nes_id=1, owner=owner2)
         # TODO: refactor! Include in global setup
         Group.objects.create(
-            title='A title', description='A description', nes_id=1,
+            title='A title', description='A description',
             experiment=experiment1
         )
         Group.objects.create(
-            title='Other title', description='Other description', nes_id=2,
+            title='Other title', description='Other description',
             experiment=experiment1
         )
         Group.objects.create(
-            title='A title', description='A description', nes_id=1,
+            title='A title', description='A description',
             experiment=experiment2
         )
 
@@ -478,9 +478,9 @@ class GroupAPITest(APITestCase):
         owner2 = User.objects.get(username='lab2')
         experiment1 = Experiment.objects.get(nes_id=1, owner=owner1)
         experiment2 = Experiment.objects.get(nes_id=1, owner=owner2)
-        group1 = Group.objects.get(nes_id=1, experiment=experiment1)
-        group2 = Group.objects.get(nes_id=2, experiment=experiment1)
-        group3 = Group.objects.get(nes_id=1, experiment=experiment2)
+        group1 = Group.objects.get(id=1)
+        group2 = Group.objects.get(id=2)
+        group3 = Group.objects.get(id=3)
         list_url = reverse('api_groups-list')
         response = self.client.get(list_url)
         self.assertEqual(
@@ -491,21 +491,18 @@ class GroupAPITest(APITestCase):
                     'title': group1.title,
                     'description': group1.description,
                     'experiment': group1.experiment.title,
-                    'nes_id': group1.nes_id,
                 },
                 {
                     'id': group2.id,
                     'title': group2.title,
                     'description': group2.description,
                     'experiment': group2.experiment.title,
-                    'nes_id': group2.nes_id,
                 },
                 {
                     'id': group3.id,
                     'title': group3.title,
                     'description': group3.description,
                     'experiment': group3.experiment.title,
-                    'nes_id': group3.nes_id,
                 }
             ]
         )
@@ -515,9 +512,9 @@ class GroupAPITest(APITestCase):
         owner2 = User.objects.get(username='lab2')
         experiment1 = Experiment.objects.get(nes_id=1, owner=owner1)
         experiment2 = Experiment.objects.get(nes_id=1, owner=owner2)
-        group1 = Group.objects.get(nes_id=1, experiment=experiment1)
-        group2 = Group.objects.get(nes_id=2, experiment=experiment1)
-        group3 = Group.objects.get(nes_id=1, experiment=experiment2)
+        group1 = Group.objects.first()
+        group2 = Group.objects.get(id=2)
+        group3 = Group.objects.get(id=3)
         list_url = reverse('api_experiment_groups-list',
                            kwargs={'experiment_nes_id': experiment1.nes_id})
         response = self.client.get(list_url)
@@ -529,21 +526,18 @@ class GroupAPITest(APITestCase):
                     'title': group1.title,
                     'description': group1.description,
                     'experiment': group1.experiment.title,
-                    'nes_id': group1.nes_id,
                 },
                 {
                     'id': group2.id,
                     'title': group2.title,
                     'description': group2.description,
                     'experiment': group2.experiment.title,
-                    'nes_id': group2.nes_id,
                 },
                 {
                     'id': group3.id,
                     'title': group3.title,
                     'description': group3.description,
                     'experiment': group3.experiment.title,
-                    'nes_id': group3.nes_id,
                 }
             ]
         )
@@ -551,8 +545,8 @@ class GroupAPITest(APITestCase):
     def test_get_returns_groups_of_an_experiment(self):
         owner = User.objects.get(username='lab1')
         experiment = Experiment.objects.get(nes_id=1, owner=owner)
-        group1 = Group.objects.get(nes_id=1, experiment=experiment)
-        group2 = Group.objects.get(nes_id=2, experiment=experiment)
+        group1 = Group.objects.get(id=1, experiment=experiment)
+        group2 = Group.objects.get(id=2, experiment=experiment)
         list_url = reverse('api_experiment_groups-list',
                            kwargs={'experiment_nes_id': experiment.nes_id})
         self.client.login(username=owner.username, password='nep-lab1')
@@ -565,14 +559,12 @@ class GroupAPITest(APITestCase):
                     'title': group1.title,
                     'description': group1.description,
                     'experiment': group1.experiment.title,
-                    'nes_id': group1.nes_id,
                 },
                 {
                     'id': group2.id,
                     'title': group2.title,
                     'description': group2.description,
                     'experiment': group2.experiment.title,
-                    'nes_id': group2.nes_id,
                 }
             ]
         )
@@ -589,7 +581,6 @@ class GroupAPITest(APITestCase):
             {
                 'title': 'A title',
                 'description': 'A description',
-                'nes_id': 17,
             }
         )
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
@@ -612,8 +603,7 @@ class GroupAPITest(APITestCase):
             list_url,
             {
                 'title': 'A title',
-                'description': 'A description',
-                'nes_id': 1,
+                'description': 'A description'
             }
         )
         self.client.logout()

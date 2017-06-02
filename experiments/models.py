@@ -72,7 +72,6 @@ class ProtocolComponent(models.Model):
 
 class Group(models.Model):
     experiment = models.ForeignKey(Experiment, related_name='groups')
-    nes_id = models.PositiveIntegerField()
 
     title = models.CharField(max_length=50)
     description = models.TextField()
@@ -80,5 +79,8 @@ class Group(models.Model):
         ProtocolComponent, null=True, blank=True
     )  # TODO: define if Group has ProtocolComponent
 
-    class Meta:
-        unique_together = ('nes_id', 'experiment')
+
+class ExperimentalProtocol(models.Model):
+    group = models.OneToOneField(Group, related_name='experimental_protocol')
+    image = models.FileField(null=True, blank=True)
+    textual_description = models.TextField(null=True, blank=True)

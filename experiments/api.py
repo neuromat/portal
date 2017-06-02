@@ -3,7 +3,7 @@ from rest_framework import serializers, permissions, viewsets
 
 from experiments import appclasses
 from experiments.models import Experiment, Study, User, ProtocolComponent, \
-    Group
+    Group, ExperimentalProtocol
 
 
 ###################
@@ -68,7 +68,15 @@ class GroupSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Group
-        fields = ('id', 'nes_id', 'title', 'description', 'experiment')
+        fields = ('id', 'title', 'description', 'experiment')
+
+
+class ExperimentalProtocolSerializer(serializers.ModelSerializer):
+    group = serializers.ReadOnlyField(source='group.title')
+
+    class Meta:
+        model = ExperimentalProtocol
+        fields = ('id', 'image', 'textual_description', 'group')
 
 
 #############
@@ -193,6 +201,17 @@ class GroupViewSet(viewsets.ModelViewSet):
         )
         serializer.save(experiment=experiment)
 
+
+class ExperimentalProtocolViewSet(viewsets.ModelViewSet):
+    serializer_class = ExperimentalProtocolSerializer
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
+
+    def get_queryset(self):
+        return ExperimentalProtocol.objects.filter(group_id=self.kwargs['pk'])
+
+    def perform_create(self, serializer):
+        group = Group.objects.get(pk=self.kwargs['pk'])
+        serializer.save(group=group)
 
 # class ProtocolComponentViewSet(viewsets.ModelViewSet):
 #     lookup_field = 'nes_id'

@@ -31,6 +31,11 @@ api_studies_list = api.StudyViewSet.as_view({
     'get': 'list',
 })
 
+api_group_experimental_protocol_list = api.ExperimentalProtocolViewSet.as_view({
+    'get': 'list',
+    'post': 'create'
+})
+
 # Get rest framework schema view
 schema_view = get_schema_view(title='NEP API')
 
@@ -44,5 +49,8 @@ urlpatterns = [
     # Groups
     url(r'^groups/$', api_groups_list, name='api_groups-list'),
     url(r'^experiments/(?P<experiment_nes_id>[0-9]+)/groups/$',
-        api_experiment_groups_list, name='api_experiment_groups-list')
+        api_experiment_groups_list, name='api_experiment_groups-list'),
+
+    url(r'^groups/(?P<pk>[0-9]+)/experimental_protocol/$',
+        api_group_experimental_protocol_list, name='api_group_experimental_protocol-list'),
 ]

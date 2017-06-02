@@ -32,7 +32,7 @@ def global_setup_ft():
             experiment=experiment_owner1
         )
         Group.objects.create(
-            nes_id=i+1, title=faker.fake.text(max_nb_chars=15),
+            title=faker.fake.text(max_nb_chars=15),
             description=faker.fake.text(max_nb_chars=150),
             experiment=experiment_owner1
         )
@@ -51,7 +51,7 @@ def global_setup_ft():
             start_date=datetime.utcnow(), experiment=experiment_owner2
         )
         Group.objects.create(
-            nes_id=i+1, title=faker.fake.text(max_nb_chars=50),
+            title=faker.fake.text(max_nb_chars=50),
             description=faker.fake.text(max_nb_chars=150),
             experiment=experiment_owner2
         )
