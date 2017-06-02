@@ -3,46 +3,15 @@ from datetime import datetime
 from django.contrib.auth.models import User
 from django.test import TestCase
 
-from experiments.models import Experiment, Study
+from experiments.models import Experiment
+from experiments.tests.tests_helper import apply_setup, global_setup_ut
 
 
-def global_setup(self):
-    """
-    This setup creates basic object models that are used in tests bellow.
-    :param self: 
-    """
-    owner1 = User.objects.create_user(username='lab1', password='nep-lab1')
-    owner2 = User.objects.create_user(username='lab2', password='nep-lab2')
-
-    experiment1 = Experiment.objects.create(
-        title='Experiment 1', nes_id=1, owner=owner1,
-        version=1, sent_date=datetime.utcnow()
-    )
-    experiment2 = Experiment.objects.create(
-        title='Experiment 2', nes_id=1, owner=owner2,
-        version=1, sent_date=datetime.utcnow()
-    )
-
-    Study.objects.create(start_date=datetime.utcnow(), experiment=experiment1)
-    Study.objects.create(start_date=datetime.utcnow(), experiment=experiment2)
-
-
-def apply_setup(setup_func):
-    """
-    Defines a decorator that uses my_setup method.
-    :param setup_func: my_setup function
-    :return: wrapper 
-    """
-    def wrap(cls):
-        cls.setup = setup_func
-        return cls
-    return wrap
-
-
+@apply_setup(global_setup_ut)
 class HomePageTest(TestCase):
 
     def setUp(self):
-        global_setup(self)
+        global_setup_ut()
 
     def test_uses_home_template(self):
         response = self.client.get('/')

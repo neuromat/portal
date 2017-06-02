@@ -4,7 +4,7 @@ from django.contrib.auth.models import User
 from datetime import datetime
 
 from experiments.models import Experiment, Study, ProtocolComponent, Group
-
+from experiments.tests.tests_helper import global_setup_ut, apply_setup
 
 # class ResearcherModelTest(TestCase):
 #
@@ -53,7 +53,6 @@ from experiments.models import Experiment, Study, ProtocolComponent, Group
 #         with self.assertRaises(ValidationError):
 #             experiment_st.save()
 #             experiment_st.full_clean()
-from experiments.tests.tests_helper import global_setup_ut, apply_setup
 
 
 @apply_setup(global_setup_ut)
