@@ -5,10 +5,10 @@ from djipsum.faker import FakerModel
 from experiments.models import Experiment, Study, Group
 
 
-def global_setup():
+def global_setup_ft():
     """
     This global setup creates basic object models that are used in 
-    functional and unit tests.
+    functional tests.
     """
     owner1 = User.objects.create_user(username='lab1', password='nep-lab1')
     owner2 = User.objects.create_user(username='lab2', password='nep-lab2')
@@ -55,3 +55,38 @@ def global_setup():
             description=faker.fake.text(max_nb_chars=150),
             experiment=experiment_owner2
         )
+
+
+def global_setup_ut():
+    """
+    This global setup creates basic object models that are used in 
+    functional tests. 
+    """
+    owner1 = User.objects.create_user(username='lab1', password='nep-lab1')
+    owner2 = User.objects.create_user(username='lab2', password='nep-lab2')
+
+    experiment1 = Experiment.objects.create(
+        title='Experiment 1', nes_id=1, owner=owner1,
+        version=1, sent_date=datetime.utcnow()
+    )
+    experiment2 = Experiment.objects.create(
+        title='Experiment 2', nes_id=1, owner=owner2,
+        version=1, sent_date=datetime.utcnow()
+    )
+
+    Study.objects.create(start_date=datetime.utcnow(),
+                         experiment=experiment1)
+    Study.objects.create(start_date=datetime.utcnow(),
+                         experiment=experiment2)
+
+
+def apply_setup(setup_func):
+    """
+    Defines a decorator that uses global setup method.
+    :param setup_func: global setup function
+    :return: wrapper 
+    """
+    def wrap(cls):
+        cls.setup = setup_func
+        return cls
+    return wrap
