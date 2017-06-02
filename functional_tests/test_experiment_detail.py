@@ -52,32 +52,37 @@ class ExperimentDetailTest(FunctionalTest):
         # She clicks in Related study link and see a modal with Study data
         self.browser.find_element_by_link_text(experiment.study.title).click()
         time.sleep(1)
-        # The modal has the study title and a description
+        # The modal has the study title and the study description
         study_title = self.browser.find_element_by_id('modal_study_title').text
         self.assertIn(experiment.study.title, study_title)
         study_description = self.browser.find_element_by_id(
-            'modal_study_description').text
-
+            'study_description').text
+        # It indicates that the study was made by a researcher
         self.assertIn(experiment.study.description, study_description)
         study_researcher = self.browser.find_element_by_id(
-            'modal_study_researcher').text
+            'study_researcher').text
         self.assertIn('Researcher:', study_researcher)
+        self.assertIn(experiment.study.researcher, study_researcher)
+        # The study has a start and end date
         study_start_date = self.browser.find_element_by_id(
-            'modal_study_startdate').text
+            'study_startdate').text
         self.assertIn('Start date:', study_start_date)
-        # Obs.: this is only to conform to study_start_date format in browser
+        # Obs.: code line right below is only to conform to study_start_date
+        # format in browser
         self.assertIn(experiment.study.start_date.strftime("%B %d, %Y")
                       .lstrip("0").replace(" 0", " "), study_start_date)
         study_end_date = self.browser.find_element_by_id(
-            'modal_study_enddate').text
+            'study_enddate').text
         self.assertIn('End date:', study_end_date)
         if experiment.study.end_date:
             self.assertIn(experiment.study.end_date.strftime("%B %d, %Y"),
                           study_end_date)
         else:
             self.assertIn(str(None), study_end_date)
+        # Right below there is a relation of contributors of the study,
+        # the contributor's team and coordinator
         study_contributors = self.browser.find_element_by_id(
-            'modal_contributors').text
+            'study_contributors').text
         self.assertIn('Contributors:', study_contributors)
         table_contributors = self.browser.find_element_by_id(
             'table_contributors')
