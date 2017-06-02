@@ -20,8 +20,17 @@
             <div role="tabpanel" class="tab-pane" id="groups">
                 {% for group in experiment.groups.all %}
                     <div class="panel panel-default">
-                        <h5>{{ group.title }}</h5>
-                        <h6>{{ group.description }}</h6>
+                        <div class="row">
+                            <div class="col-md-2">
+                                {% if group.experimental_protocol.image %}
+                                    <a><img src="/media/{{ group.experimental_protocol.image }}" style="width: 100%" /></a>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-10">
+                                <h5>{{ group.title }}</h5>
+                                <h6>{{ group.description }}</h6>
+                            </div>
+                        </div>
                     </div>
                 {% endfor %}
             </div>

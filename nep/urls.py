@@ -1,5 +1,8 @@
+from django.conf import settings
 from django.conf.urls import url, include
 from django.contrib import admin
+from django.views.static import serve
+
 from rest_framework.documentation import include_docs_urls
 
 from experiments import views
@@ -12,5 +15,6 @@ urlpatterns = [
     url(r'^api/docs/', include_docs_urls(title='NEP API')),
     url(r'^$', views.home_page, name='home'),
     url(r'^experiments/(?P<experiment_id>[0-9]+)/$',
-        views.experiment_detail, name='experiment-detail')
+        views.experiment_detail, name='experiment-detail'),
+    url(r'^media/(?P<path>.*)$', serve, {'document_root': settings.MEDIA_ROOT,})
 ]
