@@ -3,58 +3,32 @@ from django.core.exceptions import ValidationError
 from django.contrib.auth.models import User
 from datetime import datetime
 
-from experiments.models import Experiment, Study, Group
+from experiments.models import Experiment, Study, Group, Researcher
 from experiments.tests.tests_helper import global_setup_ut, apply_setup
 
 
-# class ResearcherModelTest(TestCase):
-#
-#     def test_default_attributes(self):
-#         researcher = Researcher()
-#         self.assertEqual(researcher.first_name, '')
-#         self.assertEqual(researcher.surname, '')
-#         self.assertEqual(researcher.email, '')
-#
-#     def test_researcher_is_related_to_study(self):
-#         study = Study.objects.first()
-#         researcher = Researcher(study=study)
-#         researcher.save()
-#         self.assertEqual(researcher, study.researcher)
-#         self.assertEqual(researcher, study.researcher)
-#
-#     def test_cannot_save_empty_attributes(self):
-#         researcher = Researcher(nes_id=None)
-#         with self.assertRaises(ValidationError):
-#             researcher.full_clean()
-#
-#     def test_duplicate_researchers_are_invalid(self):
-#         owner = User.objects.create_user(username='lab1')
-#         create_researcher(nes_id=1, owner=owner)
-#         researcher2 = Researcher(nes_id=1, owner=owner)
-#         with self.assertRaises(ValidationError):
-#             researcher2.full_clean()
-#
-#     def test_CAN_save_same_researcher_to_different_owners(self):
-#         owner1 = User.objects.create_user(username='lab1')
-#         owner2 = User.objects.create_user(username='lab2')
-#         Researcher.objects.create(nes_id=1, owner=owner1)
-#         researcher = Researcher(nes_id=1, owner=owner2)
-#         researcher.full_clean()
-#
+@apply_setup(global_setup_ut)
+class ResearcherModelTest(TestCase):
 
+    def setUp(self):
+        global_setup_ut()
 
-# class ExperimentStatusModelTest(TestCase):
-#     def test_default_attributes(self):
-#         experiment_st = ExperimentStatus()
-#         self.assertEqual(experiment_st.tag, '')
-#         self.assertEqual(experiment_st.name, '')
-#         self.assertEqual(experiment_st.description, '')
-#
-#     def test_cannot_save_empty_attributes(self):
-#         experiment_st = ExperimentStatus(tag='')
-#         with self.assertRaises(ValidationError):
-#             experiment_st.save()
-#             experiment_st.full_clean()
+    def test_default_attributes(self):
+        researcher = Researcher()
+        self.assertEqual(researcher.name, '')
+        self.assertEqual(researcher.email, '')
+
+    def test_researcher_is_related_to_one_study(self):
+        study = Study.objects.first()
+        researcher = Researcher(study=study)
+        researcher.save()
+        self.assertEqual(researcher, study.researcher)
+
+    def test_cannot_save_empty_attributes(self):
+        researcher = Researcher(study=Study.objects.first())
+        with self.assertRaises(ValidationError):
+            researcher.save()
+            researcher.full_clean()
 
 
 @apply_setup(global_setup_ut)
