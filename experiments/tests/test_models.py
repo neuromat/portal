@@ -3,7 +3,8 @@ from django.core.exceptions import ValidationError
 from django.contrib.auth.models import User
 from datetime import datetime
 
-from experiments.models import Experiment, Study, Group, Researcher
+from experiments.models import Experiment, Study, Group, Researcher, \
+    Collaborator
 from experiments.tests.tests_helper import global_setup_ut, apply_setup
 
 
@@ -251,3 +252,13 @@ class GroupModelTest(TestCase):
     #         experiment=experiment2, owner=owner2
     #     )
     #     group.full_clean()
+
+
+@apply_setup(global_setup_ut)
+class CollaboratorModel(TestCase):
+
+    def setUp(self):
+        global_setup_ut()
+
+    def test_default_attributes(self):
+        collaborator = Collaborator()

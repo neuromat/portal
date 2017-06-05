@@ -50,6 +50,13 @@ class Researcher(models.Model):
     email = models.EmailField()
 
 
+class Collaborator(models.Model):
+    name = models.CharField(max_length=200)
+    team = models.CharField(max_length=200)
+    coordinator = models.BooleanField(default=False)
+    study = models.ForeignKey(Study, related_name='collaborators')
+
+
 class ProtocolComponent(models.Model):
     experiment = models.ForeignKey(
         Experiment, related_name='protocol_components'

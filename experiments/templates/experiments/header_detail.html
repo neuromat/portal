@@ -45,6 +45,15 @@
                                 <th>Coordinator</th>
                             </tr>
                             </thead>
+                            <tbody>
+                            {% for collaborator in experiment.study.collaborators.all %}
+                                <tr>
+                                    <td>{{ collaborator.name }}</td>
+                                    <td>{{ collaborator.team }}</td>
+                                    <td>{{ collaborator.coordinator }}</td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
                         </table>
                     </section>
                 </div>
