@@ -2,7 +2,7 @@ from datetime import datetime
 from django.contrib.auth.models import User
 from djipsum.faker import FakerModel
 
-from experiments.models import Experiment, Study, Group
+from experiments.models import Experiment, Study, Group, Researcher
 
 
 def global_setup_ft():
@@ -13,10 +13,10 @@ def global_setup_ft():
     owner1 = User.objects.create_user(username='lab1', password='nep-lab1')
     owner2 = User.objects.create_user(username='lab2', password='nep-lab2')
 
-    # Create 3 experiments for owner 1 and 2 for owner 2, and studies,
-    # and groups associated
     faker = FakerModel(app='experiments', model='Experiment')
 
+    # Create 3 experiments for owner 1 and 2 for owner 2, and studies,
+    # and groups associated
     for i in range(0, 3):
         experiment_owner1 = Experiment.objects.create(
             title=faker.fake.text(max_nb_chars=15),
@@ -28,8 +28,7 @@ def global_setup_ft():
         Study.objects.create(
             title=faker.fake.text(max_nb_chars=15),
             description=faker.fake.text(max_nb_chars=200),
-            start_date=datetime.utcnow(),
-            experiment=experiment_owner1
+            start_date=datetime.utcnow(), experiment=experiment_owner1
         )
         Group.objects.create(
             title=faker.fake.text(max_nb_chars=15),
@@ -54,6 +53,14 @@ def global_setup_ft():
             title=faker.fake.text(max_nb_chars=50),
             description=faker.fake.text(max_nb_chars=150),
             experiment=experiment_owner2
+        )
+
+    # Create researchers associated to studies created above
+    for study in Study.objects.all():
+        Researcher.objects.create(
+            name=faker.fake.text(max_nb_chars=15),
+            email=faker.fake.text(max_nb_chars=15),
+            study=study
         )
 
 

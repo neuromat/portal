@@ -45,9 +45,9 @@ class Study(models.Model):
 
 
 class Researcher(models.Model):
+    study = models.OneToOneField(Study, related_name='researcher')
     name = models.CharField(max_length=200)
     email = models.EmailField()
-    study = models.OneToOneField(Study)
 
 
 class ProtocolComponent(models.Model):

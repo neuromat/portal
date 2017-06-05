@@ -62,7 +62,7 @@ class ExperimentDetailTest(FunctionalTest):
         study_researcher = self.browser.find_element_by_id(
             'study_researcher').text
         self.assertIn('Researcher:', study_researcher)
-        self.assertIn(experiment.study.researcher, study_researcher)
+        self.assertIn(experiment.study.researcher.name, study_researcher)
         # The study has a start and end date
         study_start_date = self.browser.find_element_by_id(
             'study_startdate').text
