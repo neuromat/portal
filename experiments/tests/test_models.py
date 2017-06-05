@@ -19,7 +19,7 @@ class ResearcherModelTest(TestCase):
         self.assertEqual(researcher.email, '')
 
     def test_researcher_is_related_to_one_study(self):
-        study = Study.objects.first()
+        study = Study.objects.last()
         researcher = Researcher(study=study)
         researcher.save()
         self.assertEqual(researcher, study.researcher)
@@ -27,7 +27,6 @@ class ResearcherModelTest(TestCase):
     def test_cannot_save_empty_attributes(self):
         researcher = Researcher(study=Study.objects.first())
         with self.assertRaises(ValidationError):
-            researcher.save()
             researcher.full_clean()
 
 

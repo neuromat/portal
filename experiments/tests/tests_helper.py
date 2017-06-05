@@ -81,10 +81,13 @@ def global_setup_ut():
         version=1, sent_date=datetime.utcnow()
     )
 
-    Study.objects.create(start_date=datetime.utcnow(),
-                         experiment=experiment1)
+    study1 = Study.objects.create(start_date=datetime.utcnow(),
+                                  experiment=experiment1)
     Study.objects.create(start_date=datetime.utcnow(),
                          experiment=experiment2)
+
+    Researcher.objects.create(name='Raimundo Nonato',
+                              email='rnonato@example.com', study=study1)
 
 
 def apply_setup(setup_func):
