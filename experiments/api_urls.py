@@ -56,7 +56,7 @@ api_studies_researcher_list = api.ResearcherViewSet.as_view({
 api_collaborators_list = api.CollaboratorViewSet.as_view({
     'get': 'list',
 })
-api_studies_collaborators_list = api.CollaboratorViewSet.as_view({
+api_study_collaborators_list = api.CollaboratorViewSet.as_view({
     'get': 'list',
     'post': 'create'
 })
@@ -92,5 +92,7 @@ urlpatterns = [
         name='api_study_researcher-list'),
     # Collaborators
     url(r'^collaborators/$', api_collaborators_list,
-        name='api_collaborators-list')
+        name='api_collaborators-list'),
+    url(r'^studies/(?P<pk>[0-9]+)/collaborators/$',
+        api_study_collaborators_list, name='api_study_collaborators-list')
 ]
