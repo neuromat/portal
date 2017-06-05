@@ -96,6 +96,14 @@ def global_setup_ut():
 
     Researcher.objects.create(name='Raimundo Nonato',
                               email='rnonato@example.com', study=study1)
+    Collaborator.objects.create(
+        name='Colaborador 1', team='Numec', coordinator=True,
+        study=study1
+    )
+    Collaborator.objects.create(
+        name='Colaborador 2', team='Numec', coordinator=False,
+        study=study1
+    )
 
 
 def apply_setup(setup_func):

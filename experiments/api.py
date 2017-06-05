@@ -3,7 +3,7 @@ from rest_framework import serializers, permissions, viewsets
 
 from experiments import appclasses
 from experiments.models import Experiment, Study, User, ProtocolComponent, \
-    Group, ExperimentalProtocol, Researcher, Participant
+    Group, ExperimentalProtocol, Researcher, Participant, Collaborator
 
 
 ###################
@@ -49,6 +49,13 @@ class ResearcherSerializer(serializers.ModelSerializer):
         fields = ('id', 'name', 'email', 'study')
 
 
+class CollaboratorSerializer(serializers.ModelSerializer):
+    study = serializers.ReadOnlyField(source='study.title')
+
+    class Meta:
+        model = Collaborator
+        fields = ('id', 'name', 'team', 'coordinator', 'study')
+
 # class ProtocolComponentSerializer(serializers.ModelSerializer):
 #     owner = serializers.ReadOnlyField(source='owner.username')
 #     experiment = serializers.ReadOnlyField(source='experiment.title')
@@ -86,21 +93,6 @@ class ParticipantSerializer(serializers.ModelSerializer):
 #############
 # API Views #
 #############
-class ResearcherViewSet(viewsets.ModelViewSet):
-    serializer_class = ResearcherSerializer
-    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
-
-    def get_queryset(self):
-        # TODO: don't filter by owner if not logged (gets TypeError
-        # exception when trying to get an individual researcher)
-        if 'pk' in self.kwargs:
-            return Researcher.objects.filter(study_id=self.kwargs['pk'])
-        else:
-            return Researcher.objects.all()
-
-    def perform_create(self, serializer):
-        study = Study.objects.get(pk=self.kwargs['pk'])
-        serializer.save(study=study)
 
 
 class ExperimentViewSet(viewsets.ModelViewSet):
@@ -172,6 +164,38 @@ class StudyViewSet(viewsets.ModelViewSet):
         # TODO: breaks when posting from the api template.
         # Doesn't have researcher field to enter a valid reseacher.
         serializer.save(experiment=experiment)
+
+
+class ResearcherViewSet(viewsets.ModelViewSet):
+    serializer_class = ResearcherSerializer
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
+
+    def get_queryset(self):
+        # TODO: don't filter by owner if not logged (gets TypeError
+        # exception when trying to get an individual researcher)
+        if 'pk' in self.kwargs:
+            return Researcher.objects.filter(study_id=self.kwargs['pk'])
+        else:
+            return Researcher.objects.all()
+
+    def perform_create(self, serializer):
+        study = Study.objects.get(pk=self.kwargs['pk'])
+        serializer.save(study=study)
+
+
+class CollaboratorViewSet(viewsets.ModelViewSet):
+    serializer_class = CollaboratorSerializer
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
+
+    def get_queryset(self):
+        if 'pk' in self.kwargs:
+            return Collaborator.objects.filter(study_id=self.kwargs['pk'])
+        else:
+            return Collaborator.objects.all()
+
+    def perform_create(self, serializer):
+        study = Study.objects.get(pk=self.kwargs['pk'])
+        serializer.save(study=study)
 
 
 class GroupViewSet(viewsets.ModelViewSet):
