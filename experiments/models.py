@@ -2,16 +2,6 @@ from django.db import models
 from django.contrib.auth.models import User
 
 
-# class Researcher(models.Model):
-#     first_name = models.CharField(max_length=150, blank=True)
-#     surname = models.CharField(max_length=150, blank=True)
-#     email = models.EmailField(blank=True)
-#     study = models.OneToOneField(Study)
-#
-#     class Meta:
-#         unique_together = ('nes_id', 'owner')
-
-
 class Experiment(models.Model):
     RECEIVING = 'receiving'
     TO_BE_ANALYSED = 'to_be_analysed'
@@ -52,6 +42,12 @@ class Study(models.Model):
     description = models.TextField()
     start_date = models.DateField()
     end_date = models.DateField(null=True)
+
+
+class Researcher(models.Model):
+    name = models.CharField(max_length=200)
+    email = models.EmailField()
+    study = models.OneToOneField(Study)
 
 
 class ProtocolComponent(models.Model):
