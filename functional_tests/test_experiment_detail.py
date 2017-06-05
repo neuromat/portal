@@ -107,9 +107,8 @@ class ExperimentDetailTest(FunctionalTest):
         )
         self.assertTrue(
             any(row.find_elements_by_tag_name('td')[2].text ==
-                str(experiment.study.collaborators.first().coordinator) for
-                row in
-                rows)
+                str(experiment.study.collaborators.first().coordinator)
+                for row in rows)
         )
 
         self.fail('Finish this test!')

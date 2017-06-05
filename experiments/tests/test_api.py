@@ -8,7 +8,8 @@ from rest_framework.test import APITestCase
 from datetime import datetime
 import json
 
-from experiments.models import Experiment, Study, Group, Researcher
+from experiments.models import Experiment, Study, Group, Researcher, \
+    Collaborator
 from experiments.tests.tests_helper import global_setup_ut, apply_setup
 
 
@@ -395,6 +396,39 @@ class ResearcherAPITest(APITestCase):
 
 
 @apply_setup(global_setup_ut)
+class CollaboratorAPITest(APITestCase):
+
+    def setUp(self):
+        global_setup_ut()
+
+    def test_get_returns_all_collaborators_short_url(self):
+        collaborator1 = Collaborator.objects.first()
+        collaborator2 = Collaborator.objects.last()
+        list_url = reverse('api_collaborators-list')
+        response = self.client.get(list_url)
+        self.assertEqual(
+            json.loads(response.content.decode('utf8')),
+            [
+                {
+                    'id': collaborator1.id,
+                    'name': collaborator1.name,
+                    'team': collaborator1.team,
+                    'coordinator': collaborator1.coordinator,
+                    'study': collaborator1.study.title,
+                },
+                {
+                    'id': collaborator2.id,
+                    'name': collaborator2.name,
+                    'team': collaborator2.team,
+                    'coordinator': collaborator2.coordinator,
+                    'study': collaborator2.study.title,
+                }
+            ]
+        )
+
+
+
+@apply_setup(global_setup_ut)
 class GroupAPITest(APITestCase):
 
     def setUp(self):
@@ -672,4 +706,3 @@ class GroupAPITest(APITestCase):
 #             }
 #         )
 #         self.client.logout()
-
