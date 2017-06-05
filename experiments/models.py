@@ -79,3 +79,22 @@ class ExperimentalProtocol(models.Model):
     group = models.OneToOneField(Group, related_name='experimental_protocol')
     image = models.FileField(null=True, blank=True)
     textual_description = models.TextField(null=True, blank=True)
+
+
+class Gender(models.Model):
+    code = models.CharField(max_length=30, primary_key=True)
+    name = models.CharField(max_length=50)
+
+    def __str__(self):
+        return self.name
+
+
+class Participant(models.Model):
+    group = models.ForeignKey(Group)
+    code = models.CharField(max_length=150)
+
+    gender = models.ForeignKey(Gender)
+    age = models.DecimalField(decimal_places=4, max_digits=8)
+
+    class Meta:
+        unique_together = ('group', 'code')
