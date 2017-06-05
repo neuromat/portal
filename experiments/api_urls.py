@@ -36,6 +36,13 @@ api_group_experimental_protocol_list =\
         'post': 'create'
     })
 
+# Experimental protocols
+api_participant_list =\
+    api.ParticipantViewSet.as_view({
+        'get': 'list',
+        'post': 'create'
+    })
+
 # Researchers
 api_studies_researcher_list = api.ResearcherViewSet.as_view({
     'get': 'list',
@@ -66,6 +73,10 @@ urlpatterns = [
     url(r'^groups/(?P<pk>[0-9]+)/experimental_protocol/$',
         api_group_experimental_protocol_list,
         name='api_group_experimental_protocol-list'),
+    # Participants
+    url(r'^groups/(?P<pk>[0-9]+)/participant/$',
+        api_participant_list,
+        name='api_participant-list'),
     # Researchers
     url(r'^researchers/$', api_researcher_list, name='api_researchers-list'),
     url(r'^studies/(?P<pk>[0-9]+)/researcher/$', api_studies_researcher_list,
