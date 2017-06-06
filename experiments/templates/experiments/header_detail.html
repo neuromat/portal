@@ -25,9 +25,8 @@
                 <div class="modal-body">
                     <p id="study_description">{{ experiment.study.description }}</p>
                     <section>
-                        <div id="study_researcher" class="col-md-6"
-                        ><strong>Researcher:
-                            {{ experiment.study.researcher.name }}</strong></div>
+                        <div id="study_researcher" class="col-md-6"><strong>Researcher:</strong>
+                            {{ experiment.study.researcher.name }}</div>
                         <div id="study_startdate"
                              class="col-md-3"><strong>Start date:</strong><br>
                             {{ experiment.study.start_date }}</div>
@@ -45,6 +44,15 @@
                                 <th>Coordinator</th>
                             </tr>
                             </thead>
+                            <tbody>
+                            {% for collaborator in experiment.study.collaborators.all %}
+                                <tr>
+                                    <td>{{ collaborator.name }}</td>
+                                    <td>{{ collaborator.team }}</td>
+                                    <td>{{ collaborator.coordinator }}</td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
                         </table>
                     </section>
                 </div>

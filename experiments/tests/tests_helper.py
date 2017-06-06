@@ -2,7 +2,8 @@ from datetime import datetime
 from django.contrib.auth.models import User
 from djipsum.faker import FakerModel
 
-from experiments.models import Experiment, Study, Group, Researcher
+from experiments.models import Experiment, Study, Group, Researcher, \
+    Collaborator
 
 
 def global_setup_ft():
@@ -63,6 +64,13 @@ def global_setup_ft():
             study=study
         )
 
+    # Create study's collaborators
+    study = Study.objects.get(experiment=Experiment.objects.first())
+    for i in range(0, 3):
+        Collaborator.objects.create(name='Collaborator ' + str(i+1),
+                                    team='Team ' + str(i+1),
+                                    coordinator=False, study=study)
+
 
 def global_setup_ut():
     """
@@ -88,6 +96,14 @@ def global_setup_ut():
 
     Researcher.objects.create(name='Raimundo Nonato',
                               email='rnonato@example.com', study=study1)
+    Collaborator.objects.create(
+        name='Colaborador 1', team='Numec', coordinator=True,
+        study=study1
+    )
+    Collaborator.objects.create(
+        name='Colaborador 2', team='Numec', coordinator=False,
+        study=study1
+    )
 
 
 def apply_setup(setup_func):

@@ -3,7 +3,8 @@ from django.core.exceptions import ValidationError
 from django.contrib.auth.models import User
 from datetime import datetime
 
-from experiments.models import Experiment, Study, Group, Researcher
+from experiments.models import Experiment, Study, Group, Researcher, \
+    Collaborator
 from experiments.tests.tests_helper import global_setup_ut, apply_setup
 
 
@@ -236,18 +237,31 @@ class GroupModelTest(TestCase):
             group.save()
             group.full_clean()
 
-    # def test_CAN_save_same_groups_to_different_owners(self):
-    #     # TODO: maybe not necessary anymore
-    #     owner1 = User.objects.first()
-    #     owner2 = User.objects.last()
-    #     experiment1 = Experiment.objects.first()
-    #     experiment2 = Experiment.objects.last()
-    #     Group.objects.create(
-    #         title='Group A', description='A description', nes_id=1,
-    #         experiment=experiment1, owner=owner1
-    #     )
-    #     group = Group(
-    #         title='Group A', description='A description', nes_id=1,
-    #         experiment=experiment2, owner=owner2
-    #     )
-    #     group.full_clean()
+
+@apply_setup(global_setup_ut)
+class CollaboratorModel(TestCase):
+
+    def setUp(self):
+        global_setup_ut()
+
+    def test_default_attributes(self):
+        collaborator = Collaborator()
+        self.assertEqual(collaborator.name, '')
+        self.assertEqual(collaborator.team, '')
+        self.assertEqual(collaborator.coordinator, False)
+
+    def test_collaborator_is_related_to_study(self):
+        study = Study.objects.first()
+        collaborator = Collaborator.objects.create(
+            name='Joãzinho trinta', team='Viradouro', study=study
+        )
+        self.assertIn(collaborator, study.collaborators.all())
+
+    def test_cannot_save_empty_attributes(self):
+        study = Study.objects.first()
+        collaborator = Collaborator.objects.create(
+            name='', team='', study=study
+        )
+        with self.assertRaises(ValidationError):
+            collaborator.save()
+            collaborator.full_clean()

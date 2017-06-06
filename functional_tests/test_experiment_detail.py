@@ -93,5 +93,22 @@ class ExperimentDetailTest(FunctionalTest):
         self.assertTrue(col_headers_contrib[0].text == 'Person')
         self.assertTrue(col_headers_contrib[1].text == 'Team')
         self.assertTrue(col_headers_contrib[2].text == 'Coordinator')
+        # She sees the content of contributors list
+        rows = table_contributors.find_element_by_tag_name(
+            'tbody').find_elements_by_tag_name('tr')
+        self.assertTrue(
+            any(row.find_elements_by_tag_name('td')[0].text ==
+                experiment.study.collaborators.first().name for row in rows)
+        )
+        self.assertTrue(
+            any(row.find_elements_by_tag_name('td')[1].text ==
+                experiment.study.collaborators.first().team for row in
+                rows)
+        )
+        self.assertTrue(
+            any(row.find_elements_by_tag_name('td')[2].text ==
+                str(experiment.study.collaborators.first().coordinator)
+                for row in rows)
+        )
 
         self.fail('Finish this test!')

@@ -21,6 +21,7 @@
                 <th></th>
             </tr>
             </thead>
+            <tbody>
             {% for experiment in experiments %}
                 <tr>
                     <td>{{ experiment.title }}</td>
@@ -32,6 +33,7 @@
                     <td><a href="{% url 'experiment-detail' experiment.id %}">View</a></td>
                 </tr>
             {% endfor %}
+            </tbody>
         </table>
         {% else %}
         <p>There's no experiments yet.</p>

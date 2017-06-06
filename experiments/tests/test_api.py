@@ -8,7 +8,8 @@ from rest_framework.test import APITestCase
 from datetime import datetime
 import json
 
-from experiments.models import Experiment, Study, Group, Researcher
+from experiments.models import Experiment, Study, Group, Researcher, \
+    Collaborator
 from experiments.tests.tests_helper import global_setup_ut, apply_setup
 
 
@@ -357,9 +358,9 @@ class ResearcherAPITest(APITestCase):
             ]
         )
 
-    def test_get_returns_all_researchers_long_url(self):
-        study = Study.objects.first()
-        researcher = Researcher.objects.get(study=study)
+    def test_get_returns_researcher_long_url(self):
+        study = Study.objects.last()
+        researcher = Researcher.objects.create(study=study)
         list_url = reverse('api_study_researcher-list',
                            kwargs={'pk': study.id})
         response = self.client.get(list_url)
@@ -392,6 +393,79 @@ class ResearcherAPITest(APITestCase):
         self.client.logout()
         new_researcher = Researcher.objects.last()
         self.assertEqual(new_researcher.name, 'João das Rosas')
+
+
+@apply_setup(global_setup_ut)
+class CollaboratorAPITest(APITestCase):
+
+    def setUp(self):
+        global_setup_ut()
+
+    def test_get_returns_all_collaborators_short_url(self):
+        collaborator1 = Collaborator.objects.first()
+        collaborator2 = Collaborator.objects.last()
+        list_url = reverse('api_collaborators-list')
+        response = self.client.get(list_url)
+        self.assertEqual(
+            json.loads(response.content.decode('utf8')),
+            [
+                {
+                    'id': collaborator1.id,
+                    'name': collaborator1.name,
+                    'team': collaborator1.team,
+                    'coordinator': collaborator1.coordinator,
+                    'study': collaborator1.study.title,
+                },
+                {
+                    'id': collaborator2.id,
+                    'name': collaborator2.name,
+                    'team': collaborator2.team,
+                    'coordinator': collaborator2.coordinator,
+                    'study': collaborator2.study.title,
+                }
+            ]
+        )
+
+    def test_get_returns_all_collaborators_long_url(self):
+        study = Study.objects.last()
+        collaborator = Collaborator.objects.create(
+            name='Cristiano', team='Real', coordinator=True, study=study
+        )
+        list_url = reverse('api_study_collaborators-list',
+                           kwargs={'pk': study.id})
+        response = self.client.get(list_url)
+        self.assertEqual(
+            json.loads(response.content.decode('utf8')),
+            [
+                {
+                    'id': collaborator.id,
+                    'name': collaborator.name,
+                    'team': collaborator.team,
+                    'coordinator': True,
+                    'study': collaborator.study.title
+                }
+            ]
+        )
+
+    def test_POSTing_a_new_collaborator(self):
+        study = Study.objects.last()
+        owner = User.objects.get(username='lab2')
+        self.client.login(username=owner.username, password='nep-lab2')
+        list_url = reverse('api_study_collaborators-list',
+                           kwargs={'pk': study.id})
+        response = self.client.post(
+            list_url,
+            {
+                'name': 'Rolando Lero',
+                'email': 'rolando@example.com',
+                'team': 'Escolinha do Prof. Raimundo',
+                'coordinator': True
+            }
+        )
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.client.logout()
+        new_collaborator = Collaborator.objects.last()
+        self.assertEqual(new_collaborator.name, 'Rolando Lero')
 
 
 @apply_setup(global_setup_ut)
@@ -672,4 +746,3 @@ class GroupAPITest(APITestCase):
 #             }
 #         )
 #         self.client.logout()
-
