@@ -97,7 +97,7 @@ class Gender(models.Model):
 
 
 class Participant(models.Model):
-    group = models.ForeignKey(Group)
+    group = models.ForeignKey(Group, related_name='participants')
     code = models.CharField(max_length=150)
 
     gender = models.ForeignKey(Gender)

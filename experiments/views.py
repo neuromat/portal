@@ -20,12 +20,25 @@ def get_current_experiments():
 def home_page(request):
     experiments = get_current_experiments()
 
+    for experiment in experiments:
+        experiment.total_participants = sum([len(group.participants.all()) for group in experiment.groups.all()])
+
     return render(request, 'experiments/home.html',
                   {'experiments': experiments})
 
 
 def experiment_detail(request, experiment_id):
     experiment = Experiment.objects.get(pk=experiment_id)
+
+    # gender_grouping = []
+    # for group in experiment.groups.all():
+    #     for participant in group.participants.all():
+    #         if participant.gender.name not in gender_grouping['gender']:
+    #             gender_grouping[{'gender': participant.gender.name}]
+    #     gender_grouping.append({'group_title': group.title, 'gender': 'M', 'quantity': 2})
+    #     gender_grouping.append({'group_title': group.title, 'gender': 'F', 'quantity': 3})
+
     return render(
+        # request, 'experiments/detail.html', {'experiment': experiment, 'gender_grouping': gender_grouping}
         request, 'experiments/detail.html', {'experiment': experiment}
     )

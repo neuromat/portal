@@ -14,8 +14,22 @@
         <!-- Tab panes -->
         <div class="tab-content">
 
-            <div role="tabpanel" class="tab-pane active"
-                 id="statistics">Statistics</div>
+            <div role="tabpanel" class="tab-pane active" id="statistics">
+                <div class="row">
+                    <div class="col-md-6">
+                        Gender of participants
+
+{#                        {% regroup gender_grouping by gender as gender_list %}#}
+{#                        {% for gender in gender_list %}#}
+{#                            <li>{{ gender.grouper }}</li>#}
+{#                        {% endfor %}#}
+
+                    </div>
+                    <div class="col-md-6">
+                        Age of participants
+                    </div>
+                </div>
+            </div>
 
             <div role="tabpanel" class="tab-pane" id="groups">
                 {% for group in experiment.groups.all %}
