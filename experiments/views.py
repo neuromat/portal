@@ -31,12 +31,20 @@ def experiment_detail(request, experiment_id):
     experiment = Experiment.objects.get(pk=experiment_id)
 
     gender_grouping = {}
+    age_grouping = {}
     for group in experiment.groups.all():
         for participant in group.participants.all():
+            # gender
             if participant.gender.code not in gender_grouping:
                 gender_grouping[participant.gender.code] = 0
             gender_grouping[participant.gender.code] += 1
+            # age
+            if int(participant.age) not in age_grouping:
+                age_grouping[int(participant.age)] = 0
+            age_grouping[int(participant.age)] += 1
 
     return render(
-        request, 'experiments/detail.html', {'experiment': experiment, 'gender_grouping': gender_grouping}
+        request, 'experiments/detail.html', {'experiment': experiment,
+                                             'gender_grouping': gender_grouping,
+                                             'age_grouping': age_grouping}
     )
