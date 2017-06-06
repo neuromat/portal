@@ -30,15 +30,13 @@ def home_page(request):
 def experiment_detail(request, experiment_id):
     experiment = Experiment.objects.get(pk=experiment_id)
 
-    # gender_grouping = []
-    # for group in experiment.groups.all():
-    #     for participant in group.participants.all():
-    #         if participant.gender.name not in gender_grouping['gender']:
-    #             gender_grouping[{'gender': participant.gender.name}]
-    #     gender_grouping.append({'group_title': group.title, 'gender': 'M', 'quantity': 2})
-    #     gender_grouping.append({'group_title': group.title, 'gender': 'F', 'quantity': 3})
+    gender_grouping = {}
+    for group in experiment.groups.all():
+        for participant in group.participants.all():
+            if participant.gender.code not in gender_grouping:
+                gender_grouping[participant.gender.code] = 0
+            gender_grouping[participant.gender.code] += 1
 
     return render(
-        # request, 'experiments/detail.html', {'experiment': experiment, 'gender_grouping': gender_grouping}
-        request, 'experiments/detail.html', {'experiment': experiment}
+        request, 'experiments/detail.html', {'experiment': experiment, 'gender_grouping': gender_grouping}
     )

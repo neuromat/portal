@@ -19,10 +19,9 @@
                     <div class="col-md-6">
                         Gender of participants
 
-{#                        {% regroup gender_grouping by gender as gender_list %}#}
-{#                        {% for gender in gender_list %}#}
-{#                            <li>{{ gender.grouper }}</li>#}
-{#                        {% endfor %}#}
+                        {% for key, value in gender_grouping.items %}
+                            <li>{{ key }} - {{ value }}</li>
+                        {% endfor %}
 
                     </div>
                     <div class="col-md-6">
