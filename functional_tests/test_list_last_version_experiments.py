@@ -15,8 +15,8 @@ class NewVisitorTest(FunctionalTest):
         self.browser.get(self.live_server_url)
 
         # In top of page she sees a link to login in the system
-        login_link = self.browser.find_element_by_id('login').text
-        self.assertIn('Log in', login_link)
+        login_link = self.browser.find_element_by_id('login-language').text
+        self.assertIn('Log In', login_link)
 
         # She notices the page title and header mention
         # Neuroscience Experiments Database
