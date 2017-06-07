@@ -25,7 +25,7 @@ class LoginPageTest(FunctionalTest):
         inputbox_username = self.browser.find_element_by_id('id_username')
         inputbox_username.send_keys('claudia')
         inputbox_password = self.browser.find_element_by_id('id_password')
-        inputbox_password.send_keys('passwd-claudia')
+        inputbox_password.send_keys('passwd')
 
         # When she hits enter to make login.
         login_button = self.browser.find_element_by_id('id_submit')
@@ -34,5 +34,8 @@ class LoginPageTest(FunctionalTest):
 
         # She is redirected to home page, but now logged in. So, she sees a
         # message of welcome and your in up right corner of the screen.
+        welcome_message = self.browser.find_element_by_id(
+            'welcome_message').text
+        self.assertIn('Welcome', welcome_message)
 
         self.fail('Finish this test!')
