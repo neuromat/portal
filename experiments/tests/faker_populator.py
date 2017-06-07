@@ -91,4 +91,4 @@ for group in Group.objects.all():
                                age=randint(5, 65))
 
 
-# TODO: keep two blank lines for script run until the end
+# TODO: why is necessary to keep two blank lines for script run until the end?
