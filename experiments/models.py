@@ -9,11 +9,11 @@ class Experiment(models.Model):
     APPROVED = 'approved'
     NOT_APPROVED = 'not_approved'
     STATUS_OPTIONS = (
-        (RECEIVING, 'receiving'),
-        (TO_BE_ANALYSED, 'to_be_analysed'),
-        (UNDER_ANALYSIS, 'under_analysis'),
-        (APPROVED, 'approved'),
-        (NOT_APPROVED, 'not_approved'),
+        (RECEIVING, 'Receiving'),
+        (TO_BE_ANALYSED, 'To be analysed'),
+        (UNDER_ANALYSIS, 'Under analysis'),
+        (APPROVED, 'Approved'),
+        (NOT_APPROVED, 'Not approved'),
     )
 
     owner = models.ForeignKey(User)
