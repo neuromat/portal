@@ -21,7 +21,9 @@ def home_page(request):
     experiments = get_current_experiments()
 
     for experiment in experiments:
-        experiment.total_participants = sum([len(group.participants.all()) for group in experiment.groups.all()])
+        experiment.total_participants = \
+            sum([len(group.participants.all())
+                 for group in experiment.groups.all()])
 
     return render(request, 'experiments/home.html',
                   {'experiments': experiments})

@@ -1,5 +1,3 @@
-import time
-
 from experiments.models import Experiment
 from functional_tests.base import FunctionalTest
 
@@ -34,7 +32,7 @@ class NewVisitorTest(FunctionalTest):
 
         # As there are experiments sended to Portal, she sees the home
         # page have a list of experiments in a table.
-        # She reads in "List of Experiments" in the table title
+        # She reads in "List of Experiments" in the table title.
         table_title = self.browser.find_element_by_id(
             'id_table_title').find_element_by_tag_name('h2').text
         self.assertEqual('List of Experiments', table_title)

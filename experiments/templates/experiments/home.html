@@ -18,6 +18,7 @@
                 <th>Description</th>
                 <th>Participants</th>
                 <th>Version</th>
+                <th>Status</th>
                 <th></th>
             </tr>
             </thead>
@@ -30,6 +31,7 @@
                     <td>{{ experiment.total_participants }} in {{ experiment.groups.count }} groups </td>
 
                     <td>{{ experiment.version }}</td>
+                    <td>{{ experiment.get_status_display }}</td>
                     <td><a href="{% url 'experiment-detail' experiment.id %}">View</a></td>
                 </tr>
             {% endfor %}
