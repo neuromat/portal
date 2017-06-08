@@ -17,5 +17,6 @@ urlpatterns = [
     url(r'^', include('django.contrib.auth.urls')),
     url(r'^experiments/(?P<experiment_id>[0-9]+)/$',
         views.experiment_detail, name='experiment-detail'),
-    url(r'^media/(?P<path>.*)$', serve, {'document_root': settings.MEDIA_ROOT,})
+    url(r'^media/(?P<path>.*)$', serve,
+        {'document_root': settings.MEDIA_ROOT, })
 ]
