@@ -10,6 +10,20 @@ h1, h3, h4, h5, p {
 
 /*
   ========================================
+  Links
+  ========================================
+*/
+
+a {
+  color: #60c8a3;
+}
+a:hover {
+  color: #a9b2b9;
+  text-decoration: none;
+}
+
+/*
+  ========================================
   Top
   ========================================
  */
@@ -33,11 +47,13 @@ h1, h3, h4, h5, p {
   border-left: 2px solid #000;
   padding-left: 10px;
 }
-.top-language {
-  font-size: small;
+.top-login-language {
   float: right;
   position: relative;
   top: 30%;
+}
+.top-language {
+  font-size: small;
 }
 
 /*
@@ -168,23 +184,14 @@ h1, h3, h4, h5, p {
   Bootstrap overrides
   ========================================
  */
-
-a {
-  color: #60c8a3;
-}
-
-a:hover {
-  color: #a9b2b9;
-  text-decoration: none;
-}
-
-/*
-  ========================================
-  Bootstrap overrides
-  ========================================
- */
 /* overrides bootstrap class */
 .list-group-item {
   background: #80868a;
   border: none;
 }
+
+/*
+  ========================================
+  Log In
+  ========================================
+ */

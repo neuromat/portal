@@ -14,6 +14,10 @@ class NewVisitorTest(FunctionalTest):
         # She goes to checkout its home page
         self.browser.get(self.live_server_url)
 
+        # In top of page she sees a link to login in the system
+        login_link = self.browser.find_element_by_id('login-language').text
+        self.assertIn('Log In', login_link)
+
         # She notices the page title and header mention
         # Neuroscience Experiments Database
         self.assertIn('Neuroscience Experiments Database', self.browser.title)
@@ -42,7 +46,7 @@ class NewVisitorTest(FunctionalTest):
         col_headers = row_headers.find_elements_by_tag_name('th')
         self.assertTrue(col_headers[0].text == 'Title')
         self.assertTrue(col_headers[1].text == 'Description')
-        self.assertTrue(col_headers[2].text == 'Groups')
+        self.assertTrue(col_headers[2].text == 'Participants')
         self.assertTrue(col_headers[3].text == 'Version')
 
         # She sees the content of the list
@@ -58,7 +62,9 @@ class NewVisitorTest(FunctionalTest):
         )
         self.assertTrue(
             any(row.find_elements_by_tag_name('td')[2].text ==
-                str(experiment.groups.count()) for row in rows)
+                str(experiment.groups.first().participants.count()) +
+                ' in ' + str(experiment.groups.count()) + ' groups' for row in
+                rows)
         )
         self.assertTrue(
             any(row.find_elements_by_tag_name('td')[3].text ==
