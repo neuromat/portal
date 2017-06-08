@@ -1,4 +1,6 @@
 import time
+
+from django.contrib.auth.models import User
 from selenium.webdriver.common.keys import Keys
 from functional_tests.base import FunctionalTest
 
@@ -33,9 +35,11 @@ class LoginPageTest(FunctionalTest):
         time.sleep(1)
 
         # She is redirected to home page, but now logged in. So, she sees a
-        # message of welcome and your in up right corner of the screen.
+        # message of welcome and your name (or username) in up right corner of
+        # the screen.
         welcome_message = self.browser.find_element_by_id(
-            'welcome_message').text
-        self.assertIn('Welcome', welcome_message)
+            'login-language').text
+        user = User.objects.get(username='claudia')
+        self.assertIn('Welcome, ' + user.first_name, welcome_message)
 
         self.fail('Finish this test!')

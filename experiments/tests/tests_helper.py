@@ -22,10 +22,14 @@ def global_setup_ft():
     group = models.Group.objects.create(name='trustees')
 
     # Create 2 trustee users and add them to trustees group
-    trustee1 = models.User.objects.create_user(username='claudia',
-                                               password='passwd')
-    trustee2 = models.User.objects.create_user(username='roque',
-                                               password='passwd')
+    trustee1 = models.User.objects.create_user(
+        username='claudia', first_name='Claudia', last_name='Vargas',
+        password='passwd'
+    )
+    trustee2 = models.User.objects.create_user(
+        username='roque', first_name='Antonio', last_name='Roque',
+        password='passwd'
+    )
     group.user_set.add(trustee1)
     group.user_set.add(trustee2)
 
