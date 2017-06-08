@@ -14,6 +14,7 @@ urlpatterns = [
     url(r'^api/', include(api_urls)),
     url(r'^api/docs/', include_docs_urls(title='NEP API')),
     url(r'^$', views.home_page, name='home'),
+    url(r'^', include('django.contrib.auth.urls')),
     url(r'^experiments/(?P<experiment_id>[0-9]+)/$',
         views.experiment_detail, name='experiment-detail'),
     url(r'^media/(?P<path>.*)$', serve, {'document_root': settings.MEDIA_ROOT,})

@@ -10,6 +10,7 @@ class ExperimentDetailTest(FunctionalTest):
         experiment = Experiment.objects.first()
         self.browser.get(self.live_server_url)
 
+        # The new visitor is in home page and see the list of experiments.
         # She clicks in first "View" link and is redirected to experiment
         # detail page
         self.browser.find_element_by_link_text('View').click()  # TODO:

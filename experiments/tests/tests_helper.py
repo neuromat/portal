@@ -1,5 +1,6 @@
 from datetime import datetime
-from django.contrib.auth.models import User
+
+from django.contrib.auth import models
 from djipsum.faker import FakerModel
 
 from experiments.models import Experiment, Study, Group, Researcher, \
@@ -11,8 +12,26 @@ def global_setup_ft():
     This global setup creates basic object models that are used in 
     functional tests.
     """
-    owner1 = User.objects.create_user(username='lab1', password='nep-lab1')
-    owner2 = User.objects.create_user(username='lab2', password='nep-lab2')
+    # Create 2 API clients
+    owner1 = models.User.objects.create_user(username='lab1',
+                                             password='nep-lab1')
+    owner2 = models.User.objects.create_user(username='lab2',
+                                             password='nep-lab2')
+
+    # Create group Trustees
+    group = models.Group.objects.create(name='trustees')
+
+    # Create 2 trustee users and add them to trustees group
+    trustee1 = models.User.objects.create_user(
+        username='claudia', first_name='Claudia', last_name='Vargas',
+        password='passwd'
+    )
+    trustee2 = models.User.objects.create_user(
+        username='roque', first_name='Antonio', last_name='Roque',
+        password='passwd'
+    )
+    group.user_set.add(trustee1)
+    group.user_set.add(trustee2)
 
     faker = FakerModel(app='experiments', model='Experiment')
 
@@ -77,8 +96,10 @@ def global_setup_ut():
     This global setup creates basic object models that are used in 
     functional tests. 
     """
-    owner1 = User.objects.create_user(username='lab1', password='nep-lab1')
-    owner2 = User.objects.create_user(username='lab2', password='nep-lab2')
+    owner1 = models.User.objects.create_user(username='lab1',
+                                             password='nep-lab1')
+    owner2 = models.User.objects.create_user(username='lab2',
+                                             password='nep-lab2')
 
     experiment1 = Experiment.objects.create(
         title='Experiment 1', nes_id=1, owner=owner1,

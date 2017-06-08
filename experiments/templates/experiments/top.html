@@ -1,6 +1,19 @@
 <section class="container nep-top">
     <div class="top-neuromat">Neuromat</div>
     <div class="top-small">Centro de Pesquisa, Inovação e Difusão em Neuromatemática</div>
-    <div class="top-language">English <i class="glyphicon
-    glyphicon-chevron-down"></i></div>
+    <div id="login-language" class="top-login-language">
+        {% if user.is_authenticated %}
+            {% if user.first_name %}
+                Welcome, {{ user.first_name }}
+            {% else %}
+                Welcome, {{ user.username }}
+            {% endif %}
+            &nbsp;&nbsp;<a href="{% url 'logout' %}">Log Out</a>
+        {% else %}
+            <a href="{% url 'login' %}">Log In</a>
+        {% endif %}
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        <span class="top-language">English</span> <i class="glyphicon
+        glyphicon-chevron-down"></i>
+    </div>
 </section>
