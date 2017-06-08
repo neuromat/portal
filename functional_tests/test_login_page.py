@@ -1,6 +1,8 @@
 import time
 
 from django.contrib.auth.models import User
+from django.http import HttpResponsePermanentRedirect
+from django.urls import reverse
 from selenium.webdriver.common.keys import Keys
 from functional_tests.base import FunctionalTest
 
@@ -41,5 +43,16 @@ class LoginPageTest(FunctionalTest):
             'login-language').text
         user = User.objects.get(username='claudia')
         self.assertIn('Welcome, ' + user.first_name, welcome_message)
+
+        # She checks the home page out and decides to log out.
+        logout_link = self.browser.find_element_by_link_text(
+            'Log Out')
+        logout_url = logout_link.get_attribute('href')
+        logout_link.click()
+        # Obs.: after clicking in logout_link, we verifiy if we've been
+        # correct redirected to home page
+        response = self.client.get(logout_url)
+        self.assertRedirects(response, reverse('home'))
+        time.sleep(1)
 
         self.fail('Finish this test!')
