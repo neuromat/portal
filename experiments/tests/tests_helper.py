@@ -43,7 +43,8 @@ def global_setup_ft():
             description=faker.fake.text(max_nb_chars=200),
             nes_id=i+1,
             owner=owner1, version=1,
-            sent_date=datetime.utcnow()
+            sent_date=datetime.utcnow(),
+            status=Experiment.TO_BE_ANALYSED
         )
         Study.objects.create(
             title=faker.fake.text(max_nb_chars=15),
@@ -62,7 +63,8 @@ def global_setup_ft():
             description=faker.fake.text(max_nb_chars=200),
             nes_id=i + 1,
             owner=owner2, version=1,
-            sent_date=datetime.utcnow()
+            sent_date=datetime.utcnow(),
+            status=Experiment.TO_BE_ANALYSED
         )
         Study.objects.create(
             title=faker.fake.text(max_nb_chars=15),
