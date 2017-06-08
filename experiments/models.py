@@ -89,8 +89,7 @@ class ExperimentalProtocol(models.Model):
 
 
 class Gender(models.Model):
-    code = models.CharField(max_length=30, primary_key=True)
-    name = models.CharField(max_length=50)
+    name = models.CharField(max_length=50, primary_key=True)
 
     def __str__(self):
         return self.name

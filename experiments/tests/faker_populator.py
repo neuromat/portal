@@ -76,8 +76,8 @@ Collaborator.objects.create(name=fake.name(),
                             coordinator=True, study=study)
 
 # Create genders
-male = Gender.objects.create(code='M', name='Male')
-female = Gender.objects.create(code='F', name='Female')
+male = Gender.objects.create(name='Male')
+female = Gender.objects.create(name='Female')
 
 # Create groups' experimental protocols and participants
 for group in Group.objects.all():

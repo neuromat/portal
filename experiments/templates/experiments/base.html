@@ -10,6 +10,8 @@
     <link rel="stylesheet" href="{% static 'css/normalize.css' %}">
     <link rel="stylesheet" href="{% static 'bootstrap-3.3.7-dist/css/bootstrap.min.css' %}">
     <link rel="stylesheet" href="{% static 'css/main.css' %}">
+    {% block scripts %}
+    {% endblock %}
 </head>
 <body>
 {% include 'experiments/top.html' %}

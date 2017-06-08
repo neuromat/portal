@@ -35,9 +35,9 @@ def experiment_detail(request, experiment_id):
     for group in experiment.groups.all():
         for participant in group.participants.all():
             # gender
-            if participant.gender.code not in gender_grouping:
-                gender_grouping[participant.gender.code] = 0
-            gender_grouping[participant.gender.code] += 1
+            if participant.gender.name not in gender_grouping:
+                gender_grouping[participant.gender.name] = 0
+            gender_grouping[participant.gender.name] += 1
             # age
             if int(participant.age) not in age_grouping:
                 age_grouping[int(participant.age)] = 0

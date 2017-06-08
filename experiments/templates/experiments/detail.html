@@ -1,8 +1,56 @@
 {% extends 'experiments/base.html' %}
 
+{% block scripts %}
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script type="text/javascript">
+
+        google.charts.load('current', {packages: ['corechart', 'bar']});
+        google.charts.setOnLoadCallback(drawPieChart);
+        google.charts.setOnLoadCallback(drawColumnChart);
+
+        function drawPieChart() {
+            var data_array = [['Gender', 'Number of participants']];
+            var django_data = {{ gender_grouping|safe }};
+            for (var item in django_data){
+                data_array.push([item, django_data[item]])
+            }
+            var data = google.visualization.arrayToDataTable(data_array);
+            var options = {
+              title: 'Gender of the participants',
+              pieHole: 0.3
+            };
+            var chart = new google.visualization.PieChart(document.getElementById('gender-chart'));
+            chart.draw(data, options);
+        }
+    
+        function drawColumnChart() {
+            var data_array = [['Age', 'amount' ]];
+            var django_data = {{ age_grouping|safe }};
+            for (var item in django_data){
+                data_array.push([item, django_data[item]])
+            }
+            var data = google.visualization.arrayToDataTable(data_array);
+            var options = {
+                title: 'Age of the participants',
+                legend: { position: 'none' },
+                hAxis: {
+                  title: 'Age (years)'
+                },
+                vAxis: {
+                  title: 'Amount'
+                }
+            };
+            var chart = new google.visualization.ColumnChart(document.getElementById('age-chart'));
+            chart.draw(data, options);
+        }
+        
+    </script>
+{% endblock %}
+
 {% block header %}
     {% include 'experiments/header_detail.html' %}
 {% endblock %}
+
 {% block content %}
     <section class="container toggable-tabs">
         <ul class="nav nav-tabs" role="tablist">
@@ -17,18 +65,10 @@
             <div role="tabpanel" class="tab-pane active" id="statistics">
                 <div class="row">
                     <div class="col-md-6">
-                        Gender of participants
-
-                        {% for key, value in gender_grouping.items %}
-                            <li>{{ key }} - {{ value }}</li>
-                        {% endfor %}
-
+                        <div id="gender-chart" style="height: 300px;"></div>
                     </div>
                     <div class="col-md-6">
-                        Age of participants
-                        {% for key, value in age_grouping.items %}
-                            <li>{{ key }} - {{ value }}</li>
-                        {% endfor %}
+                        <div id="age-chart" style="height: 300px;"></div>
                     </div>
                 </div>
             </div>
