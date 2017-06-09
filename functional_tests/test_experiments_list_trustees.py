@@ -41,4 +41,9 @@ class TrusteeLoggedInTest(FunctionalTest):
                 experiment.get_status_display() for row in rows)
         )
 
+        # Statuses are links. She clicks in an experiment status that has to
+        # be analysed and see a modal that display other status that she can
+        # chose.
+        self.browser.find_element_by_link_text("To Be Approved").click()
+
         self.fail('Finish this test!')
