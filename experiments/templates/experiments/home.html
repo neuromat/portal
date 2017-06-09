@@ -12,9 +12,9 @@
         {% if experiments %}
             {% load experiment_extras %}
             {% if user.is_authenticated and user|has_group:'trustees' %}
-                {% include 'experiments/experiments_list_trustee.html' %}
+                {% include 'experiments/list_trustee.html' %}
             {% else %}
-                {% include 'experiments/experiments_list_default.html' %}
+                {% include 'experiments/list_default.html' %}
             {% endif %}
         {% else %}
         <p>There's no experiments yet.</p>

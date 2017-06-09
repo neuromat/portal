@@ -44,6 +44,11 @@ class TrusteeLoggedInTest(FunctionalTest):
         # Statuses are links. She clicks in an experiment status that has to
         # be analysed and see a modal that display other status that she can
         # chose.
-        self.browser.find_element_by_link_text("To Be Approved").click()
+        self.browser.find_element_by_link_text('To be analysed').click()
+        time.sleep(1)
+        self.browser.find_element_by_id('status_modal')
+        modal_title = self.browser.find_element_by_id(
+            'modal_status_title').text
+        self.assertIn('Change status for', modal_title)
 
         self.fail('Finish this test!')
