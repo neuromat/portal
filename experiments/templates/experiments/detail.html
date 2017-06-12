@@ -85,7 +85,7 @@
                             <div class="col-md-10">
                                 <h5>{{ group.title }}</h5>
                                 <h6>{{ group.description }}</h6>
-                                {% if group.inclusion_criteria %}
+                                {% if group.inclusion_criteria.all %}
                                     <h6>Inclusion criterias:<br/>
                                         {% for criteria in group.inclusion_criteria.all %}
                                             {{ criteria.code }} - {{ criteria.description }}{% if not forloop.last %},{% endif %}
