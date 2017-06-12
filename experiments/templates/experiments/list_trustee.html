@@ -11,6 +11,7 @@
     </tr>
     </thead>
     <tbody>
+    {% load experiment_extras %}
     {% for experiment in experiments %}
         <tr>
             <td>{{ experiment.title }}</td>
@@ -21,7 +22,9 @@
                    data-target="#status_modal"
                    data-experiment_id="{{ experiment.id }}"
                    data-experiment_title="{{ experiment.title }}"
-                   data-experiment_statuses="{{ experiment.STATUS_OPTIONS }}">
+                   data-experiment_status="{{ experiment.status }}"
+                   data-experiment_statuses="
+{{ experiment.STATUS_OPTIONS|statuses_to_json }}">
                 {{ experiment.get_status_display }}</a>
             </td>
             <td><a href="{% url 'experiment-detail' experiment.id %}">View</a></td>
@@ -35,14 +38,10 @@
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
                     <h4 id="modal_status_title" class="modal-title">Change
-                        status for</h4> {# see script in block script #}
+                        status for</h4> {# see script in block script in home.html #}
                 </div>
                 <div id="status_body" class="modal-body">
                     <p>Please select an option:</p>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary">Save changes</button>
                 </div>
             </div><!-- /.modal-content -->
         </div><!-- /.modal-dialog -->

@@ -55,10 +55,18 @@ class TrusteeLoggedInTest(FunctionalTest):
         self.assertIn('Change status for experiment', modal_status_title)
         self.assertIn('"' + experiment1.title + '"', modal_status_title)
         # In modal body she sees that she can chose a new status for the
-        # experiment.
+        # experiment. As she wants to analyse the experiment, she changes
+        # the status to "Under analysis".
         modal_status_body = modal_status.find_element_by_id(
             'status_body').text
         self.assertIn('Please select an option:', modal_status_body)
-        self.assertIn('To be analised', modal_status_body)
+        self.assertIn('To be analysed', modal_status_body)
+        form_status_choices = self.browser.find_element_by_id(
+            'id_status_choices')
+        form_status_choices.find_element_by_xpath(
+            '//input[@type="radio" and  @value=' + '"' +
+            Experiment.UNDER_ANALYSIS + '"]').click()
+        submit_button = self.browser.find_element_by_id('id_submit')
+        submit_button.send_keys(Keys.ENTER)
 
         self.fail('Finish this test!')
