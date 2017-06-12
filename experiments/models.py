@@ -35,6 +35,16 @@ class Experiment(models.Model):
         unique_together = ('nes_id', 'owner', 'version')
 
 
+class ClassificationOfDiseases(models.Model):
+    code = models.CharField(max_length=10, null=False)
+    description = models.CharField(max_length=300, null=False)
+    abbreviated_description = models.CharField(max_length=190, null=False)
+    parent = models.ForeignKey('self', null=True, related_name='children')
+
+    def __str__(self):
+        return self.abbreviated_description
+
+
 class Keyword(models.Model):
     name = models.CharField(max_length=50, null=False, blank=False, primary_key=True)
 
@@ -85,6 +95,7 @@ class Group(models.Model):
 
     title = models.CharField(max_length=50)
     description = models.TextField()
+    inclusion_criteria = models.ManyToManyField(ClassificationOfDiseases, null=True, blank=True)
     protocol_component = models.ForeignKey(
         ProtocolComponent, null=True, blank=True
     )  # TODO: define if Group has ProtocolComponent

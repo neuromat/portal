@@ -3,7 +3,7 @@ from rest_framework import serializers, permissions, viewsets
 
 from experiments import appclasses
 from experiments.models import Experiment, Study, User, ProtocolComponent, \
-    Group, ExperimentalProtocol, Researcher, Participant, Collaborator, Keyword
+    Group, ExperimentalProtocol, Researcher, Participant, Collaborator, Keyword, ClassificationOfDiseases
 
 
 ###################
@@ -85,12 +85,30 @@ class CollaboratorSerializer(serializers.ModelSerializer):
 #                   'duration_value', 'component_type', 'experiment', 'owner')
 
 
+class ClassificationOfDiseasesSerializer(serializers.Serializer):
+    class Meta:
+        model = ClassificationOfDiseases
+        fields = ('code',)
+
+
 class GroupSerializer(serializers.ModelSerializer):
     experiment = serializers.ReadOnlyField(source='experiment.title')
+    inclusion_criteria = ClassificationOfDiseasesSerializer(many=True, read_only=False)
 
     class Meta:
         model = Group
-        fields = ('id', 'title', 'description', 'experiment')
+        fields = ('id', 'title', 'description', 'experiment', 'inclusion_criteria')
+
+    def create(self, validated_data):
+        inclusion_criteria = self.initial_data['inclusion_criteria']
+        group = Group.objects.create(experiment=validated_data['experiment'],
+                                     title=validated_data['title'],
+                                     description=validated_data['description'])
+        for criteria in inclusion_criteria:
+            classification_of_diseases = ClassificationOfDiseases.objects.filter(code=criteria['code'])
+            if classification_of_diseases:
+                group.inclusion_criteria.add(classification_of_diseases.first())
+        return group
 
 
 class ExperimentalProtocolSerializer(serializers.ModelSerializer):
