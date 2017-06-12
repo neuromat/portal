@@ -35,6 +35,13 @@ class Experiment(models.Model):
         unique_together = ('nes_id', 'owner', 'version')
 
 
+class Keyword(models.Model):
+    name = models.CharField(max_length=50, null=False, blank=False, primary_key=True)
+
+    def __str__(self):
+        return self.name
+
+
 class Study(models.Model):
     experiment = models.OneToOneField(Experiment)
 
@@ -42,6 +49,7 @@ class Study(models.Model):
     description = models.TextField()
     start_date = models.DateField()
     end_date = models.DateField(null=True)
+    keywords = models.ManyToManyField(Keyword, null=True, blank=True)
 
 
 class Researcher(models.Model):

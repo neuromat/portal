@@ -3,7 +3,7 @@ from rest_framework import serializers, permissions, viewsets
 
 from experiments import appclasses
 from experiments.models import Experiment, Study, User, ProtocolComponent, \
-    Group, ExperimentalProtocol, Researcher, Participant, Collaborator
+    Group, ExperimentalProtocol, Researcher, Participant, Collaborator, Keyword
 
 
 ###################
@@ -32,13 +32,32 @@ class UserSerializer(serializers.ModelSerializer):
         fields = ('id', 'username', 'experiments')
 
 
+class KeywordSerializer(serializers.Serializer):
+    class Meta:
+        model = Keyword
+        fields = ('name',)
+
+
 class StudySerializer(serializers.ModelSerializer):
     experiment = serializers.ReadOnlyField(source='experiment.title')
+    keywords = KeywordSerializer(many=True, read_only=False)
 
     class Meta:
         model = Study
         fields = ('id', 'title', 'description', 'start_date',
-                  'end_date', 'experiment')
+                  'end_date', 'experiment', 'keywords')
+
+    def create(self, validated_data):
+        keywords_data = self.initial_data['keywords']
+        study = Study.objects.create(experiment=validated_data['experiment'],
+                                     title=validated_data['title'],
+                                     description=validated_data['description'],
+                                     start_date=validated_data['start_date'],
+                                     end_date=validated_data['end_date'])
+        for keyword_data in keywords_data:
+            keyword, created = Keyword.objects.get_or_create(name=keyword_data['name'])
+            study.keywords.add(keyword)
+        return study
 
 
 class ResearcherSerializer(serializers.ModelSerializer):

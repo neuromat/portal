@@ -55,6 +55,13 @@
                             </tbody>
                         </table>
                     </section>
+                    <section>
+                        <div id="keywords"><strong>Keywords: </strong>
+                        {% for keyword in experiment.study.keywords.all %}
+                            {{ keyword.name }}{% if not forloop.last %} | {% endif %}
+                        {% endfor %}
+                        </div>
+                    </section>
                 </div>
 
                 <div class="modal-footer">
