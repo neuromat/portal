@@ -41,14 +41,24 @@ class TrusteeLoggedInTest(FunctionalTest):
                 experiment.get_status_display() for row in rows)
         )
 
-        # Statuses are links. She clicks in an experiment status that has to
-        # be analysed and see a modal that display other status that she can
-        # chose.
+        # Statuses table cells are links. She clicks in an experiment status
+        # that has to be analysed and see a modal that display the modal
+        # title that shows experiment title in quotes.
+        experiment_id = self.browser.find_element_by_link_text(
+            'To be analysed').get_attribute('data-experiment_id')
+        experiment1 = Experiment.objects.get(id=experiment_id)
         self.browser.find_element_by_link_text('To be analysed').click()
         time.sleep(1)
-        self.browser.find_element_by_id('status_modal')
-        modal_title = self.browser.find_element_by_id(
+        modal_status = self.browser.find_element_by_id('status_modal')
+        modal_status_title = modal_status.find_element_by_id(
             'modal_status_title').text
-        self.assertIn('Change status for', modal_title)
+        self.assertIn('Change status for experiment', modal_status_title)
+        self.assertIn('"' + experiment1.title + '"', modal_status_title)
+        # In modal body she sees that she can chose a new status for the
+        # experiment.
+        modal_status_body = modal_status.find_element_by_id(
+            'status_body').text
+        self.assertIn('Please select an option:', modal_status_body)
+        self.assertIn('To be analised', modal_status_body)
 
         self.fail('Finish this test!')
