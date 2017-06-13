@@ -27,3 +27,13 @@ class HomePageTest(TestCase):
         response = self.client.get('/experiments/' + experiment_id + '/')
         self.assertTemplateUsed(response, 'experiments/detail.html')
 
+    def test_trustee_can_change_experiment_status_with_a_POST_request(self):
+        experiment = Experiment.objects.filter(
+            status=Experiment.TO_BE_ANALYSED
+        ).first()
+        response = self.client.post(
+            'experiments/{experiment.id}/change_status/',
+            data={'status': 'under_analysis'}
+        )
+        self.assertEqual(response.status_code, 200)
+        # Finish this test implementation!

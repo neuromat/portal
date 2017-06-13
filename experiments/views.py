@@ -50,3 +50,7 @@ def experiment_detail(request, experiment_id):
                                              'gender_grouping': gender_grouping,
                                              'age_grouping': age_grouping}
     )
+
+
+def change_status(request, experiment_id):
+    pass
