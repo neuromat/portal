@@ -10,35 +10,64 @@
             <h2>List of Experiments</h2>
         </div>
         {% if experiments %}
-        <table id="id_experiments_table" class="table table-hover
-        experiment-table">
-            <thead>
-            <tr>
-                <th>Title</th>
-                <th>Description</th>
-                <th>Participants</th>
-                <th>Version</th>
-                <th>Status</th>
-                <th></th>
-            </tr>
-            </thead>
-            <tbody>
-            {% for experiment in experiments %}
-                <tr>
-                    <td>{{ experiment.title }}</td>
-                    <td>{{ experiment.description }}</td>
-
-                    <td>{{ experiment.total_participants }} in {{ experiment.groups.count }} groups </td>
-
-                    <td>{{ experiment.version }}</td>
-                    <td>{{ experiment.get_status_display }}</td>
-                    <td><a href="{% url 'experiment-detail' experiment.id %}">View</a></td>
-                </tr>
-            {% endfor %}
-            </tbody>
-        </table>
+            {% load experiment_extras %}
+            {% if user.is_authenticated and user|has_group:'trustees' %}
+                {% include 'experiments/list_trustee.html' %}
+            {% else %}
+                {% include 'experiments/list_default.html' %}
+            {% endif %}
         {% else %}
-        <p>There's no experiments yet.</p>
-    {% endif %}
+            <p>There's no experiments yet.</p>
+        {% endif %}
     </section>
+{% endblock %}
+
+{% block script %}
+    <script>  {# this script is related to experiment/list_trustee.html #}
+    /**
+     * Receives experiment status and statuses in json encoding,
+     * and construct html with input radios in a form.
+     */
+    function statuses_radio_options(csrftoken, exp_id, exp_status, statuses) {
+        var html = '<form action="/experiments/' + exp_id + '/' +
+            'change_status" ' + 'id="id_status_choices" method="POST">';
+        html += '<input name="csrfmiddlewaretoken" value="' + csrftoken +
+            '"' + 'type="hidden">';
+        for (var i = 0; i < statuses.length; i++) {
+            html += ('<input type="radio" name="status" value="' +
+            statuses[i][0] + '"' +
+            (exp_status === statuses[i][0] ? 'checked' : '') + '>' +
+            statuses[i][1] + '<br>');
+        }
+        html += '<br>';
+        html += '<div class=modal-footer>';
+        html += '<button type="button" class="btn btn-default" ' +
+            'data-dismiss="modal">Close</button>';
+        html += '<input id="id_submit" type="submit" value="Save changes" ' +
+            'class="btn ' + 'btn-primary">';
+        html += '</form>';
+        html += '</div>';
+        return html;
+
+    }
+    $('#status_modal').on('show.bs.modal', function (event) {
+        var link = $(event.relatedTarget);
+        var experiment_id = link.data('experiment_id');
+        var experiment_title = link.data('experiment_title');
+        var experiment_status = link.data('experiment_status');
+        var statuses = link.data('experiment_statuses');
+        delete statuses["receiving"];
+        statuses = JSON.parse(statuses);
+{#        delete statuses[0][0]; delete statuses[0][1];  // TODO: deleting by integer index#}
+        var csrftoken = $("[name=csrfmiddlewaretoken]").val();
+        var modal = $(this);
+        modal.find('.modal-title').text('Change status for experiment ' +
+            '"' + experiment_title + '"');
+        var modal_body = modal.find('.modal-body');
+        var html = statuses_radio_options(csrftoken, experiment_id,
+            experiment_status, statuses);
+        modal_body.text('Please select an option:');
+        modal_body.append(html);
+    })
+    </script>
 {% endblock %}

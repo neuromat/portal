@@ -1,0 +1,51 @@
+<table id="id_experiments_table" class="table table-hover
+        experiment-table">
+    <thead>
+    <tr>
+        <th>Title</th>
+        <th>Description</th>
+        <th>Participants</th>
+        <th>Version</th>
+        <th>Status</th>
+        <th></th>
+    </tr>
+    </thead>
+    <tbody>
+    {% load experiment_extras %}
+    {% for experiment in experiments %}
+        <tr>
+            <td>{{ experiment.title }}</td>
+            <td>{{ experiment.description }}</td>
+            <td>{{ experiment.total_participants }} in {{ experiment.groups.count }} groups </td>
+            <td>{{ experiment.version }}</td>
+            <td><a href="#" data-toggle="modal"
+                   data-target="#status_modal"
+                   data-experiment_id="{{ experiment.id }}"
+                   data-experiment_title="{{ experiment.title }}"
+                   data-experiment_status="{{ experiment.status }}"
+                   data-experiment_statuses="
+{{ experiment.STATUS_OPTIONS|statuses_to_json }}">
+                {{ experiment.get_status_display }}</a>
+            </td>
+            <td><a href="{% url 'experiment-detail' experiment.id %}">View</a></td>
+        </tr>
+    {% endfor %}
+    </tbody>
+    {# Experiment status modal #}
+    <div id="status_modal" class="modal fade" tabindex="-1" role="dialog">
+        {% csrf_token %}  {# to get token in form generated in home.html script #}
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 id="modal_status_title" class="modal-title">Change
+                        status for</h4> {# see script in block script in home.html #}
+                </div>
+                <div id="status_body" class="modal-body">
+                    <p>Please select an option:</p>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
+    {# End Experiment status modal #}
+</table>
