@@ -17,8 +17,8 @@
                 {% include 'experiments/list_default.html' %}
             {% endif %}
         {% else %}
-        <p>There's no experiments yet.</p>
-    {% endif %}
+            <p>There's no experiments yet.</p>
+        {% endif %}
     </section>
 {% endblock %}
 
@@ -51,21 +51,23 @@
 
     }
     $('#status_modal').on('show.bs.modal', function (event) {
-            var link = $(event.relatedTarget);
-            var experiment_id = link.data('experiment_id');
-            var experiment_title = link.data('experiment_title');
-            var experiment_status = link.data('experiment_status');
-            var statuses = link.data('experiment_statuses');
-            var csrftoken = $("[name=csrfmiddlewaretoken]").val();
-            var modal = $(this);
-            modal.find('.modal-title').text('Change status for experiment ' +
-                '"' + experiment_title + '"');
-            var modal_body = modal.find('.modal-body');
-            statuses = JSON.parse(statuses);
-            var html = statuses_radio_options(csrftoken, experiment_id,
-                experiment_status, statuses);
-            modal_body.text('Please select an option:');
-            modal_body.append(html);
-        })
+        var link = $(event.relatedTarget);
+        var experiment_id = link.data('experiment_id');
+        var experiment_title = link.data('experiment_title');
+        var experiment_status = link.data('experiment_status');
+        var statuses = link.data('experiment_statuses');
+        delete statuses["receiving"];
+        statuses = JSON.parse(statuses);
+{#        delete statuses[0][0]; delete statuses[0][1];  // TODO: deleting by integer index#}
+        var csrftoken = $("[name=csrfmiddlewaretoken]").val();
+        var modal = $(this);
+        modal.find('.modal-title').text('Change status for experiment ' +
+            '"' + experiment_title + '"');
+        var modal_body = modal.find('.modal-body');
+        var html = statuses_radio_options(csrftoken, experiment_id,
+            experiment_status, statuses);
+        modal_body.text('Please select an option:');
+        modal_body.append(html);
+    })
     </script>
 {% endblock %}
