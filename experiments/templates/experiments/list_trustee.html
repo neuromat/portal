@@ -33,6 +33,7 @@
     </tbody>
     {# Experiment status modal #}
     <div id="status_modal" class="modal fade" tabindex="-1" role="dialog">
+        {% csrf_token %}  {# to get token in form generated in home.html script #}
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">

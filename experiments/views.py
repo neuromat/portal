@@ -1,3 +1,4 @@
+from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.db.models import Max, Q
 
@@ -53,4 +54,8 @@ def experiment_detail(request, experiment_id):
 
 
 def change_status(request, experiment_id):
-    pass
+    experiment = Experiment.objects.get(pk=experiment_id)
+    experiment.status = request.POST.get('status')
+    experiment.save()
+
+    return HttpResponseRedirect('/')
