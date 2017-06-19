@@ -5,7 +5,7 @@ SECRET_KEY = 'w&hkq685h_b37nsph31m@t$^5bf3^q98+2!chqno+#@89y%ah9'
 
 DEBUG = True
 
-ALLOWED_HOSTS = ['']
+ALLOWED_HOSTS = ['127.0.0.1']
 
 DEV_APPS = []
 
