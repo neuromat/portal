@@ -59,7 +59,7 @@ class Study(models.Model):
     description = models.TextField()
     start_date = models.DateField()
     end_date = models.DateField(null=True)
-    keywords = models.ManyToManyField(Keyword, null=True, blank=True)
+    keywords = models.ManyToManyField(Keyword, blank=True)
 
 
 class Researcher(models.Model):
@@ -95,7 +95,7 @@ class Group(models.Model):
 
     title = models.CharField(max_length=50)
     description = models.TextField()
-    inclusion_criteria = models.ManyToManyField(ClassificationOfDiseases, null=True, blank=True)
+    inclusion_criteria = models.ManyToManyField(ClassificationOfDiseases, blank=True)
     protocol_component = models.ForeignKey(
         ProtocolComponent, null=True, blank=True
     )  # TODO: define if Group has ProtocolComponent

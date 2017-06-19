@@ -48,15 +48,22 @@ class StudySerializer(serializers.ModelSerializer):
                   'end_date', 'experiment', 'keywords')
 
     def create(self, validated_data):
-        keywords_data = self.initial_data['keywords']
-        study = Study.objects.create(experiment=validated_data['experiment'],
-                                     title=validated_data['title'],
-                                     description=validated_data['description'],
-                                     start_date=validated_data['start_date'],
-                                     end_date=validated_data['end_date'])
-        for keyword_data in keywords_data:
-            keyword, created = Keyword.objects.get_or_create(name=keyword_data['name'])
-            study.keywords.add(keyword)
+        if 'end_date' in validated_data:
+            study = Study.objects.create(experiment=validated_data['experiment'],
+                                         title=validated_data['title'],
+                                         description=validated_data['description'],
+                                         start_date=validated_data['start_date'],
+                                         end_date=validated_data['end_date'])
+        else:
+            study = Study.objects.create(experiment=validated_data['experiment'],
+                                         title=validated_data['title'],
+                                         description=validated_data['description'],
+                                         start_date=validated_data['start_date'])
+        if 'keywords' in self.initial_data:
+            keywords_data = self.initial_data['keywords']
+            for keyword_data in keywords_data:
+                keyword, created = Keyword.objects.get_or_create(name=keyword_data['name'])
+                study.keywords.add(keyword)
         return study
 
 
@@ -100,14 +107,15 @@ class GroupSerializer(serializers.ModelSerializer):
         fields = ('id', 'title', 'description', 'experiment', 'inclusion_criteria')
 
     def create(self, validated_data):
-        inclusion_criteria = self.initial_data['inclusion_criteria']
         group = Group.objects.create(experiment=validated_data['experiment'],
                                      title=validated_data['title'],
                                      description=validated_data['description'])
-        for criteria in inclusion_criteria:
-            classification_of_diseases = ClassificationOfDiseases.objects.filter(code=criteria['code'])
-            if classification_of_diseases:
-                group.inclusion_criteria.add(classification_of_diseases.first())
+        if 'inclusion_criteria' in self.initial_data:
+            inclusion_criteria = self.initial_data['inclusion_criteria']
+            for criteria in inclusion_criteria:
+                classification_of_diseases = ClassificationOfDiseases.objects.filter(code=criteria['code'])
+                if classification_of_diseases:
+                    group.inclusion_criteria.add(classification_of_diseases.first())
         return group
 
 

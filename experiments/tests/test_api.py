@@ -199,7 +199,8 @@ class StudyAPITest(APITestCase):
                     'description': study1.description,
                     'start_date': study1.start_date.strftime('%Y-%m-%d'),
                     'end_date': study1.end_date,
-                    'experiment': 'Experiment 1'
+                    'experiment': 'Experiment 1',
+                    'keywords': list(study1.keywords.all())
                 },
                 {
                     'id': study2.id,
@@ -207,7 +208,8 @@ class StudyAPITest(APITestCase):
                     'description': study2.description,
                     'start_date': study2.start_date.strftime('%Y-%m-%d'),
                     'end_date': study2.end_date,
-                    'experiment': 'Experiment 2'
+                    'experiment': 'Experiment 2',
+                    'keywords': list(study1.keywords.all())
                 },
             ]
         )
@@ -229,7 +231,8 @@ class StudyAPITest(APITestCase):
                     'description': study1.description,
                     'start_date': study1.start_date.strftime('%Y-%m-%d'),
                     'end_date': study1.end_date,
-                    'experiment': 'Experiment 1'
+                    'experiment': 'Experiment 1',
+                    'keywords': list(study1.keywords.all())
                 },
                 {
                     'id': study2.id,
@@ -237,7 +240,8 @@ class StudyAPITest(APITestCase):
                     'description': study2.description,
                     'start_date': study2.start_date.strftime('%Y-%m-%d'),
                     'end_date': study2.end_date,
-                    'experiment': 'Experiment 2'
+                    'experiment': 'Experiment 2',
+                    'keywords': list(study2.keywords.all())
                 },
             ]
         )
@@ -260,6 +264,7 @@ class StudyAPITest(APITestCase):
                     'start_date': study.start_date.strftime('%Y-%m-%d'),
                     'end_date': study.end_date,
                     'experiment': 'Experiment 2',
+                    'keywords': list(study.keywords.all())
                 },
             ]
         )
@@ -492,10 +497,6 @@ class GroupAPITest(APITestCase):
         )
 
     def test_get_returns_all_groups_short_url(self):
-        owner1 = User.objects.get(username='lab1')
-        owner2 = User.objects.get(username='lab2')
-        experiment1 = Experiment.objects.get(nes_id=1, owner=owner1)
-        experiment2 = Experiment.objects.get(nes_id=1, owner=owner2)
         group1 = Group.objects.get(id=1)
         group2 = Group.objects.get(id=2)
         group3 = Group.objects.get(id=3)
@@ -509,32 +510,33 @@ class GroupAPITest(APITestCase):
                     'title': group1.title,
                     'description': group1.description,
                     'experiment': group1.experiment.title,
+                    'inclusion_criteria': list(group1.inclusion_criteria.all())
                 },
                 {
                     'id': group2.id,
                     'title': group2.title,
                     'description': group2.description,
                     'experiment': group2.experiment.title,
+                    'inclusion_criteria': list(group2.inclusion_criteria.all())
                 },
                 {
                     'id': group3.id,
                     'title': group3.title,
                     'description': group3.description,
                     'experiment': group3.experiment.title,
+                    'inclusion_criteria': list(group3.inclusion_criteria.all())
                 }
             ]
         )
 
     def test_get_returns_all_groups_long_url(self):
         owner1 = User.objects.get(username='lab1')
-        owner2 = User.objects.get(username='lab2')
-        experiment1 = Experiment.objects.get(nes_id=1, owner=owner1)
-        experiment2 = Experiment.objects.get(nes_id=1, owner=owner2)
+        experiment = Experiment.objects.get(nes_id=1, owner=owner1)
         group1 = Group.objects.first()
         group2 = Group.objects.get(id=2)
         group3 = Group.objects.get(id=3)
         list_url = reverse('api_experiment_groups-list',
-                           kwargs={'experiment_nes_id': experiment1.nes_id})
+                           kwargs={'experiment_nes_id': experiment.nes_id})
         response = self.client.get(list_url)
         self.assertEqual(
             json.loads(response.content.decode('utf8')),
@@ -544,18 +546,21 @@ class GroupAPITest(APITestCase):
                     'title': group1.title,
                     'description': group1.description,
                     'experiment': group1.experiment.title,
+                    'inclusion_criteria': list(group1.inclusion_criteria.all())
                 },
                 {
                     'id': group2.id,
                     'title': group2.title,
                     'description': group2.description,
                     'experiment': group2.experiment.title,
+                    'inclusion_criteria': list(group2.inclusion_criteria.all())
                 },
                 {
                     'id': group3.id,
                     'title': group3.title,
                     'description': group3.description,
                     'experiment': group3.experiment.title,
+                    'inclusion_criteria': list(group3.inclusion_criteria.all())
                 }
             ]
         )
@@ -577,12 +582,14 @@ class GroupAPITest(APITestCase):
                     'title': group1.title,
                     'description': group1.description,
                     'experiment': group1.experiment.title,
+                    'inclusion_criteria': list(group1.inclusion_criteria.all())
                 },
                 {
                     'id': group2.id,
                     'title': group2.title,
                     'description': group2.description,
                     'experiment': group2.experiment.title,
+                    'inclusion_criteria': list(group2.inclusion_criteria.all())
                 }
             ]
         )
