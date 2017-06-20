@@ -28,13 +28,14 @@
      * Receives experiment status and statuses in json encoding,
      * and construct html with input radios in a form.
      */
-    function statuses_radio_options(exp_status, statuses) {
-        var html = '<form action="/experiments/change_status" ' +
+    function statuses_radio_options(experiment, statuses) {
+        var html = '<form action="/experiments/' + experiment.id + '/change_status" ' +
             'id="id_status_choices" method="POST">';
+        html += "{% csrf_token %}";
         for (var i = 0; i < statuses.length; i++) {
             html += ('<input type="radio" name="status" value="' +
             statuses[i][0] + '"' +
-            (exp_status === statuses[i][0] ? 'checked' : '') + '>' +
+            (experiment.status === statuses[i][0] ? 'checked' : '') + '>' +
             statuses[i][1] + '<br>');
         }
         html += '<br>';
@@ -50,15 +51,18 @@
     }
     $('#status_modal').on('show.bs.modal', function (event) {
             var link = $(event.relatedTarget);
-            var experiment_title = link.data('experiment_title');
-            var experiment_status = link.data('experiment_status');
+            var experiment = {
+                id: link.data('experiment_id'),
+                title: link.data('experiment_title'),
+                status: link.data('experiment_status')
+            };
             var statuses = link.data('experiment_statuses');
             var modal = $(this);
             modal.find('.modal-title').text('Change status for experiment ' +
-                '"' + experiment_title + '"');
+                '"' + experiment.title + '"');
             var modal_body = modal.find('.modal-body');
             statuses = JSON.parse(statuses);
-            var html = statuses_radio_options(experiment_status, statuses);
+            var html = statuses_radio_options(experiment, statuses);
             modal_body.text('Please select an option:');
             modal_body.append(html);
         })
