@@ -32,8 +32,11 @@ class HomePageTest(TestCase):
             status=Experiment.TO_BE_ANALYSED
         ).first()
         response = self.client.post(
-            'experiments/{experiment.id}/change_status/',
-            data={'status': 'under_analysis'}
+            f'/experiments/{experiment.id}/change_status/',
+            {'status': Experiment.UNDER_ANALYSIS},
         )
-        self.assertEqual(response.status_code, 200)
-        # Finish this test implementation!
+        # Is it redirecting?
+        self.assertEqual(response.status_code, 302)
+        # experiment has changed status to UNDER_ANALYSIS?
+        experiment = Experiment.objects.get(pk=experiment.id)
+        self.assertEqual(experiment.status, Experiment.UNDER_ANALYSIS)

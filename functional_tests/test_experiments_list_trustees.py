@@ -72,10 +72,10 @@ class TrusteeLoggedInTest(FunctionalTest):
         # The trustee Claudia is redirect to home page and see that the
         # experiment that she changed is now "Under analysis"
         # table = self.browser.find_element_by_id('id_experiments_table')
+        table = self.browser.find_element_by_id('id_experiments_table')
         rows = table.find_element_by_tag_name(
             'tbody').find_elements_by_tag_name('tr')
-        row = any(row.find_elements_by_tag_name('td')[0].text ==
-                  experiment.title for row in rows)
-        print(row)  # DEBUG
+        any(row.find_elements_by_tag_name('td')[0].text ==
+            experiment.title for row in rows)
 
         self.fail('Finish this test!')
