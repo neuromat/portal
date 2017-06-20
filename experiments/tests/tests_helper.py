@@ -105,11 +105,13 @@ def global_setup_ut():
 
     experiment1 = Experiment.objects.create(
         title='Experiment 1', nes_id=1, owner=owner1,
-        version=1, sent_date=datetime.utcnow()
+        version=1, sent_date=datetime.utcnow(),
+        status=Experiment.TO_BE_ANALYSED
     )
     experiment2 = Experiment.objects.create(
         title='Experiment 2', nes_id=1, owner=owner2,
-        version=1, sent_date=datetime.utcnow()
+        version=1, sent_date=datetime.utcnow(),
+        status=Experiment.UNDER_ANALYSIS
     )
 
     study1 = Study.objects.create(start_date=datetime.utcnow(),
