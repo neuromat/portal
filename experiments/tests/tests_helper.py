@@ -64,7 +64,7 @@ def global_setup_ft():
             nes_id=i + 1,
             owner=owner2, version=1,
             sent_date=datetime.utcnow(),
-            status=Experiment.TO_BE_ANALYSED
+            status=Experiment.APPROVED
         )
         Study.objects.create(
             title=faker.fake.text(max_nb_chars=15),
@@ -84,12 +84,8 @@ def global_setup_ft():
             email=faker.fake.text(max_nb_chars=15),
             study=study
         )
-
-    # Create study's collaborators
-    study = Study.objects.get(experiment=Experiment.objects.first())
-    for i in range(0, 3):
-        Collaborator.objects.create(name='Collaborator ' + str(i+1),
-                                    team='Team ' + str(i+1),
+        Collaborator.objects.create(name=faker.fake.text(max_nb_chars=15),
+                                    team=faker.fake.text(max_nb_chars=15),
                                     coordinator=False, study=study)
 
 

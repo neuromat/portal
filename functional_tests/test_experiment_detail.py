@@ -7,7 +7,7 @@ from functional_tests.base import FunctionalTest
 class ExperimentDetailTest(FunctionalTest):
 
     def test_can_view_detail_page(self):
-        experiment = Experiment.objects.first()
+        experiment = Experiment.objects.filter(status=Experiment.APPROVED).first()
         self.browser.get(self.live_server_url)
 
         # The new visitor is in home page and see the list of experiments.

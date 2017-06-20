@@ -5,7 +5,7 @@ from functional_tests.base import FunctionalTest
 class NewVisitorTest(FunctionalTest):
 
     def test_can_view_initial_page(self):
-        experiment = Experiment.objects.first()
+        experiment = Experiment.objects.filter(status=Experiment.APPROVED).first()
 
         # A neuroscience researcher discovered a new site that
         # provides a data base with neuroscience experiments.
