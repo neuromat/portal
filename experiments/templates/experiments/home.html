@@ -23,20 +23,26 @@
 {% endblock %}
 
 {% block script %}
-    <script>  {# this script is related to experiment/list_trustee.html #}
+    <script> {# this script is related to experiment/list_trustee.html #}
     /**
      * Receives experiment status and statuses in json encoding,
      * and construct html with input radios in a form.
      */
     function statuses_radio_options(experiment, statuses) {
+        if ($.isEmptyObject(statuses)) {
+            return '<p class="alert">You can\'t change an experiment status' +
+                ' that has already been approved or rejected.</p>';
+        }
         var html = '<form action="/experiments/' + experiment.id + '/change_status" ' +
             'id="id_status_choices" method="POST">';
         html += "{% csrf_token %}";
-        for (var i = 0; i < statuses.length; i++) {
-            html += ('<input type="radio" name="status" value="' +
-            statuses[i][0] + '"' +
-            (experiment.status === statuses[i][0] ? 'checked' : '') + '>' +
-            statuses[i][1] + '<br>');
+        for (var key in statuses) {
+            if (statuses.hasOwnProperty(key)) {
+                html += ('<input type="radio" name="status" value="' +
+                key + '"' +
+                (experiment.status === key ? 'checked' : '') + '>' +
+                statuses[key] + '<br>');
+            }
         }
         html += '<br>';
         html += '<div class=modal-footer>';
@@ -61,7 +67,6 @@
             modal.find('.modal-title').text('Change status for experiment ' +
                 '"' + experiment.title + '"');
             var modal_body = modal.find('.modal-body');
-            statuses = JSON.parse(statuses);
             var html = statuses_radio_options(experiment, statuses);
             modal_body.text('Please select an option:');
             modal_body.append(html);

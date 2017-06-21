@@ -3,27 +3,13 @@ import time
 from selenium.webdriver.common.keys import Keys
 
 from experiments.models import Experiment
-from functional_tests.base import FunctionalTest
+from functional_tests.base import FunctionalTestTrustee
 
 
-class TrusteeLoggedInTest(FunctionalTest):
+class TrusteeLoggedInTest(FunctionalTestTrustee):
 
     def test_trustee_can_view_initial_page(self):
         experiment = Experiment.objects.first()
-
-        # Trustee Claudia visit the home page and click in "Log In"
-        self.browser.get(self.live_server_url)
-        self.browser.find_element_by_link_text('Log In').click()
-        time.sleep(1)
-
-        # The trustee Claudia log in Portal
-        inputbox_username = self.browser.find_element_by_id('id_username')
-        inputbox_username.send_keys('claudia')
-        inputbox_password = self.browser.find_element_by_id('id_password')
-        inputbox_password.send_keys('passwd')
-        login_button = self.browser.find_element_by_id('id_submit')
-        login_button.send_keys(Keys.ENTER)
-        time.sleep(1)
 
         # She is redirected to home page but now logged in.
         # She sees a list of experiments that has to be analysed and
@@ -41,6 +27,7 @@ class TrusteeLoggedInTest(FunctionalTest):
                 experiment.get_status_display() for row in rows)
         )
 
+    def test_trustee_can_change_experiment_status(self):
         # Statuses table cells are links. She clicks in an experiment status
         # that has to be analysed and see a modal that display the modal
         # title that shows experiment title in quotes.
@@ -77,5 +64,50 @@ class TrusteeLoggedInTest(FunctionalTest):
             'tbody').find_elements_by_tag_name('tr')
         any(row.find_elements_by_tag_name('td')[0].text ==
             experiment.title for row in rows)
+
+    def test_trustee_when_viewing_stauses_to_change_cant_see_only_status_allowed(self):
+        # She clicks in an experiment status that has to be analysed and see a
+        # modal that display the modal title that shows experiment title in quotes.
+        self.browser.find_element_by_link_text('To be analysed').click()
+        time.sleep(1)
+        # She sees a modal with "To be analysed" and "Under analysis" status options
+        form_status_choices = self.browser.find_element_by_id(
+            'id_status_choices')
+        statuses = dict(Experiment.STATUS_OPTIONS)
+        self.assertIn(statuses[Experiment.TO_BE_ANALYSED], form_status_choices.text)
+        self.assertIn(statuses[Experiment.UNDER_ANALYSIS], form_status_choices.text)
+        # She press ESC to quit modal and clicks in an experiment status that is under
+        # analysis. Now a modal with all status options but "Receiving" appears
+        form_status_choices.send_keys(Keys.ESCAPE)
+        time.sleep(1)
+        self.browser.find_element_by_link_text('Under analysis').click()
+        time.sleep(1)
+        form_status_choices = self.browser.find_element_by_id(
+            'id_status_choices')
+        statuses = dict(Experiment.STATUS_OPTIONS)
+        self.assertIn(statuses[Experiment.TO_BE_ANALYSED], form_status_choices.text)
+        self.assertIn(statuses[Experiment.UNDER_ANALYSIS], form_status_choices.text)
+        self.assertIn(statuses[Experiment.APPROVED], form_status_choices.text)
+        self.assertIn(statuses[Experiment.NOT_APPROVED], form_status_choices.text)
+        # She press ESC to quit modal and clicks in an experiment status that is approved.
+        # Now a modal telling that she cannot change status appears.
+        form_status_choices.send_keys(Keys.ESCAPE)
+        time.sleep(1)
+        self.browser.find_element_by_link_text('Approved').click()
+        time.sleep(1)
+        modal_body = self.browser.find_element_by_id('status_body').text
+        self.assertIn('You can\'t change an experiment status' +
+                      ' that has already been approved or rejected.', modal_body)
+
+        # Finally, she press ESC to quit modal and clicks in an experiment
+        # status that is NOT approved. Now a modal telling that she cannot
+        # change status appears.
+        self.browser.find_element_by_id('status_body').send_keys(Keys.ESCAPE)
+        time.sleep(1)
+        self.browser.find_element_by_link_text('Not approved').click()
+        time.sleep(1)
+        modal_body = self.browser.find_element_by_id('status_body').text
+        self.assertIn('You can\'t change an experiment status' +
+                      ' that has already been approved or rejected.', modal_body)
 
         self.fail('Finish this test!')
