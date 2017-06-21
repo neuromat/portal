@@ -30,28 +30,33 @@
      */
     function statuses_radio_options(experiment, statuses) {
         if ($.isEmptyObject(statuses)) {
-            return '<p class="alert">You can\'t change an experiment status' +
-                ' that has already been approved or rejected.</p>';
+            return `
+                <p class="alert">You can\'t change an experiment status that has already been approved or rejected.</p>
+            `;
         }
-        var html = '<form action="/experiments/' + experiment.id + '/change_status" ' +
-            'id="id_status_choices" method="POST">';
-        html += "{% csrf_token %}";
+        // Start html form
+        var html = `
+            <form action="/experiments/${experiment.id}/change_status" id="id_status_choices" method="POST">
+            {% csrf_token %}
+        `;
+        // Buid input radios with experiment.status === key checked
         for (var key in statuses) {
             if (statuses.hasOwnProperty(key)) {
-                html += ('<input type="radio" name="status" value="' +
-                key + '"' +
-                (experiment.status === key ? 'checked' : '') + '>' +
-                statuses[key] + '<br>');
+                var checked = experiment.status === key ? 'checked' : '';
+                html += `
+                    <input type="radio" name="status" value=${key} ${checked}>${statuses[key]} <br>
+                `;
             }
         }
-        html += '<br>';
-        html += '<div class=modal-footer>';
-        html += '<button type="button" class="btn btn-default" ' +
-            'data-dismiss="modal">Close</button>';
-        html += '<input id="id_submit" type="submit" value="Save changes" ' +
-            'class="btn ' + 'btn-primary">';
-        html += '</form>';
-        html += '</div>';
+        // Finish html form
+        html += `
+                <br>
+                <div class=modal-footer>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <input id="id_submit" type="submit" value="Save changes" class="btn btn-primary">
+                </div>
+            </form>
+         `;
         return html;
 
     }
