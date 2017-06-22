@@ -23,10 +23,13 @@
 {% endblock %}
 
 {% block script %}
-    <script> {# this script is related to experiment/list_trustee.html #}
+    {##}
+    {## Script related to experiments/list_trustee.html ##}
+    {##}
+    <script>
     /**
      * Receives experiment status and statuses in json encoding,
-     * and construct html with input radios in a form.
+     * and construct html with input radios in a form inside modal.
      */
     function statuses_radio_options(experiment, statuses) {
         if ($.isEmptyObject(statuses)) {
@@ -77,4 +80,10 @@
         modal_body.append(html);
     })
     </script>
+
+    {##}
+    {## Script related to experiments/top.html #}
+    {##}
+    {% load static %}
+    <script src="{% static 'js/new_experiments_received.js' %}"></script>
 {% endblock %}

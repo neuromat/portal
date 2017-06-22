@@ -111,13 +111,13 @@ class TrusteeTest(FunctionalTestTrustee):
                       ' that has already been approved or rejected.', modal_body)
 
     def test_trustee_can_see_experiments_to_be_analysed_sign(self):
-        new_experiments = self.browser.find_element_by_class_name('fa-bell')
-        # TODO: test css - when there are experiments to be analysed assert
-        # if fa-bell has the badger indicating number of experiments to be analysed
         experiments_to_be_analysed = Experiment.objects.filter(status=Experiment.TO_BE_ANALYSED)
+        new_experiments = self.browser.find_element_by_id('new_experiments')
+        # TODO: we are using a bad technique - badger is greater or equal zero or -1
+        badger = new_experiments.get_attribute('class').find('badger')
         if experiments_to_be_analysed:
-            self.assertIn('link', new_experiments.text)
+            self.assertLess(-1, badger)
         else:
-            self.assertNotIn('link', new_experiments.text)
+            self.assertLess(badger, 0)
 
         self.fail('Finish this test!')

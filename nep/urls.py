@@ -20,5 +20,8 @@ urlpatterns = [
     url(r'^experiments/(?P<experiment_id>[0-9]+)/change_status',
         views.change_status, name='change-status'),
     url(r'^media/(?P<path>.*)$', serve,
-        {'document_root': settings.MEDIA_ROOT, })
+        {'document_root': settings.MEDIA_ROOT, }),
+
+    # Ajax
+    url(r'^experiments/to_be_analysed/count/$', views.ajax_to_be_analysed, name='ajax-to_be_analysed')
 ]

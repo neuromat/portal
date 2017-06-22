@@ -57,8 +57,13 @@
 {% endblock %}
 
 {% block script %}
-    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-    <script type="text/javascript">
+    {##}
+    {## Script related to experiments/top.html #}
+    {##}
+    {% load static %}
+    <script src="{% static 'js/new_experiments_received.js' %}"></script>
+    <script src="https://www.gstatic.com/charts/loader.js"></script>
+    <script>
 
         google.charts.load('current', {packages: ['corechart', 'bar']});
         google.charts.setOnLoadCallback(drawPieChart);

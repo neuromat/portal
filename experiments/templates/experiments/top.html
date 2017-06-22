@@ -8,7 +8,7 @@
             {% else %}
                 Welcome, {{ user.username }}
             {% endif %}
-            <i id="new_experiments" class="fa fa-bell fa-2x icon-grey badger"></i>&nbsp;&nbsp;
+            <i id="new_experiments" class="fa fa-bell fa-2x icon-grey"></i>&nbsp;&nbsp;
             <a href="{% url 'logout' %}">Log Out</a>
         {% else %}
             <a href="{% url 'login' %}">Log In</a>
