@@ -6,7 +6,7 @@ from experiments.models import Experiment
 from functional_tests.base import FunctionalTestTrustee
 
 
-class TrusteeLoggedInTest(FunctionalTestTrustee):
+class TrusteeTest(FunctionalTestTrustee):
 
     def test_trustee_can_view_initial_page(self):
         experiment = Experiment.objects.first()
@@ -65,7 +65,7 @@ class TrusteeLoggedInTest(FunctionalTestTrustee):
         any(row.find_elements_by_tag_name('td')[0].text ==
             experiment.title for row in rows)
 
-    def test_trustee_when_viewing_stauses_to_change_cant_see_only_status_allowed(self):
+    def test_trustee_when_viewing_stauses_to_change_can_see_only_status_allowed_to_change(self):
         # She clicks in an experiment status that has to be analysed and see a
         # modal that display the modal title that shows experiment title in quotes.
         self.browser.find_element_by_link_text('To be analysed').click()
@@ -109,5 +109,15 @@ class TrusteeLoggedInTest(FunctionalTestTrustee):
         modal_body = self.browser.find_element_by_id('status_body').text
         self.assertIn('You can\'t change an experiment status' +
                       ' that has already been approved or rejected.', modal_body)
+
+    def test_trustee_can_see_experiments_to_be_analysed_sign(self):
+        new_experiments = self.browser.find_element_by_class_name('fa-bell')
+        # TODO: test css - when there are experiments to be analysed assert
+        # if fa-bell has the badger indicating number of experiments to be analysed
+        experiments_to_be_analysed = Experiment.objects.filter(status=Experiment.TO_BE_ANALYSED)
+        if experiments_to_be_analysed:
+            self.assertIn('link', new_experiments.text)
+        else:
+            self.assertNotIn('link', new_experiments.text)
 
         self.fail('Finish this test!')
