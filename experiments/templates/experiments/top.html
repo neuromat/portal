@@ -8,12 +8,12 @@
             {% else %}
                 Welcome, {{ user.username }}
             {% endif %}
-            &nbsp;&nbsp;<a href="{% url 'logout' %}">Log Out</a>
+            <i id="new_experiments" class="fa fa-bell fa-2x icon-grey"></i>&nbsp;&nbsp;
+            <a href="{% url 'logout' %}">Log Out</a>
         {% else %}
             <a href="{% url 'login' %}">Log In</a>
         {% endif %}
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-        <span class="top-language">English</span> <i class="glyphicon
-        glyphicon-chevron-down"></i>
+        <span class="top-language">English</span> <i class="glyphicon glyphicon-chevron-down"></i>
     </div>
 </section>

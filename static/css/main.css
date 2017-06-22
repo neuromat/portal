@@ -24,6 +24,28 @@ a:hover {
   color: #a9b2b9;
   text-decoration: none;
 }
+*.icon-grey {
+  color: grey;
+}
+i#new_experiments {
+  width: 50px;
+  text-align: center;
+  vertical-align: middle;
+  position: relative;
+}
+.badger:after {
+    position: absolute;
+    background: red;
+    height: 2rem;
+    top: -0.2rem;
+    right: 0.2rem;
+    width: 2rem;
+    text-align: center;
+    line-height: 2rem;
+    font-size: 1rem;
+    border-radius: 50%;
+    color: white;
+}
 
 /*
   ========================================

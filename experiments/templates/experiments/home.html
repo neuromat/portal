@@ -23,10 +23,13 @@
 {% endblock %}
 
 {% block script %}
-    <script> {# this script is related to experiment/list_trustee.html #}
+    {##}
+    {## Script related to experiments/list_trustee.html ##}
+    {##}
+    <script>
     /**
      * Receives experiment status and statuses in json encoding,
-     * and construct html with input radios in a form.
+     * and construct html with input radios in a form inside modal.
      */
     function statuses_radio_options(experiment, statuses) {
         if ($.isEmptyObject(statuses)) {
@@ -61,20 +64,26 @@
 
     }
     $('#status_modal').on('show.bs.modal', function (event) {
-            var link = $(event.relatedTarget);
-            var experiment = {
-                id: link.data('experiment_id'),
-                title: link.data('experiment_title'),
-                status: link.data('experiment_status')
-            };
-            var statuses = link.data('experiment_statuses');
-            var modal = $(this);
-            modal.find('.modal-title').text('Change status for experiment ' +
-                '"' + experiment.title + '"');
-            var modal_body = modal.find('.modal-body');
-            var html = statuses_radio_options(experiment, statuses);
-            modal_body.text('Please select an option:');
-            modal_body.append(html);
-        })
+        var link = $(event.relatedTarget);
+        var experiment = {
+            id: link.data('experiment_id'),
+            title: link.data('experiment_title'),
+            status: link.data('experiment_status')
+        };
+        var statuses = link.data('experiment_statuses');
+        var modal = $(this);
+        modal.find('.modal-title').text('Change status for experiment ' +
+            '"' + experiment.title + '"');
+        var modal_body = modal.find('.modal-body');
+        var html = statuses_radio_options(experiment, statuses);
+        modal_body.text('Please select an option:');
+        modal_body.append(html);
+    })
     </script>
+
+    {##}
+    {## Script related to experiments/top.html #}
+    {##}
+    {% load static %}
+    <script src="{% static 'js/new_experiments_received.js' %}"></script>
 {% endblock %}

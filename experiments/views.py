@@ -1,4 +1,4 @@
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import render
 from django.db.models import Max, Q
 
@@ -76,3 +76,9 @@ def change_status(request, experiment_id):
     experiment.save()
 
     return HttpResponseRedirect('/')
+
+
+def ajax_to_be_analysed(request):
+    to_be_analysed = Experiment.objects.filter(status=Experiment.TO_BE_ANALYSED).count()
+
+    return HttpResponse(to_be_analysed, content_type='application/json')
