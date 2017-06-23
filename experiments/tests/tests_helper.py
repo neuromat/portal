@@ -2,34 +2,52 @@ from datetime import datetime
 from random import randint, choice
 
 from django.contrib.auth import models
-from djipsum.faker import FakerModel
+from faker import Factory
 
 from experiments.models import Experiment, Study, Group, Researcher, \
-    Collaborator
+    Collaborator, Participant, Gender
 
 
-def create_experiment_study_group(qtty, owner, status):
-    faker = FakerModel(app='experiments', model='Experiment')
+def create_experiment_groups(qtty, experiment):
+    """
+    :param qtty: Number of groups
+    :param experiment: Experiment model instance
+    """
+    fake = Factory.create()
 
-    for i in range(0, qtty):
+    for i in range(qtty):
+        Group.objects.create(
+            title=fake.text(max_nb_chars=15),
+            description=fake.text(max_nb_chars=150),
+            experiment=experiment
+        )
+
+
+def create_experiment_and_study(qtty, owner, status):
+    """
+    :param qtty: Number of experiments
+    :param owner: Owner of experiment - User instance model
+    :param status: Expeeriment status
+    """
+    fake = Factory.create()
+
+
+    for i in range(qtty):
         experiment = Experiment.objects.create(
-            title=faker.fake.text(max_nb_chars=15),
-            description=faker.fake.text(max_nb_chars=200),
-            nes_id=randint(0, 10000),  # TODO: guarantee that this won't genetates constraint violaton (nes_id, owner_id)
+            title=fake.text(max_nb_chars=15),
+            description=fake.text(max_nb_chars=200),
+            nes_id=randint(1, 10000),  # TODO: guarantee that this won't
+            # genetates constraint violaton (nes_id, owner_id)
             owner=owner, version=1,
             sent_date=datetime.utcnow(),
             status=status
         )
         Study.objects.create(
-            title=faker.fake.text(max_nb_chars=15),
-            description=faker.fake.text(max_nb_chars=200),
+            title=fake.text(max_nb_chars=15),
+            description=fake.text(max_nb_chars=200),
             start_date=datetime.utcnow(), experiment=experiment
         )
-        Group.objects.create(
-            title=faker.fake.text(max_nb_chars=15),
-            description=faker.fake.text(max_nb_chars=150),
-            experiment=experiment
-        )
+        create_experiment_groups(randint(2, 3), experiment)
 
 
 def create_trustee_users():
@@ -49,17 +67,35 @@ def create_trustee_users():
 
 
 def create_researchers():
-    faker = FakerModel(app='experiments', model='Experiment')
+    fake = Factory.create()
 
     for study in Study.objects.all():
         Researcher.objects.create(
-            name=faker.fake.text(max_nb_chars=15),
-            email=faker.fake.text(max_nb_chars=15),
+            name=fake.text(max_nb_chars=15),
+            email=fake.text(max_nb_chars=15),
             study=study
         )
-        Collaborator.objects.create(name=faker.fake.text(max_nb_chars=15),
-                                    team=faker.fake.text(max_nb_chars=15),
+        Collaborator.objects.create(name=fake.text(max_nb_chars=15),
+                                    team=fake.text(max_nb_chars=15),
                                     coordinator=False, study=study)
+
+
+def create_participants(qtty, group, gender):
+    """
+    :param gender:
+    :param qtty:
+    :param group: Group model instance
+    """
+    fake = Factory.create()
+
+    for j in range(qtty):
+        gender1 = Gender.objects.first()
+        gender2 = Gender.objects.last()
+        Participant.objects.create(
+            code=fake.ssn(), age=randint(18, 80),
+            gender=gender,
+            group=group
+        )
 
 
 def global_setup_ft():
@@ -78,12 +114,24 @@ def global_setup_ft():
 
     # Create 3 experiments for owner 1 and 2 for owner 2, and studies,
     # and groups associated
-    create_experiment_study_group(2, choice([owner1, owner2]), Experiment.TO_BE_ANALYSED)
-    create_experiment_study_group(1, choice([owner1, owner2]), Experiment.UNDER_ANALYSIS)
-    create_experiment_study_group(1, choice([owner1, owner2]), Experiment.APPROVED)
-    create_experiment_study_group(1, choice([owner1, owner2]), Experiment.NOT_APPROVED)
+    create_experiment_and_study(2, choice([owner1, owner2]), Experiment.TO_BE_ANALYSED)
+    create_experiment_and_study(1, choice([owner1, owner2]), Experiment.UNDER_ANALYSIS)
+    create_experiment_and_study(1, choice([owner1, owner2]), Experiment.APPROVED)
+    create_experiment_and_study(1, choice([owner1, owner2]), Experiment.NOT_APPROVED)
 
-    # Create researchers associated to studies created in create_experiment_study_group method
+    # create genders
+    gender1 = Gender.objects.create(name='male')
+    gender2 = Gender.objects.create(name='female')
+
+    # Create randint(3, 7) participants for each group (requires create
+    # groups before)
+    for group in Group.objects.all():
+        create_participants(
+            randint(3, 7), group,
+            gender1 if randint(1, 2) == 1 else gender2)
+
+    # Create researchers associated to studies created in
+    # create_experiment_and_study method
     # Requires running create_experiment_study_group before
     create_researchers()
 

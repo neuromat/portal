@@ -80,7 +80,7 @@ for study in Study.objects.all():
 
 # Create study's collaborators
 study = Study.objects.get(experiment=Experiment.objects.first())
-for i in range(1, 3):
+for i in range(2):
     Collaborator.objects.create(name=fake.name(),
                                 team=fake.company(),
                                 coordinator=False, study=study)
@@ -110,11 +110,11 @@ for group in Group.objects.all():
     exp_pro.image = None
     exp_pro.save()
 
-    for i in range(0, 2):
+    for i in range(2):
         Participant.objects.create(group=group, code=fake.ssn(),
-                                   gender=female, age=randint(5, 65))
+                                   gender=female, age=randint(18, 80))
     Participant.objects.create(group=group, code=fake.ssn(), gender=male,
-                               age=randint(5, 65))
+                               age=randint(18, 80))
 
 
 # TODO: why is necessary to keep two blank lines for script run until the end?

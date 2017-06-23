@@ -7,15 +7,15 @@
 {% block content %}
     <section class="container toggable-tabs">
         <ul class="nav nav-tabs" role="tablist">
-            <li role="presentation" class="active"><a href="#statistics" role="tab" data-toggle="tab">Statistics</a></li>
-            <li role="presentation"><a href="#groups" role="tab" data-toggle="tab">Groups</a></li>
-            <li role="presentation"><a href="#settings" role="tab" data-toggle="tab">Settings</a></li>
+            <li role="presentation" class="active"><a href="#statistics_tab" role="tab" data-toggle="tab">Statistics</a></li>
+            <li role="presentation"><a href="#groups_tab" role="tab" data-toggle="tab">Groups</a></li>
+            <li role="presentation"><a href="#settings_tab" role="tab" data-toggle="tab">Settings</a></li>
         </ul>
 
         <!-- Tab panes -->
-        <div class="tab-content">
+        <div class="tab-content portal-tab-content">
 
-            <div role="tabpanel" class="tab-pane active" id="statistics">
+            <div role="tabpanel" class="tab-pane active" id="statistics_tab">
                 <div class="row">
                     <div class="col-md-6">
                         <div id="gender-chart" style="height: 300px;"></div>
@@ -26,24 +26,25 @@
                 </div>
             </div>
 
-            <div role="tabpanel" class="tab-pane" id="groups">
+            <div role="tabpanel" class="tab-pane groups-tab" id="groups_tab">
                 {% for group in experiment.groups.all %}
-                    <div class="panel panel-default">
+                    <div class="panel panel-default panel-groups">
                         <div class="row">
-                            <div class="col-md-2">
+                            <div class="col-md-2 prot-exp-image">
                                 {% if group.experimental_protocol.image %}
                                     <a><img src="/media/{{ group.experimental_protocol.image }}" style="width: 100%" /></a>
                                 {% endif %}
                             </div>
                             <div class="col-md-10">
-                                <h5>{{ group.title }}</h5>
-                                <h6>{{ group.description }}</h6>
+                                <strong>{{ group.title }}</strong><br>
+                                {{ group.participants.all.count }}
+                                participants<br><br>
+                                <p>{{ group.description }}</p>
                                 {% if group.inclusion_criteria.all %}
-                                    <h6>Inclusion criterias:<br/>
+                                    <h4>Inclusion criterias:</h4><br>
                                         {% for criteria in group.inclusion_criteria.all %}
                                             {{ criteria.code }} - {{ criteria.description }}{% if not forloop.last %},{% endif %}
                                         {% endfor %}
-                                    </h6>
                                 {% endif %}
                             </div>
                         </div>
@@ -51,7 +52,8 @@
                 {% endfor %}
             </div>
 
-            <div role="tabpanel" class="tab-pane" id="settings">Settings</div>
+            <div role="tabpanel" class="tab-pane"
+                 id="settings_tab">Settings</div>
         </div>
     </section>
 {% endblock %}

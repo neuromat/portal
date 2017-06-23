@@ -1,15 +1,14 @@
-import io
+import json
+from datetime import datetime
 
-from django.urls import reverse
 from django.contrib.auth.models import User
+from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase
-from datetime import datetime
-import json
 
+from experiments.helpers import generate_image_file
 from experiments.models import Experiment, Study, Group, Researcher, \
     Collaborator
-from experiments.tests.helpers import generate_image_file
 from experiments.tests.tests_helper import global_setup_ut, apply_setup
 
 
