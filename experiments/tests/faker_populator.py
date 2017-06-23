@@ -2,11 +2,13 @@ from datetime import datetime
 from random import randint
 
 from django.contrib.auth import models
+from django.core.files.base import ContentFile
 from faker import Factory
 from subprocess import call
 
 # TODO: when executing from bash command line, final line identifier breaks
 # imports. We are kepping in Collaborator in same line
+from experiments.tests.helpers import generate_image_file
 from nep.local_settings import BASE_DIR
 from experiments.models import Experiment, Study, Group, Researcher
 from experiments.models import Collaborator, Gender, ExperimentalProtocol
@@ -100,9 +102,21 @@ female = Gender.objects.create(name='Female')
 
 # Create groups' experimental protocols and participants
 for group in Group.objects.all():
-    # TODO: fix this faker generator to provides correct file path and name
-    ExperimentalProtocol.objects.create(group=group, image=fake.file_path(),
-                                        textual_description=fake.text())
+    ExperimentalProtocol.objects.create(
+        group=group,
+        textual_description=fake.text()
+    )
+    for exp_pro in ExperimentalProtocol.objects.all():
+        image_file = generate_image_file(
+            randint(100, 500), randint(300, 700), fake.word() + '.jpg')
+        exp_pro.image.save(image_file.name, image_file)
+        exp_pro.save()
+    # Update image of last experimental protocol with a null image to test
+    # displaying default image: "No image"
+    exp_pro = ExperimentalProtocol.objects.last()
+    exp_pro.image = None
+    exp_pro.save()
+
     for i in range(0, 2):
         Participant.objects.create(group=group, code=fake.ssn(),
                                    gender=female, age=randint(5, 65))
