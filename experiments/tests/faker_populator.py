@@ -1,18 +1,19 @@
 from datetime import datetime
 from random import randint
-
-from django.contrib.auth import models
-from django.core.files.base import ContentFile
-from faker import Factory
 from subprocess import call
+
+from __builtin__ import raw_input
+from django.contrib.auth import models
+from faker import Factory
 
 # TODO: when executing from bash command line, final line identifier breaks
 # imports. We are kepping in Collaborator in same line
-from experiments.tests.helpers import generate_image_file
-from nep.local_settings import BASE_DIR
-from experiments.models import Experiment, Study, Group, Researcher
+from experiments.helpers import generate_image_file
 from experiments.models import Collaborator, Gender, ExperimentalProtocol
+from experiments.models import Experiment, Study, Group, Researcher
 from experiments.models import Participant
+from experiments.tests.tests_helper import create_experiment_groups
+from nep.local_settings import BASE_DIR
 
 
 # Clear database and run migrate
@@ -54,11 +55,7 @@ for i in range(1, 4):
         description=fake.text(),
         start_date=datetime.utcnow(), experiment=experiment_owner1
     )
-    Group.objects.create(
-        title=fake.name(),
-        description=fake.text(),
-        experiment=experiment_owner1
-    )
+    create_experiment_groups(randint(1, 3), experiment_owner1)
 
 for i in range(4, 6):
     experiment_owner2 = Experiment.objects.create(
@@ -74,11 +71,7 @@ for i in range(4, 6):
         description=fake.text(),
         start_date=datetime.utcnow(), experiment=experiment_owner2
     )
-    Group.objects.create(
-        title=fake.name(),
-        description=fake.text(),
-        experiment=experiment_owner2
-    )
+    create_experiment_groups(randint(1, 3), experiment_owner2)
 
 # Create researchers associated to studies created above
 for study in Study.objects.all():
