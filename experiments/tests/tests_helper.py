@@ -4,8 +4,9 @@ from random import randint, choice
 from django.contrib.auth import models
 from faker import Factory
 
+from experiments.helpers import generate_image_file
 from experiments.models import Experiment, Study, Group, Researcher, \
-    Collaborator, Participant, Gender
+    Collaborator, Participant, Gender, ExperimentalProtocol
 
 
 def create_experiment_groups(qtty, experiment):
@@ -30,7 +31,6 @@ def create_experiment_and_study(qtty, owner, status):
     :param status: Expeeriment status
     """
     fake = Factory.create()
-
 
     for i in range(qtty):
         experiment = Experiment.objects.create(
@@ -89,13 +89,33 @@ def create_participants(qtty, group, gender):
     fake = Factory.create()
 
     for j in range(qtty):
-        gender1 = Gender.objects.first()
-        gender2 = Gender.objects.last()
         Participant.objects.create(
             code=fake.ssn(), age=randint(18, 80),
             gender=gender,
             group=group
         )
+
+
+def create_experiment_protocol(group):
+    """
+    :type group: Group model instance
+    """
+    fake = Factory.create()
+
+    ExperimentalProtocol.objects.create(
+        group=group,
+        textual_description=fake.text()
+    )
+    for exp_pro in ExperimentalProtocol.objects.all():
+        image_file = generate_image_file(
+            randint(100, 500), randint(300, 700), fake.word() + '.jpg')
+        exp_pro.image.save(image_file.name, image_file)
+        exp_pro.save()
+        # Update image of last experimental protocol with a null image to test
+        # displaying default image: "No image"
+    exp_pro = ExperimentalProtocol.objects.last()
+    exp_pro.image = None
+    exp_pro.save()
 
 
 def global_setup_ft():
@@ -126,6 +146,7 @@ def global_setup_ft():
     # Create randint(3, 7) participants for each group (requires create
     # groups before)
     for group in Group.objects.all():
+        create_experiment_protocol(group)
         create_participants(
             randint(3, 7), group,
             gender1 if randint(1, 2) == 1 else gender2)

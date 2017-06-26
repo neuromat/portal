@@ -98,21 +98,22 @@ for group in Group.objects.all():
         group=group,
         textual_description=fake.text()
     )
-    for exp_pro in ExperimentalProtocol.objects.all():
-        image_file = generate_image_file(
-            randint(100, 500), randint(300, 700), fake.word() + '.jpg')
-        exp_pro.image.save(image_file.name, image_file)
-        exp_pro.save()
-    # Update image of last experimental protocol with a null image to test
-    # displaying default image: "No image"
-    exp_pro = ExperimentalProtocol.objects.last()
-    exp_pro.image = None
-    exp_pro.save()
     for i in range(2):
         Participant.objects.create(group=group, code=fake.ssn(),
                                    gender=female, age=randint(18, 80))
     Participant.objects.create(group=group, code=fake.ssn(), gender=male,
                                age=randint(18, 80))
+
+for exp_pro in ExperimentalProtocol.objects.all():
+    image_file = generate_image_file(
+        randint(100, 500), randint(300, 700), fake.word() + '.jpg')
+    exp_pro.image.save(image_file.name, image_file)
+    exp_pro.save()
+    # Update image of last experimental protocol with a null image to test
+    # displaying default image: "No image"
+exp_pro = ExperimentalProtocol.objects.last()
+exp_pro.image = None
+exp_pro.save()
 
 
 # TODO: why is necessary to keep two blank lines for script run until the end?
