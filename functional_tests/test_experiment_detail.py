@@ -133,5 +133,20 @@ class ExperimentDetailTest(FunctionalTest):
             self.assertIn(group.description, groups_tab_content)
             self.assertIn(str(group.participants.all().count()) +
                           ' participants', groups_tab_content)
+        # She notices that the protocol experiment image is a link. When she
+        # clicks on it, a modal is displayed with the full image.
+        self.browser.find_element_by_id('protocol_image').click()
+        time.sleep(1)
+        modal = self.browser.find_element_by_id('protocol_image_full')
+        modal_title = self.browser.find_element_by_class_name(
+            'modal-title').text
+        self.assertIn(modal_title, 'Graphical representation')
+        protocol_image_path = modal.find_element_by_tag_name(
+            'img').get_attribute('src')
+        self.assertTrue(
+            '/media/' + str(experiment.groups.first()
+                            .experimental_protocol.image),
+            protocol_image_path
+        )
 
         self.fail('Finish this test!')

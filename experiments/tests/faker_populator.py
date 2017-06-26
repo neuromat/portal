@@ -111,6 +111,7 @@ for exp_pro in ExperimentalProtocol.objects.all():
     exp_pro.save()
     # Update image of last experimental protocol with a null image to test
     # displaying default image: "No image"
+
 exp_pro = ExperimentalProtocol.objects.last()
 exp_pro.image = None
 exp_pro.save()

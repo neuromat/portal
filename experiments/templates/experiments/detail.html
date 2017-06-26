@@ -32,7 +32,11 @@
                         <div class="row">
                             <div class="col-md-2 prot-exp-image">
                                 {% if group.experimental_protocol.image %}
-                                    <a><img src="/media/{{ group.experimental_protocol.image }}" style="width: 100%" /></a>
+                                    <a id="protocol_image" href="#"
+                                       data-toggle="modal"
+                                       data-target="#protocol_image_full"
+                                       data-image_path="/media/{{ group.experimental_protocol.image }}">
+                                        <img src="/media/{{ group.experimental_protocol.image }}"/></a>
                                 {% endif %}
                             </div>
                             <div class="col-md-10">
@@ -42,9 +46,9 @@
                                 <p>{{ group.description }}</p>
                                 {% if group.inclusion_criteria.all %}
                                     <h4>Inclusion criterias:</h4><br>
-                                        {% for criteria in group.inclusion_criteria.all %}
-                                            {{ criteria.code }} - {{ criteria.description }}{% if not forloop.last %},{% endif %}
-                                        {% endfor %}
+                                    {% for criteria in group.inclusion_criteria.all %}
+                                        {{ criteria.code }} - {{ criteria.description }}{% if not forloop.last %},{% endif %}
+                                    {% endfor %}
                                 {% endif %}
                             </div>
                         </div>
@@ -55,18 +59,49 @@
             <div role="tabpanel" class="tab-pane"
                  id="settings_tab">Settings</div>
         </div>
+        {# Full protocol experiment image modal #}
+        <div id="protocol_image_full" class="modal fade" tabindex="-1"
+             role="dialog">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title">Graphical representation</h4>
+                    </div>
+                    <div class="modal-body"">
+                        {# see script bellow #}
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    </div>
+                </div><!-- /.modal-content -->
+            </div><!-- /.modal-dialog -->
+        </div><!-- /.modal -->
     </section>
 {% endblock %}
 
 {% block script %}
     {##}
-    {## Script related to experiments/top.html #}
+    {# Script related to experiments/top.html #}
     {##}
     {% load static %}
     <script src="{% static 'js/new_experiments_received.js' %}"></script>
+
+    {# Display protocol experiment full image #}
+    <script>
+        $('#protocol_image_full').on('show.bs.modal', function (event) {
+            let link = $(event.relatedTarget);
+            let image_path = link.data('image_path');
+            $('.modal-body').empty().append(`<img id='full_image'
+            src=${image_path}/>`); // first empty to not repeat image
+        });
+    </script>
+
+    {##}
+    {# Charts in Statistics tab #}
+    {##}
     <script src="https://www.gstatic.com/charts/loader.js"></script>
     <script>
-
         google.charts.load('current', {packages: ['corechart', 'bar']});
         google.charts.setOnLoadCallback(drawPieChart);
         google.charts.setOnLoadCallback(drawColumnChart);
@@ -79,13 +114,12 @@
             }
             var data = google.visualization.arrayToDataTable(data_array);
             var options = {
-              title: 'Gender of the participants',
-              pieHole: 0.3
+                title: 'Gender of the participants',
+                pieHole: 0.3
             };
             var chart = new google.visualization.PieChart(document.getElementById('gender-chart'));
             chart.draw(data, options);
         }
-
         function drawColumnChart() {
             var data_array = [['Age', 'amount' ]];
             var django_data = {{ age_grouping|safe }};
@@ -97,15 +131,14 @@
                 title: 'Age of the participants',
                 legend: { position: 'none' },
                 hAxis: {
-                  title: 'Age (years)'
+                    title: 'Age (years)'
                 },
                 vAxis: {
-                  title: 'Amount'
+                    title: 'Amount'
                 }
             };
             var chart = new google.visualization.ColumnChart(document.getElementById('age-chart'));
             chart.draw(data, options);
         }
-
     </script>
 {% endblock %}
