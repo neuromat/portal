@@ -11,7 +11,7 @@ class FunctionalTest(StaticLiveServerTestCase):
 
     def setUp(self):
         global_setup_ft()
-        self.browser = webdriver.Firefox(firefox_binary='/home/caco/.local/bin/firefox/firefox')
+        self.browser = webdriver.Firefox()
 
     def tearDown(self):
         self.browser.quit()
@@ -22,7 +22,7 @@ class FunctionalTestTrustee(StaticLiveServerTestCase):
 
     def setUp(self):
         global_setup_ft()
-        self.browser = webdriver.Firefox(firefox_binary='/home/caco/.local/bin/firefox/firefox')
+        self.browser = webdriver.Firefox()
 
         # Trustee Claudia visit the home page and click in "Log In"
         self.browser.get(self.live_server_url)

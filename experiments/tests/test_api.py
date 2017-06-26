@@ -1,13 +1,12 @@
-import io
+import json
+from datetime import datetime
 
-from PIL import Image
-from django.urls import reverse
 from django.contrib.auth.models import User
+from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase
-from datetime import datetime
-import json
 
+from experiments.helpers import generate_image_file
 from experiments.models import Experiment, Study, Group, Researcher, \
     Collaborator
 from experiments.tests.tests_helper import global_setup_ut, apply_setup
@@ -19,18 +18,6 @@ class ExperimentAPITest(APITestCase):
 
     def setUp(self):
         global_setup_ut()
-
-    def generate_image_file(self):
-        """
-        Generates an image file to test upload
-        :return: image file
-        """
-        file = io.BytesIO()
-        image = Image.new('RGBA', size=(100, 100), color=(155, 0, 0))
-        image.save(file, 'png')
-        file.name = 'test.png'
-        file.seek(0)
-        return file
 
     def test_get_returns_all_experiments(self):
         owner1 = User.objects.get(username='lab1')
@@ -73,7 +60,7 @@ class ExperimentAPITest(APITestCase):
 
     def test_POSTing_a_new_experiment(self):
         owner = User.objects.get(username='lab1')
-        image_file = self.generate_image_file()
+        image_file = generate_image_file(100, 100, 'test.jpg')
         self.client.login(username=owner.username, password='nep-lab1')
         response = self.client.post(
             self.list_url,

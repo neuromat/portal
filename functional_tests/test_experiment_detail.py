@@ -1,5 +1,7 @@
 import time
 
+from selenium.webdriver.common.keys import Keys
+
 from experiments.models import Experiment
 from functional_tests.base import FunctionalTest
 
@@ -110,6 +112,41 @@ class ExperimentDetailTest(FunctionalTest):
             any(row.find_elements_by_tag_name('td')[2].text ==
                 str(experiment.study.collaborators.first().coordinator)
                 for row in rows)
+        )
+
+        ##
+        # Testing Statistics, Groups and Settings
+        ##
+
+        # She hit ESC to exit Study modal and clicks the Groups tab
+        study_modal = self.browser.find_element_by_id('study_modal')
+        study_modal.send_keys(Keys.ESCAPE)
+        time.sleep(1)
+        self.browser.find_element_by_link_text('Groups').click()
+        # In Groups tab she can see a list of the groups associated with
+        # this experiment with: group's title, description, the protocol
+        # experiment image (if it has one), and the number of participants
+        # in that group.
+        groups_tab_content = self.browser.find_element_by_id('groups_tab').text
+        for group in experiment.groups.all():
+            self.assertIn(group.title, groups_tab_content)
+            self.assertIn(group.description, groups_tab_content)
+            self.assertIn(str(group.participants.all().count()) +
+                          ' participants', groups_tab_content)
+        # She notices that the protocol experiment image is a link. When she
+        # clicks on it, a modal is displayed with the full image.
+        self.browser.find_element_by_id('protocol_image').click()
+        time.sleep(1)
+        modal = self.browser.find_element_by_id('protocol_image_full')
+        modal_title = self.browser.find_element_by_class_name(
+            'modal-title').text
+        self.assertIn(modal_title, 'Graphical representation')
+        protocol_image_path = modal.find_element_by_tag_name(
+            'img').get_attribute('src')
+        self.assertTrue(
+            '/media/' + str(experiment.groups.first()
+                            .experimental_protocol.image),
+            protocol_image_path
         )
 
         self.fail('Finish this test!')

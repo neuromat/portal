@@ -1,16 +1,18 @@
 from datetime import datetime
 from random import randint
+from subprocess import call
 
 from django.contrib.auth import models
 from faker import Factory
-from subprocess import call
 
 # TODO: when executing from bash command line, final line identifier breaks
 # imports. We are kepping in Collaborator in same line
-from nep.local_settings import BASE_DIR
-from experiments.models import Experiment, Study, Group, Researcher
+from experiments.helpers import generate_image_file
 from experiments.models import Collaborator, Gender, ExperimentalProtocol
+from experiments.models import Experiment, Study, Group, Researcher
 from experiments.models import Participant
+from experiments.tests.tests_helper import create_experiment_groups
+from nep.local_settings import BASE_DIR
 
 
 # Clear database and run migrate
@@ -52,11 +54,7 @@ for i in range(1, 4):
         description=fake.text(),
         start_date=datetime.utcnow(), experiment=experiment_owner1
     )
-    Group.objects.create(
-        title=fake.name(),
-        description=fake.text(),
-        experiment=experiment_owner1
-    )
+    create_experiment_groups(randint(1, 3), experiment_owner1)
 
 for i in range(4, 6):
     experiment_owner2 = Experiment.objects.create(
@@ -72,11 +70,7 @@ for i in range(4, 6):
         description=fake.text(),
         start_date=datetime.utcnow(), experiment=experiment_owner2
     )
-    Group.objects.create(
-        title=fake.name(),
-        description=fake.text(),
-        experiment=experiment_owner2
-    )
+    create_experiment_groups(randint(1, 3), experiment_owner2)
 
 # Create researchers associated to studies created above
 for study in Study.objects.all():
@@ -85,7 +79,7 @@ for study in Study.objects.all():
 
 # Create study's collaborators
 study = Study.objects.get(experiment=Experiment.objects.first())
-for i in range(1, 3):
+for i in range(2):
     Collaborator.objects.create(name=fake.name(),
                                 team=fake.company(),
                                 coordinator=False, study=study)
@@ -100,14 +94,27 @@ female = Gender.objects.create(name='Female')
 
 # Create groups' experimental protocols and participants
 for group in Group.objects.all():
-    # TODO: fix this faker generator to provides correct file path and name
-    ExperimentalProtocol.objects.create(group=group, image=fake.file_path(),
-                                        textual_description=fake.text())
-    for i in range(0, 2):
+    ExperimentalProtocol.objects.create(
+        group=group,
+        textual_description=fake.text()
+    )
+    for i in range(2):
         Participant.objects.create(group=group, code=fake.ssn(),
-                                   gender=female, age=randint(5, 65))
+                                   gender=female, age=randint(18, 80))
     Participant.objects.create(group=group, code=fake.ssn(), gender=male,
-                               age=randint(5, 65))
+                               age=randint(18, 80))
+
+for exp_pro in ExperimentalProtocol.objects.all():
+    image_file = generate_image_file(
+        randint(100, 500), randint(300, 700), fake.word() + '.jpg')
+    exp_pro.image.save(image_file.name, image_file)
+    exp_pro.save()
+    # Update image of last experimental protocol with a null image to test
+    # displaying default image: "No image"
+
+exp_pro = ExperimentalProtocol.objects.last()
+exp_pro.image = None
+exp_pro.save()
 
 
 # TODO: why is necessary to keep two blank lines for script run until the end?
