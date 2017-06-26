@@ -2,7 +2,6 @@ from datetime import datetime
 from random import randint
 from subprocess import call
 
-from __builtin__ import raw_input
 from django.contrib.auth import models
 from faker import Factory
 
@@ -109,7 +108,6 @@ for group in Group.objects.all():
     exp_pro = ExperimentalProtocol.objects.last()
     exp_pro.image = None
     exp_pro.save()
-
     for i in range(2):
         Participant.objects.create(group=group, code=fake.ssn(),
                                    gender=female, age=randint(18, 80))
