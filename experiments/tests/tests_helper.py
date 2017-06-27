@@ -132,12 +132,15 @@ def global_setup_ft():
     # Create group Trustees
     create_trustee_users()
 
-    # Create 3 experiments for owner 1 and 2 for owner 2, and studies,
-    # and groups associated
-    create_experiment_and_study(2, choice([owner1, owner2]), Experiment.TO_BE_ANALYSED)
-    create_experiment_and_study(1, choice([owner1, owner2]), Experiment.UNDER_ANALYSIS)
-    create_experiment_and_study(1, choice([owner1, owner2]), Experiment.APPROVED)
-    create_experiment_and_study(1, choice([owner1, owner2]), Experiment.NOT_APPROVED)
+    # Create 5 experiments for 2 owners, randomly, and studies
+    create_experiment_and_study(2, choice([owner1, owner2]),
+                                Experiment.TO_BE_ANALYSED)
+    create_experiment_and_study(1, choice([owner1, owner2]),
+                                Experiment.UNDER_ANALYSIS)
+    create_experiment_and_study(1, choice([owner1, owner2]),
+                                Experiment.APPROVED)
+    create_experiment_and_study(1, choice([owner1, owner2]),
+                                Experiment.NOT_APPROVED)
 
     # create genders
     gender1 = Gender.objects.create(name='male')

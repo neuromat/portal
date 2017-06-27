@@ -26,6 +26,31 @@ class TrusteeTest(FunctionalTestTrustee):
             any(row.find_elements_by_tag_name('td')[4].text ==
                 experiment.get_status_display() for row in rows)
         )
+        # She verifies that the first two experiments are to be analysed,
+        # and one is under analysis. There is one the has been approved and
+        # one more that has not been approved - experiments list template
+        # for trustees displays first experiments to be analysed,
+        # then experiments under analysis and, at last, approved and not
+        # approved ones.
+        i = 0
+        for row in rows:
+            if i < 2:
+                self.assertTrue(
+                    row.find_elements_by_tag_name('td')[4].text ==
+                    Experiment.STATUS_OPTIONS[1][1])  # 'To be analysed'
+            if i == 2:
+                self.assertTrue(
+                    row.find_elements_by_tag_name('td')[4].text ==
+                    Experiment.STATUS_OPTIONS[2][1])  # 'Under analysis'
+            if i == 3:
+                self.assertTrue(
+                    row.find_elements_by_tag_name('td')[4].text ==
+                    Experiment.STATUS_OPTIONS[4][1])  # 'Not approved'
+            if i == 4:
+                self.assertTrue(
+                    row.find_elements_by_tag_name('td')[4].text ==
+                    Experiment.STATUS_OPTIONS[3][1])  # 'Approved'
+            i = i + 1
 
     def test_trustee_can_change_experiment_status(self):
         # Statuses table cells are links. She clicks in an experiment status
