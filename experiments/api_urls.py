@@ -61,6 +61,13 @@ api_study_collaborators_list = api.CollaboratorViewSet.as_view({
     'post': 'create'
 })
 
+# EEG setting
+api_group_eeg_setting_list =\
+    api.EEGSettingViewSet.as_view({
+        'get': 'list',
+        'post': 'create'
+    })
+
 
 # Get rest framework schema view
 schema_view = get_schema_view(title='NEP API')
@@ -94,5 +101,10 @@ urlpatterns = [
     url(r'^collaborators/$', api_collaborators_list,
         name='api_collaborators-list'),
     url(r'^studies/(?P<pk>[0-9]+)/collaborators/$',
-        api_study_collaborators_list, name='api_study_collaborators-list')
+        api_study_collaborators_list, name='api_study_collaborators-list'),
+
+    # EEG setting
+    url(r'^groups/(?P<pk>[0-9]+)/eeg_setting/$',
+        api_group_eeg_setting_list,
+        name='api_group_eeg_setting-list'),
 ]

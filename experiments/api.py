@@ -3,7 +3,8 @@ from rest_framework import serializers, permissions, viewsets
 
 from experiments import appclasses
 from experiments.models import Experiment, Study, User, ProtocolComponent, \
-    Group, ExperimentalProtocol, Researcher, Participant, Collaborator, Keyword, ClassificationOfDiseases
+    Group, ExperimentalProtocol, Researcher, Participant, Collaborator, Keyword, ClassificationOfDiseases, \
+    EEGSetting
 
 
 ###################
@@ -82,14 +83,23 @@ class CollaboratorSerializer(serializers.ModelSerializer):
         model = Collaborator
         fields = ('id', 'name', 'team', 'coordinator', 'study')
 
-# class ProtocolComponentSerializer(serializers.ModelSerializer):
-#     owner = serializers.ReadOnlyField(source='owner.username')
-#     experiment = serializers.ReadOnlyField(source='experiment.title')
-#
-#     class Meta:
-#         model = ProtocolComponent
-#         fields = ('id', 'experiment_nes_id', 'identification', 'description',
-#                   'duration_value', 'component_type', 'experiment', 'owner')
+
+class EEGSettingSerializer(serializers.ModelSerializer):
+    group = serializers.ReadOnlyField(source='group.title')
+
+    class Meta:
+        model = EEGSetting
+        fields = ('id', 'group', 'name', 'description')
+
+
+class ProtocolComponentSerializer(serializers.ModelSerializer):
+    owner = serializers.ReadOnlyField(source='owner.username')
+    experiment = serializers.ReadOnlyField(source='experiment.title')
+
+    class Meta:
+        model = ProtocolComponent
+        fields = ('id', 'experiment_nes_id', 'identification', 'description',
+                  'duration_value', 'component_type', 'experiment', 'owner')
 
 
 class ClassificationOfDiseasesSerializer(serializers.Serializer):
@@ -296,6 +306,19 @@ class ParticipantViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         group = Group.objects.get(pk=self.kwargs['pk'])
         serializer.save(group=group)
+
+
+class EEGSettingViewSet(viewsets.ModelViewSet):
+    serializer_class = EEGSettingSerializer
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
+
+    def get_queryset(self):
+        return EEGSetting.objects.filter(group_id=self.kwargs['pk'])
+
+    def perform_create(self, serializer):
+        group = Group.objects.get(pk=self.kwargs['pk'])
+        serializer.save(group=group)
+
 
 # class ProtocolComponentViewSet(viewsets.ModelViewSet):
 #     lookup_field = 'nes_id'
