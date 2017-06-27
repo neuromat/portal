@@ -1,42 +1,26 @@
 from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import render
-from django.db.models import Max, Q
 
+from experiments import appclasses
 from experiments.models import Experiment
-
-
-# TODO: make method in appclasses.ExperimentVersion
-def get_current_experiments():
-    experiment_max_version_set = \
-        Experiment.objects.values('owner', 'nes_id').annotate(
-            max_version=Max('version'))
-    q_statement = Q()
-    for experiment in experiment_max_version_set:
-        q_statement |= (Q(owner=experiment['owner']) &
-                        Q(nes_id=experiment['nes_id']) &
-                        Q(version=experiment['max_version']) &
-                        Q(status=Experiment.APPROVED))
-    return Experiment.objects.filter(q_statement)
-
-
-def get_current_experiments_trustees():
-    experiment_max_version_set = \
-        Experiment.objects.values('owner', 'nes_id').annotate(
-            max_version=Max('version'))
-    q_statement = Q()
-    for experiment in experiment_max_version_set:
-        q_statement |= (Q(owner=experiment['owner']) &
-                        Q(nes_id=experiment['nes_id']) &
-                        Q(version=experiment['max_version']))
-    return Experiment.objects.filter(q_statement)
 
 
 def home_page(request):
     if request.user.is_authenticated and \
             request.user.groups.filter(name='trustees').exists():
-        experiments = get_current_experiments_trustees()
+        all_experiments = \
+            appclasses.CurrentExperiments().get_current_experiments_trustees()
+        # We put experiments in following order:
+        # TO_BE_ANALYSED, UNDER_ANALYSIS, NOT_APPROVED and APPROVED
+        to_be_analysed = all_experiments.filter(
+            status=Experiment.TO_BE_ANALYSED)
+        under_analysis = all_experiments.filter(
+            status=Experiment.UNDER_ANALYSIS)
+        not_approved = all_experiments.filter(status=Experiment.NOT_APPROVED)
+        approved = all_experiments.filter(status=Experiment.APPROVED)
+        experiments = to_be_analysed | under_analysis | not_approved | approved
     else:
-        experiments = get_current_experiments()
+        experiments = appclasses.CurrentExperiments().get_current_experiments()
 
     for experiment in experiments:
         experiment.total_participants = \
