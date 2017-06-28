@@ -7,10 +7,16 @@ from faker import Factory
 
 # TODO: when executing from bash command line, final line identifier breaks
 # imports. We are kepping in Collaborator in same line
-from experiments.models import Collaborator, Gender, ClassificationOfDiseases
+from experiments.models import Gender, ClassificationOfDiseases, Keyword
 from experiments.models import Experiment, Study, Group, Researcher
-from experiments.tests.tests_helper import create_experiment_groups, create_classification_of_deseases, create_experiment_protocol, create_participants, create_study_collaborator
+from experiments.tests.tests_helper import create_experiment_groups
+from experiments.tests.tests_helper import create_classification_of_deseases
+from experiments.tests.tests_helper import create_experiment_protocol
+from experiments.tests.tests_helper import create_participants
+from experiments.tests.tests_helper import create_study_collaborator
+from experiments.tests.tests_helper import create_keyword
 from nep.local_settings import BASE_DIR
+
 
 
 # Clear database and run migrate
@@ -78,6 +84,15 @@ for study in Study.objects.all():
 # Create study collaborators (requires creating studies before)
 for study in Study.objects.all():
     create_study_collaborator(randint(2, 3), study)
+
+# Create some keywords to associate with studies
+create_keyword(10)
+# Associate keywords with studies
+for study in Study.objects.all():
+    kw1 = choice(Keyword.objects.all())
+    kw2 = choice(Keyword.objects.all())
+    kw3 = choice(Keyword.objects.all())
+    study.keywords.add(kw1, kw2, kw3)
 
 # Create some entries for ClassificationOfDiseases
 create_classification_of_deseases(10)

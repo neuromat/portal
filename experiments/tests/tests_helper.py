@@ -7,7 +7,7 @@ from faker import Factory
 from experiments.helpers import generate_image_file
 from experiments.models import Experiment, Study, Group, Researcher, \
     Collaborator, Participant, Gender, ExperimentalProtocol, \
-    ClassificationOfDiseases
+    ClassificationOfDiseases, Keyword
 
 
 def create_experiment_groups(qtty, experiment):
@@ -149,6 +149,21 @@ def create_study_collaborator(qtty, study):
         )
 
 
+def create_keyword(qtty):
+    """
+    :param qtty: number of keywords to be created 
+    """
+    fake = Factory.create()
+
+    Keyword.objects.create(name=fake.word())
+    for i in range(qtty):
+        while True:
+            keyword = fake.word()
+            if not Keyword.objects.filter(name=keyword):
+                break
+        Keyword.objects.create(name=keyword)
+
+
 def global_setup_ft():
     """
     This global setup creates basic object models that are used in 
@@ -177,6 +192,15 @@ def global_setup_ft():
     # Create study collaborators (requires creating studies before)
     for study in Study.objects.all():
         create_study_collaborator(randint(2, 3), study)
+
+    # Create some keywords to associate with studies
+    create_keyword(10)
+    # Associate keywords with studies
+    for study in Study.objects.all():
+        kw1 = choice(Keyword.objects.all())
+        kw2 = choice(Keyword.objects.all())
+        kw3 = choice(Keyword.objects.all())
+        study.keywords.add(kw1, kw2, kw3)
 
     # Create genders
     gender1 = Gender.objects.create(name='male')
