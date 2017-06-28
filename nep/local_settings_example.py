@@ -23,5 +23,4 @@ TIME_ZONE = 'America/Sao_Paulo'
 
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, "static"),
-    '/home/caco/Workspace/nep-system/portal',
 ]
