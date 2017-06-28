@@ -36,9 +36,9 @@ class Experiment(models.Model):
 
 
 class ClassificationOfDiseases(models.Model):
-    code = models.CharField(max_length=10, null=False)
-    description = models.CharField(max_length=300, null=False)
-    abbreviated_description = models.CharField(max_length=190, null=False)
+    code = models.CharField(max_length=10)
+    description = models.CharField(max_length=300)
+    abbreviated_description = models.CharField(max_length=190)
     parent = models.ForeignKey('self', null=True, related_name='children')
 
     def __str__(self):
@@ -95,7 +95,8 @@ class Group(models.Model):
 
     title = models.CharField(max_length=50)
     description = models.TextField()
-    inclusion_criteria = models.ManyToManyField(ClassificationOfDiseases, blank=True)
+    inclusion_criteria = \
+        models.ManyToManyField(ClassificationOfDiseases, blank=True)
     protocol_component = models.ForeignKey(
         ProtocolComponent, null=True, blank=True
     )  # TODO: define if Group has ProtocolComponent

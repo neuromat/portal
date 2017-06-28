@@ -40,18 +40,22 @@
                                 {% endif %}
                             </div>
                             <div class="col-md-10">
-                                <strong>{{ group.title }}</strong><br>
+                                <strong>{{ group.title }}</strong>
+                                <br>
                                 {{ group.participants.all.count }}
                                 participants<br><br>
                                 <p>{{ group.description }}</p>
                                 {% if group.inclusion_criteria.all %}
-                                    <h4>Inclusion criterias:</h4><br>
+                                    Inclusion criterias:
+                                    <br>
                                     {% for criteria in group.inclusion_criteria.all %}
                                         {{ criteria.code }} - {{ criteria.description }}{% if not forloop.last %},{% endif %}
                                     {% endfor %}
                                 {% endif %}
                             </div>
                         </div>
+                        <div class="pull-right"><a href="#">Details</a></div>
+                        <br>
                     </div>
                 {% endfor %}
             </div>
@@ -68,7 +72,7 @@
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
                         <h4 class="modal-title">Graphical representation</h4>
                     </div>
-                    <div class="modal-body"">
+                    <div class="modal-body">
                         {# see script bellow #}
                     </div>
                     <div class="modal-footer">

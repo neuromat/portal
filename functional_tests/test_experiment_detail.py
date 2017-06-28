@@ -126,13 +126,32 @@ class ExperimentDetailTest(FunctionalTest):
         # In Groups tab she can see a list of the groups associated with
         # this experiment with: group's title, description, the protocol
         # experiment image (if it has one), and the number of participants
-        # in that group.
+        # in that group. There is also the information criteria that was
+        # used to include each group.
         groups_tab_content = self.browser.find_element_by_id('groups_tab').text
         for group in experiment.groups.all():
             self.assertIn(group.title, groups_tab_content)
             self.assertIn(group.description, groups_tab_content)
             self.assertIn(str(group.participants.all().count()) +
                           ' participants', groups_tab_content)
+            if group.inclusion_criteria.all().count() > 0:
+                self.assertIn('Inclusion criterias:', groups_tab_content)
+                for ic in group.inclusion_criteria.all():
+                    self.assertIn(ic.code + ' - ' + ic.description,
+                                  groups_tab_content)
+        # Finally, at right of each group information there is a button
+        # written 'Details'. She clicks on the first link and the panel
+        # expands displaying textual representation of the experimental
+        # protocol.
+        group = experiment.groups.first()
+        link_details = self.browser.find_element_by_link_text('Details')
+        link_details.click()
+        time.sleep(1)
+        expanded_panel = self.browser.find_element_by_id('expanded_panel')
+        self.assertIn('Textual description', expanded_panel)
+        self.assertIn(group.experimental_protocol.textual_description,
+                      expanded_panel)
+
         # She notices that the protocol experiment image is a link. When she
         # clicks on it, a modal is displayed with the full image.
         self.browser.find_element_by_id('protocol_image').click()
