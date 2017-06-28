@@ -6,7 +6,8 @@ from faker import Factory
 
 from experiments.helpers import generate_image_file
 from experiments.models import Experiment, Study, Group, Researcher, \
-    Collaborator, Participant, Gender, ExperimentalProtocol
+    Collaborator, Participant, Gender, ExperimentalProtocol, \
+    ClassificationOfDiseases
 
 
 def create_experiment_groups(qtty, experiment):
@@ -118,6 +119,20 @@ def create_experiment_protocol(group):
     exp_pro.save()
 
 
+def create_classification_of_deseases(qtty):
+    """
+    :param qtty: number of objects to create 
+    """
+    fake = Factory.create()
+
+    for i in range(qtty):
+        ClassificationOfDiseases.objects.create(
+            code=fake.ssn(), description=fake.text(),
+            abbreviated_description=fake.text(max_nb_chars=100),
+            parent=None
+        )
+
+
 def global_setup_ft():
     """
     This global setup creates basic object models that are used in 
@@ -132,7 +147,8 @@ def global_setup_ft():
     # Create group Trustees
     create_trustee_users()
 
-    # Create 5 experiments for 2 owners, randomly, and studies
+    # Create 5 experiments for 2 owners, randomly, and studies (groups are
+    # created inside create_experiment_and_study)
     create_experiment_and_study(2, choice([owner1, owner2]),
                                 Experiment.TO_BE_ANALYSED)
     create_experiment_and_study(1, choice([owner1, owner2]),
@@ -146,13 +162,20 @@ def global_setup_ft():
     gender1 = Gender.objects.create(name='male')
     gender2 = Gender.objects.create(name='female')
 
+    # Create some entries for ClassificationOfDiseases
+    create_classification_of_deseases(10)
+
     # Create randint(3, 7) participants for each group (requires create
     # groups before)
     for group in Group.objects.all():
         create_experiment_protocol(group)
         create_participants(
             randint(3, 7), group,
-            gender1 if randint(1, 2) == 1 else gender2)
+            gender1 if randint(1, 2) == 1 else gender2
+        )
+        ic1 = choice(ClassificationOfDiseases.objects.all())
+        ic2 = choice(ClassificationOfDiseases.objects.all())
+        group.inclusion_criteria.add(ic1, ic2)
 
     # Create researchers associated to studies created in
     # create_experiment_and_study method
