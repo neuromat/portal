@@ -113,6 +113,11 @@ class ExperimentDetailTest(FunctionalTest):
                 str(experiment.study.collaborators.first().coordinator)
                 for row in rows)
         )
+        # Finally, in the study modal, she sees a list of keywords
+        # associated with the study
+        keywords_text = self.browser.find_element_by_id('keywords').text
+        for keyword in experiment.study.keywords.all():
+            self.assertIn(keyword.name, keywords_text)
 
         ##
         # Testing Statistics, Groups and Settings

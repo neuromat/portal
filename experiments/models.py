@@ -46,7 +46,7 @@ class ClassificationOfDiseases(models.Model):
 
 
 class Keyword(models.Model):
-    name = models.CharField(max_length=50, null=False, blank=False, primary_key=True)
+    name = models.CharField(max_length=50, primary_key=True)
 
     def __str__(self):
         return self.name
