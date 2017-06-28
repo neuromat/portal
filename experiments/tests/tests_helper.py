@@ -25,6 +25,7 @@ def create_experiment_groups(qtty, experiment):
         )
 
 
+# TODO: separate study creation from experiment creation
 def create_experiment_and_study(qtty, owner, status):
     """
     :param qtty: Number of experiments
@@ -133,6 +134,21 @@ def create_classification_of_deseases(qtty):
         )
 
 
+def create_study_collaborator(qtty, study):
+    """
+    :param qtty: number of collaborators 
+    :param study: Study model instance
+    """
+    fake = Factory.create()
+
+    for i in range(qtty):
+        Collaborator.objects.create(
+            name=fake.name(), team=fake.word(),
+            coordinator=randint(0, 1),
+            study=study
+        )
+
+
 def global_setup_ft():
     """
     This global setup creates basic object models that are used in 
@@ -158,7 +174,11 @@ def global_setup_ft():
     create_experiment_and_study(1, choice([owner1, owner2]),
                                 Experiment.NOT_APPROVED)
 
-    # create genders
+    # Create study collaborators (requires creating studies before)
+    for study in Study.objects.all():
+        create_study_collaborator(randint(2, 3), study)
+
+    # Create genders
     gender1 = Gender.objects.create(name='male')
     gender2 = Gender.objects.create(name='female')
 

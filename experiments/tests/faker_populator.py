@@ -9,7 +9,7 @@ from faker import Factory
 # imports. We are kepping in Collaborator in same line
 from experiments.models import Collaborator, Gender, ClassificationOfDiseases
 from experiments.models import Experiment, Study, Group, Researcher
-from experiments.tests.tests_helper import create_experiment_groups, create_classification_of_deseases, create_experiment_protocol, create_participants
+from experiments.tests.tests_helper import create_experiment_groups, create_classification_of_deseases, create_experiment_protocol, create_participants, create_study_collaborator
 from nep.local_settings import BASE_DIR
 
 
@@ -75,16 +75,9 @@ for study in Study.objects.all():
     Researcher.objects.create(name=fake.name(), email=fake.email(),
                               study=study)
 
-# Create study's collaborators
-study = Study.objects.get(experiment=Experiment.objects.first())
-for i in range(2):
-    Collaborator.objects.create(name=fake.name(),
-                                team=fake.company(),
-                                coordinator=False, study=study)
-
-Collaborator.objects.create(name=fake.name(),
-                            team=fake.company(),
-                            coordinator=True, study=study)
+# Create study collaborators (requires creating studies before)
+for study in Study.objects.all():
+    create_study_collaborator(randint(2, 3), study)
 
 # Create some entries for ClassificationOfDiseases
 create_classification_of_deseases(10)
