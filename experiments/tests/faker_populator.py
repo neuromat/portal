@@ -1,5 +1,5 @@
 from datetime import datetime
-from random import randint
+from random import randint, choice
 from subprocess import call
 
 from django.contrib.auth import models
@@ -7,12 +7,16 @@ from faker import Factory
 
 # TODO: when executing from bash command line, final line identifier breaks
 # imports. We are kepping in Collaborator in same line
-from experiments.helpers import generate_image_file
-from experiments.models import Collaborator, Gender, ExperimentalProtocol
+from experiments.models import Gender, ClassificationOfDiseases, Keyword
 from experiments.models import Experiment, Study, Group, Researcher
-from experiments.models import Participant
 from experiments.tests.tests_helper import create_experiment_groups
+from experiments.tests.tests_helper import create_classification_of_deseases
+from experiments.tests.tests_helper import create_experiment_protocol
+from experiments.tests.tests_helper import create_participants
+from experiments.tests.tests_helper import create_study_collaborator
+from experiments.tests.tests_helper import create_keyword
 from nep.local_settings import BASE_DIR
+
 
 
 # Clear database and run migrate
@@ -77,44 +81,36 @@ for study in Study.objects.all():
     Researcher.objects.create(name=fake.name(), email=fake.email(),
                               study=study)
 
-# Create study's collaborators
-study = Study.objects.get(experiment=Experiment.objects.first())
-for i in range(2):
-    Collaborator.objects.create(name=fake.name(),
-                                team=fake.company(),
-                                coordinator=False, study=study)
+# Create study collaborators (requires creating studies before)
+for study in Study.objects.all():
+    create_study_collaborator(randint(2, 3), study)
 
-Collaborator.objects.create(name=fake.name(),
-                            team=fake.company(),
-                            coordinator=True, study=study)
+# Create some keywords to associate with studies
+create_keyword(10)
+# Associate keywords with studies
+for study in Study.objects.all():
+    kw1 = choice(Keyword.objects.all())
+    kw2 = choice(Keyword.objects.all())
+    kw3 = choice(Keyword.objects.all())
+    study.keywords.add(kw1, kw2, kw3)
+
+# Create some entries for ClassificationOfDiseases
+create_classification_of_deseases(10)
 
 # Create genders
-male = Gender.objects.create(name='Male')
-female = Gender.objects.create(name='Female')
+gender1 = Gender.objects.create(name='Male')
+gender2 = Gender.objects.create(name='Female')
 
 # Create groups' experimental protocols and participants
 for group in Group.objects.all():
-    ExperimentalProtocol.objects.create(
-        group=group,
-        textual_description=fake.text()
+    create_experiment_protocol(group)
+    create_participants(
+        randint(3, 7), group,
+        gender1 if randint(1, 2) == 1 else gender2
     )
-    for i in range(2):
-        Participant.objects.create(group=group, code=fake.ssn(),
-                                   gender=female, age=randint(18, 80))
-    Participant.objects.create(group=group, code=fake.ssn(), gender=male,
-                               age=randint(18, 80))
-
-for exp_pro in ExperimentalProtocol.objects.all():
-    image_file = generate_image_file(
-        randint(100, 500), randint(300, 700), fake.word() + '.jpg')
-    exp_pro.image.save(image_file.name, image_file)
-    exp_pro.save()
-    # Update image of last experimental protocol with a null image to test
-    # displaying default image: "No image"
-
-exp_pro = ExperimentalProtocol.objects.last()
-exp_pro.image = None
-exp_pro.save()
+    ic1 = choice(ClassificationOfDiseases.objects.all())
+    ic2 = choice(ClassificationOfDiseases.objects.all())
+    group.inclusion_criteria.add(ic1, ic2)
 
 
 # TODO: why is necessary to keep two blank lines for script run until the end?

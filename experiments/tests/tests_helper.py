@@ -6,7 +6,8 @@ from faker import Factory
 
 from experiments.helpers import generate_image_file
 from experiments.models import Experiment, Study, Group, Researcher, \
-    Collaborator, Participant, Gender, ExperimentalProtocol
+    Collaborator, Participant, Gender, ExperimentalProtocol, \
+    ClassificationOfDiseases, Keyword
 
 
 def create_experiment_groups(qtty, experiment):
@@ -24,6 +25,7 @@ def create_experiment_groups(qtty, experiment):
         )
 
 
+# TODO: separate study creation from experiment creation
 def create_experiment_and_study(qtty, owner, status):
     """
     :param qtty: Number of experiments
@@ -118,6 +120,50 @@ def create_experiment_protocol(group):
     exp_pro.save()
 
 
+def create_classification_of_deseases(qtty):
+    """
+    :param qtty: number of objects to create 
+    """
+    fake = Factory.create()
+
+    for i in range(qtty):
+        ClassificationOfDiseases.objects.create(
+            code=fake.ssn(), description=fake.text(),
+            abbreviated_description=fake.text(max_nb_chars=100),
+            parent=None
+        )
+
+
+def create_study_collaborator(qtty, study):
+    """
+    :param qtty: number of collaborators 
+    :param study: Study model instance
+    """
+    fake = Factory.create()
+
+    for i in range(qtty):
+        Collaborator.objects.create(
+            name=fake.name(), team=fake.word(),
+            coordinator=randint(0, 1),
+            study=study
+        )
+
+
+def create_keyword(qtty):
+    """
+    :param qtty: number of keywords to be created 
+    """
+    fake = Factory.create()
+
+    Keyword.objects.create(name=fake.word())
+    for i in range(qtty):
+        while True:
+            keyword = fake.word()
+            if not Keyword.objects.filter(name=keyword):
+                break
+        Keyword.objects.create(name=keyword)
+
+
 def global_setup_ft():
     """
     This global setup creates basic object models that are used in 
@@ -132,7 +178,8 @@ def global_setup_ft():
     # Create group Trustees
     create_trustee_users()
 
-    # Create 5 experiments for 2 owners, randomly, and studies
+    # Create 5 experiments for 2 owners, randomly, and studies (groups are
+    # created inside create_experiment_and_study)
     create_experiment_and_study(2, choice([owner1, owner2]),
                                 Experiment.TO_BE_ANALYSED)
     create_experiment_and_study(1, choice([owner1, owner2]),
@@ -142,9 +189,25 @@ def global_setup_ft():
     create_experiment_and_study(1, choice([owner1, owner2]),
                                 Experiment.NOT_APPROVED)
 
-    # create genders
+    # Create study collaborators (requires creating studies before)
+    for study in Study.objects.all():
+        create_study_collaborator(randint(2, 3), study)
+
+    # Create some keywords to associate with studies
+    create_keyword(10)
+    # Associate keywords with studies
+    for study in Study.objects.all():
+        kw1 = choice(Keyword.objects.all())
+        kw2 = choice(Keyword.objects.all())
+        kw3 = choice(Keyword.objects.all())
+        study.keywords.add(kw1, kw2, kw3)
+
+    # Create genders
     gender1 = Gender.objects.create(name='male')
     gender2 = Gender.objects.create(name='female')
+
+    # Create some entries for ClassificationOfDiseases
+    create_classification_of_deseases(10)
 
     # Create randint(3, 7) participants for each group (requires create
     # groups before)
@@ -152,7 +215,11 @@ def global_setup_ft():
         create_experiment_protocol(group)
         create_participants(
             randint(3, 7), group,
-            gender1 if randint(1, 2) == 1 else gender2)
+            gender1 if randint(1, 2) == 1 else gender2
+        )
+        ic1 = choice(ClassificationOfDiseases.objects.all())
+        ic2 = choice(ClassificationOfDiseases.objects.all())
+        group.inclusion_criteria.add(ic1, ic2)
 
     # Create researchers associated to studies created in
     # create_experiment_and_study method
