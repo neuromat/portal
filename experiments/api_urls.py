@@ -68,6 +68,26 @@ api_group_eeg_setting_list =\
         'post': 'create'
     })
 
+# EMG setting
+api_group_emg_setting_list =\
+    api.EMGSettingViewSet.as_view({
+        'get': 'list',
+        'post': 'create'
+    })
+
+# TMS setting
+api_group_tms_setting_list =\
+    api.TMSSettingViewSet.as_view({
+        'get': 'list',
+        'post': 'create'
+    })
+
+# Context tree
+api_group_context_tree_list =\
+    api.ContextTreeViewSet.as_view({
+        'get': 'list',
+        'post': 'create'
+    })
 
 # Get rest framework schema view
 schema_view = get_schema_view(title='NEP API')
@@ -104,7 +124,11 @@ urlpatterns = [
         api_study_collaborators_list, name='api_study_collaborators-list'),
 
     # EEG setting
-    url(r'^groups/(?P<pk>[0-9]+)/eeg_setting/$',
-        api_group_eeg_setting_list,
-        name='api_group_eeg_setting-list'),
+    url(r'^groups/(?P<pk>[0-9]+)/eeg_setting/$', api_group_eeg_setting_list, name='api_group_eeg_setting-list'),
+    # EMG setting
+    url(r'^groups/(?P<pk>[0-9]+)/emg_setting/$', api_group_emg_setting_list, name='api_group_emg_setting-list'),
+    # TMS setting
+    url(r'^groups/(?P<pk>[0-9]+)/tms_setting/$', api_group_tms_setting_list, name='api_group_tms_setting-list'),
+    # Context tree
+    url(r'^groups/(?P<pk>[0-9]+)/context_tree/$', api_group_context_tree_list, name='api_group_context_tree-list'),
 ]

@@ -125,8 +125,8 @@ class Participant(models.Model):
         unique_together = ('group', 'code')
 
 
-class GroupSetting(models.Model):
-    group = models.ForeignKey(Group)
+class ExperimentSetting(models.Model):
+    experiment = models.ForeignKey(Experiment)
     name = models.CharField(max_length=150)
     description = models.TextField()
 
@@ -137,19 +137,19 @@ class GroupSetting(models.Model):
         return self.name
 
 
-class EEGSetting(GroupSetting):
+class EEGSetting(ExperimentSetting):
     pass
 
 
-class EMGSetting(GroupSetting):
+class EMGSetting(ExperimentSetting):
     acquisition_software_version = models.CharField(max_length=150)
 
 
-class TMSSetting(GroupSetting):
+class TMSSetting(ExperimentSetting):
     pass
 
 
-class ContextTree(GroupSetting):
+class ContextTree(ExperimentSetting):
     setting_text = models.TextField(null=True, blank=True)
     # setting_file = models.FileField(upload_to=get_context_tree_dir, null=True, blank=True)
 

@@ -4,7 +4,7 @@ from rest_framework import serializers, permissions, viewsets
 from experiments import appclasses
 from experiments.models import Experiment, Study, User, ProtocolComponent, \
     Group, ExperimentalProtocol, Researcher, Participant, Collaborator, Keyword, ClassificationOfDiseases, \
-    EEGSetting
+    EEGSetting, EMGSetting, TMSSetting, ContextTree
 
 
 ###################
@@ -85,11 +85,35 @@ class CollaboratorSerializer(serializers.ModelSerializer):
 
 
 class EEGSettingSerializer(serializers.ModelSerializer):
-    group = serializers.ReadOnlyField(source='group.title')
+    experiment = serializers.ReadOnlyField(source='experiment.title')
 
     class Meta:
         model = EEGSetting
-        fields = ('id', 'group', 'name', 'description')
+        fields = ('id', 'experiment', 'name', 'description')
+
+
+class EMGSettingSerializer(serializers.ModelSerializer):
+    experiment = serializers.ReadOnlyField(source='experiment.title')
+
+    class Meta:
+        model = EMGSetting
+        fields = ('id', 'experiment', 'name', 'description', 'acquisition_software_version')
+
+
+class TMSSettingSerializer(serializers.ModelSerializer):
+    experiment = serializers.ReadOnlyField(source='experiment.title')
+
+    class Meta:
+        model = TMSSetting
+        fields = ('id', 'experiment', 'name', 'description')
+
+
+class ContextTreeSerializer(serializers.ModelSerializer):
+    experiment = serializers.ReadOnlyField(source='experiment.title')
+
+    class Meta:
+        model = ContextTree
+        fields = ('id', 'experiment', 'name', 'description', 'setting_text')
 
 
 class ProtocolComponentSerializer(serializers.ModelSerializer):
@@ -313,12 +337,47 @@ class EEGSettingViewSet(viewsets.ModelViewSet):
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
 
     def get_queryset(self):
-        return EEGSetting.objects.filter(group_id=self.kwargs['pk'])
+        return EEGSetting.objects.filter(experiment_id=self.kwargs['pk'])
 
     def perform_create(self, serializer):
-        group = Group.objects.get(pk=self.kwargs['pk'])
-        serializer.save(group=group)
+        experiment = Experiment.objects.get(pk=self.kwargs['pk'])
+        serializer.save(experiment=experiment)
 
+
+class EMGSettingViewSet(viewsets.ModelViewSet):
+    serializer_class = EMGSettingSerializer
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
+
+    def get_queryset(self):
+        return EMGSetting.objects.filter(experiment_id=self.kwargs['pk'])
+
+    def perform_create(self, serializer):
+        experiment = Experiment.objects.get(pk=self.kwargs['pk'])
+        serializer.save(experiment=experiment)
+
+
+class TMSSettingViewSet(viewsets.ModelViewSet):
+    serializer_class = TMSSettingSerializer
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
+
+    def get_queryset(self):
+        return TMSSetting.objects.filter(experiment_id=self.kwargs['pk'])
+
+    def perform_create(self, serializer):
+        experiment = Experiment.objects.get(pk=self.kwargs['pk'])
+        serializer.save(experiment=experiment)
+
+
+class ContextTreeViewSet(viewsets.ModelViewSet):
+    serializer_class = ContextTreeSerializer
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
+
+    def get_queryset(self):
+        return ContextTree.objects.filter(experiment_id=self.kwargs['pk'])
+
+    def perform_create(self, serializer):
+        experiment = Experiment.objects.get(pk=self.kwargs['pk'])
+        serializer.save(experiment=experiment)
 
 # class ProtocolComponentViewSet(viewsets.ModelViewSet):
 #     lookup_field = 'nes_id'
