@@ -32,7 +32,7 @@ class HomePageTest(TestCase):
             status=Experiment.TO_BE_ANALYSED
         ).first()
         response = self.client.post(
-            f'/experiments/{experiment.id}/change_status/',
+            '/experiments/' + str(experiment.id) + '/change_status/',
             {'status': Experiment.UNDER_ANALYSIS},
         )
         # Is it redirecting?
