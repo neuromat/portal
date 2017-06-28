@@ -92,7 +92,8 @@
         $('#protocol_image_full').on('show.bs.modal', function (event) {
             let link = $(event.relatedTarget);
             let image_path = link.data('image_path');
-            $('.modal-body').empty().append(`<img id='full_image'
+            let modal = $(this);
+            modal.find('.modal-body').empty().append(`<img id='full_image'
             src=${image_path}/>`); // first empty to not repeat image
         });
     </script>
