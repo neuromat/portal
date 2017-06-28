@@ -28,34 +28,51 @@
 
             <div role="tabpanel" class="tab-pane groups-tab" id="groups_tab">
                 {% for group in experiment.groups.all %}
-                    <div class="panel panel-default panel-groups">
-                        <div class="row">
-                            <div class="col-md-2 prot-exp-image">
-                                {% if group.experimental_protocol.image %}
-                                    <a id="protocol_image" href="#"
-                                       data-toggle="modal"
-                                       data-target="#protocol_image_full"
-                                       data-image_path="/media/{{ group.experimental_protocol.image }}">
-                                        <img src="/media/{{ group.experimental_protocol.image }}"/></a>
-                                {% endif %}
-                            </div>
-                            <div class="col-md-10">
-                                <strong>{{ group.title }}</strong>
-                                <br>
-                                {{ group.participants.all.count }}
-                                participants<br><br>
-                                <p>{{ group.description }}</p>
-                                {% if group.inclusion_criteria.all %}
-                                    Inclusion criterias:
+                    <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+                        <div class="panel panel-default nep-panel-group">
+                            <div class="row">
+                                <div class="col-md-2 prot-exp-image">
+                                    {% if group.experimental_protocol.image %}
+                                        <a id="protocol_image" href="#"
+                                           data-toggle="modal"
+                                           data-target="#protocol_image_full"
+                                           data-image_path="/media/{{ group.experimental_protocol.image }}">
+                                            <img src="/media/{{ group.experimental_protocol.image }}"/></a>
+                                    {% endif %}
+                                </div>
+                                <div class="col-md-10">
+                                    <strong>{{ group.title }}</strong>
                                     <br>
-                                    {% for criteria in group.inclusion_criteria.all %}
-                                        {{ criteria.code }} - {{ criteria.description }}{% if not forloop.last %},{% endif %}
-                                    {% endfor %}
-                                {% endif %}
+                                    {{ group.participants.all.count }}
+                                    participants<br><br>
+                                    <p>{{ group.description }}</p>
+                                    {% if group.inclusion_criteria.all %}
+                                        Inclusion criterias:
+                                        <br>
+                                        {% for criteria in group.inclusion_criteria.all %}
+                                            {{ criteria.code }} - {{ criteria.description }}{% if not forloop.last %},{% endif %}
+                                        {% endfor %}
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="pull-right">
+                                <a role="button" data-toggle="collapse"
+                                   data-parent="#accordion"
+                                   href="#collapseOne{{ group.id }}"
+                                   aria-expanded="true" aria-controls="collapseOne">Details</a>
+                            </div>
+                            <br>
+                            <div id="collapseOne{{ group.id }}"
+                                 class="panel-collapse
+                            collapse out" role="tabpanel"
+                                 aria-labelledby="headingOne">
+                                <div class="panel-body">
+                                    <strong>Textual description</strong>
+                                    <br>
+                                    {{ group.experimental_protocol.textual_description }}
+                                </div>
                             </div>
                         </div>
-                        <div class="pull-right"><a href="#">Details</a></div>
-                        <br>
                     </div>
                 {% endfor %}
             </div>

@@ -92,7 +92,6 @@ class ProtocolComponent(models.Model):
 
 class Group(models.Model):
     experiment = models.ForeignKey(Experiment, related_name='groups')
-
     title = models.CharField(max_length=50)
     description = models.TextField()
     inclusion_criteria = \

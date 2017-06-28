@@ -147,7 +147,8 @@ class ExperimentDetailTest(FunctionalTest):
         link_details = self.browser.find_element_by_link_text('Details')
         link_details.click()
         time.sleep(1)
-        expanded_panel = self.browser.find_element_by_id('expanded_panel')
+        expanded_panel = self.browser.find_element_by_id('collapseOne' +
+                                                         str(group.id)).text
         self.assertIn('Textual description', expanded_panel)
         self.assertIn(group.experimental_protocol.textual_description,
                       expanded_panel)
