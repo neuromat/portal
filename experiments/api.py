@@ -278,7 +278,7 @@ class CollaboratorViewSet(viewsets.ModelViewSet):
 
 
 class GroupViewSet(viewsets.ModelViewSet):
-    lookup_field = 'experiment_nes_id'  # TODO: see if not more used
+    lookup_field = 'experiment_nes_id'
     serializer_class = GroupSerializer
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
 
