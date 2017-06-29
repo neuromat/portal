@@ -79,9 +79,22 @@
             </div>
 
             <div role="tabpanel" class="tab-pane" id="settings_tab">
-{#                {% if group. %}#}
-                Settings
-                Teste
+                {% if experiment.eeg_setting_set.all %}
+                    EEG Settings
+                    {% for eeg_setting in experiment.eeg_setting_set.all %}
+                        {{ eeg_setting.name }}<br/>
+                        {{ eeg_setting.description }}
+                    {% endfor %}
+                {% endif %}
+                {% if experiment.emg_setting_set.all %}
+                    EMG Settings
+                {% endif %}
+                {% if experiment.tms_setting_set.all %}
+                    TMS Settings
+                {% endif %}
+                {% if experiment.context_tree_set.all %}
+                    Context trees
+                {% endif %}
             </div>
         </div>
         {# Full protocol experiment image modal #}

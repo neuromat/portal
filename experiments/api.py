@@ -333,50 +333,110 @@ class ParticipantViewSet(viewsets.ModelViewSet):
 
 
 class EEGSettingViewSet(viewsets.ModelViewSet):
+    lookup_field = 'experiment_nes_id'
     serializer_class = EEGSettingSerializer
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
 
     def get_queryset(self):
-        return EEGSetting.objects.filter(experiment_id=self.kwargs['pk'])
+        if 'experiment_nes_id' in self.kwargs and (self.request.user != AnonymousUser()):
+            experiment = Experiment.objects.filter(
+                nes_id=self.kwargs['experiment_nes_id'],
+                owner=self.request.user
+            )
+            return EEGSetting.objects.filter(experiment=experiment)
+        else:
+            return EEGSetting.objects.all()
 
     def perform_create(self, serializer):
-        experiment = Experiment.objects.get(pk=self.kwargs['pk'])
+        exp_nes_id = self.kwargs['experiment_nes_id']
+        owner = self.request.user
+        last_version = appclasses.ExperimentVersion(
+            exp_nes_id, owner
+        ).get_last_version()
+        experiment = Experiment.objects.get(
+            nes_id=exp_nes_id, owner=owner, version=last_version
+        )
         serializer.save(experiment=experiment)
 
 
 class EMGSettingViewSet(viewsets.ModelViewSet):
+    lookup_field = 'experiment_nes_id'
     serializer_class = EMGSettingSerializer
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
 
     def get_queryset(self):
-        return EMGSetting.objects.filter(experiment_id=self.kwargs['pk'])
+        if 'experiment_nes_id' in self.kwargs and (self.request.user != AnonymousUser()):
+            experiment = Experiment.objects.filter(
+                nes_id=self.kwargs['experiment_nes_id'],
+                owner=self.request.user
+            )
+            return EMGSetting.objects.filter(experiment=experiment)
+        else:
+            return EMGSetting.objects.all()
 
     def perform_create(self, serializer):
-        experiment = Experiment.objects.get(pk=self.kwargs['pk'])
+        exp_nes_id = self.kwargs['experiment_nes_id']
+        owner = self.request.user
+        last_version = appclasses.ExperimentVersion(
+            exp_nes_id, owner
+        ).get_last_version()
+        experiment = Experiment.objects.get(
+            nes_id=exp_nes_id, owner=owner, version=last_version
+        )
         serializer.save(experiment=experiment)
 
 
 class TMSSettingViewSet(viewsets.ModelViewSet):
+    lookup_field = 'experiment_nes_id'
     serializer_class = TMSSettingSerializer
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
 
     def get_queryset(self):
-        return TMSSetting.objects.filter(experiment_id=self.kwargs['pk'])
+        if 'experiment_nes_id' in self.kwargs and (self.request.user != AnonymousUser()):
+            experiment = Experiment.objects.filter(
+                nes_id=self.kwargs['experiment_nes_id'],
+                owner=self.request.user
+            )
+            return TMSSetting.objects.filter(experiment=experiment)
+        else:
+            return TMSSetting.objects.all()
 
     def perform_create(self, serializer):
-        experiment = Experiment.objects.get(pk=self.kwargs['pk'])
+        exp_nes_id = self.kwargs['experiment_nes_id']
+        owner = self.request.user
+        last_version = appclasses.ExperimentVersion(
+            exp_nes_id, owner
+        ).get_last_version()
+        experiment = Experiment.objects.get(
+            nes_id=exp_nes_id, owner=owner, version=last_version
+        )
         serializer.save(experiment=experiment)
 
 
 class ContextTreeViewSet(viewsets.ModelViewSet):
+    lookup_field = 'experiment_nes_id'
     serializer_class = ContextTreeSerializer
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
 
     def get_queryset(self):
-        return ContextTree.objects.filter(experiment_id=self.kwargs['pk'])
+        if 'experiment_nes_id' in self.kwargs and (self.request.user != AnonymousUser()):
+            experiment = Experiment.objects.filter(
+                nes_id=self.kwargs['experiment_nes_id'],
+                owner=self.request.user
+            )
+            return ContextTree.objects.filter(experiment=experiment)
+        else:
+            return ContextTree.objects.all()
 
     def perform_create(self, serializer):
-        experiment = Experiment.objects.get(pk=self.kwargs['pk'])
+        exp_nes_id = self.kwargs['experiment_nes_id']
+        owner = self.request.user
+        last_version = appclasses.ExperimentVersion(
+            exp_nes_id, owner
+        ).get_last_version()
+        experiment = Experiment.objects.get(
+            nes_id=exp_nes_id, owner=owner, version=last_version
+        )
         serializer.save(experiment=experiment)
 
 # class ProtocolComponentViewSet(viewsets.ModelViewSet):
