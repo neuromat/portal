@@ -18,7 +18,6 @@ from experiments.tests.tests_helper import create_keyword
 from nep.local_settings import BASE_DIR
 
 
-
 # Clear database and run migrate
 call(['rm', BASE_DIR + '/db.sqlite3'])
 call([BASE_DIR + '/manage.py', 'migrate'])

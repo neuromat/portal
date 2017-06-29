@@ -110,7 +110,8 @@ def create_experiment_protocol(group):
     )
     for exp_pro in ExperimentalProtocol.objects.all():
         image_file = generate_image_file(
-            randint(100, 500), randint(300, 700), fake.word() + '.jpg')
+            randint(100, 800), randint(300, 700), fake.word() + '.jpg'
+        )
         exp_pro.image.save(image_file.name, image_file)
         exp_pro.save()
         # Update image of last experimental protocol with a null image to test

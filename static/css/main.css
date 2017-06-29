@@ -240,6 +240,10 @@ i#new_experiments {
   border: none;
 }
 
+#protocol_image_full .modal-dialog {
+  display: table;
+}
+
 /*
   ========================================
   Log In
