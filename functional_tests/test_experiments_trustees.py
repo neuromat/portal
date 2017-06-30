@@ -171,9 +171,9 @@ class TrusteeTest(FunctionalTestTrustee):
         # Then a message appears on screen, telling her that an email was
         # sent to the experiment study researcher to warning him his
         # experiment was approved
-        self.assertIn('An email was sended to ' +
+        self.assertIn('An email was sent to ' +
                       experiment.study.researcher.name +
-                      ' warning her that her experiment was approved',
+                      ' warning that the experiment was approved.',
                       self.browser.find_element_by_tag_name('body').text)
         # The work is done. She is satisfied and decides to log out from system
         self.browser.find_element_by_link_text('Log Out').click()
@@ -181,18 +181,22 @@ class TrusteeTest(FunctionalTestTrustee):
         # The email was sent to the researcher. The guy checks her email and
         # finds a message
         email = mail.outbox[0]
-        self.assertIn(RESEARCHER_TEST_EMAIL, email.to)
-        self.assertEqual(email.subject, SUBJECT_APPROVED)
+        self.assertIn(experiment.study.researcher.email, email.to)
+        self.assertEqual(email.subject,
+                         'Your experiment was approved in ODEN portal')
         # Inside it, there's a message with congratulations and a link to
         # the Portal
         self.assertIn('Congratulations, your experiment ' + experiment.title
-                      + 'was approved by the Portal committe . Now it is '
-                        'disponibilized public under license ...', email.body)
+                      + 'was approved by the Portal committee. Now it is '
+                        'available public under license Creative Commons '
+                        'Share Alike.\nYou can view your experiment data in ' +
+                        self.live_server_url, email.body)
         url_search = re.search(r'http://.+$', email.body)
         if not url_search:
             self.fail('Could not find url in email body:\n' + email.body)
-        url = url_search
+        url = url_search.group(0)
         self.assertEqual(self.live_server_url, url)
-        # She clicks on link and see the home page
+        # She clicks on link and a new tab (or window) is open in portal
+        # home page
         self.browser.get(url)
         self.assertEqual(self.live_server_url, url)

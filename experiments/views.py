@@ -1,8 +1,11 @@
+from django.contrib import messages
+from django.core.mail import send_mail
 from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import render
 
 from experiments import appclasses
 from experiments.models import Experiment
+from nep import settings
 
 
 def home_page(request):
@@ -61,13 +64,23 @@ def change_status(request, experiment_id):
 
     # if status changed was to APPROVED send email to experiment study
     # researcher
-    researcher_email = request.POST.get('warning_email_to', None)
-    if researcher_email:
+    if experiment.status == Experiment.APPROVED:
+        url = 'http://' + request.get_host()
         send_mail(
             'Your experiment was approved in ODEN portal',
-            'Body text',
+            'Congratulations, your experiment ' +
+            experiment.title +
+            'was approved by the Portal committee. Now it is '
+            'available public under license Creative Commons '
+            'Share Alike.\n'
+            'You can view your experiment data in ' + url,
             'noreplay@nep.prp.usp.br',
-            researcher_email
+            [experiment.study.researcher.email]
+        )
+        messages.success(
+            request,
+            'An email was sent to ' + experiment.study.researcher.name +
+            ' warning that the experiment was approved.'
         )
 
     return HttpResponseRedirect('/')

@@ -73,8 +73,8 @@ def create_researchers():
 
     for study in Study.objects.all():
         Researcher.objects.create(
-            name=fake.text(max_nb_chars=15),
-            email=fake.text(max_nb_chars=15),
+            name=fake.name(),
+            email=fake.email(),
             study=study
         )
         Collaborator.objects.create(name=fake.text(max_nb_chars=15),

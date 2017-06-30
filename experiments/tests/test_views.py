@@ -46,6 +46,7 @@ class HomePageTest(TestCase):
 
         self.send_mail_called = False
 
+        # TODO: refactor using Python Mock Library
         def fake_send_mail(subject, body, from_email, to):
             self.send_mail_called = True
             self.subject = subject
@@ -65,4 +66,24 @@ class HomePageTest(TestCase):
         self.assertEqual(self.subject,
                          'Your experiment was approved in ODEN portal')
         self.assertEqual(self.from_email, 'noreplay@nep.prp.usp.br')
-        self.assertEqual(self.to, experiment.study.researcher.email)
+        self.assertEqual(self.to, [experiment.study.researcher.email])
+
+    def test_adds_success_message(self):
+        experiment = Experiment.objects.filter(
+            status=Experiment.UNDER_ANALYSIS
+        ).first()
+
+        response = self.client.post(
+            '/experiments/' + str(experiment.id) + '/change_status/',
+            {'status': Experiment.APPROVED, 'warning_email_to':
+                experiment.study.researcher.email},
+            follow=True
+        )
+
+        message = list(response.context['messages'])[0]
+        self.assertEqual(
+            message.message,
+            'An email was sent to ' + experiment.study.researcher.name +
+            ' warning that the experiment was approved.'
+        )
+        self.assertEqual(message.tags, "success")
