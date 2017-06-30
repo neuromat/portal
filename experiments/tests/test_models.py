@@ -30,6 +30,8 @@ class ResearcherModelTest(TestCase):
         with self.assertRaises(ValidationError):
             researcher.full_clean()
 
+    # TODO: cannot save researcher without study
+
 
 @apply_setup(global_setup_ut)
 class StudyModelTest(TestCase):

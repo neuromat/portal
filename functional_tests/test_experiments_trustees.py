@@ -1,9 +1,14 @@
+import re
 import time
 
+from django.core import mail
 from selenium.webdriver.common.keys import Keys
 
 from experiments.models import Experiment
 from functional_tests.base import FunctionalTestTrustee
+
+RESEARCHER_TEST_EMAIL = 'gezilda@example.com'
+SUBJECT_APPROVED = 'Your experiment was approved in ODEN portal'
 
 
 class TrusteeTest(FunctionalTestTrustee):
@@ -146,3 +151,48 @@ class TrusteeTest(FunctionalTestTrustee):
             self.assertLess(badger, 0)
 
         self.fail('Finish this test!')
+
+    def test_send_email_when_trustee_change_status_to_approved_or_not_approved(self):
+        # Claudia clicks on a status "Under analysis" of an experiment and
+        # change it to "Approved"
+        experiment_id = self.browser.find_element_by_link_text(
+            'Under analysis').get_attribute('data-experiment_id')
+        experiment = Experiment.objects.get(id=experiment_id)
+        self.browser.find_element_by_link_text('Under analysis').click()
+        time.sleep(1)
+        form_status_choices = self.browser.find_element_by_id(
+            'id_status_choices')
+        form_status_choices.find_element_by_xpath(
+            '//input[@type="radio" and  @value=' + '"' +
+            Experiment.APPROVED + '"]').click()
+        submit_button = self.browser.find_element_by_id('id_submit')
+        submit_button.send_keys(Keys.ENTER)
+        time.sleep(1)
+        # Then a message appears on screen, telling her that an email was
+        # sent to the experiment study researcher to warning him his
+        # experiment was approved
+        self.assertIn('An email was sended to ' +
+                      experiment.study.researcher.name +
+                      ' warning her that her experiment was approved',
+                      self.browser.find_element_by_tag_name('body').text)
+        # The work is done. She is satisfied and decides to log out from system
+        self.browser.find_element_by_link_text('Log Out').click()
+        time.sleep(1)
+        # The email was sent to the researcher. The guy checks her email and
+        # finds a message
+        email = mail.outbox[0]
+        self.assertIn(RESEARCHER_TEST_EMAIL, email.to)
+        self.assertEqual(email.subject, SUBJECT_APPROVED)
+        # Inside it, there's a message with congratulations and a link to
+        # the Portal
+        self.assertIn('Congratulations, your experiment ' + experiment.title
+                      + 'was approved by the Portal committe . Now it is '
+                        'disponibilized public under license ...', email.body)
+        url_search = re.search(r'http://.+$', email.body)
+        if not url_search:
+            self.fail('Could not find url in email body:\n' + email.body)
+        url = url_search
+        self.assertEqual(self.live_server_url, url)
+        # She clicks on link and see the home page
+        self.browser.get(url)
+        self.assertEqual(self.live_server_url, url)

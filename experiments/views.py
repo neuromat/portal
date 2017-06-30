@@ -59,6 +59,17 @@ def change_status(request, experiment_id):
     experiment.status = request.POST.get('status')
     experiment.save()
 
+    # if status changed was to APPROVED send email to experiment study
+    # researcher
+    researcher_email = request.POST.get('warning_email_to', None)
+    if researcher_email:
+        send_mail(
+            'Your experiment was approved in ODEN portal',
+            'Body text',
+            'noreplay@nep.prp.usp.br',
+            researcher_email
+        )
+
     return HttpResponseRedirect('/')
 
 

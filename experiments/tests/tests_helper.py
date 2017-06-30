@@ -251,11 +251,14 @@ def global_setup_ut():
 
     study1 = Study.objects.create(start_date=datetime.utcnow(),
                                   experiment=experiment1)
-    Study.objects.create(start_date=datetime.utcnow(),
-                         experiment=experiment2)
+    study2 = Study.objects.create(start_date=datetime.utcnow(),
+                                  experiment=experiment2)
 
     Researcher.objects.create(name='Raimundo Nonato',
                               email='rnonato@example.com', study=study1)
+    Researcher.objects.create(name='Raimunda da Silva',
+                              email='rsilva@example.com', study=study2)
+
     Collaborator.objects.create(
         name='Colaborador 1', team='Numec', coordinator=True,
         study=study1

@@ -53,7 +53,7 @@ class Keyword(models.Model):
 
 
 class Study(models.Model):
-    experiment = models.OneToOneField(Experiment)
+    experiment = models.OneToOneField(Experiment, related_name='study')
 
     title = models.CharField(max_length=150)
     description = models.TextField()
