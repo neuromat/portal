@@ -93,7 +93,7 @@ class HomePageTest(TestCase):
         )
         self.assertEqual(message.tags, "success")
 
-    def test_cant_change_status_to_rejected_without_justification(self):
+    def test_cant_change_status_to_not_approved_without_justification(self):
         experiment = Experiment.objects.filter(
             status=Experiment.UNDER_ANALYSIS
         ).first()

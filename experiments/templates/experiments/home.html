@@ -99,7 +99,7 @@
             if ( $('input[name=status]:checked', '#id_status_choices').val()
                 === 'not_approved') { // TODO: should be something like Experiment.NOT_APPROVED. See statuses variable.
                 $('#justification_area').append("<textarea " +
-                    "id='not_approved_box'></textarea>");
+                    "id='not_approved_box' name='justification'></textarea>");
             } else {
                 $('#justification_area').empty();
             }
