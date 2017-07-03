@@ -220,3 +220,9 @@ class DataFile(models.Model):
 class EEGData(DataCollection, DataFile):
     eeg_setting = models.ForeignKey(EEGSetting)
     eeg_cap_size = models.CharField(max_length=30)
+
+
+class RejectJustification(models.Model):
+    message = models.CharField(max_length=500)
+    experiment = models.OneToOneField(Experiment,
+                                      related_name='justification')
