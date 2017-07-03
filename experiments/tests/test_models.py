@@ -267,3 +267,4 @@ class CollaboratorModel(TestCase):
         with self.assertRaises(ValidationError):
             collaborator.save()
             collaborator.full_clean()
+

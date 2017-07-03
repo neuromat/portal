@@ -92,3 +92,15 @@ class HomePageTest(TestCase):
             ' warning that the experiment changed status to Approved.'
         )
         self.assertEqual(message.tags, "success")
+
+    def test_cant_change_status_to_rejected_without_justification(self):
+        experiment = Experiment.objects.filter(
+            status=Experiment.UNDER_ANALYSIS
+        ).first()
+        self.client.post(
+            '/experiments/' + str(experiment.id) + '/change_status/',
+            {'status': Experiment.NOT_APPROVED},
+        )
+        # experiment has mantained status UNDER_ANALYSIS?
+        experiment = Experiment.objects.get(pk=experiment.id)
+        self.assertEqual(experiment.status, Experiment.UNDER_ANALYSIS)

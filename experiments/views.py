@@ -5,7 +5,6 @@ from django.shortcuts import render
 
 from experiments import appclasses
 from experiments.models import Experiment
-from nep import settings
 
 
 def home_page(request):
@@ -62,8 +61,6 @@ def change_status(request, experiment_id):
     experiment.status = request.POST.get('status')
     experiment.save()
 
-    url = 'http://' + request.get_host()
-
     # if status changed to UNDER_ANALYSIS, APPROVED, or NOT_APPROVED send email
     # to  experiment study researcher
     from_email = 'noreplay@nep.prp.usp.br'
@@ -72,7 +69,8 @@ def change_status(request, experiment_id):
         message = 'Congratulations, your experiment ' + experiment.title + \
                   ' was approved by the Portal committee. Now it is public ' \
                   'available under Creative Commons Share Alike license.\n' \
-                  'You can view your experiment data in ' + url
+                  'You can view your experiment data in ' + \
+                  'http://' + request.get_host()
         send_mail(subject, message, from_email,
                   [experiment.study.researcher.email])
         messages.success(
