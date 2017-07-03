@@ -79,9 +79,42 @@
             </div>
 
             <div role="tabpanel" class="tab-pane" id="settings_tab">
-{#                {% if group. %}#}
-                Settings
-                Teste
+                    {% if experiment.eegsetting_set.all %}
+                        <strong>EEG Settings</strong>
+                        {% for eeg_setting in experiment.eegsetting_set.all %}
+                            <div class="panel panel-default nep-panel-group">
+                                <strong>{{ eeg_setting.name }}</strong><br/>
+                                {{ eeg_setting.description }}
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                    {% if experiment.emgsetting_set.all %}
+                        <strong>EMG Settings</strong>
+                        {% for emg_setting in experiment.emgsetting_set.all %}
+                            <div class="panel panel-default nep-panel-group">
+                                <strong>{{ emg_setting.name }}</strong><br/>
+                                {{ emg_setting.description }}
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                    {% if experiment.tmssetting_set.all %}
+                        <strong>TMS Settings</strong>
+                        {% for tms_setting in experiment.tmssetting_set.all %}
+                            <div class="panel panel-default nep-panel-group">
+                                <strong>{{ tms_setting.name }}</strong><br/>
+                                {{ tms_setting.description }}
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                    {% if experiment.contexttree_set.all %}
+                        <strong>Context trees</strong>
+                        {% for context_tree in experiment.contexttree_set.all %}
+                            <div class="panel panel-default nep-panel-group">
+                                <strong>{{ context_tree.name }}</strong><br/>
+                                {{ context_tree.description }}
+                            </div>
+                        {% endfor %}
+                    {% endif %}
             </div>
         </div>
         {# Full protocol experiment image modal #}

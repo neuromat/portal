@@ -62,29 +62,36 @@ api_study_collaborators_list = api.CollaboratorViewSet.as_view({
 })
 
 # EEG setting
-api_group_eeg_setting_list =\
+api_experiment_eeg_setting_list =\
     api.EEGSettingViewSet.as_view({
         'get': 'list',
         'post': 'create'
     })
 
 # EMG setting
-api_group_emg_setting_list =\
+api_experiment_emg_setting_list =\
     api.EMGSettingViewSet.as_view({
         'get': 'list',
         'post': 'create'
     })
 
 # TMS setting
-api_group_tms_setting_list =\
+api_experiment_tms_setting_list =\
     api.TMSSettingViewSet.as_view({
         'get': 'list',
         'post': 'create'
     })
 
 # Context tree
-api_group_context_tree_list =\
+api_experiment_context_tree_list =\
     api.ContextTreeViewSet.as_view({
+        'get': 'list',
+        'post': 'create'
+    })
+
+# Participants
+api_step_list =\
+    api.StepViewSet.as_view({
         'get': 'list',
         'post': 'create'
     })
@@ -124,11 +131,18 @@ urlpatterns = [
         api_study_collaborators_list, name='api_study_collaborators-list'),
 
     # EEG setting
-    url(r'^groups/(?P<pk>[0-9]+)/eeg_setting/$', api_group_eeg_setting_list, name='api_group_eeg_setting-list'),
+    url(r'^experiments/(?P<experiment_nes_id>[0-9]+)/eeg_setting/$',
+        api_experiment_eeg_setting_list, name='api_experiment_eeg_setting-list'),
     # EMG setting
-    url(r'^groups/(?P<pk>[0-9]+)/emg_setting/$', api_group_emg_setting_list, name='api_group_emg_setting-list'),
+    url(r'^experiments/(?P<experiment_nes_id>[0-9]+)/emg_setting/$',
+        api_experiment_emg_setting_list, name='api_experiment_emg_setting-list'),
     # TMS setting
-    url(r'^groups/(?P<pk>[0-9]+)/tms_setting/$', api_group_tms_setting_list, name='api_group_tms_setting-list'),
+    url(r'^experiments/(?P<experiment_nes_id>[0-9]+)/tms_setting/$',
+        api_experiment_tms_setting_list, name='api_experiment_tms_setting-list'),
     # Context tree
-    url(r'^groups/(?P<pk>[0-9]+)/context_tree/$', api_group_context_tree_list, name='api_group_context_tree-list'),
+    url(r'^experiments/(?P<experiment_nes_id>[0-9]+)/context_tree/$',
+        api_experiment_context_tree_list, name='api_experiment_context_tree-list'),
+
+    # Step
+    url(r'^group/(?P<pk>[0-9]+)/step/$', api_step_list, name='api_step-list'),
 ]
