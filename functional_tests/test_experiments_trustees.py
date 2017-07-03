@@ -152,7 +152,9 @@ class TrusteeTest(FunctionalTestTrustee):
 
         self.fail('Finish this test!')
 
-    def test_send_email_when_trustee_change_status_to_approved_or_not_approved(self):
+    def test_send_email_when_trustee_change_status(self):
+        # Obs.: we are implementing for changing status to APPROVED
+        # TODO: see if is worth to implements to changing to other status
         # Claudia clicks on a status "Under analysis" of an experiment and
         # change it to "Approved"
         experiment_id = self.browser.find_element_by_link_text(
@@ -173,7 +175,8 @@ class TrusteeTest(FunctionalTestTrustee):
         # experiment was approved
         self.assertIn('An email was sent to ' +
                       experiment.study.researcher.name +
-                      ' warning that the experiment was approved.',
+                      ' warning that the experiment changed status to '
+                      'Approved.',
                       self.browser.find_element_by_tag_name('body').text)
         # The work is done. She is satisfied and decides to log out from system
         self.browser.find_element_by_link_text('Log Out').click()
@@ -187,9 +190,10 @@ class TrusteeTest(FunctionalTestTrustee):
         # Inside it, there's a message with congratulations and a link to
         # the Portal
         self.assertIn('Congratulations, your experiment ' + experiment.title
-                      + 'was approved by the Portal committee. Now it is '
-                        'available public under license Creative Commons '
-                        'Share Alike.\nYou can view your experiment data in ' +
+                      + ' was approved by the Portal committee. Now it is '
+                        'public available under Creative Commons '
+                        'Share Alike license.\nYou can view your experiment '
+                        'data in ' +
                         self.live_server_url, email.body)
         url_search = re.search(r'http://.+$', email.body)
         if not url_search:

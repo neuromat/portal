@@ -39,7 +39,12 @@ class HomePageTest(TestCase):
         experiment = Experiment.objects.get(pk=experiment.id)
         self.assertEqual(experiment.status, Experiment.UNDER_ANALYSIS)
 
-    def test_sends_email_to_researcher_when_trustee_changes_status_to_approved(self):
+    def test_sends_email_to_researcher_when_trustee_changes_status(self):
+        """
+        We test for changing status from UNDER_ANALYSIS to APPROVED
+        Other are similar.
+        """
+        # TODO: See if is valid to implement all of them.
         experiment = Experiment.objects.filter(
             status=Experiment.UNDER_ANALYSIS
         ).first()
@@ -84,6 +89,6 @@ class HomePageTest(TestCase):
         self.assertEqual(
             message.message,
             'An email was sent to ' + experiment.study.researcher.name +
-            ' warning that the experiment was approved.'
+            ' warning that the experiment changed status to Approved.'
         )
         self.assertEqual(message.tags, "success")

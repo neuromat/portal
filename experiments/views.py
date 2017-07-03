@@ -62,31 +62,54 @@ def change_status(request, experiment_id):
     experiment.status = request.POST.get('status')
     experiment.save()
 
-    # if status changed was to APPROVED send email to experiment study
-    # researcher
+    url = 'http://' + request.get_host()
+
+    # if status changed to UNDER_ANALYSIS, APPROVED, or NOT_APPROVED send email
+    # to  experiment study researcher
+    from_email = 'noreplay@nep.prp.usp.br'
     if experiment.status == Experiment.APPROVED:
-        url = 'http://' + request.get_host()
-        send_mail(
-            'Your experiment was approved in ODEN portal',
-            'Congratulations, your experiment ' +
-            experiment.title +
-            'was approved by the Portal committee. Now it is '
-            'available public under license Creative Commons '
-            'Share Alike.\n'
-            'You can view your experiment data in ' + url,
-            'noreplay@nep.prp.usp.br',
-            [experiment.study.researcher.email]
-        )
+        subject = 'Your experiment was approved in ODEN portal'
+        message = 'Congratulations, your experiment ' + experiment.title + \
+                  ' was approved by the Portal committee. Now it is public ' \
+                  'available under Creative Commons Share Alike license.\n' \
+                  'You can view your experiment data in ' + url
+        send_mail(subject, message, from_email,
+                  [experiment.study.researcher.email])
         messages.success(
             request,
             'An email was sent to ' + experiment.study.researcher.name +
-            ' warning that the experiment was approved.'
+            ' warning that the experiment changed status to Approved.'
+        )
+    elif experiment.status == Experiment.NOT_APPROVED:
+        subject = 'Your experiment was rejected in ODEN portal'
+        message = 'Your experiment ' + experiment.title + \
+                  ' was rejected by the Portal committee. The reason was: ' \
+                  'TODO: reason why experiment was not approved'
+        send_mail(subject, message, from_email,
+                  [experiment.study.researcher.email])
+        messages.success(
+            request,
+            'An email was sent to ' + experiment.study.researcher.name +
+            ' warning that the experiment was rejected.'
+        )
+    elif experiment.status == Experiment.UNDER_ANALYSIS:
+        subject = 'Your experiment is now under analysis in ODEN portal'
+        message = 'Your experiment ' + experiment.title + \
+                  ' is under analysis by the Portal committee.'
+        send_mail(subject, message, from_email,
+                  [experiment.study.researcher.email])
+        messages.success(
+            request,
+            'An email was sent to ' + experiment.study.researcher.name +
+            ' warning that the experiment is under analysis.'
         )
 
     return HttpResponseRedirect('/')
 
 
 def ajax_to_be_analysed(request):
-    to_be_analysed = Experiment.objects.filter(status=Experiment.TO_BE_ANALYSED).count()
+    to_be_analysed = Experiment.objects.filter(
+        status=Experiment.TO_BE_ANALYSED
+    ).count()
 
     return HttpResponse(to_be_analysed, content_type='application/json')
