@@ -101,12 +101,6 @@ class Group(models.Model):
     )  # TODO: define if Group has ProtocolComponent
 
 
-class ExperimentalProtocol(models.Model):
-    group = models.OneToOneField(Group, related_name='experimental_protocol')
-    image = models.FileField(null=True, blank=True)
-    textual_description = models.TextField(null=True, blank=True)
-
-
 class Gender(models.Model):
     name = models.CharField(max_length=50, primary_key=True)
 
@@ -169,7 +163,8 @@ class Step(models.Model):
         ("digital_game_phase", "Goalkeeper game phase"),
         ("generic_data_collection", "Generic data collection"),
     )
-    identification = models.CharField(max_length=50)
+    group = models.ForeignKey(Group)
+    identification = models.CharField(max_length=255)
     description = models.TextField(null=True, blank=True)
     duration_value = models.IntegerField(null=True, blank=True)
     duration_unit = models.CharField(null=True, blank=True, max_length=15)
@@ -185,6 +180,18 @@ class Step(models.Model):
 
 class EEG(Step):
     eeg_setting = models.ForeignKey(EEGSetting)
+
+
+class SetOfStep(Step):
+    number_of_mandatory_steps = models.IntegerField(null=True, blank=True)
+    is_sequential = models.BooleanField(default=False)
+
+
+class ExperimentalProtocol(models.Model):
+    group = models.OneToOneField(Group, related_name='experimental_protocol')
+    image = models.FileField(null=True, blank=True)
+    textual_description = models.TextField(null=True, blank=True)
+    root_step = models.ForeignKey(Step, null=True, blank=True)
 
 
 class DataCollection(models.Model):

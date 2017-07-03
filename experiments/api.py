@@ -4,7 +4,7 @@ from rest_framework import serializers, permissions, viewsets
 from experiments import appclasses
 from experiments.models import Experiment, Study, User, ProtocolComponent, \
     Group, ExperimentalProtocol, Researcher, Participant, Collaborator, Keyword, ClassificationOfDiseases, \
-    EEGSetting, EMGSetting, TMSSetting, ContextTree
+    EEGSetting, EMGSetting, TMSSetting, ContextTree, Step
 
 
 ###################
@@ -438,6 +438,19 @@ class ContextTreeViewSet(viewsets.ModelViewSet):
             nes_id=exp_nes_id, owner=owner, version=last_version
         )
         serializer.save(experiment=experiment)
+
+
+# parei aqui!!
+class StepViewSet(viewsets.ModelViewSet):
+    serializer_class = ParticipantSerializer
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
+
+    def get_queryset(self):
+        return Participant.objects.filter(group_id=self.kwargs['pk'])
+
+    def perform_create(self, serializer):
+        group = Group.objects.get(pk=self.kwargs['pk'])
+        serializer.save(group=group)
 
 # class ProtocolComponentViewSet(viewsets.ModelViewSet):
 #     lookup_field = 'nes_id'

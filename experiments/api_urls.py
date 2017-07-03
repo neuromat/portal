@@ -89,6 +89,13 @@ api_experiment_context_tree_list =\
         'post': 'create'
     })
 
+# Participants
+api_step_list =\
+    api.StepViewSet.as_view({
+        'get': 'list',
+        'post': 'create'
+    })
+
 # Get rest framework schema view
 schema_view = get_schema_view(title='NEP API')
 
@@ -135,4 +142,7 @@ urlpatterns = [
     # Context tree
     url(r'^experiments/(?P<experiment_nes_id>[0-9]+)/context_tree/$',
         api_experiment_context_tree_list, name='api_experiment_context_tree-list'),
+
+    # Step
+    url(r'^group/(?P<pk>[0-9]+)/step/$', api_step_list, name='api_step-list'),
 ]
