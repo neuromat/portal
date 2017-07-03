@@ -5,6 +5,19 @@
 {% endblock %}
 
 {% block content %}
+    {% if messages %}
+        <div class="row">
+            <div class="col-md-8">
+                {% for message in messages %}
+                    {% if message.level_tag == 'success' %}
+                        <div class="alert alert-success">{{ message }}</div>
+                    {% else %}
+                        <div class="alert alert-warning">{{ message }}</div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+    {% endif %}
     <section class="container">
         <div id="id_table_title" class="table-title">
             <h2>List of Experiments</h2>
@@ -38,21 +51,21 @@
             `;
         }
         // Start html form
-        var html = `
+        let html = `
             <form action="/experiments/${experiment.id}/change_status" id="id_status_choices" method="POST">
             {% csrf_token %}
         `;
         // Buid input radios with experiment.status === key checked
-        for (var key in statuses) {
+        for (let key in statuses) {
             if (statuses.hasOwnProperty(key)) {
-                var checked = experiment.status === key ? 'checked' : '';
+                let checked = experiment.status === key ? 'checked' : '';
                 html += `
                     <input type="radio" name="status" value=${key} ${checked}>${statuses[key]} <br>
                 `;
             }
         }
         // Finish html form
-        html += `
+        html += `<div id="justification_area"></div>
                 <br>
                 <div class=modal-footer>
                     <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
@@ -64,21 +77,34 @@
 
     }
     $('#status_modal').on('show.bs.modal', function (event) {
-        var link = $(event.relatedTarget);
-        var experiment = {
+        let link = $(event.relatedTarget);
+        let experiment = {
             id: link.data('experiment_id'),
             title: link.data('experiment_title'),
             status: link.data('experiment_status')
         };
-        var statuses = link.data('experiment_statuses');
-        var modal = $(this);
+        let statuses = link.data('experiment_statuses');
+        let modal = $(this);
         modal.find('.modal-title').text('Change status for experiment ' +
             '"' + experiment.title + '"');
-        var modal_body = modal.find('.modal-body');
-        var html = statuses_radio_options(experiment, statuses);
+        let modal_body = modal.find('.modal-body');
+        let html = statuses_radio_options(experiment, statuses);
         modal_body.text('Please select an option:');
         modal_body.append(html);
-    })
+        {##}
+        {## if trustee will reprove experiment force her to write explaining ##}
+        {## message #}
+        {##}
+        $('#id_status_choices').find('input').on('change', function() {
+            if ( $('input[name=status]:checked', '#id_status_choices').val()
+                === 'not_approved') { // TODO: should be something like Experiment.NOT_APPROVED. See statuses variable.
+                $('#justification_area').append("<textarea " +
+                    "id='not_approved_box'></textarea>");
+            } else {
+                $('#justification_area').empty();
+            }
+        });
+    });
     </script>
 
     {##}

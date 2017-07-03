@@ -73,8 +73,8 @@ def create_researchers():
 
     for study in Study.objects.all():
         Researcher.objects.create(
-            name=fake.text(max_nb_chars=15),
-            email=fake.text(max_nb_chars=15),
+            name=fake.name(),
+            email=fake.email(),
             study=study
         )
         Collaborator.objects.create(name=fake.text(max_nb_chars=15),
@@ -248,14 +248,36 @@ def global_setup_ut():
         version=1, sent_date=datetime.utcnow(),
         status=Experiment.UNDER_ANALYSIS
     )
+    experiment3 = Experiment.objects.create(
+        title='Experiment 3', nes_id=2, owner=owner2,
+        version=1, sent_date=datetime.utcnow(),
+        status=Experiment.TO_BE_ANALYSED
+    )
 
     study1 = Study.objects.create(start_date=datetime.utcnow(),
                                   experiment=experiment1)
+    study2 = Study.objects.create(start_date=datetime.utcnow(),
+                                  experiment=experiment2)
+    # Create a study and doesn't associate it with researcher bellow.
+    # This is to testing creating research associate it with a study in
+    # test_models.py
     Study.objects.create(start_date=datetime.utcnow(),
-                         experiment=experiment2)
+                         experiment=experiment3)
 
     Researcher.objects.create(name='Raimundo Nonato',
                               email='rnonato@example.com', study=study1)
+    Researcher.objects.create(name='Raimunda da Silva',
+                              email='rsilva@example.com', study=study2)
+
+    # Create some keywords to associate with studies
+    create_keyword(10)
+    # Associate keywords with studies
+    for study in Study.objects.all():
+        kw1 = choice(Keyword.objects.all())
+        kw2 = choice(Keyword.objects.all())
+        kw3 = choice(Keyword.objects.all())
+        study.keywords.add(kw1, kw2, kw3)
+
     Collaborator.objects.create(
         name='Colaborador 1', team='Numec', coordinator=True,
         study=study1

@@ -25,6 +25,7 @@ class ExperimentAPITest(APITestCase):
 
         experiment1 = Experiment.objects.get(nes_id=1, owner=owner1)
         experiment2 = Experiment.objects.get(nes_id=1, owner=owner2)
+        experiment3 = Experiment.objects.get(nes_id=2, owner=owner2)
         response = self.client.get(self.list_url)
         self.assertEqual(
             json.loads(response.content.decode('utf8')),
@@ -54,6 +55,19 @@ class ExperimentAPITest(APITestCase):
                     'status': experiment2.status,
                     'protocol_components': [],
                     'sent_date': experiment2.sent_date.strftime('%Y-%m-%d')
+                },
+                {
+                    'id': experiment3.id,
+                    'title': experiment3.title,
+                    'description': experiment3.description,
+                    'data_acquisition_done':
+                        experiment3.data_acquisition_done,
+                    'nes_id': experiment3.nes_id,
+                    'ethics_committee_file': None,
+                    'owner': experiment3.owner.username,
+                    'status': experiment3.status,
+                    'protocol_components': [],
+                    'sent_date': experiment3.sent_date.strftime('%Y-%m-%d')
                 }
             ]
         )
@@ -325,11 +339,7 @@ class ResearcherAPITest(APITestCase):
 
     def test_get_returns_all_researchers_short_url(self):
         researcher1 = Researcher.objects.first()
-        study = Study.objects.last()
-        researcher2 = Researcher.objects.create(
-            name='Torquato Neto',
-            email='tn@example.com', study=study
-        )
+        researcher2 = Researcher.objects.last()
         list_url = reverse('api_researchers-list')
         response = self.client.get(list_url)
         self.assertEqual(

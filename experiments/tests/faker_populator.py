@@ -45,7 +45,7 @@ group.user_set.add(trustee2)
 
 for i in range(1, 4):
     experiment_owner1 = Experiment.objects.create(
-        title=fake.name(),
+        title=fake.word(),
         description=fake.text(),
         nes_id=i,
         owner=owner1, version=1,
