@@ -52,7 +52,8 @@
         }
         // Start html form
         let html = `
-            <form action="/experiments/${experiment.id}/change_status" id="id_status_choices" method="POST">
+            <form id="id_status_choices" action="/experiments/${experiment.id}/change_status"
+            method="POST">
             {% csrf_token %}
         `;
         // Buid input radios with experiment.status === key checked
@@ -91,19 +92,34 @@
         let html = statuses_radio_options(experiment, statuses);
         modal_body.text('Please select an option:');
         modal_body.append(html);
-        {##}
-        {## if trustee will reprove experiment force her to write explaining ##}
-        {## message #}
-        {##}
-        $('#id_status_choices').find('input').on('change', function() {
+        {# if trustee will reprove experiment, force her to write justification #}
+        {# message #}
+        let modal_form = $('#id_status_choices');
+        modal_form.find('input').on('change', function() {
             if ( $('input[name=status]:checked', '#id_status_choices').val()
                 === 'not_approved') { // TODO: should be something like Experiment.NOT_APPROVED. See statuses variable.
-                $('#justification_area').append("<textarea " +
-                    "id='not_approved_box'></textarea>");
+                $('#justification_area').append(
+                    `<br>
+                    <span class="alert">Justification is required to
+                    reject an experiment (this message will be sent to
+                    experiment researcher)*</span>
+                    <textarea rows="10" cols="50" id="not_approved_box"
+                    name="justification" placeholder="Please write a justification for rejecting this experiment"></textarea>`
+                    );
             } else {
                 $('#justification_area').empty();
             }
         });
+        {# TODO: Prevent submit changing status if user choose NOT_APPROVED and #}
+        {# doesn't fill in the justification message #}
+{#        modal_form.submit(function (e) {#}
+{#            if (#}
+{#                $('input[name=status]:checked', '#id_status_choices').val()#}
+{#                === 'not_approved' && $('#justification_area').is(':empty')#}
+{#            ) {#}
+{#                e.preventDefault();#}
+{#            }#}
+{#        });#}
     });
     </script>
 

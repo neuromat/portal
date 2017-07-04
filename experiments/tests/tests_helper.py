@@ -238,6 +238,9 @@ def global_setup_ut():
     owner2 = models.User.objects.create_user(username='lab2',
                                              password='nep-lab2')
 
+    # Create group Trustees
+    create_trustee_users()
+
     experiment1 = Experiment.objects.create(
         title='Experiment 1', nes_id=1, owner=owner1,
         version=1, sent_date=datetime.utcnow(),
