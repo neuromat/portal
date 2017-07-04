@@ -1,3 +1,4 @@
+from django.contrib.auth.models import User
 from django.test import TestCase
 
 from experiments import views
@@ -26,6 +27,9 @@ class HomePageTest(TestCase):
         self.assertTemplateUsed(response, 'experiments/detail.html')
 
     def test_trustee_can_change_experiment_status_with_a_POST_request(self):
+        trustee_user = User.objects.get(username='claudia')
+        # password='passwd' from test helper
+        self.client.login(username=trustee_user.username, password='passwd')
         experiment = Experiment.objects.filter(
             status=Experiment.TO_BE_ANALYSED
         ).first()
@@ -121,3 +125,17 @@ class HomePageTest(TestCase):
         )
         experiment = Experiment.objects.get(pk=experiment.id)
         self.assertNotEqual('', experiment.justification)
+
+    def test_change_status_to_under_analysis_associate_experiment_with_trustee(self):
+        trustee_user = User.objects.get(username='claudia')
+        # password='passwd' from test helper
+        self.client.login(username=trustee_user.username, password='passwd')
+        experiment = Experiment.objects.filter(
+            status=Experiment.TO_BE_ANALYSED
+        ).first()
+        self.client.post(
+            '/experiments/' + str(experiment.id) + '/change_status/',
+            {'status': Experiment.UNDER_ANALYSIS},
+        )
+        experiment = Experiment.objects.get(pk=experiment.id)
+        self.assertEqual(trustee_user, experiment.trustee)

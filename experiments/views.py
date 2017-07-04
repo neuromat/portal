@@ -78,6 +78,7 @@ def change_status(request, experiment_id):
             )
             return HttpResponseRedirect('/')
         else:
+            # If has justification send email to researcher
             subject = 'Your experiment was rejected in ODEN portal'
             message = 'Your experiment ' + experiment.title + \
                       ' was rejected by the Portal committee. The reason ' \
@@ -94,8 +95,8 @@ def change_status(request, experiment_id):
             RejectJustification.objects.create(message=justification,
                                                experiment=experiment)
 
-    # if status changed to UNDER_ANALYSIS, APPROVED, or NOT_APPROVED send email
-    # to  experiment study researcher
+    # if status changed to UNDER_ANALYSIS or APPROVED, send email
+    # to experiment study researcher
     if status == Experiment.APPROVED:
         subject = 'Your experiment was approved in ODEN portal'
         message = 'Congratulations, your experiment ' + experiment.title + \
@@ -110,7 +111,7 @@ def change_status(request, experiment_id):
             'An email was sent to ' + experiment.study.researcher.name +
             ' warning that the experiment changed status to Approved.'
         )
-    elif status == Experiment.UNDER_ANALYSIS:
+    if status == Experiment.UNDER_ANALYSIS:
         subject = 'Your experiment is now under analysis in ODEN portal'
         message = 'Your experiment ' + experiment.title + \
                   ' is under analysis by the Portal committee.'
@@ -121,6 +122,8 @@ def change_status(request, experiment_id):
             'An email was sent to ' + experiment.study.researcher.name +
             ' warning that the experiment is under analysis.'
         )
+        # Associate experiment with trustee
+        experiment.trustee = request.user
 
     # TODO: if status changes to TO_BE_ANALYSED remove trustee from experiment
 

@@ -101,6 +101,7 @@ class ExperimentModelTest(TestCase):
         self.assertEqual(experiment.sent_date, None)
         self.assertEqual(experiment.version, None)
         self.assertEqual(experiment.status, experiment.RECEIVING)
+        self.assertEqual(experiment.trustee, None)
 
     def test_cannot_save_empty_attributes(self):
         owner = User.objects.first()
