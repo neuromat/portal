@@ -58,12 +58,18 @@ def experiment_detail(request, experiment_id):
 
 def change_status(request, experiment_id):
     from_email = 'noreplay@nep.prp.usp.br'
+    status = request.POST.get('status')
+    justification = request.POST.get('justification')
+    experiment = Experiment.objects.get(pk=experiment_id)
+
+    # If status posted is the same as current simply redirect to home page
+    if status == experiment.status:
+        return HttpResponseRedirect('/')
+
     # If status postted is NOT_APPROVED verify if a justification message
     # was postted too. If not redirect to home page with warning message.
-    status = request.POST.get('status')
-    experiment = Experiment.objects.get(pk=experiment_id)
     if status == Experiment.NOT_APPROVED:
-        if not request.POST.get('justification'):
+        if not justification:
             messages.warning(
                 request,
                 'The status of experiment ' + experiment.title + ' hasn\'t '
@@ -74,8 +80,9 @@ def change_status(request, experiment_id):
         else:
             subject = 'Your experiment was rejected in ODEN portal'
             message = 'Your experiment ' + experiment.title + \
-                      ' was rejected by the Portal committee. The reason was: ' \
-                      'TODO: reason why experiment was not approved'
+                      ' was rejected by the Portal committee. The reason ' \
+                      'was: ' + justification
+
             send_mail(subject, message, from_email,
                       [experiment.study.researcher.email])
             messages.success(

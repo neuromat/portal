@@ -104,3 +104,7 @@ class HomePageTest(TestCase):
         # experiment has mantained status UNDER_ANALYSIS?
         experiment = Experiment.objects.get(pk=experiment.id)
         self.assertEqual(experiment.status, Experiment.UNDER_ANALYSIS)
+
+    # TODO!
+    def test_does_not_send_email_when_status_remains_the_same(self):
+        pass
