@@ -91,15 +91,19 @@
         let html = statuses_radio_options(experiment, statuses);
         modal_body.text('Please select an option:');
         modal_body.append(html);
-        {##}
-        {## if trustee will reprove experiment force her to write explaining ##}
-        {## message #}
-        {##}
+        {# if trustee will reprove experiment, force her to write justification #}
+        {# message #}
         $('#id_status_choices').find('input').on('change', function() {
             if ( $('input[name=status]:checked', '#id_status_choices').val()
                 === 'not_approved') { // TODO: should be something like Experiment.NOT_APPROVED. See statuses variable.
-                $('#justification_area').append("<textarea " +
-                    "id='not_approved_box' name='justification'></textarea>");
+                $('#justification_area').append(
+                    `<br>
+                    <span class="alert">Justification is required to
+                    reject an experiment (this message will be sent to
+                    experiment researcher)*</span>
+                    <textarea rows="10" cols="50" id="not_approved_box"
+                    name="justification"></textarea>`
+                    );
             } else {
                 $('#justification_area').empty();
             }

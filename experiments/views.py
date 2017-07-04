@@ -57,7 +57,8 @@ def experiment_detail(request, experiment_id):
 
 
 def change_status(request, experiment_id):
-    # if status postted is NOT_APPROVED verify if a justification message
+    from_email = 'noreplay@nep.prp.usp.br'
+    # If status postted is NOT_APPROVED verify if a justification message
     # was postted too. If not redirect to home page with warning message.
     status = request.POST.get('status')
     experiment = Experiment.objects.get(pk=experiment_id)
@@ -70,13 +71,21 @@ def change_status(request, experiment_id):
                 'justification. Please resubmit changing status.'
             )
             return HttpResponseRedirect('/')
-
-    experiment.status = status
-    experiment.save()
+        else:
+            subject = 'Your experiment was rejected in ODEN portal'
+            message = 'Your experiment ' + experiment.title + \
+                      ' was rejected by the Portal committee. The reason was: ' \
+                      'TODO: reason why experiment was not approved'
+            send_mail(subject, message, from_email,
+                      [experiment.study.researcher.email])
+            messages.success(
+                request,
+                'An email was sent to ' + experiment.study.researcher.name +
+                ' warning that the experiment was rejected.'
+            )
 
     # if status changed to UNDER_ANALYSIS, APPROVED, or NOT_APPROVED send email
     # to  experiment study researcher
-    from_email = 'noreplay@nep.prp.usp.br'
     if status == Experiment.APPROVED:
         subject = 'Your experiment was approved in ODEN portal'
         message = 'Congratulations, your experiment ' + experiment.title + \
@@ -91,18 +100,6 @@ def change_status(request, experiment_id):
             'An email was sent to ' + experiment.study.researcher.name +
             ' warning that the experiment changed status to Approved.'
         )
-    elif status == Experiment.NOT_APPROVED:
-        subject = 'Your experiment was rejected in ODEN portal'
-        message = 'Your experiment ' + experiment.title + \
-                  ' was rejected by the Portal committee. The reason was: ' \
-                  'TODO: reason why experiment was not approved'
-        send_mail(subject, message, from_email,
-                  [experiment.study.researcher.email])
-        messages.success(
-            request,
-            'An email was sent to ' + experiment.study.researcher.name +
-            ' warning that the experiment was rejected.'
-        )
     elif status == Experiment.UNDER_ANALYSIS:
         subject = 'Your experiment is now under analysis in ODEN portal'
         message = 'Your experiment ' + experiment.title + \
@@ -114,6 +111,11 @@ def change_status(request, experiment_id):
             'An email was sent to ' + experiment.study.researcher.name +
             ' warning that the experiment is under analysis.'
         )
+
+    # TODO: if status changes to TO_BE_ANALYSED remove trustee from experiment
+
+    experiment.status = status
+    experiment.save()
 
     return HttpResponseRedirect('/')
 
