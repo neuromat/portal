@@ -183,6 +183,7 @@ def global_setup_ft():
     # created inside create_experiment_and_study)
     create_experiment_and_study(2, choice([owner1, owner2]),
                                 Experiment.TO_BE_ANALYSED)
+    # TODO: when creating experiment UNDER_ANALYSIS, associate with a trustee
     create_experiment_and_study(1, choice([owner1, owner2]),
                                 Experiment.UNDER_ANALYSIS)
     create_experiment_and_study(1, choice([owner1, owner2]),
@@ -249,7 +250,8 @@ def global_setup_ut():
     experiment2 = Experiment.objects.create(
         title='Experiment 2', nes_id=1, owner=owner2,
         version=1, sent_date=datetime.utcnow(),
-        status=Experiment.UNDER_ANALYSIS
+        status=Experiment.UNDER_ANALYSIS,
+        trustee=models.User.objects.get(username='claudia')
     )
     experiment3 = Experiment.objects.create(
         title='Experiment 3', nes_id=2, owner=owner2,

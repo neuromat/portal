@@ -139,3 +139,17 @@ class HomePageTest(TestCase):
         )
         experiment = Experiment.objects.get(pk=experiment.id)
         self.assertEqual(trustee_user, experiment.trustee)
+
+    def test_change_status_from_under_analysis_to_to_be_analysed_disassociate_trustee(self):
+        trustee_user = User.objects.get(username='claudia')
+        # password='passwd' from test helper
+        self.client.login(username=trustee_user.username, password='passwd')
+        experiment = Experiment.objects.filter(
+            status=Experiment.UNDER_ANALYSIS
+        ).first()
+        self.client.post(
+            '/experiments/' + str(experiment.id) + '/change_status/',
+            {'status': Experiment.TO_BE_ANALYSED},
+        )
+        experiment = Experiment.objects.get(pk=experiment.id)
+        self.assertEqual(None, experiment.trustee)

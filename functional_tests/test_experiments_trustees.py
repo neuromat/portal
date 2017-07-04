@@ -323,3 +323,32 @@ class TrusteeTest(FunctionalTestTrustee):
                          experiment.study.researcher.name +
                          ' warning that the experiment is under analysis.',
                          self.browser.find_element_by_tag_name('body').text)
+
+    def test_change_status_from_under_analysis_to_to_be_analysed_displays_warning_message(self):
+        # Claudia clicks an experiment that she is already analysing. She is
+        # in doubt about some aspect of it, and wants to pass it to other
+        # trustee.
+        experiment_link = self.browser.find_element_by_link_text(
+            'Under analysis')
+        experiment_id = experiment_link.get_attribute('data-experiment_id')
+        experiment = Experiment.objects.get(id=experiment_id)
+        experiment_link.click()
+        time.sleep(1)
+        # The modal to change experiment status pop up, and she chooses
+        # TO_BE_ANALYSED to liberate the experiment to be analysed by other
+        # trustee.
+        form_status_choices = self.browser.find_element_by_id(
+            'id_status_choices')
+        form_status_choices.find_element_by_xpath(
+            '//input[@type="radio" and  @value=' + '"' +
+            Experiment.TO_BE_ANALYSED + '"]').click()
+        self.browser.find_element_by_id('id_submit').send_keys(Keys.ENTER)
+        time.sleep(1)
+        td_tag_status = self.browser.find_element_by_xpath(
+            "//a[@data-experiment_id='" + str(experiment.id) + "']"
+        ).text
+        # Experiment.STATUS[1][1] == 'To be analysed'
+        self.assertEqual(td_tag_status, Experiment.STATUS_OPTIONS[1][1])
+        self.assertIn('You have liberate the experiment ' + experiment.title
+                      + ' to be analysed by other trustee.',
+                      self.browser.find_element_by_tag_name('body').text)
