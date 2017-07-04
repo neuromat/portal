@@ -41,7 +41,7 @@ class HomePageTest(TestCase):
 
     def test_sends_email_to_researcher_when_trustee_changes_status(self):
         """
-        We test for changing status from UNDER_ANALYSIS to APPROVED
+        We test for changing status from UNDER_ANALYSIS to APPROVED.
         Other are similar.
         """
         # TODO: See if is valid to implement all of them.
@@ -74,6 +74,7 @@ class HomePageTest(TestCase):
         self.assertEqual(self.to, [experiment.study.researcher.email])
 
     def test_adds_success_message(self):
+        # TODO: see if is worth to test other messages
         experiment = Experiment.objects.filter(
             status=Experiment.UNDER_ANALYSIS
         ).first()
@@ -106,5 +107,17 @@ class HomePageTest(TestCase):
         self.assertEqual(experiment.status, Experiment.UNDER_ANALYSIS)
 
     # TODO!
-    def test_does_not_send_email_when_status_remains_the_same(self):
+    def test_doesnt_send_email_when_status_remains_the_same(self):
         pass
+
+    def test_when_change_status_to_not_approved_save_justification_message(self):
+        experiment = Experiment.objects.filter(
+            status=Experiment.UNDER_ANALYSIS
+        ).first()
+        self.client.post(
+            '/experiments/' + str(experiment.id) + '/change_status/',
+            {'status': Experiment.NOT_APPROVED,
+             'justification': '404 Bad experiment!'},
+        )
+        experiment = Experiment.objects.get(pk=experiment.id)
+        self.assertNotEqual('', experiment.justification)

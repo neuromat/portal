@@ -4,7 +4,7 @@ from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import render
 
 from experiments import appclasses
-from experiments.models import Experiment
+from experiments.models import Experiment, RejectJustification
 
 
 def home_page(request):
@@ -90,6 +90,9 @@ def change_status(request, experiment_id):
                 'An email was sent to ' + experiment.study.researcher.name +
                 ' warning that the experiment was rejected.'
             )
+            # Save the justification message
+            RejectJustification.objects.create(message=justification,
+                                               experiment=experiment)
 
     # if status changed to UNDER_ANALYSIS, APPROVED, or NOT_APPROVED send email
     # to  experiment study researcher
