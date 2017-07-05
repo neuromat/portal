@@ -85,7 +85,7 @@ def change_status(request, experiment_id):
                       'was: ' + justification
 
             send_mail(subject, message, from_email,
-                      ['crns13@gmail.com'])
+                      [experiment.study.researcher.email])
             messages.success(
                 request,
                 'An email was sent to ' + experiment.study.researcher.name +
@@ -105,7 +105,7 @@ def change_status(request, experiment_id):
                   'You can view your experiment data in ' + \
                   'http://' + request.get_host()
         send_mail(subject, message, from_email,
-                  ['crns13@gmail.com'])
+                  [experiment.study.researcher.email])
         messages.success(
             request,
             'An email was sent to ' + experiment.study.researcher.name +
@@ -116,7 +116,7 @@ def change_status(request, experiment_id):
         message = 'Your experiment ' + experiment.title + \
                   ' is under analysis by the Portal committee.'
         send_mail(subject, message, from_email,
-                  ['crns13@gmail.com'])
+                  [experiment.study.researcher.email])
         messages.success(
             request,
             'An email was sent to ' + experiment.study.researcher.name +
