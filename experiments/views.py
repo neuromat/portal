@@ -125,7 +125,18 @@ def change_status(request, experiment_id):
         # Associate experiment with trustee
         experiment.trustee = request.user
 
-    # TODO: if status changes to TO_BE_ANALYSED remove trustee from experiment
+    # If status posted is TO_BE_ANALYSED and current experiment status is
+    # UNDER_ANALYLIS disassociate trustee from experiment and warning
+    # trustee that the experiment is going to be free for other trustee
+    # analysis
+    if status == Experiment.TO_BE_ANALYSED:
+        if experiment.status == Experiment.UNDER_ANALYSIS:
+            experiment.trustee = None
+            messages.success(
+                request,
+                'You have liberate the experiment ' + experiment.title
+                + ' to be analysed by other trustee.'
+            )
 
     experiment.status = status
     experiment.save()

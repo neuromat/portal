@@ -44,10 +44,23 @@
      * Receives experiment status and statuses in json encoding,
      * and construct html with input radios in a form inside modal.
      */
-    function statuses_radio_options(experiment, statuses) {
+    function statuses_radio_options(experiment, statuses, logged_user) {
+        // Does not display form to choose new experiment status if statuses is
+        // empty. Insted display a warning.
         if ($.isEmptyObject(statuses)) {
             return `
                 <p class="alert">You can\'t change an experiment status that has already been approved or rejected.</p>
+            `;
+        }
+        // If experiment is under analysis and logged user is different from
+        // experiment trustee does not display experiment status form. Instead
+        // display a warning.
+        // TODO: we are comparing with string literal. Best would be refer to
+        // TODO: Experiment.UNDER_ANALYSIS.
+        if (experiment.status === 'under_analysis' && logged_user !==
+            experiment.trustee) {
+            return `
+                <p class="alert">This experiment is already under analysis by trustee ${experiment.trustee}.</p>
             `;
         }
         // Start html form
@@ -82,14 +95,16 @@
         let experiment = {
             id: link.data('experiment_id'),
             title: link.data('experiment_title'),
-            status: link.data('experiment_status')
+            status: link.data('experiment_status'),
+            trustee: link.data('experiment_trustee'),
         };
+        let logged_user = link.data('logged_user');
         let statuses = link.data('experiment_statuses');
         let modal = $(this);
         modal.find('.modal-title').text('Change status for experiment ' +
             '"' + experiment.title + '"');
         let modal_body = modal.find('.modal-body');
-        let html = statuses_radio_options(experiment, statuses);
+        let html = statuses_radio_options(experiment, statuses, logged_user);
         modal_body.text('Please select an option:');
         modal_body.append(html);
         {# if trustee will reprove experiment, force her to write justification #}
