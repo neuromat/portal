@@ -78,8 +78,8 @@ def change_status(request, experiment_id):
             )
             return HttpResponseRedirect('/')
         else:
-            # If has justification send email to researcher
-            subject = 'Your experiment was rejected in ODEN portal'
+            # if has justification send email to researcher
+            subject = 'Your experiment was rejected in NEDP portal'
             message = 'Your experiment ' + experiment.title + \
                       ' was rejected by the Portal committee. The reason ' \
                       'was: ' + justification
@@ -98,7 +98,7 @@ def change_status(request, experiment_id):
     # if status changed to UNDER_ANALYSIS or APPROVED, send email
     # to experiment study researcher
     if status == Experiment.APPROVED:
-        subject = 'Your experiment was approved in ODEN portal'
+        subject = 'Your experiment was approved in NEDP portal'
         message = 'Congratulations, your experiment ' + experiment.title + \
                   ' was approved by the Portal committee. Now it is public ' \
                   'available under Creative Commons Share Alike license.\n' \
@@ -112,7 +112,7 @@ def change_status(request, experiment_id):
             ' warning that the experiment changed status to Approved.'
         )
     if status == Experiment.UNDER_ANALYSIS:
-        subject = 'Your experiment is now under analysis in ODEN portal'
+        subject = 'Your experiment is now under analysis in NEDP portal'
         message = 'Your experiment ' + experiment.title + \
                   ' is under analysis by the Portal committee.'
         send_mail(subject, message, from_email,

@@ -45,7 +45,7 @@ group.user_set.add(trustee2)
 
 for i in range(1, 4):
     experiment_owner1 = Experiment.objects.create(
-        title=fake.word(),
+        title=fake.word().title(),
         description=fake.text(),
         nes_id=i,
         owner=owner1, version=1,
@@ -53,7 +53,7 @@ for i in range(1, 4):
         status=Experiment.TO_BE_ANALYSED
     )
     Study.objects.create(
-        title=fake.name(),
+        title=fake.word().title(),
         description=fake.text(),
         start_date=datetime.utcnow(), experiment=experiment_owner1
     )
@@ -61,7 +61,7 @@ for i in range(1, 4):
 
 for i in range(4, 6):
     experiment_owner2 = Experiment.objects.create(
-        title=fake.name(),
+        title=fake.word().title(),
         description=fake.text(),
         nes_id=i,
         owner=owner2, version=1,
@@ -69,7 +69,7 @@ for i in range(4, 6):
         status=Experiment.TO_BE_ANALYSED
     )
     Study.objects.create(
-        title=fake.name(),
+        title=fake.word().title(),
         description=fake.text(),
         start_date=datetime.utcnow(), experiment=experiment_owner2
     )

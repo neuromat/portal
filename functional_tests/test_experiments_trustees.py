@@ -1,7 +1,6 @@
 import re
 import time
 
-from django.contrib.auth.models import User
 from django.core import mail
 from selenium.webdriver.common.keys import Keys
 
@@ -157,7 +156,7 @@ class TrusteeTest(FunctionalTestTrustee):
         email = mail.outbox[0]
         self.assertIn(experiment.study.researcher.email, email.to)
         self.assertEqual(email.subject,
-                         'Your experiment was approved in ODEN portal')
+                         'Your experiment was approved in NEDP portal')
         # Inside it, there's a message with congratulations and a link to
         # the Portal
         self.assertIn('Congratulations, your experiment ' + experiment.title
@@ -370,7 +369,7 @@ class TrusteeTest(FunctionalTestTrustee):
                       + ' to be analysed by other trustee.',
                       self.browser.find_element_by_tag_name('body').text)
 
-    def can_change_status_from_under_analysis_to_other_only_if_trustee_is_the_owner(self):
+    def test_can_change_status_from_under_analysis_to_other_only_if_trustee_is_the_owner(self):
         # Claudia see an experiment that is UNDER_ANALYSIS and
         # click on it. He sees a modal warning that the experiment has already
         # under analysis by other trustee.
