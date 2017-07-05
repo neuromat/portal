@@ -144,5 +144,5 @@ urlpatterns = [
         api_experiment_context_tree_list, name='api_experiment_context_tree-list'),
 
     # Step
-    url(r'^group/(?P<pk>[0-9]+)/step/$', api_step_list, name='api_step-list'),
+    url(r'^groups/(?P<pk>[0-9]+)/step/$', api_step_list, name='api_step-list'),
 ]

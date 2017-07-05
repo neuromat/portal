@@ -169,6 +169,19 @@ class ParticipantSerializer(serializers.ModelSerializer):
         fields = ('id', 'group', 'code', 'gender', 'age')
 
 
+class StepSerializer(serializers.ModelSerializer):
+    group = serializers.ReadOnlyField(source='group.title')
+
+    class Meta:
+        model = Step
+        fields = ('id', 'group', 'identification', 'description',
+                  'duration_value', 'duration_unit', 'numeration',
+                  'type', 'parent', 'order',
+                  'number_of_repetitions',
+                  'interval_between_repetitions_value',
+                  'interval_between_repetitions_unit',
+                  'random_position')
+
 #############
 # API Views #
 #############
@@ -440,13 +453,12 @@ class ContextTreeViewSet(viewsets.ModelViewSet):
         serializer.save(experiment=experiment)
 
 
-# parei aqui!!
 class StepViewSet(viewsets.ModelViewSet):
-    serializer_class = ParticipantSerializer
+    serializer_class = StepSerializer
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
 
     def get_queryset(self):
-        return Participant.objects.filter(group_id=self.kwargs['pk'])
+        return Step.objects.filter(group_id=self.kwargs['pk'])
 
     def perform_create(self, serializer):
         group = Group.objects.get(pk=self.kwargs['pk'])
