@@ -54,8 +54,11 @@
          */
         function statuses_radio_options(experiment, statuses, logged_user) {
             // Does not display form to choose new experiment status if statuses is
-            // empty. Insted display a warning.
+            // empty - is empty because list_trustee.html bring satuses empty when
+            // experiment status is approved or not approved.
+            // Instead display a warning.
             if ($.isEmptyObject(statuses)) {
+
                 return `
                 <p class="alert">You can\'t change an experiment status that has already been approved or rejected.</p>
             `;
