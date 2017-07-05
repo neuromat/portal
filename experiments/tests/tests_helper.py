@@ -165,6 +165,25 @@ def create_keyword(qtty):
         Keyword.objects.create(name=keyword)
 
 
+def associate_experiments_to_trustees():
+    trustee1 = models.User.objects.get(username='claudia')  # requires
+    # creates trustee Claudia
+    trustee2 = models.User.objects.get(username='roque')  # requires
+    # creates trustee Roque
+    for experiment in Experiment.objects.filter(
+            status=Experiment.UNDER_ANALYSIS):
+        experiment.trustee = choice([trustee1, trustee2])
+    # Guarantee that at least one experiment has trustee as Claudia and one
+    # experiment has trustee as Roque (requires creates at least two
+    # experiments that are under analysis).
+    exp1 = Experiment.objects.filter(status=Experiment.UNDER_ANALYSIS).first()
+    exp2 = Experiment.objects.filter(status=Experiment.UNDER_ANALYSIS).last()
+    exp1.trustee = trustee1
+    exp1.save()
+    exp2.trustee = trustee2
+    exp2.save()
+
+
 def global_setup_ft():
     """
     This global setup creates basic object models that are used in 
@@ -184,12 +203,16 @@ def global_setup_ft():
     create_experiment_and_study(2, choice([owner1, owner2]),
                                 Experiment.TO_BE_ANALYSED)
     # TODO: when creating experiment UNDER_ANALYSIS, associate with a trustee
-    create_experiment_and_study(1, choice([owner1, owner2]),
+    create_experiment_and_study(2, choice([owner1, owner2]),
                                 Experiment.UNDER_ANALYSIS)
     create_experiment_and_study(1, choice([owner1, owner2]),
                                 Experiment.APPROVED)
     create_experiment_and_study(1, choice([owner1, owner2]),
                                 Experiment.NOT_APPROVED)
+
+    # Associate trustee to studies under analysis (requires create
+    # experiments before)
+    associate_experiments_to_trustees()
 
     # Create study collaborators (requires creating studies before)
     for study in Study.objects.all():
