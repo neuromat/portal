@@ -249,12 +249,12 @@ class StudyViewSet(viewsets.ModelViewSet):
             exp_nes_id, owner
         ).get_last_version()
         # TODO: if last_version == 0 generates exception: "no experiment was
-        # created yet"
+        # TODO: created yet"
         experiment = Experiment.objects.get(
             nes_id=exp_nes_id, owner=owner, version=last_version
         )
         # TODO: breaks when posting from the api template.
-        # Doesn't have researcher field to enter a valid reseacher.
+        # Doesn't have researcher field to enter a valid r.
         serializer.save(experiment=experiment)
 
 

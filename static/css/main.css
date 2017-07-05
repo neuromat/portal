@@ -10,6 +10,9 @@ h1, h3, h4, h5, p {
 p.alert{
   color: red;
 }
+span.alert{
+  color: red;
+}
 
 /*
   ========================================
@@ -160,6 +163,9 @@ i#new_experiments {
   margin-bottom: 5px;
 }
 
+.warning-message {
+  margin-top: 20px;
+}
 
 /*
   ========================================

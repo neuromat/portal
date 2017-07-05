@@ -6,6 +6,27 @@
 
 {% block content %}
     <section class="container">
+        {% if messages %}
+            <div class="row warning-message">
+                {% for message in messages %}
+                    {% if message.level_tag == 'success' %}
+                        <div class="alert alert-success">
+                            <button type="button" class="close"
+                                    data-dismiss="alert"
+                                    aria-hidden="true">&times;</button>
+                            {{ message }}
+                        </div>
+                    {% else %}
+                        <div class="alert alert-warning">
+                            {# TODO: repeting button tag. Is there other solution? #}
+                            <button type="button" class="close"
+                                    data-dismiss="alert"aria-hidden="true">&times;</button>
+                            {{ message }}
+                        </div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+        {% endif %}
         <div id="id_table_title" class="table-title">
             <h2>List of Experiments</h2>
         </div>
@@ -27,32 +48,46 @@
     {## Script related to experiments/list_trustee.html ##}
     {##}
     <script>
-    /**
-     * Receives experiment status and statuses in json encoding,
-     * and construct html with input radios in a form inside modal.
-     */
-    function statuses_radio_options(experiment, statuses) {
-        if ($.isEmptyObject(statuses)) {
-            return `
+        /**
+         * Receives experiment status and statuses in json encoding,
+         * and construct html with input radios in a form inside modal.
+         */
+        function statuses_radio_options(experiment, statuses, logged_user) {
+            // Does not display form to choose new experiment status if statuses is
+            // empty. Insted display a warning.
+            if ($.isEmptyObject(statuses)) {
+                return `
                 <p class="alert">You can\'t change an experiment status that has already been approved or rejected.</p>
             `;
-        }
-        // Start html form
-        var html = `
-            <form action="/experiments/${experiment.id}/change_status" id="id_status_choices" method="POST">
+            }
+            // If experiment is under analysis and logged user is different from
+            // experiment trustee does not display experiment status form. Instead
+            // display a warning.
+            // TODO: we are comparing with string literal. Best would be refer to
+            // TODO: Experiment.UNDER_ANALYSIS.
+            if (experiment.status === 'under_analysis' && logged_user !==
+                experiment.trustee) {
+                return `
+                <p class="alert">This experiment is already under analysis by trustee ${experiment.trustee}.</p>
+            `;
+            }
+            // Start html form
+            let html = `
+            <form id="id_status_choices" action="/experiments/${experiment.id}/change_status"
+            method="POST">
             {% csrf_token %}
         `;
-        // Buid input radios with experiment.status === key checked
-        for (var key in statuses) {
-            if (statuses.hasOwnProperty(key)) {
-                var checked = experiment.status === key ? 'checked' : '';
-                html += `
+            // Buid input radios with experiment.status === key checked
+            for (let key in statuses) {
+                if (statuses.hasOwnProperty(key)) {
+                    let checked = experiment.status === key ? 'checked' : '';
+                    html += `
                     <input type="radio" name="status" value=${key} ${checked}>${statuses[key]} <br>
                 `;
+                }
             }
-        }
-        // Finish html form
-        html += `
+            // Finish html form
+            html += `<div id="justification_area"></div>
                 <br>
                 <div class=modal-footer>
                     <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
@@ -60,25 +95,55 @@
                 </div>
             </form>
          `;
-        return html;
+            return html;
 
-    }
-    $('#status_modal').on('show.bs.modal', function (event) {
-        var link = $(event.relatedTarget);
-        var experiment = {
-            id: link.data('experiment_id'),
-            title: link.data('experiment_title'),
-            status: link.data('experiment_status')
-        };
-        var statuses = link.data('experiment_statuses');
-        var modal = $(this);
-        modal.find('.modal-title').text('Change status for experiment ' +
-            '"' + experiment.title + '"');
-        var modal_body = modal.find('.modal-body');
-        var html = statuses_radio_options(experiment, statuses);
-        modal_body.text('Please select an option:');
-        modal_body.append(html);
-    })
+        }
+        $('#status_modal').on('show.bs.modal', function (event) {
+            let link = $(event.relatedTarget);
+            let experiment = {
+                id: link.data('experiment_id'),
+                title: link.data('experiment_title'),
+                status: link.data('experiment_status'),
+                trustee: link.data('experiment_trustee'),
+            };
+            let logged_user = link.data('logged_user');
+            let statuses = link.data('experiment_statuses');
+            let modal = $(this);
+            modal.find('.modal-title').text('Change status for experiment ' +
+                '"' + experiment.title + '"');
+            let modal_body = modal.find('.modal-body');
+            let html = statuses_radio_options(experiment, statuses, logged_user);
+            modal_body.text('Please select an option:');
+            modal_body.append(html);
+            {# if trustee will reprove experiment, force her to write justification #}
+            {# message #}
+            let modal_form = $('#id_status_choices');
+            modal_form.find('input').on('change', function() {
+                if ( $('input[name=status]:checked', '#id_status_choices').val()
+                    === 'not_approved') { // TODO: should be something like Experiment.NOT_APPROVED. See statuses variable.
+                    $('#justification_area').append(
+                        `<br>
+                    <span class="alert">Justification is required to
+                    reject an experiment (this message will be sent to
+                    experiment researcher)*</span>
+                    <textarea rows="10" cols="50" id="not_approved_box"
+                    name="justification" placeholder="Please write a justification for rejecting this experiment"></textarea>`
+                    );
+                } else {
+                    $('#justification_area').empty();
+                }
+            });
+            {# TODO: Prevent submit changing status if user choose NOT_APPROVED and #}
+            {# doesn't fill in the justification message #}
+            {#        modal_form.submit(function (e) {#}
+            {#            if (#}
+            {#                $('input[name=status]:checked', '#id_status_choices').val()#}
+            {#                === 'not_approved' && $('#justification_area').is(':empty')#}
+            {#            ) {#}
+            {#                e.preventDefault();#}
+            {#            }#}
+            {#        });#}
+        });
     </script>
 
     {##}
@@ -86,4 +151,7 @@
     {##}
     {% load static %}
     <script src="{% static 'js/new_experiments_received.js' %}"></script>
+    <script>
+        $('div.warning-message').delay(6000).slideUp(300);
+    </script>
 {% endblock %}

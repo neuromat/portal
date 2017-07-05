@@ -73,8 +73,8 @@ def create_researchers():
 
     for study in Study.objects.all():
         Researcher.objects.create(
-            name=fake.text(max_nb_chars=15),
-            email=fake.text(max_nb_chars=15),
+            name=fake.name(),
+            email=fake.email(),
             study=study
         )
         Collaborator.objects.create(name=fake.text(max_nb_chars=15),
@@ -165,6 +165,25 @@ def create_keyword(qtty):
         Keyword.objects.create(name=keyword)
 
 
+def associate_experiments_to_trustees():
+    trustee1 = models.User.objects.get(username='claudia')  # requires
+    # creates trustee Claudia
+    trustee2 = models.User.objects.get(username='roque')  # requires
+    # creates trustee Roque
+    for experiment in Experiment.objects.filter(
+            status=Experiment.UNDER_ANALYSIS):
+        experiment.trustee = choice([trustee1, trustee2])
+    # Guarantee that at least one experiment has trustee as Claudia and one
+    # experiment has trustee as Roque (requires creates at least two
+    # experiments that are under analysis).
+    exp1 = Experiment.objects.filter(status=Experiment.UNDER_ANALYSIS).first()
+    exp2 = Experiment.objects.filter(status=Experiment.UNDER_ANALYSIS).last()
+    exp1.trustee = trustee1
+    exp1.save()
+    exp2.trustee = trustee2
+    exp2.save()
+
+
 def global_setup_ft():
     """
     This global setup creates basic object models that are used in 
@@ -183,12 +202,17 @@ def global_setup_ft():
     # created inside create_experiment_and_study)
     create_experiment_and_study(2, choice([owner1, owner2]),
                                 Experiment.TO_BE_ANALYSED)
-    create_experiment_and_study(1, choice([owner1, owner2]),
+    # TODO: when creating experiment UNDER_ANALYSIS, associate with a trustee
+    create_experiment_and_study(2, choice([owner1, owner2]),
                                 Experiment.UNDER_ANALYSIS)
     create_experiment_and_study(1, choice([owner1, owner2]),
                                 Experiment.APPROVED)
     create_experiment_and_study(1, choice([owner1, owner2]),
                                 Experiment.NOT_APPROVED)
+
+    # Associate trustee to studies under analysis (requires create
+    # experiments before)
+    associate_experiments_to_trustees()
 
     # Create study collaborators (requires creating studies before)
     for study in Study.objects.all():
@@ -238,6 +262,9 @@ def global_setup_ut():
     owner2 = models.User.objects.create_user(username='lab2',
                                              password='nep-lab2')
 
+    # Create group Trustees
+    create_trustee_users()
+
     experiment1 = Experiment.objects.create(
         title='Experiment 1', nes_id=1, owner=owner1,
         version=1, sent_date=datetime.utcnow(),
@@ -246,16 +273,39 @@ def global_setup_ut():
     experiment2 = Experiment.objects.create(
         title='Experiment 2', nes_id=1, owner=owner2,
         version=1, sent_date=datetime.utcnow(),
-        status=Experiment.UNDER_ANALYSIS
+        status=Experiment.UNDER_ANALYSIS,
+        trustee=models.User.objects.get(username='claudia')
+    )
+    experiment3 = Experiment.objects.create(
+        title='Experiment 3', nes_id=2, owner=owner2,
+        version=1, sent_date=datetime.utcnow(),
+        status=Experiment.TO_BE_ANALYSED
     )
 
     study1 = Study.objects.create(start_date=datetime.utcnow(),
                                   experiment=experiment1)
+    study2 = Study.objects.create(start_date=datetime.utcnow(),
+                                  experiment=experiment2)
+    # Create a study and doesn't associate it with researcher bellow.
+    # This is to testing creating research associate it with a study in
+    # test_models.py
     Study.objects.create(start_date=datetime.utcnow(),
-                         experiment=experiment2)
+                         experiment=experiment3)
 
     Researcher.objects.create(name='Raimundo Nonato',
                               email='rnonato@example.com', study=study1)
+    Researcher.objects.create(name='Raimunda da Silva',
+                              email='rsilva@example.com', study=study2)
+
+    # Create some keywords to associate with studies
+    create_keyword(10)
+    # Associate keywords with studies
+    for study in Study.objects.all():
+        kw1 = choice(Keyword.objects.all())
+        kw2 = choice(Keyword.objects.all())
+        kw3 = choice(Keyword.objects.all())
+        study.keywords.add(kw1, kw2, kw3)
+
     Collaborator.objects.create(
         name='Colaborador 1', team='Numec', coordinator=True,
         study=study1

@@ -30,6 +30,8 @@ class Experiment(models.Model):
     status = models.CharField(
         max_length=20, choices=STATUS_OPTIONS, default=RECEIVING
     )
+    trustee = models.ForeignKey(User, null=True,
+                                blank=True, related_name='experiments')
 
     class Meta:
         unique_together = ('nes_id', 'owner', 'version')
@@ -53,7 +55,7 @@ class Keyword(models.Model):
 
 
 class Study(models.Model):
-    experiment = models.OneToOneField(Experiment)
+    experiment = models.OneToOneField(Experiment, related_name='study')
 
     title = models.CharField(max_length=150)
     description = models.TextField()
@@ -220,3 +222,9 @@ class DataFile(models.Model):
 class EEGData(DataCollection, DataFile):
     eeg_setting = models.ForeignKey(EEGSetting)
     eeg_cap_size = models.CharField(max_length=30)
+
+
+class RejectJustification(models.Model):
+    message = models.CharField(max_length=500)
+    experiment = models.OneToOneField(Experiment,
+                                      related_name='justification')

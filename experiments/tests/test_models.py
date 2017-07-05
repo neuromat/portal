@@ -4,7 +4,7 @@ from django.contrib.auth.models import User
 from datetime import datetime
 
 from experiments.models import Experiment, Study, Group, Researcher, \
-    Collaborator
+    Collaborator, RejectJustification
 from experiments.tests.tests_helper import global_setup_ut, apply_setup
 
 
@@ -29,6 +29,8 @@ class ResearcherModelTest(TestCase):
         researcher = Researcher(study=Study.objects.first())
         with self.assertRaises(ValidationError):
             researcher.full_clean()
+
+    # TODO: cannot save researcher without study
 
 
 @apply_setup(global_setup_ut)
@@ -99,6 +101,7 @@ class ExperimentModelTest(TestCase):
         self.assertEqual(experiment.sent_date, None)
         self.assertEqual(experiment.version, None)
         self.assertEqual(experiment.status, experiment.RECEIVING)
+        self.assertEqual(experiment.trustee, None)
 
     def test_cannot_save_empty_attributes(self):
         owner = User.objects.first()
@@ -265,3 +268,33 @@ class CollaboratorModel(TestCase):
         with self.assertRaises(ValidationError):
             collaborator.save()
             collaborator.full_clean()
+
+
+@apply_setup(global_setup_ut)
+class RejectJustificationModel(TestCase):
+
+    def setUp(self):
+        global_setup_ut()
+
+    def test_default_attributes(self):
+        justification = RejectJustification()
+        self.assertEqual(justification.message, '')
+
+    def test_cannot_save_empty_attributes(self):
+        experiment = Experiment.objects.filter(
+            status=Experiment.UNDER_ANALYSIS).first()
+        justification = RejectJustification.objects.create(
+            message='', experiment=experiment
+        )
+        with self.assertRaises(ValidationError):
+            justification.save()
+            justification.full_clean()
+
+    def test_justification_message_is_related_to_one_experiment(self):
+        experiment = Experiment.objects.filter(
+            status=Experiment.UNDER_ANALYSIS).first()
+        justification = RejectJustification(
+            message='A justification', experiment=experiment
+        )
+        justification.save()
+        self.assertEqual(justification, experiment.justification)
