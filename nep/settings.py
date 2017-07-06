@@ -17,8 +17,6 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 DEBUG = False
 
-# ALLOWED_HOSTS = ['']
-
 TIME_ZONE = 'America/Sao_Paulo'
 
 # Application definition
