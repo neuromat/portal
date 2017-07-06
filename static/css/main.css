@@ -7,6 +7,48 @@
 h1, h3, h4, h5, p {
   margin-bottom: 22px;
 }
+p.alert{
+  color: red;
+}
+span.alert{
+  color: red;
+}
+
+/*
+  ========================================
+  Links
+  ========================================
+*/
+
+a {
+  color: #60c8a3;
+}
+a:hover {
+  color: #a9b2b9;
+  text-decoration: none;
+}
+*.icon-grey {
+  color: grey;
+}
+i#new_experiments {
+  width: 50px;
+  text-align: center;
+  vertical-align: middle;
+  position: relative;
+}
+.badger:after {
+    position: absolute;
+    background: red;
+    height: 2rem;
+    top: -0.2rem;
+    right: 0.2rem;
+    width: 2rem;
+    text-align: center;
+    line-height: 2rem;
+    font-size: 1rem;
+    border-radius: 50%;
+    color: white;
+}
 
 /*
   ========================================
@@ -33,11 +75,13 @@ h1, h3, h4, h5, p {
   border-left: 2px solid #000;
   padding-left: 10px;
 }
-.top-language {
-  font-size: small;
+.top-login-language {
   float: right;
   position: relative;
   top: 30%;
+}
+.top-language {
+  font-size: small;
 }
 
 /*
@@ -111,7 +155,6 @@ h1, h3, h4, h5, p {
 }
 
 .toggable-tabs {
-  height: 400px;
   border-left: 1px solid #a6aaad;
   border-right: 1px solid #a6aaad;
   border-bottom: 1px solid #a6aaad;
@@ -120,6 +163,9 @@ h1, h3, h4, h5, p {
   margin-bottom: 5px;
 }
 
+.warning-message {
+  margin-top: 20px;
+}
 
 /*
   ========================================
@@ -165,17 +211,27 @@ h1, h3, h4, h5, p {
 
 /*
   ========================================
-  Bootstrap overrides
+  Experiment details tabs
   ========================================
  */
 
-a {
-  color: #60c8a3;
+.groups-tab {
+  margin-top: 20px;
 }
 
-a:hover {
-  color: #a9b2b9;
-  text-decoration: none;
+.nep-panel-group {
+  padding: 10px;
+  background-color: #e9e7e5;
+}
+
+.prot-exp-image>a>img {
+  width: 100%;
+  height: 150px;
+}
+
+#full_image {
+  display: block;
+  margin: 0 auto;
 }
 
 /*
@@ -184,7 +240,18 @@ a:hover {
   ========================================
  */
 /* overrides bootstrap class */
+
 .list-group-item {
   background: #80868a;
   border: none;
 }
+
+#protocol_image_full .modal-dialog {
+  display: table;
+}
+
+/*
+  ========================================
+  Log In
+  ========================================
+ */

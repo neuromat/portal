@@ -31,7 +31,6 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
-    'django_extensions',
     'experiments.apps.ExperimentsConfig',
 ]
 
@@ -46,6 +45,9 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'nep.urls'
+
+LOGIN_REDIRECT_URL = '/'
+LOGOUT_REDIRECT_URL = '/'
 
 TEMPLATES = [
     {
@@ -103,9 +105,11 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+MEDIA_URL = '/media/'
 
 # Import local settings
 try:
     from .local_settings import *
+    INSTALLED_APPS += DEV_APPS
 except ImportError:
     pass

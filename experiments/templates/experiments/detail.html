@@ -3,30 +3,201 @@
 {% block header %}
     {% include 'experiments/header_detail.html' %}
 {% endblock %}
+
 {% block content %}
     <section class="container toggable-tabs">
         <ul class="nav nav-tabs" role="tablist">
-            <li role="presentation" class="active"><a href="#statistics" role="tab" data-toggle="tab">Statistics</a></li>
-            <li role="presentation"><a href="#groups" role="tab" data-toggle="tab">Groups</a></li>
-            <li role="presentation"><a href="#settings" role="tab" data-toggle="tab">Settings</a></li>
+            <li role="presentation" class="active"><a href="#statistics_tab" role="tab" data-toggle="tab">Statistics</a></li>
+            <li role="presentation"><a href="#groups_tab" role="tab" data-toggle="tab">Groups</a></li>
+            <li role="presentation"><a href="#settings_tab" role="tab" data-toggle="tab">Settings</a></li>
         </ul>
 
         <!-- Tab panes -->
-        <div class="tab-content">
+        <div class="tab-content portal-tab-content">
 
-            <div role="tabpanel" class="tab-pane active"
-                 id="statistics">Statistics</div>
-
-            <div role="tabpanel" class="tab-pane" id="groups">
-                {% for group in experiment.groups.all %}
-                    <div class="panel panel-default">
-                        <h5>{{ group.title }}</h5>
-                        <h6>{{ group.description }}</h6>
+            <div role="tabpanel" class="tab-pane active" id="statistics_tab">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div id="gender-chart" style="height: 300px;"></div>
                     </div>
-                {% endfor %}
+                    <div class="col-md-6">
+                        <div id="age-chart" style="height: 300px;"></div>
+                    </div>
+                </div>
             </div>
 
-            <div role="tabpanel" class="tab-pane" id="settings">Settings</div>
+            <div role="tabpanel" class="tab-pane groups-tab" id="groups_tab">
+                <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+                    {% for group in experiment.groups.all %}
+                        <div class="panel panel-default nep-panel-group">
+                            <div class="row">
+                                <div class="col-md-2 prot-exp-image">
+                                    {% if group.experimental_protocol.image %}
+                                        <a id="protocol_image" href="#"
+                                           data-toggle="modal"
+                                           data-target="#protocol_image_full"
+                                           data-image_path="/media/{{ group.experimental_protocol.image }}">
+                                            <img src="/media/{{ group.experimental_protocol.image }}"/></a>
+                                    {% endif %}
+                                </div>
+                                <div class="col-md-10">
+                                    <strong>{{ group.title }}</strong>
+                                    <br>
+                                    {{ group.participants.all.count }}
+                                    participants<br><br>
+                                    <p>{{ group.description }}</p>
+                                    {% if group.inclusion_criteria.all %}
+                                        Inclusion criterias:
+                                        <br>
+                                        {% for criteria in group.inclusion_criteria.all %}
+                                            {{ criteria.code }} - {{ criteria.description }}{% if not forloop.last %},{% endif %}
+                                        {% endfor %}
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="pull-right">
+                                <a role="button" data-toggle="collapse"
+                                   data-parent="#accordion"
+                                   href="#collapse{{ group.id }}"
+                                   aria-expanded="true"
+                                   aria-controls="collapse{{ group.id }}">Details</a>
+                            </div>
+                            <br>
+                            <div id="collapse{{ group.id }}"
+                                 class="panel-collapse
+                            collapse out" role="tabpanel"
+                                 aria-labelledby="heading{{ group.id }}">
+                                <div class="panel-body">
+                                    <strong>Textual description</strong>
+                                    <br>
+                                    {{ group.experimental_protocol.textual_description }}
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div role="tabpanel" class="tab-pane" id="settings_tab">
+                    {% if experiment.eegsetting_set.all %}
+                        <strong>EEG Settings</strong>
+                        {% for eeg_setting in experiment.eegsetting_set.all %}
+                            <div class="panel panel-default nep-panel-group">
+                                <strong>{{ eeg_setting.name }}</strong><br/>
+                                {{ eeg_setting.description }}
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                    {% if experiment.emgsetting_set.all %}
+                        <strong>EMG Settings</strong>
+                        {% for emg_setting in experiment.emgsetting_set.all %}
+                            <div class="panel panel-default nep-panel-group">
+                                <strong>{{ emg_setting.name }}</strong><br/>
+                                {{ emg_setting.description }}
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                    {% if experiment.tmssetting_set.all %}
+                        <strong>TMS Settings</strong>
+                        {% for tms_setting in experiment.tmssetting_set.all %}
+                            <div class="panel panel-default nep-panel-group">
+                                <strong>{{ tms_setting.name }}</strong><br/>
+                                {{ tms_setting.description }}
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                    {% if experiment.contexttree_set.all %}
+                        <strong>Context trees</strong>
+                        {% for context_tree in experiment.contexttree_set.all %}
+                            <div class="panel panel-default nep-panel-group">
+                                <strong>{{ context_tree.name }}</strong><br/>
+                                {{ context_tree.description }}
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+            </div>
         </div>
+        {# Full protocol experiment image modal #}
+        <div id="protocol_image_full" class="modal fade" tabindex="-1"
+             role="dialog">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title">Graphical representation</h4>
+                    </div>
+                    <div class="modal-body">
+                        {# see script bellow #}
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    </div>
+                </div><!-- /.modal-content -->
+            </div><!-- /.modal-dialog -->
+        </div><!-- /.modal -->
     </section>
+{% endblock %}
+
+{% block script %}
+    {##}
+    {# Script related to experiments/top.html #}
+    {##}
+    {% load static %}
+    <script src="{% static 'js/new_experiments_received.js' %}"></script>
+
+    {# Display protocol experiment full image #}
+    <script>
+        $('#protocol_image_full').on('show.bs.modal', function (event) {
+            let link = $(event.relatedTarget);
+            let image_path = link.data('image_path');
+            let modal = $(this);
+            modal.find('.modal-body').empty().append(`<img id='full_image'
+            src=${image_path}/>`); // first empty to not repeat image
+        });
+    </script>
+
+    {##}
+    {# Charts in Statistics tab #}
+    {##}
+    <script src="https://www.gstatic.com/charts/loader.js"></script>
+    <script>
+        google.charts.load('current', {packages: ['corechart', 'bar']});
+        google.charts.setOnLoadCallback(drawPieChart);
+        google.charts.setOnLoadCallback(drawColumnChart);
+
+        function drawPieChart() {
+            var data_array = [['Gender', 'Number of participants']];
+            var django_data = {{ gender_grouping|safe }};
+            for (var item in django_data){
+                data_array.push([item, django_data[item]])
+            }
+            var data = google.visualization.arrayToDataTable(data_array);
+            var options = {
+                title: 'Gender of the participants',
+                pieHole: 0.3
+            };
+            var chart = new google.visualization.PieChart(document.getElementById('gender-chart'));
+            chart.draw(data, options);
+        }
+        function drawColumnChart() {
+            var data_array = [['Age', 'amount' ]];
+            var django_data = {{ age_grouping|safe }};
+            for (var item in django_data){
+                data_array.push([item, django_data[item]])
+            }
+            var data = google.visualization.arrayToDataTable(data_array);
+            var options = {
+                title: 'Age of the participants',
+                legend: { position: 'none' },
+                hAxis: {
+                    title: 'Age (years)'
+                },
+                vAxis: {
+                    title: 'Amount'
+                }
+            };
+            var chart = new google.visualization.ColumnChart(document.getElementById('age-chart'));
+            chart.draw(data, options);
+        }
+    </script>
 {% endblock %}

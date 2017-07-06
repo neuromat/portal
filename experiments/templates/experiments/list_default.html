@@ -1,0 +1,23 @@
+<table id="id_experiments_table" class="table table-hover
+        experiment-table">
+    <thead>
+    <tr>
+        <th>Title</th>
+        <th>Description</th>
+        <th>Participants</th>
+        <th>Version</th>
+        <th></th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for experiment in experiments %}
+        <tr>
+            <td>{{ experiment.title }}</td>
+            <td>{{ experiment.description }}</td>
+            <td>{{ experiment.total_participants }} in {{ experiment.groups.count }} groups </td>
+            <td>{{ experiment.version }}</td>
+            <td><a href="{% url 'experiment-detail' experiment.id %}">View</a></td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>

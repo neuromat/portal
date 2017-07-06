@@ -10,6 +10,7 @@
     <link rel="stylesheet" href="{% static 'css/normalize.css' %}">
     <link rel="stylesheet" href="{% static 'bootstrap-3.3.7-dist/css/bootstrap.min.css' %}">
     <link rel="stylesheet" href="{% static 'css/main.css' %}">
+    <link rel="stylesheet" href="{% static 'font-awesome-4.7.0/css/font-awesome.min.css' %}">
 </head>
 <body>
 {% include 'experiments/top.html' %}
@@ -20,5 +21,7 @@
 {% include 'experiments/footer.html' %}
 <script src="{% static 'js/jquery-3.2.1.js' %}"></script>
 <script src="{% static 'bootstrap-3.3.7-dist/js/bootstrap.min.js' %}"></script>
+{% block script %}
+{% endblock %}
 </body>
 </html>
