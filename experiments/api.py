@@ -158,7 +158,7 @@ class ExperimentalProtocolSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ExperimentalProtocol
-        fields = ('id', 'image', 'textual_description', 'group')
+        fields = ('id', 'image', 'textual_description', 'group', 'root_step')
 
 
 class ParticipantSerializer(serializers.ModelSerializer):
