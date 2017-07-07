@@ -92,7 +92,7 @@ def create_participants(qtty, group, gender):
 
     for j in range(qtty):
         Participant.objects.create(
-            code=fake.ssn(), age=randint(18, 80),
+            code=randint(1, 1000), age=randint(18, 80),
             gender=gender,
             group=group
         )
@@ -129,7 +129,7 @@ def create_classification_of_deseases(qtty):
 
     for i in range(qtty):
         ClassificationOfDiseases.objects.create(
-            code=fake.ssn(), description=fake.text(),
+            code=randint(1, 1000), description=fake.text(),
             abbreviated_description=fake.text(max_nb_chars=100),
             parent=None
         )
