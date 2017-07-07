@@ -4,7 +4,7 @@ from rest_framework import serializers, permissions, viewsets
 from experiments import appclasses
 from experiments.models import Experiment, Study, User, ProtocolComponent, \
     Group, ExperimentalProtocol, Researcher, Participant, Collaborator, Keyword, ClassificationOfDiseases, \
-    EEGSetting, EMGSetting, TMSSetting, ContextTree, Step
+    EEGSetting, EMGSetting, TMSSetting, ContextTree, Step, File, EEGData
 
 
 ###################
@@ -181,6 +181,23 @@ class StepSerializer(serializers.ModelSerializer):
                   'interval_between_repetitions_value',
                   'interval_between_repetitions_unit',
                   'random_position')
+
+
+class FileSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = File
+        fields = ('id', 'file',)
+
+
+class EEGDataSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = EEGData
+        fields = ('id',
+                  'step', 'participant', 'date', 'time',
+                  'description', 'file', 'file_format',
+                  'eeg_setting', 'eeg_cap_size')
 
 #############
 # API Views #
@@ -463,6 +480,28 @@ class StepViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         group = Group.objects.get(pk=self.kwargs['pk'])
         serializer.save(group=group)
+
+
+class FileViewSet(viewsets.ModelViewSet):
+    serializer_class = FileSerializer
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
+
+    def get_queryset(self):
+        return File.objects.all()
+
+    def perform_create(self, serializer):
+        serializer.save()
+
+
+class EEGDataViewSet(viewsets.ModelViewSet):
+    serializer_class = EEGDataSerializer
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
+
+    def get_queryset(self):
+        return EEGData.objects.all()
+
+    def perform_create(self, serializer):
+        serializer.save()
 
 # class ProtocolComponentViewSet(viewsets.ModelViewSet):
 #     lookup_field = 'nes_id'

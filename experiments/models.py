@@ -221,7 +221,7 @@ class DataFile(models.Model):
 
 class EEGData(DataCollection, DataFile):
     eeg_setting = models.ForeignKey(EEGSetting)
-    eeg_cap_size = models.CharField(max_length=30)
+    eeg_cap_size = models.CharField(max_length=30, null=True, blank=True)
 
 
 class RejectJustification(models.Model):

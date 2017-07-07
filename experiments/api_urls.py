@@ -96,6 +96,21 @@ api_step_list =\
         'post': 'create'
     })
 
+# Files
+api_file_list =\
+    api.FileViewSet.as_view({
+        'get': 'list',
+        'post': 'create'
+    })
+
+# Files
+api_eeg_data_list =\
+    api.EEGDataViewSet.as_view({
+        'get': 'list',
+        'post': 'create'
+    })
+
+
 # Get rest framework schema view
 schema_view = get_schema_view(title='NEP API')
 
@@ -145,4 +160,10 @@ urlpatterns = [
 
     # Step
     url(r'^groups/(?P<pk>[0-9]+)/step/$', api_step_list, name='api_step-list'),
+
+    # File
+    url(r'^files/$', api_file_list, name='api_file-list'),
+
+    # EEG data
+    url(r'^eeg_data/$', api_eeg_data_list, name='api_eeg_data-list'),
 ]
