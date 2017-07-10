@@ -45,10 +45,21 @@
 
 {% block script %}
     {##}
+    {## Prevent click in experiment if its status is approved or not approved #}
+    {## Related to list_trustee.html  #}
+    {##}
+    <script>
+        let prevent_click = $('.prevent_click');
+        prevent_click.addClass('nep-disabled');
+        prevent_click.on('click', function (e) {
+            e.stopPropagation();
+        })
+    </script>
+    {##}
     {## Script related to experiments/top.html #}
     {##}
     <script>
-        let to_be_analysed_count = {{ to_be_analysed_count }}
+        let to_be_analysed_count = {{ to_be_analysed_count }};
         if (to_be_analysed_count) {
             $('head').append('<style>.badger::after{content:"' +
                 to_be_analysed_count + '"}</style>');

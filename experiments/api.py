@@ -242,7 +242,7 @@ class ExperimentViewSet(viewsets.ModelViewSet):
 
 
 class StudyViewSet(viewsets.ModelViewSet):
-    lookup_field = 'experiment_nes_id'  # TODO: see if not more used
+    lookup_field = 'experiment_nes_id'  # TODO: see if no more used
     serializer_class = StudySerializer
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
 
