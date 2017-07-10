@@ -6,6 +6,7 @@ from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase
 
+from experiments import api
 from experiments.helpers import generate_image_file
 from experiments.models import Experiment, Study, Group, Researcher, \
     Collaborator
@@ -91,6 +92,45 @@ class ExperimentAPITest(APITestCase):
         self.client.logout()
         new_experiment = Experiment.objects.get(nes_id=17, owner=owner)
         self.assertEqual(new_experiment.title, 'New experiment')
+
+    def test_POSTing_new_experiment_send_email_to_trustees(self):
+        trustees = User.objects.filter(groups__name='trustees')
+        emails = []
+        for trustee in trustees:
+            emails += trustee.email
+
+        self.send_mail_called = False
+
+        # TODO: refactor using Python Mock Library
+        def fake_send_mail(subject, body, from_email, to):
+            self.send_mail_called = True
+            self.subject = subject
+            self.body = body
+            self.from_email = from_email
+            self.to = to
+
+        api.send_mail = fake_send_mail
+
+        owner = User.objects.get(username='lab1')
+        self.client.login(username=owner.username, password='nep-lab1')
+        response = self.client.post(
+            self.list_url,
+            {
+                'title': 'New experiment',
+                'description': 'Some description',
+                'nes_id': 27,
+                'sent_date': datetime.utcnow().strftime('%Y-%m-%d')
+            }
+        )
+
+        self.assertTrue(self.send_mail_called)
+        self.assertEqual(
+            self.subject,
+            'New experiment "' + response.data['title'] +
+            '" has arrived in NEDP portal.'
+        )
+        self.assertEqual(self.from_email, 'noreplay@nep.prp.usp.br')
+        self.assertEqual(self.to, emails)
 
     def test_POSTing_experiment_generates_new_version(self):
         owner = User.objects.get(username='lab1')
