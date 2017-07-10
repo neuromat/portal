@@ -4,7 +4,7 @@ from rest_framework import serializers, permissions, viewsets
 from experiments import appclasses
 from experiments.models import Experiment, Study, User, ProtocolComponent, \
     Group, ExperimentalProtocol, Researcher, Participant, Collaborator, Keyword, ClassificationOfDiseases, \
-    EEGSetting, EMGSetting, TMSSetting, ContextTree, Step, File, EEGData
+    EEGSetting, EMGSetting, TMSSetting, ContextTree, Step, File, EEGData, GoalkeeperGameData
 
 
 ###################
@@ -113,7 +113,7 @@ class ContextTreeSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ContextTree
-        fields = ('id', 'experiment', 'name', 'description', 'setting_text')
+        fields = ('id', 'experiment', 'name', 'description', 'setting_text', 'setting_file')
 
 
 class ProtocolComponentSerializer(serializers.ModelSerializer):
@@ -198,6 +198,15 @@ class EEGDataSerializer(serializers.ModelSerializer):
                   'step', 'participant', 'date', 'time',
                   'description', 'file', 'file_format',
                   'eeg_setting', 'eeg_cap_size')
+
+class GoalkeeperGameDataSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = GoalkeeperGameData
+        fields = ('id',
+                  'step', 'participant', 'date', 'time',
+                  'description', 'file', 'file_format',
+                  'sequence_used_in_context_tree')
+
 
 #############
 # API Views #
@@ -499,6 +508,17 @@ class EEGDataViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         return EEGData.objects.all()
+
+    def perform_create(self, serializer):
+        serializer.save()
+
+
+class GoalkeeperGameDataViewSet(viewsets.ModelViewSet):
+    serializer_class = GoalkeeperGameDataSerializer
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
+
+    def get_queryset(self):
+        return GoalkeeperGameData.objects.all()
 
     def perform_create(self, serializer):
         serializer.save()

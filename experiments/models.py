@@ -24,7 +24,7 @@ class Experiment(models.Model):
     description = models.TextField()
     data_acquisition_done = models.BooleanField(default=False)
     ethics_committee_file = models.FileField(
-        'Project file approved by the ethics committee', blank=True
+        'Project file approved by the ethics committee', blank=True, upload_to='uploads/%Y/%m/%d/'
     )
     sent_date = models.DateField(auto_now=True)
     status = models.CharField(
@@ -147,7 +147,7 @@ class TMSSetting(ExperimentSetting):
 
 class ContextTree(ExperimentSetting):
     setting_text = models.TextField(null=True, blank=True)
-    # setting_file = models.FileField(upload_to=get_context_tree_dir, null=True, blank=True)
+    setting_file = models.FileField(upload_to='uploads/%Y/%m/%d/', null=True, blank=True)
 
 
 class Step(models.Model):
@@ -162,7 +162,7 @@ class Step(models.Model):
         ("eeg", "EEG"),
         ("emg", "EMG"),
         ("tms", "TMS"),
-        ("digital_game_phase", "Goalkeeper game phase"),
+        ("goalkeeper_game", "Goalkeeper game phase"),
         ("generic_data_collection", "Generic data collection"),
     )
     group = models.ForeignKey(Group)
@@ -207,7 +207,7 @@ class DataCollection(models.Model):
 
 
 class File(models.Model):
-    file = models.FileField()
+    file = models.FileField(upload_to='uploads/%Y/%m/%d/')
 
 
 class DataFile(models.Model):
@@ -222,6 +222,10 @@ class DataFile(models.Model):
 class EEGData(DataCollection, DataFile):
     eeg_setting = models.ForeignKey(EEGSetting)
     eeg_cap_size = models.CharField(max_length=30, null=True, blank=True)
+
+
+class GoalkeeperGameData(DataCollection, DataFile):
+    sequence_used_in_context_tree = models.TextField(null=True, blank=True)
 
 
 class RejectJustification(models.Model):
