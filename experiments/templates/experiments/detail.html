@@ -142,8 +142,13 @@
     {##}
     {# Script related to experiments/top.html #}
     {##}
-    {% load static %}
-    <script src="{% static 'js/new_experiments_received.js' %}"></script>
+    <script>
+        let to_be_analysed_count = {{ to_be_analysed_count }}
+        if (to_be_analysed_count) {
+            $('head').append('<style>.badger::after{content:"' +
+                to_be_analysed_count + '"}</style>');
+        }
+    </script>
 
     {# Display protocol experiment full image #}
     <script>

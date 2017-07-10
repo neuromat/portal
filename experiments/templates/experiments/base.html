@@ -11,6 +11,8 @@
     <link rel="stylesheet" href="{% static 'bootstrap-3.3.7-dist/css/bootstrap.min.css' %}">
     <link rel="stylesheet" href="{% static 'css/main.css' %}">
     <link rel="stylesheet" href="{% static 'font-awesome-4.7.0/css/font-awesome.min.css' %}">
+    {% block style %}
+    {% endblock %}
 </head>
 <body>
 {% include 'experiments/top.html' %}
