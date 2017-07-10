@@ -8,6 +8,8 @@ from experiments.models import Experiment, RejectJustification
 
 
 def home_page(request):
+    to_be_analysed_count = None  # will be None if home contains the list of
+    # normal user
     if request.user.is_authenticated and \
             request.user.groups.filter(name='trustees').exists():
         all_experiments = \
@@ -21,6 +23,7 @@ def home_page(request):
         not_approved = all_experiments.filter(status=Experiment.NOT_APPROVED)
         approved = all_experiments.filter(status=Experiment.APPROVED)
         experiments = to_be_analysed | under_analysis | not_approved | approved
+        to_be_analysed_count = to_be_analysed.count()
     else:
         experiments = appclasses.CurrentExperiments().get_current_experiments()
 
@@ -30,10 +33,20 @@ def home_page(request):
                  for group in experiment.groups.all()])
 
     return render(request, 'experiments/home.html',
-                  {'experiments': experiments})
+                  {'experiments': experiments, 'to_be_analysed_count':
+                      to_be_analysed_count})
 
 
 def experiment_detail(request, experiment_id):
+    to_be_analysed_count = None  # will be None if home contains the list of
+    # normal user
+    if request.user.is_authenticated and \
+            request.user.groups.filter(name='trustees').exists():
+        all_experiments = \
+            appclasses.CurrentExperiments().get_current_experiments_trustees()
+        to_be_analysed_count = all_experiments.filter(
+                status=Experiment.TO_BE_ANALYSED).count()
+
     experiment = Experiment.objects.get(pk=experiment_id)
 
     gender_grouping = {}
@@ -50,9 +63,12 @@ def experiment_detail(request, experiment_id):
             age_grouping[int(participant.age)] += 1
 
     return render(
-        request, 'experiments/detail.html', {'experiment': experiment,
-                                             'gender_grouping': gender_grouping,
-                                             'age_grouping': age_grouping}
+        request, 'experiments/detail.html', {
+            'experiment': experiment,
+            'gender_grouping': gender_grouping,
+            'age_grouping': age_grouping,
+            'to_be_analysed_count': to_be_analysed_count
+        }
     )
 
 

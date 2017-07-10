@@ -1,4 +1,5 @@
 from django.contrib.auth.models import AnonymousUser
+from django.core.mail import send_mail
 from rest_framework import serializers, permissions, viewsets
 
 from experiments import appclasses
@@ -250,6 +251,21 @@ class ExperimentViewSet(viewsets.ModelViewSet):
             owner=owner, version=exp_version.get_last_version() + 1
         )
 
+        # Send email to trustees telling them that new experiment has arrived
+        trustees = User.objects.filter(groups__name='trustees')
+        emails = []
+        for trustee in trustees:
+            emails += trustee.email
+        from_email = 'noreplay@nep.prp.usp.br'
+        subject = 'New experiment "' + self.request.data['title'] + \
+                  '" has arrived in NEDP portal.'
+        message = 'New experiment arrived in NEDP portal:\n' + \
+                  'Title:\n' + self.request.data['title'] + '\n' + \
+                  'Description:\n' + self.request.data['description'] + '\n' + \
+                  'Owner: ' + str(self.request.user) + '\n'
+
+        send_mail(subject, message, from_email, emails)
+
     def perform_update(self, serializer):
         nes_id = self.kwargs['experiment_nes_id']
         owner = self.request.user
@@ -260,7 +276,7 @@ class ExperimentViewSet(viewsets.ModelViewSet):
 
 
 class StudyViewSet(viewsets.ModelViewSet):
-    lookup_field = 'experiment_nes_id'  # TODO: see if not more used
+    lookup_field = 'experiment_nes_id'  # TODO: see if no more used
     serializer_class = StudySerializer
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
 
