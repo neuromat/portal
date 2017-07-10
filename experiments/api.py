@@ -4,7 +4,7 @@ from rest_framework import serializers, permissions, viewsets
 from experiments import appclasses
 from experiments.models import Experiment, Study, User, ProtocolComponent, \
     Group, ExperimentalProtocol, Researcher, Participant, Collaborator, Keyword, ClassificationOfDiseases, \
-    EEGSetting, EMGSetting, TMSSetting, ContextTree, Step, File, EEGData, GoalkeeperGameData
+    EEGSetting, EMGSetting, TMSSetting, ContextTree, Step, File, EEGData, GoalkeeperGameData, QuestionnaireResponse
 
 
 ###################
@@ -199,6 +199,7 @@ class EEGDataSerializer(serializers.ModelSerializer):
                   'description', 'file', 'file_format',
                   'eeg_setting', 'eeg_cap_size')
 
+
 class GoalkeeperGameDataSerializer(serializers.ModelSerializer):
     class Meta:
         model = GoalkeeperGameData
@@ -207,6 +208,13 @@ class GoalkeeperGameDataSerializer(serializers.ModelSerializer):
                   'description', 'file', 'file_format',
                   'sequence_used_in_context_tree')
 
+
+class QuestionnaireResponseSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = QuestionnaireResponse
+        fields = ('id',
+                  'step', 'participant', 'date', 'time',
+                  'limesurvey_response')
 
 #############
 # API Views #
@@ -519,6 +527,17 @@ class GoalkeeperGameDataViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         return GoalkeeperGameData.objects.all()
+
+    def perform_create(self, serializer):
+        serializer.save()
+
+
+class QuestionnaireResponseViewSet(viewsets.ModelViewSet):
+    serializer_class = QuestionnaireResponseSerializer
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
+
+    def get_queryset(self):
+        return QuestionnaireResponse.objects.all()
 
     def perform_create(self, serializer):
         serializer.save()

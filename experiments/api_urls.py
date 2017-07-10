@@ -119,6 +119,14 @@ api_goalkeeper_game_data_list =\
     })
 
 
+# Questionnaire response
+api_questionnaire_response_list =\
+    api.QuestionnaireResponseViewSet.as_view({
+        'get': 'list',
+        'post': 'create'
+    })
+
+
 # Get rest framework schema view
 schema_view = get_schema_view(title='NEP API')
 
@@ -177,4 +185,8 @@ urlpatterns = [
 
     # Goalkeeper game data
     url(r'^goalkeeper_game_data/$', api_goalkeeper_game_data_list, name='api_goalkeeper_game_data-list'),
+
+    # Questionnaire response
+    url(r'^questionnaire_response/$', api_questionnaire_response_list, name='api_questionnaire_response-list'),
+
 ]

@@ -232,3 +232,7 @@ class RejectJustification(models.Model):
     message = models.CharField(max_length=500)
     experiment = models.OneToOneField(Experiment,
                                       related_name='justification')
+
+
+class QuestionnaireResponse(DataCollection):
+    limesurvey_response = models.TextField()
