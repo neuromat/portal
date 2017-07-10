@@ -43,7 +43,7 @@ class HomePageTest(TestCase):
         experiment = Experiment.objects.get(pk=experiment.id)
         self.assertEqual(experiment.status, Experiment.UNDER_ANALYSIS)
 
-    def test_sends_email_to_researcher_when_trustee_changes_status(self):
+    def test_send_email_to_researcher_when_trustee_changes_status(self):
         """
         We test for changing status from UNDER_ANALYSIS to APPROVED.
         Other are similar.
