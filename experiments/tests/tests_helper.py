@@ -88,14 +88,14 @@ def create_participants(qtty, group, gender):
     :param qtty:
     :param group: Group model instance
     """
-    fake = Factory.create()
-
+    code = randint(1, 1000)
     for j in range(qtty):
         Participant.objects.create(
-            code=randint(1, 1000), age=randint(18, 80),
+            code=code, age=randint(18, 80),
             gender=gender,
             group=group
         )
+        code += 1
 
 
 def create_experiment_protocol(group):
