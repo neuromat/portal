@@ -96,6 +96,37 @@ api_step_list =\
         'post': 'create'
     })
 
+# Files
+api_file_list =\
+    api.FileViewSet.as_view({
+        'get': 'list',
+        'post': 'create'
+    })
+
+# EEG data
+api_eeg_data_list =\
+    api.EEGDataViewSet.as_view({
+        'get': 'list',
+        'post': 'create'
+    })
+
+
+# Goalkeeper game data
+api_goalkeeper_game_data_list =\
+    api.GoalkeeperGameDataViewSet.as_view({
+        'get': 'list',
+        'post': 'create'
+    })
+
+
+# Questionnaire response
+api_questionnaire_response_list =\
+    api.QuestionnaireResponseViewSet.as_view({
+        'get': 'list',
+        'post': 'create'
+    })
+
+
 # Get rest framework schema view
 schema_view = get_schema_view(title='NEP API')
 
@@ -145,4 +176,17 @@ urlpatterns = [
 
     # Step
     url(r'^groups/(?P<pk>[0-9]+)/step/$', api_step_list, name='api_step-list'),
+
+    # File
+    url(r'^files/$', api_file_list, name='api_file-list'),
+
+    # EEG data
+    url(r'^eeg_data/$', api_eeg_data_list, name='api_eeg_data-list'),
+
+    # Goalkeeper game data
+    url(r'^goalkeeper_game_data/$', api_goalkeeper_game_data_list, name='api_goalkeeper_game_data-list'),
+
+    # Questionnaire response
+    url(r'^questionnaire_response/$', api_questionnaire_response_list, name='api_questionnaire_response-list'),
+
 ]

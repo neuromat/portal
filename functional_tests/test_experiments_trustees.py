@@ -88,26 +88,24 @@ class TrusteeTest(FunctionalTestTrustee):
         self.assertIn(statuses[Experiment.UNDER_ANALYSIS], form_status_choices.text)
         self.assertIn(statuses[Experiment.APPROVED], form_status_choices.text)
         self.assertIn(statuses[Experiment.NOT_APPROVED], form_status_choices.text)
-        # She press ESC to quit modal and clicks in an experiment status that is approved.
-        # Now a modal telling that she cannot change status appears.
+        # She press ESC to quit modal and clicks in an experiment status
+        # that is approved. As when the experiment is already approved or
+        # rejected trustee can't change its status, clicking on it has no
+        # effect, the modal doesn't pop up.
         form_status_choices.send_keys(Keys.ESCAPE)
         time.sleep(1)
         self.browser.find_element_by_link_text('Approved').click()
         time.sleep(1)
         modal_body = self.browser.find_element_by_id('status_body').text
-        self.assertIn('You can\'t change an experiment status' +
-                      ' that has already been approved or rejected.', modal_body)
+        self.assertEqual('', modal_body)
 
-        # Finally, she press ESC to quit modal and clicks in an experiment
-        # status that is NOT approved. Now a modal telling that she cannot
-        # change status appears.
-        self.browser.find_element_by_id('status_body').send_keys(Keys.ESCAPE)
-        time.sleep(1)
+        # Finally, she clicks in an experiment status that is NOT approved.
+        # The same occurs as clicking in approved experiment. She can't
+        # change its status.
         self.browser.find_element_by_link_text('Not approved').click()
         time.sleep(1)
         modal_body = self.browser.find_element_by_id('status_body').text
-        self.assertIn('You can\'t change an experiment status' +
-                      ' that has already been approved or rejected.', modal_body)
+        self.assertEqual('', modal_body)
 
     def test_trustee_can_see_experiments_to_be_analysed_sign(self):
         experiments_to_be_analysed = Experiment.objects.filter(status=Experiment.TO_BE_ANALYSED)

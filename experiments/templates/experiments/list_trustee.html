@@ -18,14 +18,15 @@
             <td>{{ experiment.description }}</td>
             <td>{{ experiment.total_participants }} in {{ experiment.groups.count }} groups </td>
             <td>{{ experiment.version }}</td>
-            <td><a href="#" data-toggle="modal"
+            <td><a id="link_modal" href="#"
+                   data-toggle="modal"
                    data-target="#status_modal"
+                   class="{% if experiment.status == 'approved' or experiment.status == 'not_approved' %}prevent_click{% endif %}"
                    data-experiment_id="{{ experiment.id }}"
                    data-experiment_title="{{ experiment.title }}"
                    data-experiment_status="{{ experiment.status }}"
-                   data-experiment_trustee ="{{ experiment.trustee }}"
-                   data-experiment_statuses="{{ experiment.STATUS_OPTIONS|statuses_to_json:experiment.status }}"
                    data-experiment_trustee="{{ experiment.trustee }}"
+                   data-experiment_statuses="{{ experiment.STATUS_OPTIONS|statuses_to_json:experiment.status }}"
                    data-logged_user="{{ request.user }}">
                 {{ experiment.get_status_display }}</a>
             </td>

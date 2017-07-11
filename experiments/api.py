@@ -1,10 +1,11 @@
 from django.contrib.auth.models import AnonymousUser
+from django.core.mail import send_mail
 from rest_framework import serializers, permissions, viewsets
 
 from experiments import appclasses
 from experiments.models import Experiment, Study, User, ProtocolComponent, \
     Group, ExperimentalProtocol, Researcher, Participant, Collaborator, Keyword, ClassificationOfDiseases, \
-    EEGSetting, EMGSetting, TMSSetting, ContextTree, Step
+    EEGSetting, EMGSetting, TMSSetting, ContextTree, Step, File, EEGData, GoalkeeperGameData, QuestionnaireResponse
 
 
 ###################
@@ -113,7 +114,7 @@ class ContextTreeSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ContextTree
-        fields = ('id', 'experiment', 'name', 'description', 'setting_text')
+        fields = ('id', 'experiment', 'name', 'description', 'setting_text', 'setting_file')
 
 
 class ProtocolComponentSerializer(serializers.ModelSerializer):
@@ -158,7 +159,7 @@ class ExperimentalProtocolSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ExperimentalProtocol
-        fields = ('id', 'image', 'textual_description', 'group')
+        fields = ('id', 'image', 'textual_description', 'group', 'root_step')
 
 
 class ParticipantSerializer(serializers.ModelSerializer):
@@ -181,6 +182,40 @@ class StepSerializer(serializers.ModelSerializer):
                   'interval_between_repetitions_value',
                   'interval_between_repetitions_unit',
                   'random_position')
+
+
+class FileSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = File
+        fields = ('id', 'file',)
+
+
+class EEGDataSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = EEGData
+        fields = ('id',
+                  'step', 'participant', 'date', 'time',
+                  'description', 'file', 'file_format',
+                  'eeg_setting', 'eeg_cap_size')
+
+
+class GoalkeeperGameDataSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = GoalkeeperGameData
+        fields = ('id',
+                  'step', 'participant', 'date', 'time',
+                  'description', 'file', 'file_format',
+                  'sequence_used_in_context_tree')
+
+
+class QuestionnaireResponseSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = QuestionnaireResponse
+        fields = ('id',
+                  'step', 'participant', 'date', 'time',
+                  'limesurvey_response')
 
 #############
 # API Views #
@@ -216,6 +251,21 @@ class ExperimentViewSet(viewsets.ModelViewSet):
             owner=owner, version=exp_version.get_last_version() + 1
         )
 
+        # Send email to trustees telling them that new experiment has arrived
+        trustees = User.objects.filter(groups__name='trustees')
+        emails = []
+        for trustee in trustees:
+            emails += trustee.email
+        from_email = 'noreplay@nep.prp.usp.br'
+        subject = 'New experiment "' + self.request.data['title'] + \
+                  '" has arrived in NEDP portal.'
+        message = 'New experiment arrived in NEDP portal:\n' + \
+                  'Title:\n' + self.request.data['title'] + '\n' + \
+                  'Description:\n' + self.request.data['description'] + '\n' + \
+                  'Owner: ' + str(self.request.user) + '\n'
+
+        send_mail(subject, message, from_email, emails)
+
     def perform_update(self, serializer):
         nes_id = self.kwargs['experiment_nes_id']
         owner = self.request.user
@@ -226,7 +276,7 @@ class ExperimentViewSet(viewsets.ModelViewSet):
 
 
 class StudyViewSet(viewsets.ModelViewSet):
-    lookup_field = 'experiment_nes_id'  # TODO: see if not more used
+    lookup_field = 'experiment_nes_id'  # TODO: see if no more used
     serializer_class = StudySerializer
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
 
@@ -463,6 +513,50 @@ class StepViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         group = Group.objects.get(pk=self.kwargs['pk'])
         serializer.save(group=group)
+
+
+class FileViewSet(viewsets.ModelViewSet):
+    serializer_class = FileSerializer
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
+
+    def get_queryset(self):
+        return File.objects.all()
+
+    def perform_create(self, serializer):
+        serializer.save()
+
+
+class EEGDataViewSet(viewsets.ModelViewSet):
+    serializer_class = EEGDataSerializer
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
+
+    def get_queryset(self):
+        return EEGData.objects.all()
+
+    def perform_create(self, serializer):
+        serializer.save()
+
+
+class GoalkeeperGameDataViewSet(viewsets.ModelViewSet):
+    serializer_class = GoalkeeperGameDataSerializer
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
+
+    def get_queryset(self):
+        return GoalkeeperGameData.objects.all()
+
+    def perform_create(self, serializer):
+        serializer.save()
+
+
+class QuestionnaireResponseViewSet(viewsets.ModelViewSet):
+    serializer_class = QuestionnaireResponseSerializer
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
+
+    def get_queryset(self):
+        return QuestionnaireResponse.objects.all()
+
+    def perform_create(self, serializer):
+        serializer.save()
 
 # class ProtocolComponentViewSet(viewsets.ModelViewSet):
 #     lookup_field = 'nes_id'

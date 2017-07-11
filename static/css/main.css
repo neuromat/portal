@@ -23,19 +23,23 @@ span.alert{
 a {
   color: #60c8a3;
 }
-a:hover {
+
+a:hover, a.nep-disabled {
   color: #a9b2b9;
   text-decoration: none;
 }
+
 *.icon-grey {
   color: grey;
 }
+
 i#new_experiments {
   width: 50px;
   text-align: center;
   vertical-align: middle;
   position: relative;
 }
+
 .badger:after {
     position: absolute;
     background: red;
