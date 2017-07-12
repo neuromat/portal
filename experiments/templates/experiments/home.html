@@ -7,32 +7,7 @@
 {% block content %}
     <section class="container">
         {% if messages %}
-            <div class="row warning-message">
-                {% for message in messages %}
-                    {% if message.level_tag == 'success' %}
-                        <div class="alert alert-success">
-                            <button type="button" class="close"
-                                    data-dismiss="alert"
-                                    aria-hidden="true">&times;</button>
-                            {{ message }}
-                        </div>
-                    {% elif message.level_tag == 'warning' %}
-                        <div class="alert alert-warning">
-                            {# TODO: repeting button tag. Is there other solution? #}
-                            <button type="button" class="close"
-                                    data-dismiss="alert"aria-hidden="true">&times;</button>
-                            {{ message }}
-                        </div>
-                    {% else %}
-                        <div class="alert alert-danger">
-                            {# TODO: repeting button tag. Is there other solution? #}
-                            <button type="button" class="close"
-                                    data-dismiss="alert"aria-hidden="true">&times;</button>
-                            {{ message }}
-                        </div>
-                    {% endif %}
-                {% endfor %}
-            </div>
+            {% include 'experiments/messages.html' %}
         {% endif %}
         <div id="id_table_title" class="table-title">
             <h2>List of Experiments</h2>
@@ -175,6 +150,7 @@
             });
         });
     </script>
+    {# Script related to experiments/messages.html #}
     <script>
         $('div.alert-success').delay(6000).slideUp(300);
     </script>
