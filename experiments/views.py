@@ -148,7 +148,7 @@ def change_status(request, experiment_id):
     if status == Experiment.TO_BE_ANALYSED:
         if experiment.status == Experiment.UNDER_ANALYSIS:
             experiment.trustee = None
-            messages.success(
+            messages.warning(
                 request,
                 'You have liberate the experiment ' + experiment.title
                 + ' to be analysed by other trustee.'
