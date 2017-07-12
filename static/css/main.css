@@ -14,6 +14,7 @@ p.alert{
 
 span.alert{
   color: red;
+  padding: 0;
 }
 
 pre.textual-protocol {
@@ -262,6 +263,10 @@ i#new_experiments {
 
 /*
   ========================================
-  Log In
+  Forms
   ========================================
  */
+
+.text-box-justification {
+  width: 100%;
+}
