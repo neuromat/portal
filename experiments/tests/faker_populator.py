@@ -97,8 +97,8 @@ for study in Study.objects.all():
 create_classification_of_deseases(10)
 
 # Create genders
-gender1 = Gender.objects.create(name='Male')
-gender2 = Gender.objects.create(name='Female')
+gender1 = Gender.objects.create(name='male')
+gender2 = Gender.objects.create(name='female')
 
 # Create groups' experimental protocols and participants
 for group in Group.objects.all():

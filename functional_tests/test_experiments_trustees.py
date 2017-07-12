@@ -245,27 +245,29 @@ class TrusteeTest(FunctionalTestTrustee):
         )
         # She's hurry, and tries to submit the form without justifying why
         # she is rejecting the experiment. As she is not allowed to reject
-        # an experiment without gives a justification, javascript prevent her
-        # to submit the form.
+        # an experiment without gives a justification, required html
+        # form attribute prevents her from submitting form.
         # TODO: implement this test!
 
         # Javascript is momentarily disable in her browser so she can submit
         # the form. But as she didn't write justification, she is redirected
         # to home page with a message warning that the status of the
         # experiment hasn't changed.
-        submit_button = self.browser.find_element_by_id('id_submit')
-        submit_button.send_keys(Keys.ENTER)
-        time.sleep(1)
-        td_tag_status = self.browser.find_element_by_xpath(
-            "//a[@data-experiment_id='" + str(experiment.id) + "']"
-        ).text
-        # Experiment.STATUS[2][1] == 'Under analysis'
-        self.assertEqual(td_tag_status, Experiment.STATUS_OPTIONS[2][1])
-        self.assertIn('The status of experiment ' + experiment.title +
-                      ' hasn\'t changed to "Not approved" because you have '
-                      'not given a justification. Please resubmit changing '
-                      'status.',
-                      self.browser.find_element_by_tag_name('body').text)
+        # This test is required if javascript is disabled
+        # TODO: is possible disable javascript in selenium driver?
+        # submit_button = self.browser.find_element_by_id('id_submit')
+        # submit_button.send_keys(Keys.ENTER)
+        # time.sleep(1)
+        # td_tag_status = self.browser.find_element_by_xpath(
+        #     "//a[@data-experiment_id='" + str(experiment.id) + "']"
+        # ).text
+        # # Experiment.STATUS[2][1] == 'Under analysis'
+        # self.assertEqual(td_tag_status, Experiment.STATUS_OPTIONS[2][1])
+        # self.assertIn('The status of experiment ' + experiment.title +
+        #               ' hasn\'t changed to "Not approved" because you have '
+        #               'not given a justification. Please resubmit changing '
+        #               'status.',
+        #               self.browser.find_element_by_tag_name('body').text)
 
     def test_change_status_to_not_approved_with_justification_displays_warning_message(self):
         # Claudia has examined an experiment that has not conditions to be

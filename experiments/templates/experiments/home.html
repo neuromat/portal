@@ -7,25 +7,7 @@
 {% block content %}
     <section class="container">
         {% if messages %}
-            <div class="row warning-message">
-                {% for message in messages %}
-                    {% if message.level_tag == 'success' %}
-                        <div class="alert alert-success">
-                            <button type="button" class="close"
-                                    data-dismiss="alert"
-                                    aria-hidden="true">&times;</button>
-                            {{ message }}
-                        </div>
-                    {% else %}
-                        <div class="alert alert-warning">
-                            {# TODO: repeting button tag. Is there other solution? #}
-                            <button type="button" class="close"
-                                    data-dismiss="alert"aria-hidden="true">&times;</button>
-                            {{ message }}
-                        </div>
-                    {% endif %}
-                {% endfor %}
-            </div>
+            {% include 'experiments/messages.html' %}
         {% endif %}
         <div id="id_table_title" class="table-title">
             <h2>List of Experiments</h2>
@@ -79,7 +61,6 @@
             // experiment status is approved or not approved.
             // Instead display a warning.
             if ($.isEmptyObject(statuses)) {
-
                 return `
                 <p class="alert">You can\'t change an experiment status that has already been approved or rejected.</p>
             `;
@@ -102,6 +83,9 @@
             {% csrf_token %}
         `;
             // Buid input radios with experiment.status === key checked
+            html += `
+            <div class="form-group">
+            `;
             for (let key in statuses) {
                 if (statuses.hasOwnProperty(key)) {
                     let checked = experiment.status === key ? 'checked' : '';
@@ -110,6 +94,9 @@
                 `;
                 }
             }
+            html += `
+            </div>
+            `;
             // Finish html form
             html += `<div id="justification_area"></div>
                 <br>
@@ -147,29 +134,24 @@
                     === 'not_approved') { // TODO: should be something like Experiment.NOT_APPROVED. See statuses variable.
                     $('#justification_area').append(
                         `<br>
-                    <span class="alert">Justification is required to
+                    <label for="justification">
+                    Justification is required to
                     reject an experiment (this message will be sent to
-                    experiment researcher)*</span>
-                    <textarea rows="10" cols="50" id="not_approved_box"
-                    name="justification" placeholder="Please write a justification for rejecting this experiment"></textarea>`
-                    );
+                    experiment researcher)<span class="alert">*</span></label>
+                    <div class="form-group">
+                        <textarea rows="10" id="not_approved_box"
+                        required class="text-box-justification"
+                    name="justification" placeholder="Please write a justification for rejecting this experiment"></textarea>
+                    </div>
+                    `);
                 } else {
                     $('#justification_area').empty();
                 }
             });
-            {# TODO: Prevent submit changing status if user choose NOT_APPROVED and #}
-            {# doesn't fill in the justification message #}
-            {#        modal_form.submit(function (e) {#}
-            {#            if (#}
-            {#                $('input[name=status]:checked', '#id_status_choices').val()#}
-            {#                === 'not_approved' && $('#justification_area').is(':empty')#}
-            {#            ) {#}
-            {#                e.preventDefault();#}
-            {#            }#}
-            {#        });#}
         });
     </script>
+    {# Script related to experiments/messages.html #}
     <script>
-        $('div.warning-message').delay(6000).slideUp(300);
+        $('div.alert-success').delay(6000).slideUp(300);
     </script>
 {% endblock %}
