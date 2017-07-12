@@ -7,11 +7,17 @@
 h1, h3, h4, h5, p {
   margin-bottom: 22px;
 }
+
 p.alert{
   color: red;
 }
+
 span.alert{
   color: red;
+}
+
+pre.textual-protocol {
+  font-family: "Liberation Sans", serif;
 }
 
 /*
