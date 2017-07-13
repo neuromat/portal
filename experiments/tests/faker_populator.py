@@ -77,7 +77,8 @@ for i in range(4, 6):
 
 # Create researchers associated to studies created above
 for study in Study.objects.all():
-    Researcher.objects.create(name=fake.name(), email=fake.email(),
+    Researcher.objects.create(name=fake.name(),
+                              email='claudia.portal.neuromat@gmail.com',
                               study=study)
 
 # Create study collaborators (requires creating studies before)
