@@ -166,3 +166,8 @@ def ajax_to_be_analysed(request):
     ).count()
 
     return HttpResponse(to_be_analysed, content_type='application/json')
+
+
+def search_experiments(request):
+    return render(request, 'experiments/home.html',
+                  {'table_title': 'Search Results'})
