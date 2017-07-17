@@ -24,7 +24,7 @@ class NewVisitorTest(FunctionalTest):
 
         # She sees that in header bunner there is a search box invited her
         # to type terms/words that will be searched in the portal
-        searchbox = self.browser.find_element_by_id('id_search_box')
+        searchbox = self.browser.find_element_by_id('search_box')
         self.assertEqual(
             searchbox.get_attribute('placeholder'),
             'Type key terms/words to be searched'
