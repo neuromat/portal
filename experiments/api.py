@@ -6,7 +6,7 @@ from experiments import appclasses
 from experiments.models import Experiment, Study, User, ProtocolComponent, \
     Group, ExperimentalProtocol, Researcher, Participant, Collaborator, Keyword, ClassificationOfDiseases, \
     EEGSetting, EMGSetting, TMSSetting, ContextTree, Step, File, \
-    EEGData, EMGData, GoalkeeperGameData, QuestionnaireResponse
+    EEGData, EMGData, TMSData, GoalkeeperGameData, QuestionnaireResponse
 
 
 ###################
@@ -210,6 +210,22 @@ class EMGDataSerializer(serializers.ModelSerializer):
                   'step', 'participant', 'date', 'time',
                   'description', 'file', 'file_format',
                   'emg_setting', 'emg_setting_reason_for_change')
+
+
+class TMSDataSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = TMSData
+        fields = ('id',
+                  'step', 'participant', 'date', 'time',
+                  'tms_setting', 'resting_motor_threshold', 'test_pulse_intensity_of_simulation',
+                  'second_test_pulse_intensity', 'interval_between_pulses', 'interval_between_pulses_unit',
+                  'time_between_mep_trials', 'time_between_mep_trials_unit', 'repetitive_pulse_frequency',
+                  'coil_orientation', 'coil_orientation_angle', 'direction_of_induced_current', 'description',
+                  'hotspot_name', 'coordinate_x', 'coordinate_y', 'hot_spot_map',
+                  'localization_system_name', 'localization_system_description', 'localization_system_image',
+                  'brain_area_name', 'brain_area_description',
+                  'brain_area_system_name', 'brain_area_system_description')
 
 
 class GoalkeeperGameDataSerializer(serializers.ModelSerializer):
@@ -554,6 +570,17 @@ class EMGDataViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         return EMGData.objects.all()
+
+    def perform_create(self, serializer):
+        serializer.save()
+
+
+class TMSDataViewSet(viewsets.ModelViewSet):
+    serializer_class = TMSDataSerializer
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
+
+    def get_queryset(self):
+        return TMSData.objects.all()
 
     def perform_create(self, serializer):
         serializer.save()

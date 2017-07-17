@@ -119,6 +119,14 @@ api_emg_data_list =\
     })
 
 
+# TMS data
+api_tms_data_list =\
+    api.TMSDataViewSet.as_view({
+        'get': 'list',
+        'post': 'create'
+    })
+
+
 # Goalkeeper game data
 api_goalkeeper_game_data_list =\
     api.GoalkeeperGameDataViewSet.as_view({
@@ -193,6 +201,9 @@ urlpatterns = [
 
     # EMG data
     url(r'^emg_data/$', api_emg_data_list, name='api_emg_data-list'),
+
+    # TMS data
+    url(r'^tms_data/$', api_tms_data_list, name='api_tms_data-list'),
 
     # Goalkeeper game data
     url(r'^goalkeeper_game_data/$', api_goalkeeper_game_data_list, name='api_goalkeeper_game_data-list'),

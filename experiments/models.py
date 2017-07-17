@@ -191,7 +191,7 @@ class SetOfStep(Step):
 
 class ExperimentalProtocol(models.Model):
     group = models.OneToOneField(Group, related_name='experimental_protocol')
-    image = models.FileField(null=True, blank=True)
+    image = models.FileField(null=True, blank=True, upload_to='uploads/%Y/%m/%d/')
     textual_description = models.TextField(null=True, blank=True)
     root_step = models.ForeignKey(Step, null=True, blank=True)
 
@@ -228,6 +228,38 @@ class EEGData(DataCollection, DataFile):
 class EMGData(DataFile, DataCollection):
     emg_setting = models.ForeignKey(EMGSetting)
     emg_setting_reason_for_change = models.TextField(null=True, blank=True, default='')
+
+
+class TMSData(DataCollection):
+    # main data
+    tms_setting = models.ForeignKey(TMSSetting)
+    resting_motor_threshold = models.FloatField(null=True, blank=True)
+    test_pulse_intensity_of_simulation = models.FloatField(null=True, blank=True)
+    second_test_pulse_intensity = models.FloatField(null=True, blank=True)
+    interval_between_pulses = models.IntegerField(null=True, blank=True)
+    interval_between_pulses_unit = models.CharField(null=True, blank=True, max_length=15)
+    time_between_mep_trials = models.IntegerField(null=True, blank=True)
+    time_between_mep_trials_unit = models.CharField(null=True, blank=True, max_length=15)
+    repetitive_pulse_frequency = models.IntegerField(null=True, blank=True)
+    coil_orientation = models.CharField(null=True, blank=True, max_length=150)
+    coil_orientation_angle = models.IntegerField(null=True, blank=True)
+    direction_of_induced_current = models.CharField(null=True, blank=True, max_length=150)
+    description = models.TextField(null=False, blank=False)
+    # hotspot data
+    hotspot_name = models.CharField(max_length=50)
+    coordinate_x = models.IntegerField(null=True, blank=True)
+    coordinate_y = models.IntegerField(null=True, blank=True)
+    hot_spot_map = models.FileField(upload_to='uploads/%Y/%m/%d/', null=True, blank=True)
+    # localization system info
+    localization_system_name = models.CharField(null=False, max_length=50, blank=False)
+    localization_system_description = models.TextField(null=True, blank=True)
+    localization_system_image = models.FileField(upload_to='uploads/%Y/%m/%d/', null=True, blank=True)
+    # brain area info
+    brain_area_name = models.CharField(null=False, max_length=50, blank=False)
+    brain_area_description = models.TextField(null=True, blank=True)
+    # brain area system info
+    brain_area_system_name = models.CharField(null=False, max_length=50, blank=False)
+    brain_area_system_description = models.TextField(null=True, blank=True)
 
 
 class GoalkeeperGameData(DataCollection, DataFile):
