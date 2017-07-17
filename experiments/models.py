@@ -274,3 +274,7 @@ class RejectJustification(models.Model):
 
 class QuestionnaireResponse(DataCollection):
     limesurvey_response = models.TextField()
+
+
+class GenericDataCollectionData(DataFile, DataCollection):
+    pass

@@ -127,6 +127,14 @@ api_tms_data_list =\
     })
 
 
+# Generic Data Collection data
+api_generic_data_collection_data_list =\
+    api.GenericDataCollectionDataViewSet.as_view({
+        'get': 'list',
+        'post': 'create'
+    })
+
+
 # Goalkeeper game data
 api_goalkeeper_game_data_list =\
     api.GoalkeeperGameDataViewSet.as_view({
@@ -210,5 +218,9 @@ urlpatterns = [
 
     # Questionnaire response
     url(r'^questionnaire_response/$', api_questionnaire_response_list, name='api_questionnaire_response-list'),
+
+    # Generic Data Collection data
+    url(r'^generic_data_collection_data/$',
+        api_generic_data_collection_data_list, name='api_generic_data_collection_data-list'),
 
 ]

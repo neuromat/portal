@@ -6,7 +6,7 @@ from experiments import appclasses
 from experiments.models import Experiment, Study, User, ProtocolComponent, \
     Group, ExperimentalProtocol, Researcher, Participant, Collaborator, Keyword, ClassificationOfDiseases, \
     EEGSetting, EMGSetting, TMSSetting, ContextTree, Step, File, \
-    EEGData, EMGData, TMSData, GoalkeeperGameData, QuestionnaireResponse
+    EEGData, EMGData, TMSData, GoalkeeperGameData, QuestionnaireResponse, GenericDataCollectionData
 
 
 ###################
@@ -243,6 +243,14 @@ class QuestionnaireResponseSerializer(serializers.ModelSerializer):
         fields = ('id',
                   'step', 'participant', 'date', 'time',
                   'limesurvey_response')
+
+
+class GenericDataCollectionDataSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = GenericDataCollectionData
+        fields = ('id',
+                  'step', 'participant', 'date', 'time',
+                  'description', 'file', 'file_format')
 
 #############
 # API Views #
@@ -607,31 +615,13 @@ class QuestionnaireResponseViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         serializer.save()
 
-# class ProtocolComponentViewSet(viewsets.ModelViewSet):
-#     lookup_field = 'nes_id'
-#     serializer_class = ProtocolComponentSerializer
-#     permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
-#
-#     def get_queryset(self):
-#         # TODO: don't filter by owner if not logged (gets TypeError)
-#         # exception when trying to get an individual experiment
-#         if 'nes_id' in self.kwargs:
-#             return ProtocolComponent.objects.filter(owner=self.request.user)
-#         else:
-#             return ProtocolComponent.objects.all()
-#
-#     def perform_create(self, serializer):
-#         # TODO: we must create protocol_component for the last experiment
-#         # version
-#         experiment_nes_id = self.request.data['experiment']
-#         experiment = Experiment.objects.filter(
-#             experiment_nes_id=experiment_nes_id, owner=self.request.user).get()
-#         serializer.save(experiment=experiment, owner=self.request.user)
-#
-#     def perform_update(self, serializer):
-#         # TODO: save in with last experiment version
-#         experiment_nes_id = self.request.data['experiment']
-#         experiment = Experiment.objects.filter(
-#             experiment_nes_id=experiment_nes_id, owner=self.request.user
-#         ).get()
-#         serializer.save()
+
+class GenericDataCollectionDataViewSet(viewsets.ModelViewSet):
+    serializer_class = GenericDataCollectionDataSerializer
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
+
+    def get_queryset(self):
+        return GenericDataCollectionData.objects.all()
+
+    def perform_create(self, serializer):
+        serializer.save()
