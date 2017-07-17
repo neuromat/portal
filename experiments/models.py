@@ -221,7 +221,13 @@ class DataFile(models.Model):
 
 class EEGData(DataCollection, DataFile):
     eeg_setting = models.ForeignKey(EEGSetting)
+    eeg_setting_reason_for_change = models.TextField(null=True, blank=True, default='')
     eeg_cap_size = models.CharField(max_length=30, null=True, blank=True)
+
+
+class EMGData(DataFile, DataCollection):
+    emg_setting = models.ForeignKey(EMGSetting)
+    emg_setting_reason_for_change = models.TextField(null=True, blank=True, default='')
 
 
 class GoalkeeperGameData(DataCollection, DataFile):

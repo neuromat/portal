@@ -111,6 +111,14 @@ api_eeg_data_list =\
     })
 
 
+# EMG data
+api_emg_data_list =\
+    api.EMGDataViewSet.as_view({
+        'get': 'list',
+        'post': 'create'
+    })
+
+
 # Goalkeeper game data
 api_goalkeeper_game_data_list =\
     api.GoalkeeperGameDataViewSet.as_view({
@@ -182,6 +190,9 @@ urlpatterns = [
 
     # EEG data
     url(r'^eeg_data/$', api_eeg_data_list, name='api_eeg_data-list'),
+
+    # EMG data
+    url(r'^emg_data/$', api_emg_data_list, name='api_emg_data-list'),
 
     # Goalkeeper game data
     url(r'^goalkeeper_game_data/$', api_goalkeeper_game_data_list, name='api_goalkeeper_game_data-list'),
