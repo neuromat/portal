@@ -6,7 +6,7 @@ from experiments import appclasses
 from experiments.models import Experiment, Study, User, ProtocolComponent, \
     Group, ExperimentalProtocol, Researcher, Participant, Collaborator, Keyword, ClassificationOfDiseases, \
     EEGSetting, EMGSetting, TMSSetting, ContextTree, Step, File, \
-    EEGData, EMGData, TMSData, GoalkeeperGameData, QuestionnaireResponse, GenericDataCollectionData
+    EEGData, EMGData, TMSData, GoalkeeperGameData, QuestionnaireResponse, AdditionalData, GenericDataCollectionData
 
 
 ###################
@@ -243,6 +243,14 @@ class QuestionnaireResponseSerializer(serializers.ModelSerializer):
         fields = ('id',
                   'step', 'participant', 'date', 'time',
                   'limesurvey_response')
+
+
+class AdditionalDataSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = AdditionalData
+        fields = ('id',
+                  'step', 'participant', 'date', 'time',
+                  'description', 'file', 'file_format')
 
 
 class GenericDataCollectionDataSerializer(serializers.ModelSerializer):
@@ -611,6 +619,17 @@ class QuestionnaireResponseViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         return QuestionnaireResponse.objects.all()
+
+    def perform_create(self, serializer):
+        serializer.save()
+
+
+class AdditionalDataViewSet(viewsets.ModelViewSet):
+    serializer_class = AdditionalDataSerializer
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
+
+    def get_queryset(self):
+        return AdditionalData.objects.all()
 
     def perform_create(self, serializer):
         serializer.save()

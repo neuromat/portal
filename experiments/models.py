@@ -278,3 +278,7 @@ class QuestionnaireResponse(DataCollection):
 
 class GenericDataCollectionData(DataFile, DataCollection):
     pass
+
+
+class AdditionalData(DataFile, DataCollection):
+    pass

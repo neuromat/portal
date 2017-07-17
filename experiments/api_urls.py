@@ -127,6 +127,14 @@ api_tms_data_list =\
     })
 
 
+# Additional data
+api_additional_data_list =\
+    api.AdditionalDataViewSet.as_view({
+        'get': 'list',
+        'post': 'create'
+    })
+
+
 # Generic Data Collection data
 api_generic_data_collection_data_list =\
     api.GenericDataCollectionDataViewSet.as_view({
@@ -218,6 +226,10 @@ urlpatterns = [
 
     # Questionnaire response
     url(r'^questionnaire_response/$', api_questionnaire_response_list, name='api_questionnaire_response-list'),
+
+    # Additional data
+    url(r'^additional_data/$',
+        api_additional_data_list, name='api_additional_data-list'),
 
     # Generic Data Collection data
     url(r'^generic_data_collection_data/$',
