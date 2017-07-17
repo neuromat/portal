@@ -17,7 +17,7 @@ class SearchTest(FunctionalTest):
         search_box = self.browser.find_element_by_id(
             'search_box')
         search_box.send_keys('Plexus')
-        self.browser.find_element_by_id('submit').click()
+        self.browser.find_element_by_id('submit_keys').click()
         # search_box.send_keys(Keys.ENTER)
         time.sleep(1)
         # The system searches in title experiments and find one entry that

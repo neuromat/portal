@@ -33,8 +33,9 @@ def home_page(request):
                  for group in experiment.groups.all()])
 
     return render(request, 'experiments/home.html',
-                  {'experiments': experiments, 'to_be_analysed_count':
-                      to_be_analysed_count})
+                  {'experiments': experiments,
+                   'to_be_analysed_count': to_be_analysed_count,
+                   'table_title': 'List of Experiments'})
 
 
 def experiment_detail(request, experiment_id):
