@@ -7,6 +7,7 @@ from rest_framework.documentation import include_docs_urls
 
 from experiments import views
 from experiments import api_urls
+from downloads import urls
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
@@ -21,6 +22,8 @@ urlpatterns = [
         views.change_status, name='change-status'),
     url(r'^media/(?P<path>.*)$', serve,
         {'document_root': settings.MEDIA_ROOT, }),
+    url(r'^downloads/', include(urls)),
+
 
     # Ajax
     url(r'^experiments/to_be_analysed/count/$', views.ajax_to_be_analysed,
