@@ -4,9 +4,10 @@ from django.contrib.auth.models import User
 
 # Create your models here.
 def get_export_dir(instance, filename):
-    return "export/%(user)s/%(export)s/%(filename)s" % \
+    return "downloads/%(user)s/%(export)s/%(filename)s" % \
         {'user': instance.export.user.id,
          'export': instance.export.pk, 'filename': filename}
+
 
 class Export(models.Model):
     user = models.ForeignKey(User, null=False)

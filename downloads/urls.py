@@ -3,6 +3,6 @@ from . import views
 
 
 urlpatterns = [
-    url(r'^$', views.download_view, name='download_view'),
+    url(r'(?P<experiment_id>[0-9]+)/$', views.download_view, name='download_view'),
 ]
 

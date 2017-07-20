@@ -10,8 +10,10 @@
             href="#" data-toggle="modal" data-target="#study_modal">{{ experiment.study.title }}</a></div>
     <div id="id_detail_acquisition" class="detail-acquisition">Data
         acquisition not finished yet</div>
-    <div id="id_link_download" class="detail-donwload"><a
-            href="/downloads/">Download data</a></div>
+    <form name="download" method="post" action="/downloads/{{ experiment.id }}/">
+        <input type="submit" value="Download experiment data" class="detail-donwload" href="/downloads/{{ experiment.id }}/" />
+        {% csrf_token %}
+    </form>
 
     {# Study modal #}
     <div id="study_modal" class="modal fade" tabindex="-1" role="dialog">

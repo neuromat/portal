@@ -5,7 +5,7 @@ from subprocess import call
 from django.contrib.auth import models
 from faker import Factory
 
-# python manage.py shell < experiments/faker_populator.py
+# python manage.py shell < experiments/tests/faker_populator.py
 # TODO: when executing from bash command line, final line identifier breaks
 # imports. We are kepping in Collaborator in same line
 from experiments.models import Gender, ClassificationOfDiseases, Keyword
