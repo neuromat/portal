@@ -4,7 +4,7 @@ from json import dump, load
 # from survey.views import get_questionnaire_language
 
 
-BASE_DIRECTORY = "NES_DOWNLOAD"
+BASE_DIRECTORY = "EXPERIMENT_DOWNLOAD"
 PER_PARTICIPANT_DIRECTORY = "Per_participant"
 PER_QUESTIONNAIRE_DIRECTORY = "Per_questionnaire"
 QUESTIONNAIRE_METADATA_DIRECTORY = "Questionnaire_metadata"

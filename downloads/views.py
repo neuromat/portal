@@ -40,11 +40,11 @@ def download_view(request, experiment_id):
 
         build_complete_export_structure(experiment_id, input_filename)
 
-        complete_filename = export_create(request, export_instance.id, input_filename)
+        complete_filename = export_create(request, export_instance.id, input_filename, experiment_id)
 
         if complete_filename:
 
-            messages.success(request, _("Export was finished correctly"))
+            messages.success(request, ("Export was finished correctly"))
 
             print("antes do fim: httpResponse")
 
@@ -55,6 +55,7 @@ def download_view(request, experiment_id):
             return response
         else:
             messages.error(request, ("Export data was not generated."))
+            return HttpResponse("Export data from experiment " + experiment_id + " was not generated")
 
     return HttpResponse("Download experiment id " + experiment_id)
     # description = ''
@@ -77,24 +78,50 @@ def update_export_instance(input_file, output_export, export_instance):
     export_instance.save()
 
 
-def export_create(request, export_id, input_filename, template_name="downloads/download_data.html"):
+def export_create(request, export_id, input_filename, experiment_id, template_name="downloads/download_data.html"):
     try:
 
         export_instance = get_export_instance(request.user, export_id)
         export = ExportExecution(export_instance.user.id, export_instance.id)
 
-        # set path of the directory base: ex.
+        # set path of the directory base: ex. /Users/.../portal/media/download/user.id
         base_directory, path_to_create = path.split(export.get_directory_base())
-        # create directory base
+        # create directory base ex. /Users/.../portal/media/download/user.id/path_create
         error_msg, base_directory_name = create_directory(base_directory, path_to_create)
         if error_msg != "":
             messages.error(request, error_msg)
-            return render(request, template_name)
-
+            # return render(request, template_name)
+            return HttpResponse("Fail when create directory ")
+        # ex. /Users/.../portal/media/download/user.id/export_instance.id/json_export.json
         input_export_file = path.join("export", path.join(str(request.user.id),
                                                           path.join(str(export_instance.id), str(input_filename))))
 
         # language_code = request.LANGUAGE_CODE
+        # prepare data to be processed
+        input_data = export.read_configuration_data(input_filename)
+
+        if not export.is_input_data_consistent() or not input_data:
+            messages.error(request, ("Inconsistent data read from json file"))
+            # return render(request, template_name)
+            return HttpResponse("json file inconsistent ")
+
+        # create directory base for export: /EXPERIMENT_DOWNLOAD
+        error_msg = export.create_export_directory()
+
+        if error_msg != "":
+            messages.error(request, error_msg)
+            # return render(request, template_name)
+            return HttpResponse("Fail when create export directory ")
+
+        # Create arquivos para exportação
+        # create files protocolo experimental and diagnosis/participant csv file for each group
+        error_msg = export.process_experiment_data(experiment_id)
+
+        if error_msg != "":
+            messages.error(request, error_msg)
+            # return render(request, template_name)
+            return HttpResponse("Fail in process_experiment_data ")
+
         # create zip file and include files
         export_complete_filename = ""
         if export.files_to_zip_list:
@@ -110,9 +137,8 @@ def export_create(request, export_id, input_filename, template_name="downloads/d
 
             zip_file.close()
 
-            output_export_file = path.join("download", path.join(str(export_instance.user.id),
-                                                               path.join(str(export_instance.id),
-                                                                         str(export_filename))))
+            output_export_file = path.join("download", path.join(str(export_instance.user.id), path.join(str(
+                export_instance.id), str(export_filename))))
 
             update_export_instance(input_export_file, output_export_file, export_instance)
 
@@ -131,4 +157,5 @@ def export_create(request, export_id, input_filename, template_name="downloads/d
         print(e)
         error_msg = e
         messages.error(request, error_msg)
-        return render(request, template_name)
+        # return render(request, template_name)
+        return HttpResponse("Error in export create ")
