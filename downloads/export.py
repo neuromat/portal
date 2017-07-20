@@ -1,9 +1,10 @@
 import json
 from os import path, makedirs
+from csv import writer
 from django.conf import settings
 from django.shortcuts import get_object_or_404
 
-from experiments.models import Experiment, Group
+from experiments.models import Experiment, Group, Participant, EEGData, EMGData
 
 DEFAULT_LANGUAGE = "pt-BR"
 
@@ -16,6 +17,18 @@ input_data_keys = [
     "export_filename",
     "questionnaire_list"
 ]
+
+
+def save_to_csv(complete_filename, rows_to_be_saved):
+    """
+    :param complete_filename: filename and directory structure where file is going to be saved
+    :param rows_to_be_saved: list of rows that are going to be written on the file
+    :return:
+    """
+    with open(complete_filename.encode('utf-8'), 'w', newline='', encoding='UTF-8') as csv_file:
+        export_writer = writer(csv_file)
+        for row in rows_to_be_saved:
+            export_writer.writerow(row)
 
 
 def create_directory(basedir, path_to_create):
@@ -190,35 +203,60 @@ class ExportExecution:
 
                 # save experimental protocol description
                 experimental_protocol_description = group.experimental_protocol.textual_description
-                filename_experimental_protocol = "%s.txt" % "Experimental_protocol_description"
-                # ex. Users/..../EXPERIMENT_DOWNLOAD/Group_xxx/Experimental_protocol
-                # /Experimental_protocol_description.txt
-                complete_filename_experimental_protocol = path.join(directory_experimental_protocol,
-                                                                    filename_experimental_protocol)
+                if experimental_protocol_description:
+                    filename_experimental_protocol = "%s.txt" % "Experimental_protocol_description"
+                    # ex. Users/..../EXPERIMENT_DOWNLOAD/Group_xxx/Experimental_protocol
+                    # /Experimental_protocol_description.txt
+                    complete_filename_experimental_protocol = path.join(directory_experimental_protocol,
+                                                                        filename_experimental_protocol)
 
-                self.files_to_zip_list.append([complete_filename_experimental_protocol,
-                                               export_directory_experimental_protocol])
+                    self.files_to_zip_list.append([complete_filename_experimental_protocol,
+                                                   export_directory_experimental_protocol])
 
-                with open(complete_filename_experimental_protocol.encode('utf-8'), 'w', newline='', encoding='UTF-8') \
-                        as txt_file:
-                    txt_file.writelines(group_resume)
-                    txt_file.writelines(experimental_protocol_description)
+                    with open(complete_filename_experimental_protocol.encode('utf-8'), 'w', newline='', encoding='UTF-8') \
+                            as txt_file:
+                        txt_file.writelines(group_resume)
+                        txt_file.writelines(experimental_protocol_description)
 
                 # save protocol image
                 experimental_protocol_image = group.experimental_protocol.image
-                filename_protocol_image = "Experimental_protocol_image.png"
-                complete_protocol_image_filename = path.join(directory_experimental_protocol, filename_protocol_image)
-                self.files_to_zip_list.append([complete_protocol_image_filename,
-                                               export_directory_experimental_protocol])
+                if experimental_protocol_image:
+                    filename_protocol_image = "Experimental_protocol_image.png"
+                    complete_protocol_image_filename = path.join(directory_experimental_protocol,
+                                                                 filename_protocol_image)
+                    self.files_to_zip_list.append([complete_protocol_image_filename,
+                                                   export_directory_experimental_protocol])
 
-                image_protocol = path.join(path.join(settings.BASE_DIR,"media/"), experimental_protocol_image.name)
-                with open(image_protocol, 'rb') as f:
-                    data = f.read()
+                    image_protocol = path.join(path.join(settings.BASE_DIR,"media/"), experimental_protocol_image.name)
+                    with open(image_protocol, 'rb') as f:
+                        data = f.read()
 
-                with open(complete_protocol_image_filename, 'wb') as f:
-                    f.write(data)
+                    with open(complete_protocol_image_filename, 'wb') as f:
+                        f.write(data)
 
-        #         # save eeg, emg, tms, context tree setting default in Experimental Protocol directory
+                # Export data per Participant
+                participant_list = Participant.objects.filter(group=group)
+                # participant with data collection
+                eeg_participant_list = EEGData.objects.filter(participant__in=participant_list).values('participant_id')
+                emg_participant_list = EMGData.objects.filter(participant__in=participant_list).values('participant_id')
+                header_personal_data = ["Participant_code", "Age", "Gender"]
+                personal_data_list = []
+                for participant in participant_list:
+                    # save personal data
+                    data = [participant.code, participant.age, participant.gender]
+                    personal_data_list.append(data)
+
+                personal_data_list.insert(0, header_personal_data)
+                export_participant_filename = "%s.csv" % "Participants"
+                # ex. ex. Users/..../EXPERIMENT_DOWNLOAD/Group_xxx/Participants.csv
+                complete_participant_filename = path.join(group_directory, export_participant_filename)
+                # save personal_data_list to csv file
+                save_to_csv(complete_participant_filename, personal_data_list)
+                self.files_to_zip_list.append([complete_participant_filename, export_directory_group])
+
+                # save eeg, emg, tms, context tree setting data
+
+                # save eeg, emg, tms, context tree setting default in Experimental Protocol directory
         #         if 'eeg_default_setting_id' in self.per_group_data[group_id]:
         #             eeg_default_setting_description = get_eeg_setting_description(self.per_group_data[group_id][
         #                                                                               'eeg_default_setting_id'])
