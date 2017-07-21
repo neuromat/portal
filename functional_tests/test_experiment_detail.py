@@ -8,8 +8,11 @@ from functional_tests.base import FunctionalTest
 
 class ExperimentDetailTest(FunctionalTest):
 
+    # TODO: break by tabs
     def test_can_view_detail_page(self):
-        experiment = Experiment.objects.filter(status=Experiment.APPROVED).first()
+        experiment = Experiment.objects.filter(
+            status=Experiment.APPROVED
+        ).first()
         self.browser.get(self.live_server_url)
 
         # The new visitor is in home page and see the list of experiments.
@@ -25,9 +28,9 @@ class ExperimentDetailTest(FunctionalTest):
         self.assertIn('Open Database for Experiments in Neuroscience',
                       page_header_text)
 
-        # In header she notices three elements besides header title:
-        # Experiment title, experiment detail, and a button to go back home
-        # page.
+        # In header she notices four elements besides header title:
+        # Experiment title, experiment detail, info related to ethics
+        # committee experiment approval, and a button to go back home page.
         experiment_title = self.browser.find_element_by_id(
             'id_detail_title').text
         self.assertEqual(experiment.title, experiment_title)
@@ -36,6 +39,26 @@ class ExperimentDetailTest(FunctionalTest):
         experiment_description = self.browser.find_element_by_id(
             'id_detail_description').text
         self.assertEqual(experiment.description, experiment_description)
+        ethics_commitee_project_info = self.browser.find_element_by_link_text(
+            'Project Info')
+        self.assertEqual(experiment.ethics_committee_info.project_url,
+                         ethics_commitee_project_info.get_attribute('href'))
+        ethics_commitee_url = self.browser.find_element_by_link_text(
+            'Ethics committee approval'
+        )
+        self.assertEqual(
+            experiment.ethics_committee_info.ethics_committee_url,
+            ethics_commitee_url.get_attribute('href')
+        )
+        ethics_commitee_file = self.browser.find_element_by_link_text(
+            'Download project file approved'
+        )
+        # self.assertIn because experiment.ethics_committee_info.file.url
+        # gives relative url here in test, but prepends url in template system
+        self.assertIn(
+            experiment.ethics_committee_info.file.url,
+            ethics_commitee_file.get_attribute('href')
+        )
 
         # Right bellow she sees the study that the experiment belongs to
         # at left, and if data acquisition was finished, at right

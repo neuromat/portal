@@ -21,8 +21,8 @@ class ExperimentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Experiment
         fields = ('id', 'title', 'description', 'data_acquisition_done',
-                  'nes_id', 'ethics_committee_file', 'owner',
-                  'status', 'protocol_components', 'sent_date')
+                  'nes_id', 'owner', 'status', 'protocol_components',
+                  'sent_date')
 
 
 class UserSerializer(serializers.ModelSerializer):

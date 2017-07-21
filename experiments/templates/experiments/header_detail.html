@@ -5,6 +5,11 @@
         <a href="{% url 'home' %}">Back Search</a>
     </div>
     <div id="id_detail_description" class="detail-description">{{ experiment.description }}</div>
+    <div>
+        <a href="{{ experiment.ethics_committee_info.project_url }}">Project Info</a>
+        <a href="{{ experiment.ethics_committee_info.ethics_committee_url }}">Ethics committee approval</a>
+        <a href="{{ experiment.ethics_committee_info.file.url }}">Download project file approved</a>
+    </div>
     <hr class="detail-header-hr">
     <div id="id_detail_study" class="detail-study">Related study: <a
             href="#" data-toggle="modal" data-target="#study_modal">{{ experiment.study.title }}</a></div>

@@ -38,7 +38,6 @@ class ExperimentAPITest(APITestCase):
                     'data_acquisition_done':
                         experiment1.data_acquisition_done,
                     'nes_id': experiment1.nes_id,
-                    'ethics_committee_file': None,
                     'owner': experiment1.owner.username,
                     'status': experiment1.status,
                     'protocol_components': [],
@@ -51,7 +50,6 @@ class ExperimentAPITest(APITestCase):
                     'data_acquisition_done':
                         experiment2.data_acquisition_done,
                     'nes_id': experiment2.nes_id,
-                    'ethics_committee_file': None,
                     'owner': experiment2.owner.username,
                     'status': experiment2.status,
                     'protocol_components': [],
@@ -64,7 +62,6 @@ class ExperimentAPITest(APITestCase):
                     'data_acquisition_done':
                         experiment3.data_acquisition_done,
                     'nes_id': experiment3.nes_id,
-                    'ethics_committee_file': None,
                     'owner': experiment3.owner.username,
                     'status': experiment3.status,
                     'protocol_components': [],
@@ -154,7 +151,6 @@ class ExperimentAPITest(APITestCase):
         experiment_version_2 = Experiment.objects.last()
         self.assertEqual(experiment_version_2.version, 2)
 
-        self.client.logout()
 
     def test_PATCHing_an_existing_experiment(self):
         # TODO: get last version
@@ -192,7 +188,6 @@ class ExperimentAPITest(APITestCase):
                 'data_acquisition_done':
                     updated_experiment.data_acquisition_done,
                 'nes_id': updated_experiment.nes_id,
-                'ethics_committee_file': None,
                 'owner': updated_experiment.owner.username,
                 'protocol_components': [],
                 'status': updated_experiment.status,
