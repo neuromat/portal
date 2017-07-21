@@ -307,7 +307,6 @@ def global_setup_ut():
 
     create_ethics_committee_info(experiment1)
     create_ethics_committee_info(experiment2)
-    create_ethics_committee_info(experiment3)
 
     study1 = Study.objects.create(start_date=datetime.utcnow(),
                                   experiment=experiment1)

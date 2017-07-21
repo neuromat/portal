@@ -4,9 +4,11 @@ from rest_framework import serializers, permissions, viewsets
 
 from experiments import appclasses
 from experiments.models import Experiment, Study, User, ProtocolComponent, \
-    Group, ExperimentalProtocol, Researcher, Participant, Collaborator, Keyword, ClassificationOfDiseases, \
+    Group, ExperimentalProtocol, Researcher, Participant, Collaborator, \
+    Keyword, ClassificationOfDiseases, \
     EEGSetting, EMGSetting, TMSSetting, ContextTree, Step, File, \
-    EEGData, EMGData, TMSData, GoalkeeperGameData, QuestionnaireResponse, AdditionalData, GenericDataCollectionData
+    EEGData, EMGData, TMSData, GoalkeeperGameData, QuestionnaireResponse, \
+    AdditionalData, GenericDataCollectionData, EthicsCommitteeInfo
 
 
 ###################
@@ -23,6 +25,15 @@ class ExperimentSerializer(serializers.ModelSerializer):
         fields = ('id', 'title', 'description', 'data_acquisition_done',
                   'nes_id', 'owner', 'status', 'protocol_components',
                   'sent_date')
+
+
+class EthicsCommitteeInfoSerializer(serializers.ModelSerializer):
+    experiment = serializers.ReadOnlyField(source='experiment.title')
+
+    class Meta:
+        model = EthicsCommitteeInfo
+        fields = ('id', 'project_url', 'ethics_committee_url', 'file',
+                  'experiment')
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -318,14 +329,43 @@ class ExperimentViewSet(viewsets.ModelViewSet):
         )
 
 
+class EthicsCommitteeInfoViewSet(viewsets.ModelViewSet):
+    serializer_class = EthicsCommitteeInfoSerializer
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
+
+    def get_queryset(self):
+        if 'experiment_nes_id' in self.kwargs and \
+                (self.request.user != AnonymousUser()):
+            experiment = Experiment.objects.filter(
+                nes_id=self.kwargs['experiment_nes_id'],
+                owner=self.request.user
+            )
+            return EthicsCommitteeInfo.objects.filter(experiment=experiment)
+        else:
+            return EthicsCommitteeInfo.objects.all()
+
+    def perform_create(self, serializer):
+        exp_nes_id = self.kwargs['experiment_nes_id']
+        owner = self.request.user
+        last_version = appclasses.ExperimentVersion(
+            exp_nes_id, owner
+        ).get_last_version()
+        # TODO: if last_version == 0 generates exception: "no experiment was
+        # created yet"
+        experiment = Experiment.objects.get(
+            nes_id=exp_nes_id, owner=owner, version=last_version
+        )
+        # TODO: breaks when posting from the api template.
+        # Doesn't have researcher field to enter a valid researcher.
+        serializer.save(experiment=experiment)
+
+
 class StudyViewSet(viewsets.ModelViewSet):
-    lookup_field = 'experiment_nes_id'  # TODO: see if no more used
     serializer_class = StudySerializer
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
 
     def get_queryset(self):
-        if 'experiment_nes_id' in \
-                self.kwargs and \
+        if 'experiment_nes_id' in self.kwargs and \
                 (self.request.user != AnonymousUser()):
             experiment = Experiment.objects.filter(
                 nes_id=self.kwargs['experiment_nes_id'],
@@ -342,12 +382,12 @@ class StudyViewSet(viewsets.ModelViewSet):
             exp_nes_id, owner
         ).get_last_version()
         # TODO: if last_version == 0 generates exception: "no experiment was
-        # TODO: created yet"
+        # created yet"
         experiment = Experiment.objects.get(
             nes_id=exp_nes_id, owner=owner, version=last_version
         )
         # TODO: breaks when posting from the api template.
-        # Doesn't have researcher field to enter a valid r.
+        # Doesn't have researcher field to enter a valid researcher.
         serializer.save(experiment=experiment)
 
 
