@@ -4,8 +4,9 @@ from django.contrib.auth.models import User
 from datetime import datetime
 
 from experiments.models import Experiment, Study, Group, Researcher, \
-    Collaborator, RejectJustification
-from experiments.tests.tests_helper import global_setup_ut, apply_setup
+    Collaborator, RejectJustification, EthicsCommitteeInfo
+from experiments.tests.tests_helper import global_setup_ut, apply_setup, \
+    create_experiment
 
 
 @apply_setup(global_setup_ut)
@@ -52,37 +53,46 @@ class StudyModelTest(TestCase):
             study.save()
             study.full_clean()
 
-    def test_duplicate_studies_are_invalid(self):
+    def test_study_has_only_one_experiment(self):
+        # Valid because in tests_helper.py we are creating experiments tied
+        # with studies
         experiment = Experiment.objects.last()
         study = Study(start_date=datetime.utcnow(),
                       experiment=experiment)
         with self.assertRaises(ValidationError):
             study.full_clean()
 
-    # def test_CAN_save_same_study_to_different_owners(self):
-    #     # TODO: maybe not necessary anymore
-    #     owner2 = User.objects.last()
-    #     experiment = Experiment.objects.last()
-    #     study = Study(title='A title', description='A description', nes_id=1,
-    #                   start_date=datetime.utcnow(), end_date=datetime.utcnow(),
-    #                   experiment=experiment, owner=owner2)
-    #     study.full_clean()
 
-    # TODO: adapt test so we see if study is related to experiment owner
-    # def test_study_is_related_to_owner(self):
-    #     owner = User.objects.first()
-    #     experiment = Experiment.objects.last()
-    #     study = Study(start_date=datetime.utcnow(), experiment=experiment)
-    #     study.save()
-    #     self.assertIn(study, owner.study_set.all())
+@apply_setup(global_setup_ut)
+class EthicsCommitteInfoModelTest(TestCase):
 
-    def test_study_has_one_experiment(self):
-        # TODO: this test is incomplete. Finish it!
+    def setUp(self):
+        global_setup_ut()
+
+    def test_default_attributes(self):
+        ethics_committe_info = EthicsCommitteeInfo()
+        self.assertEqual(ethics_committe_info.project_url, None)
+        self.assertEqual(ethics_committe_info.ethics_committee_url, '')
+        self.assertEqual(ethics_committe_info.file, '')
+
+    def test_cannot_save_empty_attributes(self):
         owner = User.objects.first()
+        create_experiment(1, owner, Experiment.TO_BE_ANALYSED)
+        experiment = Experiment.objects.last()
+        ethics_committe_info = EthicsCommitteeInfo(
+            ethics_committee_url='', file='', experiment=experiment
+        )
+        with self.assertRaises(ValidationError):
+            ethics_committe_info.save()
+            ethics_committe_info.full_clean()
+
+    def test_ethics_committee_info_has_only_one_experiment(self):
         experiment = Experiment.objects.first()
-        study1 = Study.objects.first()
-        study2 = Study(start_date=datetime.utcnow(),
-                       experiment=experiment)
+        ethics_committe_info = EthicsCommitteeInfo(
+            ethics_committee_url='http://example.com', experiment=experiment
+        )
+        with self.assertRaises(ValidationError):
+            ethics_committe_info.full_clean()
 
 
 @apply_setup(global_setup_ut)
@@ -97,7 +107,6 @@ class ExperimentModelTest(TestCase):
         self.assertEqual(experiment.title, '')
         self.assertEqual(experiment.description, '')
         self.assertEqual(experiment.data_acquisition_done, False)
-        self.assertEqual(experiment.ethics_committee_file, '')
         self.assertEqual(experiment.sent_date, None)
         self.assertEqual(experiment.version, None)
         self.assertEqual(experiment.status, experiment.RECEIVING)

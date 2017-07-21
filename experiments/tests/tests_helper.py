@@ -7,7 +7,7 @@ from faker import Factory
 from experiments.helpers import generate_image_file
 from experiments.models import Experiment, Study, Group, Researcher, \
     Collaborator, Participant, Gender, ExperimentalProtocol, \
-    ClassificationOfDiseases, Keyword
+    ClassificationOfDiseases, Keyword, EthicsCommitteeInfo
 
 
 def create_experiment_groups(qtty, experiment):
@@ -25,8 +25,32 @@ def create_experiment_groups(qtty, experiment):
         )
 
 
-# TODO: separate study creation from experiment creation
-def create_experiment_and_study(qtty, owner, status):
+def create_study(experiment):
+    """
+    :param experiment: Experiment to be associated with Study
+    """
+    fake = Factory.create()
+
+    Study.objects.create(
+        title=fake.text(max_nb_chars=15),
+        description=fake.text(max_nb_chars=200),
+        start_date=datetime.utcnow(), experiment=experiment
+    )
+
+
+def create_ethics_committee_info(experiment):
+    fake = Factory.create()
+
+    eci = EthicsCommitteeInfo.objects.create(project_url=fake.uri(),
+                                             ethics_committee_url=fake.uri(),
+                                             experiment=experiment)
+    # TODO: generate PDF
+    file = generate_image_file(500, 800, fake.word() + '.jpg')
+    eci.file.save(file.name, file)
+    eci.save()
+
+
+def create_experiment(qtty, owner, status):
     """
     :param qtty: Number of experiments
     :param owner: Owner of experiment - User instance model
@@ -44,11 +68,7 @@ def create_experiment_and_study(qtty, owner, status):
             sent_date=datetime.utcnow(),
             status=status
         )
-        Study.objects.create(
-            title=fake.text(max_nb_chars=15),
-            description=fake.text(max_nb_chars=200),
-            start_date=datetime.utcnow(), experiment=experiment
-        )
+        create_study(experiment)
         create_experiment_groups(randint(2, 3), experiment)
 
 
@@ -200,15 +220,18 @@ def global_setup_ft():
 
     # Create 5 experiments for 2 owners, randomly, and studies (groups are
     # created inside create_experiment_and_study)
-    create_experiment_and_study(2, choice([owner1, owner2]),
-                                Experiment.TO_BE_ANALYSED)
+    create_experiment(2, choice([owner1, owner2]),
+                      Experiment.TO_BE_ANALYSED)
+    create_ethics_committee_info(Experiment.objects.last())
     # TODO: when creating experiment UNDER_ANALYSIS, associate with a trustee
-    create_experiment_and_study(2, choice([owner1, owner2]),
-                                Experiment.UNDER_ANALYSIS)
-    create_experiment_and_study(1, choice([owner1, owner2]),
-                                Experiment.APPROVED)
-    create_experiment_and_study(1, choice([owner1, owner2]),
-                                Experiment.NOT_APPROVED)
+    create_experiment(2, choice([owner1, owner2]),
+                      Experiment.UNDER_ANALYSIS)
+    create_ethics_committee_info(Experiment.objects.last())
+    create_experiment(2, choice([owner1, owner2]),
+                      Experiment.APPROVED)
+    create_ethics_committee_info(Experiment.objects.last())
+    create_experiment(1, choice([owner1, owner2]),
+                      Experiment.NOT_APPROVED)
 
     # Associate trustee to studies under analysis (requires create
     # experiments before)
@@ -281,6 +304,9 @@ def global_setup_ut():
         version=1, sent_date=datetime.utcnow(),
         status=Experiment.TO_BE_ANALYSED
     )
+
+    create_ethics_committee_info(experiment1)
+    create_ethics_committee_info(experiment2)
 
     study1 = Study.objects.create(start_date=datetime.utcnow(),
                                   experiment=experiment1)

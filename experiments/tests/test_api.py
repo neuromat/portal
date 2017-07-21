@@ -9,8 +9,9 @@ from rest_framework.test import APITestCase
 from experiments import api
 from experiments.helpers import generate_image_file
 from experiments.models import Experiment, Study, Group, Researcher, \
-    Collaborator
+    Collaborator, EthicsCommitteeInfo
 from experiments.tests.tests_helper import global_setup_ut, apply_setup
+from nep import settings
 
 
 @apply_setup(global_setup_ut)
@@ -38,7 +39,6 @@ class ExperimentAPITest(APITestCase):
                     'data_acquisition_done':
                         experiment1.data_acquisition_done,
                     'nes_id': experiment1.nes_id,
-                    'ethics_committee_file': None,
                     'owner': experiment1.owner.username,
                     'status': experiment1.status,
                     'protocol_components': [],
@@ -51,7 +51,6 @@ class ExperimentAPITest(APITestCase):
                     'data_acquisition_done':
                         experiment2.data_acquisition_done,
                     'nes_id': experiment2.nes_id,
-                    'ethics_committee_file': None,
                     'owner': experiment2.owner.username,
                     'status': experiment2.status,
                     'protocol_components': [],
@@ -64,7 +63,6 @@ class ExperimentAPITest(APITestCase):
                     'data_acquisition_done':
                         experiment3.data_acquisition_done,
                     'nes_id': experiment3.nes_id,
-                    'ethics_committee_file': None,
                     'owner': experiment3.owner.username,
                     'status': experiment3.status,
                     'protocol_components': [],
@@ -154,7 +152,6 @@ class ExperimentAPITest(APITestCase):
         experiment_version_2 = Experiment.objects.last()
         self.assertEqual(experiment_version_2.version, 2)
 
-        self.client.logout()
 
     def test_PATCHing_an_existing_experiment(self):
         # TODO: get last version
@@ -192,7 +189,6 @@ class ExperimentAPITest(APITestCase):
                 'data_acquisition_done':
                     updated_experiment.data_acquisition_done,
                 'nes_id': updated_experiment.nes_id,
-                'ethics_committee_file': None,
                 'owner': updated_experiment.owner.username,
                 'protocol_components': [],
                 'status': updated_experiment.status,
@@ -255,7 +251,7 @@ class StudyAPITest(APITestCase):
             ]
         )
 
-    def test_get_returns_all_studies_long_url(self):
+    def test_get_returns_all_studies_long_url_not_logged(self):
         owner = User.objects.get(username='lab2')
         experiment = Experiment.objects.get(nes_id=1, owner=owner)
         study1 = Study.objects.first()
@@ -287,7 +283,7 @@ class StudyAPITest(APITestCase):
             ]
         )
 
-    def test_get_returns_all_studies_of_an_experiment(self):
+    def test_get_returns_all_studies_long_url_logged(self):
         owner = User.objects.get(username='lab2')
         experiment = Experiment.objects.get(nes_id=1, owner=owner)
         study = Study.objects.get(experiment=experiment)
@@ -332,9 +328,9 @@ class StudyAPITest(APITestCase):
         new_study = Study.objects.get(experiment=experiment)
         self.assertEqual(new_study.title, 'New study')
 
-        # TODO: IMPORTANT! Test client can't POST (PUT etc.) to a model without
-        # been its owner. This requires adds, at first, an owner to all
-        # models, and ensure that only same client can POST to that model.
+        # TODO: IMPORTANT! Test client can't POST (PUT etc.) to Study model
+        # without been its owner (indirectly by experiment's study). Ensure
+        # that only same client can POST to that model.
 
     # def test_PUTing_an_existing_study(self):
     #     pass  # TODO: update test with new url
@@ -790,3 +786,109 @@ class GroupAPITest(APITestCase):
 #             }
 #         )
 #         self.client.logout()
+
+@apply_setup(global_setup_ut)
+class EthicsCommitteeInfoAPITest(APITestCase):
+
+    def setUp(self):
+        global_setup_ut()
+
+    def test_get_returns_all_ethics_committe_info_short_url(self):
+        eci1 = EthicsCommitteeInfo.objects.first()
+        eci2 = EthicsCommitteeInfo.objects.last()
+        list_url = reverse('api_ethics_committee_info-list')
+        response = self.client.get(list_url)
+        self.assertEqual(
+            json.loads(response.content.decode('utf8')),
+            [
+                {
+                    'id': eci1.id,
+                    'project_url': eci1.project_url,
+                    'ethics_committee_url': eci1.ethics_committee_url,
+                    'file': 'http://testserver' + eci1.file.url,
+                    'experiment': eci1.experiment.title
+                },
+                {
+                    'id': eci2.id,
+                    'project_url': eci2.project_url,
+                    'ethics_committee_url': eci2.ethics_committee_url,
+                    'file': 'http://testserver' + eci2.file.url,
+                    'experiment': eci2.experiment.title
+                }
+            ]
+        )
+
+    def test_get_returns_all_ethics_committe_info_long_url_not_logged(self):
+        eci1 = EthicsCommitteeInfo.objects.first()
+        eci2 = EthicsCommitteeInfo.objects.last()
+        experiment = eci1.experiment  # could be experiment = eci2.experiment
+        list_url = reverse('api_experiment_ethics_committee_info-list',
+                           kwargs={'experiment_nes_id': experiment.nes_id})
+        response = self.client.get(list_url)
+        self.assertEqual(
+            json.loads(response.content.decode('utf8')),
+            [
+                {
+                    'id': eci1.id,
+                    'project_url': eci1.project_url,
+                    'ethics_committee_url': eci1.ethics_committee_url,
+                    'file': 'http://testserver' + eci1.file.url,
+                    'experiment': eci1.experiment.title
+                },
+                {
+                    'id': eci2.id,
+                    'project_url': eci2.project_url,
+                    'ethics_committee_url': eci2.ethics_committee_url,
+                    'file': 'http://testserver' + eci2.file.url,
+                    'experiment': eci2.experiment.title
+                }
+            ]
+        )
+
+    def test_get_returns_all_ethics_committe_info_long_url_logged(self):
+        eci = EthicsCommitteeInfo.objects.first()
+        experiment = eci.experiment
+        list_url = reverse('api_experiment_ethics_committee_info-list',
+                           kwargs={'experiment_nes_id': experiment.nes_id})
+        # password='nep-lab1': see tests helper - experiment has 'lab1' as
+        # owner
+        self.client.login(username=experiment.owner.username,
+                          password='nep-lab1')
+        response = self.client.get(list_url)
+        self.assertEqual(
+            json.loads(response.content.decode('utf8')),
+            [
+                {
+                    'id': eci.id,
+                    'project_url': eci.project_url,
+                    'ethics_committee_url': eci.ethics_committee_url,
+                    'file': 'http://testserver' + eci.file.url,
+                    'experiment': eci.experiment.title
+                }
+            ]
+        )
+        self.client.logout()
+
+    def test_POSTing_a_new_ethics_committe_info(self):
+        experiment = Experiment.objects.last()
+        file = generate_image_file(800, 500, 'ethics_committee_file.jpg')
+        # password='nep-lab2': see tests helper - experiment has 'lab2' as
+        # owner
+        self.client.login(username=experiment.owner.username,
+                          password='nep-lab2')
+        list_url = reverse('api_experiment_ethics_committee_info-list',
+                           kwargs={'experiment_nes_id': experiment.nes_id})
+        response = self.client.post(
+            list_url,
+            {
+                'project_url': 'http://example1.com',
+                'ethics_committee_url': 'http://example2.com',
+                'file': file
+            }
+        )
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.client.logout()
+        new_ethics_committee_info = EthicsCommitteeInfo.objects.get(
+            experiment=experiment)
+        self.assertEqual(new_ethics_committee_info.project_url,
+                         'http://example1.com')
