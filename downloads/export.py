@@ -237,7 +237,10 @@ class ExportExecution:
                 # Export data per Participant
                 participant_list = Participant.objects.filter(group=group)
                 # participant with data collection
-                eeg_participant_list = EEGData.objects.filter(participant__in=participant_list).values('participant_id')
+                eeg_participant_id_list = EEGData.objects.filter(participant__in=participant_list).values('participant_id')
+                eeg_participant_list = []
+                for eeg_participant in eeg_participant_id_list:
+                    eeg_participant_list.append(eeg_participant['participant_id'])
                 emg_participant_list = EMGData.objects.filter(participant__in=participant_list).values('participant_id')
                 header_personal_data = ["Participant_code", "Age", "Gender"]
                 personal_data_list = []
@@ -245,6 +248,29 @@ class ExportExecution:
                     # save personal data
                     data = [participant.code, participant.age, participant.gender]
                     personal_data_list.append(data)
+                    if participant.id in eeg_participant_list:
+                        # ex. Users/.../EXPERIMENT_DOWNLOAD/Group_group.title/Participants
+                        group_participant_directory = path.join(group_directory, "Participants")
+                        if not path.exists(group_participant_directory):
+                            error_msg, group_participant_directory = create_directory(group_directory, "Participants")
+                            if error_msg != "":
+                                return error_msg
+                            # ex. EXPERIMENT_DOWNLOAD/Group_group.title/Participants
+                            export_directory_group_participant = path.join(export_experiment_data, group_directory_name)
+
+                        # ex. Users/.../EXPERIMENT_DOWNLOAD/Group_group.title/Participants/Participant_PXXX
+                        participant_name_directory = "Participant_" + participant.code
+                        participant_directory = path.join(group_participant_directory, participant_name_directory)
+                        if not path.exists(participant_directory):
+                            error_msg, participant_directory = create_directory(group_participant_directory,
+                                                                                participant_name_directory)
+                            if error_msg != "":
+                                return error_msg
+                            # ex. EXPERIMENT_DOWNLOAD/Group_group.title/Participants/Participant_PXXX
+                            export_directory_participant = path.join(export_directory_group_participant,
+                                                                     participant_name_directory)
+                        eeg_data = EEGData.objects.filter(participant_id=participant.id)
+                        eeg_data_filename = eeg_data[0].file.file.name
 
                 personal_data_list.insert(0, header_personal_data)
                 export_participant_filename = "%s.csv" % "Participants"
