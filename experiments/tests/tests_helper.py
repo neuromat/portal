@@ -227,7 +227,7 @@ def global_setup_ft():
     create_experiment(2, choice([owner1, owner2]),
                       Experiment.UNDER_ANALYSIS)
     create_ethics_committee_info(Experiment.objects.last())
-    create_experiment(1, choice([owner1, owner2]),
+    create_experiment(2, choice([owner1, owner2]),
                       Experiment.APPROVED)
     create_ethics_committee_info(Experiment.objects.last())
     create_experiment(1, choice([owner1, owner2]),

@@ -12,14 +12,15 @@ class ExperimentDetailTest(FunctionalTest):
     def test_can_view_detail_page(self):
         experiment = Experiment.objects.filter(
             status=Experiment.APPROVED
-        ).first()
+        ).last()
         self.browser.get(self.live_server_url)
 
         # The new visitor is in home page and see the list of experiments.
-        # She clicks in first "View" link and is redirected to experiment
+        # She clicks in second "View" link and is redirected to experiment
         # detail page
-        self.browser.find_element_by_link_text('View').click()  # TODO:
-        # really gets first element?
+        # TODO: frequently fails to catch second link
+        list_links = self.browser.find_elements_by_link_text('View')
+        list_links[1].click()
         time.sleep(1)
 
         # She sees a new page with a header title: Open Database
@@ -28,9 +29,9 @@ class ExperimentDetailTest(FunctionalTest):
         self.assertIn('Open Database for Experiments in Neuroscience',
                       page_header_text)
 
-        # In header she notices four elements besides header title:
-        # Experiment title, experiment detail, info related to ethics
-        # committee experiment approval, and a button to go back home page.
+        # In header she notices three elements besides header title:
+        # Experiment title, experiment detail, and a button to go back home
+        # page.
         experiment_title = self.browser.find_element_by_id(
             'id_detail_title').text
         self.assertEqual(experiment.title, experiment_title)
@@ -39,10 +40,19 @@ class ExperimentDetailTest(FunctionalTest):
         experiment_description = self.browser.find_element_by_id(
             'id_detail_description').text
         self.assertEqual(experiment.description, experiment_description)
-        ethics_commitee_project_info = self.browser.find_element_by_link_text(
-            'Project Info')
-        self.assertEqual(experiment.ethics_committee_info.project_url,
-                         ethics_commitee_project_info.get_attribute('href'))
+
+        # Bellow experiment description there are info related to ethics
+        # committee experiment approval (because experiment has that data
+        # posted via api)
+        ethics_commitee_head = \
+            self.browser.find_element_by_id('ethics_committee_info').text
+        self.assertIn('Ethics Commite Info', ethics_commitee_head)
+        ethics_commitee_project_info = \
+            self.browser.find_element_by_link_text('Project Info')
+        self.assertEqual(
+            experiment.ethics_committee_info.project_url,
+            ethics_commitee_project_info.get_attribute('href')
+        )
         ethics_commitee_url = self.browser.find_element_by_link_text(
             'Ethics committee approval'
         )
@@ -53,8 +63,9 @@ class ExperimentDetailTest(FunctionalTest):
         ethics_commitee_file = self.browser.find_element_by_link_text(
             'Download project file approved'
         )
-        # self.assertIn because experiment.ethics_committee_info.file.url
-        # gives relative url here in test, but prepends url in template system
+        # Obs.: self.assertIn because
+        # experiment.ethics_committee_info.file.url gives relative url
+        # here in test, but prepends url in template system
         self.assertIn(
             experiment.ethics_committee_info.file.url,
             ethics_commitee_file.get_attribute('href')
@@ -196,5 +207,28 @@ class ExperimentDetailTest(FunctionalTest):
                             .experimental_protocol.image),
             protocol_image_path
         )
+
+    # TODO: new test made necessary. Test above includes testing when there
+    # are committee info. Refactor this class test to test for different
+    # elements in separated tests.
+    def test_display_message_if_that_is_not_ethics_committee_info(self):
+        self.browser.get(self.live_server_url)
+        experiment = Experiment.objects.filter(
+            status=Experiment.APPROVED
+        ).first()
+
+        # The visitor is in home page and see the list of experiments.
+        # She clicks in first "View" link and is redirected to experiment
+        # detail page
+        list_links = self.browser.find_elements_by_link_text('View')
+        list_links[0].click()
+        time.sleep(1)
+
+        # In Ethics Committe Info section she sees a message telling that
+        # there is no such information
+        no_ethics_committee_info = self.browser.find_element_by_id(
+            'ethics_committee_info').text
+        self.assertIn('There\'s no ethics committe info',
+                      no_ethics_committee_info)
 
         self.fail('Finish this test!')
