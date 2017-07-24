@@ -48,17 +48,36 @@ i#new_experiments {
 }
 
 .badger:after {
-    position: absolute;
-    background: red;
-    height: 2rem;
-    top: -0.2rem;
-    right: 0.2rem;
-    width: 2rem;
-    text-align: center;
-    line-height: 2rem;
-    font-size: 1rem;
-    border-radius: 50%;
-    color: white;
+  position: absolute;
+  background: red;
+  height: 2rem;
+  top: -0.2rem;
+  right: 0.2rem;
+  width: 2rem;
+  text-align: center;
+  line-height: 2rem;
+  font-size: 1rem;
+  border-radius: 50%;
+  color: white;
+}
+
+/*
+  ========================================
+  Buttons
+  ========================================
+*/
+
+.nep-btn {
+  background: #60c8a3;
+  color: #fff;
+  padding: 2px 12px;
+  border-radius: 18px;
+  vertical-align: middle;
+}
+
+a:hover.nep-btn {
+  color: #fff;
+  background: #a9b2b9;
 }
 
 /*
