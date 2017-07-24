@@ -5,21 +5,21 @@
         <a href="{% url 'home' %}">Back Search</a>
     </div>
     <div id="id_detail_description" class="detail-description">{{ experiment.description }}</div>
-    <br>
     <aside id="ethics_committee_info">
-        <h5><strong>Ethics Commite Info</strong></h5>
-        {% if experiment.ethics_committee_info %}
-            <div>
-                <a href="
-{{ experiment.ethics_committee_info.project_url }}">Project Info</a>&nbsp;
-                &nbsp;&nbsp;
-                <a href="
-{{ experiment.ethics_committee_info.ethics_committee_url }}">Ethics
-                    committee approval</a>&nbsp;&nbsp;&nbsp;
-                <a href="{{ experiment.ethics_committee_info.file.url }}">Download project file approved</a>
-            </div>
-            {% else %}
-            <p>There's no ethics committe info</p>
+        {% if experiment.project_url %}
+            <a href="{{ experiment.project_url }}">Project Info</a>&nbsp;
+            &nbsp;&nbsp;
+        {% endif %}
+        {% if experiment.ethics_committee_url %}
+            <a href="{{ experiment.ethics_committee_url }}">Ethics committee approval</a>&nbsp;&nbsp;&nbsp;
+        {% else %}
+            <span class="alert">There's no ethics committee url</span> &nbsp;
+            &nbsp;&nbsp;
+        {% endif %}
+        {% if experiment.ethics_committee_file %}
+            <a href="{{ experiment.ethics_committee_file.url }}">Download project file approved</a>
+        {% else %}
+            <span class="alert">There's no ethics committee approved file</span>
         {% endif %}
     </aside>
     <hr class="detail-header-hr">

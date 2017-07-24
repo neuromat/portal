@@ -29,16 +29,6 @@ api_studies_list = api.StudyViewSet.as_view({
     'get': 'list'
 })
 
-# Ethics Committee Info
-api_experiment_ethics_committee_info_list = \
-    api.EthicsCommitteeInfoViewSet.as_view({
-        'get': 'list',
-        'post': 'create'
-    })
-api_ethics_committee_info_list = api.EthicsCommitteeInfoViewSet.as_view({
-    'get': 'list'
-})
-
 # Experimental protocols
 api_group_experimental_protocol_list =\
     api.ExperimentalProtocolViewSet.as_view({
@@ -175,12 +165,6 @@ schema_view = get_schema_view(title='NEP API')
 urlpatterns = [
     url(r'^schema/$', schema_view),
     url(r'^', include(router.urls)),
-    # Ethics Committe Info
-    url(r'^ethics_committee_info/$', api_ethics_committee_info_list,
-        name='api_ethics_committee_info-list'),
-    url(r'^experiments/(?P<experiment_nes_id>[0-9]+)/ethics_committee_info/$',
-        api_experiment_ethics_committee_info_list,
-        name='api_experiment_ethics_committee_info-list'),
     # Studies
     url(r'^studies/$', api_studies_list, name='api_studies-list'),
     # TODO: uniformizar nomenclatura (singular X plural quando camo é um
