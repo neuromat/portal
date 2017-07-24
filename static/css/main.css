@@ -75,6 +75,10 @@ i#new_experiments {
   vertical-align: middle;
 }
 
+a.nep-btn {
+  text-decoration: none;
+}
+
 a:hover.nep-btn {
   color: #fff;
   background: #a9b2b9;
