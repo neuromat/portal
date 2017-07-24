@@ -46,18 +46,17 @@ class ExperimentDetailTest(FunctionalTest):
         # posted via api)
         ethics_commitee_head = \
             self.browser.find_element_by_id('ethics_committee_info').text
-        self.assertIn('Ethics Commite Info', ethics_commitee_head)
         ethics_commitee_project_info = \
             self.browser.find_element_by_link_text('Project Info')
         self.assertEqual(
-            experiment.ethics_committee_info.project_url,
+            experiment.project_url,
             ethics_commitee_project_info.get_attribute('href')
         )
         ethics_commitee_url = self.browser.find_element_by_link_text(
             'Ethics committee approval'
         )
         self.assertEqual(
-            experiment.ethics_committee_info.ethics_committee_url,
+            experiment.ethics_committee_url,
             ethics_commitee_url.get_attribute('href')
         )
         ethics_commitee_file = self.browser.find_element_by_link_text(
@@ -67,7 +66,7 @@ class ExperimentDetailTest(FunctionalTest):
         # experiment.ethics_committee_info.file.url gives relative url
         # here in test, but prepends url in template system
         self.assertIn(
-            experiment.ethics_committee_info.file.url,
+            experiment.ethics_committee_file.url,
             ethics_commitee_file.get_attribute('href')
         )
 
@@ -213,9 +212,6 @@ class ExperimentDetailTest(FunctionalTest):
     # elements in separated tests.
     def test_display_message_if_that_is_not_ethics_committee_info(self):
         self.browser.get(self.live_server_url)
-        experiment = Experiment.objects.filter(
-            status=Experiment.APPROVED
-        ).first()
 
         # The visitor is in home page and see the list of experiments.
         # She clicks in first "View" link and is redirected to experiment
@@ -228,7 +224,9 @@ class ExperimentDetailTest(FunctionalTest):
         # there is no such information
         no_ethics_committee_info = self.browser.find_element_by_id(
             'ethics_committee_info').text
-        self.assertIn('There\'s no ethics committe info',
+        self.assertIn('There\'s no ethics committee url',
+                      no_ethics_committee_info)
+        self.assertIn('There\'s no ethics committee approved file',
                       no_ethics_committee_info)
 
         self.fail('Finish this test!')

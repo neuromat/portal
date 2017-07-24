@@ -7,7 +7,7 @@ from faker import Factory
 from experiments.helpers import generate_image_file
 from experiments.models import Experiment, Study, Group, Researcher, \
     Collaborator, Participant, Gender, ExperimentalProtocol, \
-    ClassificationOfDiseases, Keyword, EthicsCommitteeInfo
+    ClassificationOfDiseases, Keyword
 
 
 def create_experiment_groups(qtty, experiment):
@@ -36,18 +36,6 @@ def create_study(experiment):
         description=fake.text(max_nb_chars=200),
         start_date=datetime.utcnow(), experiment=experiment
     )
-
-
-def create_ethics_committee_info(experiment):
-    fake = Factory.create()
-
-    eci = EthicsCommitteeInfo.objects.create(project_url=fake.uri(),
-                                             ethics_committee_url=fake.uri(),
-                                             experiment=experiment)
-    # TODO: generate PDF
-    file = generate_image_file(500, 800, fake.word() + '.jpg')
-    eci.file.save(file.name, file)
-    eci.save()
 
 
 def create_experiment(qtty, owner, status):
@@ -204,6 +192,17 @@ def associate_experiments_to_trustees():
     exp2.save()
 
 
+def create_ethics_committee_info(experiment):
+    fake = Factory.create()
+
+    experiment.project_url = fake.uri()
+    experiment.ethics_committee_url = fake.uri()
+    # TODO: generate PDF
+    file = generate_image_file(500, 800, fake.word() + '.jpg')
+    experiment.ethics_committee_file.save(file.name, file)
+    experiment.save()
+
+
 def global_setup_ft():
     """
     This global setup creates basic object models that are used in 
@@ -222,14 +221,14 @@ def global_setup_ft():
     # created inside create_experiment_and_study)
     create_experiment(2, choice([owner1, owner2]),
                       Experiment.TO_BE_ANALYSED)
-    create_ethics_committee_info(Experiment.objects.last())
     # TODO: when creating experiment UNDER_ANALYSIS, associate with a trustee
     create_experiment(2, choice([owner1, owner2]),
                       Experiment.UNDER_ANALYSIS)
-    create_ethics_committee_info(Experiment.objects.last())
     create_experiment(2, choice([owner1, owner2]),
                       Experiment.APPROVED)
-    create_ethics_committee_info(Experiment.objects.last())
+    experiment = Experiment.objects.last()
+    # We create one experiment approved with ethics committee information
+    create_ethics_committee_info(experiment)
     create_experiment(1, choice([owner1, owner2]),
                       Experiment.NOT_APPROVED)
 
@@ -304,9 +303,7 @@ def global_setup_ut():
         version=1, sent_date=datetime.utcnow(),
         status=Experiment.TO_BE_ANALYSED
     )
-
-    create_ethics_committee_info(experiment1)
-    create_ethics_committee_info(experiment2)
+    create_ethics_committee_info(experiment3)
 
     study1 = Study.objects.create(start_date=datetime.utcnow(),
                                   experiment=experiment1)
