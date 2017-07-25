@@ -298,10 +298,13 @@ class ExperimentViewSet(viewsets.ModelViewSet):
         )
 
         # Send email to trustees telling them that new experiment has arrived
+        # TODO: Specify if that is a new experiment, or a new version
         trustees = User.objects.filter(groups__name='trustees')
         emails = []
         for trustee in trustees:
-            emails += trustee.email
+            if trustee.email:
+                emails.append(trustee.email)
+
         from_email = 'noreplay@nep.prp.usp.br'
         subject = 'New experiment "' + self.request.data['title'] + \
                   '" has arrived in NEDP portal.'
