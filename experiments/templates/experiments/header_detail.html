@@ -5,13 +5,13 @@
         <a href="{% url 'home' %}" class="nep-btn">Back Search</a>
     </div>
     <div id="id_detail_description" class="detail-description">{{ experiment.description }}</div>
+    {% if experiment.project_url %}
+        <a href="{{ experiment.project_url }}">Project Info</a>&nbsp;
+        &nbsp;&nbsp;
+    {% endif %}
     {% load experiment_extras %}
     {% if user.is_authenticated and user|has_group:'trustees' %}
         <aside id="ethics_committee_info">
-            {% if experiment.project_url %}
-                <a href="{{ experiment.project_url }}">Project Info</a>&nbsp;
-                &nbsp;&nbsp;
-            {% endif %}
             {% if experiment.ethics_committee_url %}
                 <a href="{{ experiment.ethics_committee_url }}">Ethics committee approval</a>&nbsp;&nbsp;&nbsp;
             {% else %}
