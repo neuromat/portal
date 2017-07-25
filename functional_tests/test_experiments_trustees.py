@@ -7,9 +7,6 @@ from selenium.webdriver.common.keys import Keys
 from experiments.models import Experiment
 from functional_tests.base import FunctionalTestTrustee
 
-RESEARCHER_TEST_EMAIL = 'gezilda@example.com'
-SUBJECT_APPROVED = 'Your experiment was approved in ODEN portal'
-
 
 class TrusteeTest(FunctionalTestTrustee):
 
@@ -67,32 +64,32 @@ class TrusteeTest(FunctionalTestTrustee):
         self.browser.find_element_by_link_text('To be analysed').click()
         time.sleep(1)
         # She sees a modal with "To be analysed" and "Under analysis" status options
-        form_status_choices = self.browser.find_element_by_id(
+        status_choices_form = self.browser.find_element_by_id(
             'id_status_choices')
         statuses = dict(Experiment.STATUS_OPTIONS)
-        self.assertIn(statuses[Experiment.TO_BE_ANALYSED], form_status_choices.text)
-        self.assertIn(statuses[Experiment.UNDER_ANALYSIS], form_status_choices.text)
+        self.assertIn(statuses[Experiment.TO_BE_ANALYSED], status_choices_form.text)
+        self.assertIn(statuses[Experiment.UNDER_ANALYSIS], status_choices_form.text)
         # She press ESC to quit modal and clicks in an experiment status that is under
         # analysis. Now a modal with all status options but "Receiving" appears
-        form_status_choices.send_keys(Keys.ESCAPE)
+        status_choices_form.send_keys(Keys.ESCAPE)
         time.sleep(1)
         self.browser.find_element_by_link_text(
             'Under analysis').find_element_by_xpath(
             "//a[@data-experiment_trustee='claudia'] "
         ).click()
         time.sleep(1)
-        form_status_choices = self.browser.find_element_by_id(
+        status_choices_form = self.browser.find_element_by_id(
             'id_status_choices')
         statuses = dict(Experiment.STATUS_OPTIONS)
-        self.assertIn(statuses[Experiment.TO_BE_ANALYSED], form_status_choices.text)
-        self.assertIn(statuses[Experiment.UNDER_ANALYSIS], form_status_choices.text)
-        self.assertIn(statuses[Experiment.APPROVED], form_status_choices.text)
-        self.assertIn(statuses[Experiment.NOT_APPROVED], form_status_choices.text)
+        self.assertIn(statuses[Experiment.TO_BE_ANALYSED], status_choices_form.text)
+        self.assertIn(statuses[Experiment.UNDER_ANALYSIS], status_choices_form.text)
+        self.assertIn(statuses[Experiment.APPROVED], status_choices_form.text)
+        self.assertIn(statuses[Experiment.NOT_APPROVED], status_choices_form.text)
         # She press ESC to quit modal and clicks in an experiment status
         # that is approved. As when the experiment is already approved or
         # rejected trustee can't change its status, clicking on it has no
         # effect, the modal doesn't pop up.
-        form_status_choices.send_keys(Keys.ESCAPE)
+        status_choices_form.send_keys(Keys.ESCAPE)
         time.sleep(1)
         self.browser.find_element_by_link_text('Approved').click()
         time.sleep(1)
@@ -130,12 +127,12 @@ class TrusteeTest(FunctionalTestTrustee):
         experiment = Experiment.objects.get(pk=experiment_id)
         experiment_link.click()
         time.sleep(1)
-        form_status_choices = self.browser.find_element_by_id(
+        status_choices_form = self.browser.find_element_by_id(
             'id_status_choices')
-        form_status_choices.find_element_by_xpath(
+        status_choices_form.find_element_by_xpath(
             '//input[@type="radio" and  @value=' + '"' +
             Experiment.APPROVED + '"]').click()
-        submit_button = self.browser.find_element_by_id('id_submit')
+        submit_button = self.browser.find_element_by_id('submit')
         submit_button.send_keys(Keys.ENTER)
         time.sleep(1)
         # Then a message appears on screen, telling her that an email was
@@ -195,12 +192,12 @@ class TrusteeTest(FunctionalTestTrustee):
             'status_body').text
         self.assertIn('Please select an option:', modal_status_body)
         self.assertIn('To be analysed', modal_status_body)
-        form_status_choices = self.browser.find_element_by_id(
+        status_choices_form = self.browser.find_element_by_id(
             'id_status_choices')
-        form_status_choices.find_element_by_xpath(
+        status_choices_form.find_element_by_xpath(
             '//input[@type="radio" and  @value=' + '"' +
             Experiment.UNDER_ANALYSIS + '"]').click()
-        submit_button = self.browser.find_element_by_id('id_submit')
+        submit_button = self.browser.find_element_by_id('submit')
         submit_button.send_keys(Keys.ENTER)
         time.sleep(1)
         # The trustee Claudia is redirect to home page with a warning
@@ -230,9 +227,9 @@ class TrusteeTest(FunctionalTestTrustee):
         time.sleep(1)
         # The modal to change experiment status pop up, so she can select
         # NOT_APPROVED to the experiment.
-        form_status_choices = self.browser.find_element_by_id(
+        status_choices_form = self.browser.find_element_by_id(
             'id_status_choices')
-        form_status_choices.find_element_by_xpath(
+        status_choices_form.find_element_by_xpath(
             '//input[@type="radio" and  @value=' + '"' +
             Experiment.NOT_APPROVED + '"]').click()
         # As she's clicked in NOT_APPROVED choice, a html textarea opens
@@ -255,7 +252,7 @@ class TrusteeTest(FunctionalTestTrustee):
         # experiment hasn't changed.
         # This test is required if javascript is disabled
         # TODO: is possible disable javascript in selenium driver?
-        # submit_button = self.browser.find_element_by_id('id_submit')
+        # submit_button = self.browser.find_element_by_id('submit')
         # submit_button.send_keys(Keys.ENTER)
         # time.sleep(1)
         # td_tag_status = self.browser.find_element_by_xpath(
@@ -284,9 +281,9 @@ class TrusteeTest(FunctionalTestTrustee):
         time.sleep(1)
         # The modal to change experiment status pop up, so she can select
         # NOT_APPROVED to the experiment.
-        form_status_choices = self.browser.find_element_by_id(
+        status_choices_form = self.browser.find_element_by_id(
             'id_status_choices')
-        form_status_choices.find_element_by_xpath(
+        status_choices_form.find_element_by_xpath(
             '//input[@type="radio" and  @value=' + '"' +
             Experiment.NOT_APPROVED + '"]').click()
         # As she choose NOT_APPROVED a textarea appears in modal requesting
@@ -295,7 +292,7 @@ class TrusteeTest(FunctionalTestTrustee):
         not_approved_box = self.browser.find_element_by_id('not_approved_box')
         not_approved_box.send_keys('The data sent has some mistakes. Please '
                                    'correct them and send again.')
-        submit_button = self.browser.find_element_by_id('id_submit')
+        submit_button = self.browser.find_element_by_id('submit')
         submit_button.send_keys(Keys.ENTER)
         time.sleep(1)
         td_tag_status = self.browser.find_element_by_xpath(
@@ -321,12 +318,12 @@ class TrusteeTest(FunctionalTestTrustee):
         time.sleep(1)
         # The modal to change experiment status pop up, and she chooses
         # UNDER_ANALYSIS, the same status as before.
-        form_status_choices = self.browser.find_element_by_id(
+        status_choices_form = self.browser.find_element_by_id(
             'id_status_choices')
-        form_status_choices.find_element_by_xpath(
+        status_choices_form.find_element_by_xpath(
             '//input[@type="radio" and  @value=' + '"' +
             Experiment.UNDER_ANALYSIS + '"]').click()
-        self.browser.find_element_by_id('id_submit').send_keys(Keys.ENTER)
+        self.browser.find_element_by_id('submit').send_keys(Keys.ENTER)
         time.sleep(1)
         td_tag_status = self.browser.find_element_by_xpath(
             "//a[@data-experiment_id='" + str(experiment.id) + "']"
@@ -353,12 +350,12 @@ class TrusteeTest(FunctionalTestTrustee):
         # The modal to change experiment status pop up, and she chooses
         # TO_BE_ANALYSED to liberate the experiment to be analysed by other
         # trustee.
-        form_status_choices = self.browser.find_element_by_id(
+        status_choices_form = self.browser.find_element_by_id(
             'id_status_choices')
-        form_status_choices.find_element_by_xpath(
+        status_choices_form.find_element_by_xpath(
             '//input[@type="radio" and  @value=' + '"' +
             Experiment.TO_BE_ANALYSED + '"]').click()
-        self.browser.find_element_by_id('id_submit').send_keys(Keys.ENTER)
+        self.browser.find_element_by_id('submit').send_keys(Keys.ENTER)
         time.sleep(1)
         td_tag_status = self.browser.find_element_by_xpath(
             "//a[@data-experiment_id='" + str(experiment.id) + "']"

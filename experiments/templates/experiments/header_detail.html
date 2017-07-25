@@ -1,10 +1,27 @@
 <header class="container detail-header">
     <h2>Open Database for Experiments in Neuroscience</h2>
-    <div id="id_detail_title" class="detail-title">{{ experiment.title }}</div>
+    <h4 id="id_detail_title" class="detail-title">{{ experiment.title }}</h4>
     <div id="id_link_home" class="detail-back-search">
-        <a href="{% url 'home' %}">Back Search</a>
+        <a href="{% url 'home' %}" class="nep-btn">Back Search</a>
     </div>
     <div id="id_detail_description" class="detail-description">{{ experiment.description }}</div>
+    <aside id="ethics_committee_info">
+        {% if experiment.project_url %}
+            <a href="{{ experiment.project_url }}">Project Info</a>&nbsp;
+            &nbsp;&nbsp;
+        {% endif %}
+        {% if experiment.ethics_committee_url %}
+            <a href="{{ experiment.ethics_committee_url }}">Ethics committee approval</a>&nbsp;&nbsp;&nbsp;
+        {% else %}
+            <span class="alert">There's no ethics committee url</span> &nbsp;
+            &nbsp;&nbsp;
+        {% endif %}
+        {% if experiment.ethics_committee_file %}
+            <a href="{{ experiment.ethics_committee_file.url }}">Download project file approved</a>
+        {% else %}
+            <span class="alert">There's no ethics committee approved file</span>
+        {% endif %}
+    </aside>
     <hr class="detail-header-hr">
     <div id="id_detail_study" class="detail-study">Related study: <a
             href="#" data-toggle="modal" data-target="#study_modal">{{ experiment.study.title }}</a></div>
@@ -57,9 +74,9 @@
                     </section>
                     <section>
                         <div id="keywords"><strong>Keywords: </strong>
-                        {% for keyword in experiment.study.keywords.all %}
-                            {{ keyword.name }}{% if not forloop.last %} | {% endif %}
-                        {% endfor %}
+                            {% for keyword in experiment.study.keywords.all %}
+                                {{ keyword.name }}{% if not forloop.last %} | {% endif %}
+                            {% endfor %}
                         </div>
                     </section>
                 </div>

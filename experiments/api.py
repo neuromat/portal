@@ -4,8 +4,11 @@ from rest_framework import serializers, permissions, viewsets
 
 from experiments import appclasses
 from experiments.models import Experiment, Study, User, ProtocolComponent, \
-    Group, ExperimentalProtocol, Researcher, Participant, Collaborator, Keyword, ClassificationOfDiseases, \
-    EEGSetting, EMGSetting, TMSSetting, ContextTree, Step, File, EEGData, GoalkeeperGameData, QuestionnaireResponse
+    Group, ExperimentalProtocol, Researcher, Participant, Collaborator, \
+    Keyword, ClassificationOfDiseases, \
+    EEGSetting, EMGSetting, TMSSetting, ContextTree, Step, File, \
+    EEGData, EMGData, TMSData, GoalkeeperGameData, QuestionnaireResponse, \
+    AdditionalData, GenericDataCollectionData
 
 
 ###################
@@ -20,8 +23,9 @@ class ExperimentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Experiment
         fields = ('id', 'title', 'description', 'data_acquisition_done',
-                  'nes_id', 'ethics_committee_file', 'owner',
-                  'status', 'protocol_components', 'sent_date')
+                  'nes_id', 'owner', 'status', 'protocol_components',
+                  'sent_date', 'project_url', 'ethics_committee_url',
+                  'ethics_committee_file')
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -198,7 +202,33 @@ class EEGDataSerializer(serializers.ModelSerializer):
         fields = ('id',
                   'step', 'participant', 'date', 'time',
                   'description', 'file', 'file_format',
-                  'eeg_setting', 'eeg_cap_size')
+                  'eeg_setting', 'eeg_cap_size', 'eeg_setting_reason_for_change')
+
+
+class EMGDataSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = EMGData
+        fields = ('id',
+                  'step', 'participant', 'date', 'time',
+                  'description', 'file', 'file_format',
+                  'emg_setting', 'emg_setting_reason_for_change')
+
+
+class TMSDataSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = TMSData
+        fields = ('id',
+                  'step', 'participant', 'date', 'time',
+                  'tms_setting', 'resting_motor_threshold', 'test_pulse_intensity_of_simulation',
+                  'second_test_pulse_intensity', 'interval_between_pulses', 'interval_between_pulses_unit',
+                  'time_between_mep_trials', 'time_between_mep_trials_unit', 'repetitive_pulse_frequency',
+                  'coil_orientation', 'coil_orientation_angle', 'direction_of_induced_current', 'description',
+                  'hotspot_name', 'coordinate_x', 'coordinate_y', 'hot_spot_map',
+                  'localization_system_name', 'localization_system_description', 'localization_system_image',
+                  'brain_area_name', 'brain_area_description',
+                  'brain_area_system_name', 'brain_area_system_description')
 
 
 class GoalkeeperGameDataSerializer(serializers.ModelSerializer):
@@ -216,6 +246,22 @@ class QuestionnaireResponseSerializer(serializers.ModelSerializer):
         fields = ('id',
                   'step', 'participant', 'date', 'time',
                   'limesurvey_response')
+
+
+class AdditionalDataSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = AdditionalData
+        fields = ('id',
+                  'step', 'participant', 'date', 'time',
+                  'description', 'file', 'file_format')
+
+
+class GenericDataCollectionDataSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = GenericDataCollectionData
+        fields = ('id',
+                  'step', 'participant', 'date', 'time',
+                  'description', 'file', 'file_format')
 
 #############
 # API Views #
@@ -276,13 +322,11 @@ class ExperimentViewSet(viewsets.ModelViewSet):
 
 
 class StudyViewSet(viewsets.ModelViewSet):
-    lookup_field = 'experiment_nes_id'  # TODO: see if no more used
     serializer_class = StudySerializer
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
 
     def get_queryset(self):
-        if 'experiment_nes_id' in \
-                self.kwargs and \
+        if 'experiment_nes_id' in self.kwargs and \
                 (self.request.user != AnonymousUser()):
             experiment = Experiment.objects.filter(
                 nes_id=self.kwargs['experiment_nes_id'],
@@ -299,12 +343,12 @@ class StudyViewSet(viewsets.ModelViewSet):
             exp_nes_id, owner
         ).get_last_version()
         # TODO: if last_version == 0 generates exception: "no experiment was
-        # TODO: created yet"
+        # created yet"
         experiment = Experiment.objects.get(
             nes_id=exp_nes_id, owner=owner, version=last_version
         )
         # TODO: breaks when posting from the api template.
-        # Doesn't have researcher field to enter a valid r.
+        # Doesn't have researcher field to enter a valid researcher.
         serializer.save(experiment=experiment)
 
 
@@ -537,6 +581,28 @@ class EEGDataViewSet(viewsets.ModelViewSet):
         serializer.save()
 
 
+class EMGDataViewSet(viewsets.ModelViewSet):
+    serializer_class = EMGDataSerializer
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
+
+    def get_queryset(self):
+        return EMGData.objects.all()
+
+    def perform_create(self, serializer):
+        serializer.save()
+
+
+class TMSDataViewSet(viewsets.ModelViewSet):
+    serializer_class = TMSDataSerializer
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
+
+    def get_queryset(self):
+        return TMSData.objects.all()
+
+    def perform_create(self, serializer):
+        serializer.save()
+
+
 class GoalkeeperGameDataViewSet(viewsets.ModelViewSet):
     serializer_class = GoalkeeperGameDataSerializer
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
@@ -558,31 +624,24 @@ class QuestionnaireResponseViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         serializer.save()
 
-# class ProtocolComponentViewSet(viewsets.ModelViewSet):
-#     lookup_field = 'nes_id'
-#     serializer_class = ProtocolComponentSerializer
-#     permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
-#
-#     def get_queryset(self):
-#         # TODO: don't filter by owner if not logged (gets TypeError)
-#         # exception when trying to get an individual experiment
-#         if 'nes_id' in self.kwargs:
-#             return ProtocolComponent.objects.filter(owner=self.request.user)
-#         else:
-#             return ProtocolComponent.objects.all()
-#
-#     def perform_create(self, serializer):
-#         # TODO: we must create protocol_component for the last experiment
-#         # version
-#         experiment_nes_id = self.request.data['experiment']
-#         experiment = Experiment.objects.filter(
-#             experiment_nes_id=experiment_nes_id, owner=self.request.user).get()
-#         serializer.save(experiment=experiment, owner=self.request.user)
-#
-#     def perform_update(self, serializer):
-#         # TODO: save in with last experiment version
-#         experiment_nes_id = self.request.data['experiment']
-#         experiment = Experiment.objects.filter(
-#             experiment_nes_id=experiment_nes_id, owner=self.request.user
-#         ).get()
-#         serializer.save()
+
+class AdditionalDataViewSet(viewsets.ModelViewSet):
+    serializer_class = AdditionalDataSerializer
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
+
+    def get_queryset(self):
+        return AdditionalData.objects.all()
+
+    def perform_create(self, serializer):
+        serializer.save()
+
+
+class GenericDataCollectionDataViewSet(viewsets.ModelViewSet):
+    serializer_class = GenericDataCollectionDataSerializer
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
+
+    def get_queryset(self):
+        return GenericDataCollectionData.objects.all()
+
+    def perform_create(self, serializer):
+        serializer.save()

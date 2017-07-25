@@ -9,7 +9,8 @@ from faker import Factory
 # imports. We are kepping in Collaborator in same line
 from experiments.models import Gender, ClassificationOfDiseases, Keyword
 from experiments.models import Experiment, Study, Group, Researcher
-from experiments.tests.tests_helper import create_experiment_groups
+from experiments.tests.tests_helper import create_experiment_groups, \
+    create_ethics_committee_info
 from experiments.tests.tests_helper import create_classification_of_deseases
 from experiments.tests.tests_helper import create_experiment_protocol
 from experiments.tests.tests_helper import create_participants
@@ -57,6 +58,7 @@ for i in range(1, 4):
         description=fake.text(),
         start_date=datetime.utcnow(), experiment=experiment_owner1
     )
+    create_ethics_committee_info(experiment_owner1)
     create_experiment_groups(randint(1, 3), experiment_owner1)
 
 for i in range(4, 6):

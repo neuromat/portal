@@ -26,7 +26,7 @@ api_experiment_studies_list = api.StudyViewSet.as_view({
     'post': 'create'
 })
 api_studies_list = api.StudyViewSet.as_view({
-    'get': 'list',
+    'get': 'list'
 })
 
 # Experimental protocols
@@ -111,6 +111,38 @@ api_eeg_data_list =\
     })
 
 
+# EMG data
+api_emg_data_list =\
+    api.EMGDataViewSet.as_view({
+        'get': 'list',
+        'post': 'create'
+    })
+
+
+# TMS data
+api_tms_data_list =\
+    api.TMSDataViewSet.as_view({
+        'get': 'list',
+        'post': 'create'
+    })
+
+
+# Additional data
+api_additional_data_list =\
+    api.AdditionalDataViewSet.as_view({
+        'get': 'list',
+        'post': 'create'
+    })
+
+
+# Generic Data Collection data
+api_generic_data_collection_data_list =\
+    api.GenericDataCollectionDataViewSet.as_view({
+        'get': 'list',
+        'post': 'create'
+    })
+
+
 # Goalkeeper game data
 api_goalkeeper_game_data_list =\
     api.GoalkeeperGameDataViewSet.as_view({
@@ -183,10 +215,24 @@ urlpatterns = [
     # EEG data
     url(r'^eeg_data/$', api_eeg_data_list, name='api_eeg_data-list'),
 
+    # EMG data
+    url(r'^emg_data/$', api_emg_data_list, name='api_emg_data-list'),
+
+    # TMS data
+    url(r'^tms_data/$', api_tms_data_list, name='api_tms_data-list'),
+
     # Goalkeeper game data
     url(r'^goalkeeper_game_data/$', api_goalkeeper_game_data_list, name='api_goalkeeper_game_data-list'),
 
     # Questionnaire response
     url(r'^questionnaire_response/$', api_questionnaire_response_list, name='api_questionnaire_response-list'),
+
+    # Additional data
+    url(r'^additional_data/$',
+        api_additional_data_list, name='api_additional_data-list'),
+
+    # Generic Data Collection data
+    url(r'^generic_data_collection_data/$',
+        api_generic_data_collection_data_list, name='api_generic_data_collection_data-list'),
 
 ]
