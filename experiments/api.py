@@ -8,7 +8,7 @@ from experiments.models import Experiment, Study, User, ProtocolComponent, \
     Keyword, ClassificationOfDiseases, \
     EEGSetting, EMGSetting, TMSSetting, ContextTree, Step, File, \
     EEGData, EMGData, TMSData, GoalkeeperGameData, QuestionnaireResponse, \
-    AdditionalData, GenericDataCollectionData
+    AdditionalData, GenericDataCollectionData, EEG
 
 
 ###################
@@ -186,6 +186,11 @@ class StepSerializer(serializers.ModelSerializer):
                   'interval_between_repetitions_value',
                   'interval_between_repetitions_unit',
                   'random_position')
+
+
+# class EEGSerializer(StepSerializer):
+#     class Meta:
+#         model = EEG
 
 
 class FileSerializer(serializers.ModelSerializer):
