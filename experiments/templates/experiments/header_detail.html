@@ -7,7 +7,6 @@
     <div id="id_detail_description" class="detail-description">{{ experiment.description }}</div>
     {% if experiment.project_url %}
         <a href="{{ experiment.project_url }}">Project Info</a>&nbsp;
-        &nbsp;&nbsp;
     {% endif %}
     {% load experiment_extras %}
     {% if user.is_authenticated and user|has_group:'trustees' %}
@@ -30,8 +29,10 @@
             href="#" data-toggle="modal" data-target="#study_modal">{{ experiment.study.title }}</a></div>
     <div id="id_detail_acquisition" class="detail-acquisition">Data
         acquisition not finished yet</div>
-    <form name="download" method="post" action="/downloads/{{ experiment.id }}/">
-        <input type="submit" value="Download experiment data" class="nep-btn detail-donwload" href="/downloads
+    <form name="download" method="post" action="/downloads
+    /{{ experiment.id }}/">
+        <input id="button_download" type="submit" value="Download experiment data"
+                class="nep-btn detail-donwload" href="/downloads
         /{{ experiment.id }}/" />
         {% csrf_token %}
     </form>

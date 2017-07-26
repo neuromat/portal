@@ -13,14 +13,13 @@ class ExperimentDetailTest(FunctionalTest):
         experiment = Experiment.objects.filter(
             status=Experiment.APPROVED
         ).last()
-        self.browser.get(self.live_server_url)
 
         # The new visitor is in home page and see the list of experiments.
         # She clicks in second "View" link and is redirected to experiment
         # detail page
         # TODO: frequently fails to catch second link
         list_links = self.browser.find_elements_by_link_text('View')
-        list_links[1].click()
+        list_links[0].click()
         time.sleep(1)
 
         # She sees a new page with a header title: Open Database
@@ -41,33 +40,13 @@ class ExperimentDetailTest(FunctionalTest):
             'id_detail_description').text
         self.assertEqual(experiment.description, experiment_description)
 
-        # Bellow experiment description there are info related to ethics
-        # committee experiment approval (because experiment has that data
-        # posted via api)
-        ethics_commitee_head = \
-            self.browser.find_element_by_id('ethics_committee_info').text
+        # Bellow experiment description there is a link to the project site,
+        # ( because experiment has that data posted via api)
         ethics_commitee_project_info = \
             self.browser.find_element_by_link_text('Project Info')
         self.assertEqual(
             experiment.project_url,
             ethics_commitee_project_info.get_attribute('href')
-        )
-        ethics_commitee_url = self.browser.find_element_by_link_text(
-            'Ethics committee approval'
-        )
-        self.assertEqual(
-            experiment.ethics_committee_url,
-            ethics_commitee_url.get_attribute('href')
-        )
-        ethics_commitee_file = self.browser.find_element_by_link_text(
-            'Download project file approved'
-        )
-        # Obs.: self.assertIn because
-        # experiment.ethics_committee_info.file.url gives relative url
-        # here in test, but prepends url in template system
-        self.assertIn(
-            experiment.ethics_committee_file.url,
-            ethics_commitee_file.get_attribute('href')
         )
 
         # Right bellow she sees the study that the experiment belongs to
@@ -79,11 +58,14 @@ class ExperimentDetailTest(FunctionalTest):
         self.assertIn('Data acquisition not finished yet',
                       data_acquisition_text)
 
-        # In right side bellow the data acquisition alert, she sees a link
+        # In right side bellow the data acquisition alert, she sees a button
         # to download of data
-        link_download = self.browser.find_element_by_id(
-            'id_link_download').text
-        self.assertIn('Download data', link_download)
+        button_download = self.browser.find_element_by_id(
+            'button_download')
+        self.assertEqual(
+            'Download experiment data',
+            button_download.get_attribute('value')
+        )
 
         # She clicks in Related study link and see a modal with Study data
         self.browser.find_element_by_link_text(experiment.study.title).click()
@@ -206,27 +188,5 @@ class ExperimentDetailTest(FunctionalTest):
                             .experimental_protocol.image),
             protocol_image_path
         )
-
-    # TODO: new test made necessary. Test above includes testing when there
-    # are committee info. Refactor this class test to test for different
-    # elements in separated tests.
-    def test_display_message_if_that_is_not_ethics_committee_info(self):
-        self.browser.get(self.live_server_url)
-
-        # The visitor is in home page and see the list of experiments.
-        # She clicks in first "View" link and is redirected to experiment
-        # detail page
-        list_links = self.browser.find_elements_by_link_text('View')
-        list_links[0].click()
-        time.sleep(1)
-
-        # In Ethics Committe Info section she sees a message telling that
-        # there is no such information
-        no_ethics_committee_info = self.browser.find_element_by_id(
-            'ethics_committee_info').text
-        self.assertIn('There\'s no ethics committee url',
-                      no_ethics_committee_info)
-        self.assertIn('There\'s no ethics committee approved file',
-                      no_ethics_committee_info)
 
         self.fail('Finish this test!')
