@@ -8,7 +8,7 @@ from experiments.models import Experiment, Study, User, ProtocolComponent, \
     Keyword, ClassificationOfDiseases, \
     EEGSetting, EMGSetting, TMSSetting, ContextTree, Step, File, \
     EEGData, EMGData, TMSData, GoalkeeperGameData, QuestionnaireResponse, \
-    AdditionalData, GenericDataCollectionData, EthicsCommitteeInfo
+    AdditionalData, GenericDataCollectionData
 
 
 ###################
@@ -24,16 +24,8 @@ class ExperimentSerializer(serializers.ModelSerializer):
         model = Experiment
         fields = ('id', 'title', 'description', 'data_acquisition_done',
                   'nes_id', 'owner', 'status', 'protocol_components',
-                  'sent_date')
-
-
-class EthicsCommitteeInfoSerializer(serializers.ModelSerializer):
-    experiment = serializers.ReadOnlyField(source='experiment.title')
-
-    class Meta:
-        model = EthicsCommitteeInfo
-        fields = ('id', 'project_url', 'ethics_committee_url', 'file',
-                  'experiment')
+                  'sent_date', 'project_url', 'ethics_committee_url',
+                  'ethics_committee_file')
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -306,10 +298,13 @@ class ExperimentViewSet(viewsets.ModelViewSet):
         )
 
         # Send email to trustees telling them that new experiment has arrived
+        # TODO: Specify if that is a new experiment, or a new version
         trustees = User.objects.filter(groups__name='trustees')
         emails = []
         for trustee in trustees:
-            emails += trustee.email
+            if trustee.email:
+                emails.append(trustee.email)
+
         from_email = 'noreplay@nep.prp.usp.br'
         subject = 'New experiment "' + self.request.data['title'] + \
                   '" has arrived in NEDP portal.'
@@ -327,37 +322,6 @@ class ExperimentViewSet(viewsets.ModelViewSet):
         serializer.save(
             owner=owner, version=exp_version.get_last_version(), nes_id=nes_id
         )
-
-
-class EthicsCommitteeInfoViewSet(viewsets.ModelViewSet):
-    serializer_class = EthicsCommitteeInfoSerializer
-    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
-
-    def get_queryset(self):
-        if 'experiment_nes_id' in self.kwargs and \
-                (self.request.user != AnonymousUser()):
-            experiment = Experiment.objects.filter(
-                nes_id=self.kwargs['experiment_nes_id'],
-                owner=self.request.user
-            )
-            return EthicsCommitteeInfo.objects.filter(experiment=experiment)
-        else:
-            return EthicsCommitteeInfo.objects.all()
-
-    def perform_create(self, serializer):
-        exp_nes_id = self.kwargs['experiment_nes_id']
-        owner = self.request.user
-        last_version = appclasses.ExperimentVersion(
-            exp_nes_id, owner
-        ).get_last_version()
-        # TODO: if last_version == 0 generates exception: "no experiment was
-        # created yet"
-        experiment = Experiment.objects.get(
-            nes_id=exp_nes_id, owner=owner, version=last_version
-        )
-        # TODO: breaks when posting from the api template.
-        # Doesn't have researcher field to enter a valid researcher.
-        serializer.save(experiment=experiment)
 
 
 class StudyViewSet(viewsets.ModelViewSet):

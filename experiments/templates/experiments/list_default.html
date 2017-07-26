@@ -16,7 +16,8 @@
             <td>{{ experiment.description }}</td>
             <td>{{ experiment.total_participants }} in {{ experiment.groups.count }} groups </td>
             <td>{{ experiment.version }}</td>
-            <td><a href="{% url 'experiment-detail' experiment.id %}">View</a></td>
+            <td><a href="{% url 'experiment-detail' experiment.id %}"
+                   class="nep-btn">View</a></td>
         </tr>
     {% endfor %}
     </tbody>

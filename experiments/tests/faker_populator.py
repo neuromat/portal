@@ -5,6 +5,7 @@ from subprocess import call
 from django.contrib.auth import models
 from faker import Factory
 
+# python manage.py shell < experiments/tests/faker_populator.py
 # TODO: when executing from bash command line, final line identifier breaks
 # imports. We are kepping in Collaborator in same line
 from experiments.models import Gender, ClassificationOfDiseases, Keyword
@@ -79,7 +80,8 @@ for i in range(4, 6):
 
 # Create researchers associated to studies created above
 for study in Study.objects.all():
-    Researcher.objects.create(name=fake.name(), email=fake.email(),
+    Researcher.objects.create(name=fake.name(),
+                              email='claudia.portal.neuromat@gmail.com',
                               study=study)
 
 # Create study collaborators (requires creating studies before)

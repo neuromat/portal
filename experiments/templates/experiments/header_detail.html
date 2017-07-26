@@ -2,28 +2,39 @@
     <h2>Open Database for Experiments in Neuroscience</h2>
     <h4 id="id_detail_title" class="detail-title">{{ experiment.title }}</h4>
     <div id="id_link_home" class="detail-back-search">
-        <a href="{% url 'home' %}">Back Search</a>
+        <a href="{% url 'home' %}" class="nep-btn">Back Search</a>
     </div>
     <div id="id_detail_description" class="detail-description">{{ experiment.description }}</div>
-    <aside id="ethics_committee_info">
-        <h5>Ethics Commite Info</h5>
-        {% if experiment.ethics_committee_info %}
-            <div>
-                <a href="{{ experiment.ethics_committee_info.project_url }}">Project Info</a>
-                <a href="{{ experiment.ethics_committee_info.ethics_committee_url }}">Ethics committee approval</a>
-                <a href="{{ experiment.ethics_committee_info.file.url }}">Download project file approved</a>
-            </div>
+    {% if experiment.project_url %}
+        <a href="{{ experiment.project_url }}">Project Info</a>&nbsp;
+        &nbsp;&nbsp;
+    {% endif %}
+    {% load experiment_extras %}
+    {% if user.is_authenticated and user|has_group:'trustees' %}
+        <aside id="ethics_committee_info">
+            {% if experiment.ethics_committee_url %}
+                <a href="{{ experiment.ethics_committee_url }}">Ethics committee approval</a>&nbsp;&nbsp;&nbsp;
             {% else %}
-            <p>There's no ethics committe info</p>
-        {% endif %}
-    </aside>
+                <span class="alert">There's no ethics committee url</span> &nbsp;
+                &nbsp;&nbsp;
+            {% endif %}
+            {% if experiment.ethics_committee_file %}
+                <a href="{{ experiment.ethics_committee_file.url }}">Download project file approved</a>
+            {% else %}
+                <span class="alert">There's no ethics committee approved file</span>
+            {% endif %}
+        </aside>
+    {% endif %}
     <hr class="detail-header-hr">
     <div id="id_detail_study" class="detail-study">Related study: <a
             href="#" data-toggle="modal" data-target="#study_modal">{{ experiment.study.title }}</a></div>
     <div id="id_detail_acquisition" class="detail-acquisition">Data
         acquisition not finished yet</div>
-    <div id="id_link_download" class="detail-donwload"><a
-            href="#">Download data</a></div>
+    <form name="download" method="post" action="/downloads/{{ experiment.id }}/">
+        <input type="submit" value="Download experiment data" class="nep-btn detail-donwload" href="/downloads
+        /{{ experiment.id }}/" />
+        {% csrf_token %}
+    </form>
 
     {# Study modal #}
     <div id="study_modal" class="modal fade" tabindex="-1" role="dialog">

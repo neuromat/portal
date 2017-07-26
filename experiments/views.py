@@ -172,3 +172,4 @@ def ajax_to_be_analysed(request):
 def search_experiments(request):
     return render(request, 'experiments/home.html',
                   {'table_title': 'Search Results'})
+

@@ -24,6 +24,13 @@ class Experiment(models.Model):
     description = models.TextField()
     data_acquisition_done = models.BooleanField(default=False)
     sent_date = models.DateField(auto_now=True)
+    project_url = models.CharField(max_length=255, blank=True, null=True)
+    ethics_committee_url = models.CharField(max_length=255, blank=True,
+                                            null=True)
+    ethics_committee_file = models.FileField(
+        'Project file approved by the ethics committee',
+        upload_to='uploads/%Y/%m/%d/', blank=True, null=True
+    )
     status = models.CharField(
         max_length=20, choices=STATUS_OPTIONS, default=RECEIVING
     )
@@ -32,17 +39,6 @@ class Experiment(models.Model):
 
     class Meta:
         unique_together = ('nes_id', 'owner', 'version')
-
-
-class EthicsCommitteeInfo(models.Model):
-    experiment = models.OneToOneField(Experiment,
-                                      related_name='ethics_committee_info')
-    project_url = models.CharField(max_length=255, null=True)
-    ethics_committee_url = models.CharField(max_length=255)
-    file = models.FileField(
-        'Project file approved by the ethics committee',
-        upload_to='uploads/%Y/%m/%d/'
-    )
 
 
 class ClassificationOfDiseases(models.Model):
