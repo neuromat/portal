@@ -67,6 +67,12 @@ i#new_experiments {
   ========================================
 */
 
+/* this is for removing shadow from submit buttons
+   it's used together with .nep-btn */
+.nep-btn-submit {
+  border: none;
+}
+
 .nep-btn {
   background: #60c8a3;
   color: #fff;
@@ -293,4 +299,16 @@ a:hover.nep-btn {
 
 .text-box-justification {
   width: 100%;
+}
+
+/*
+  ========================================
+  Messages
+  ========================================
+ */
+
+.nep-alert {
+  margin-left: auto;
+  margin-right: auto;
+  width: 97%;
 }
