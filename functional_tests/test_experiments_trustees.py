@@ -145,7 +145,7 @@ class TrusteeTest(FunctionalTestTrustee):
                       self.browser.find_element_by_tag_name('body').text)
         # The work is done. She is satisfied and decides to log out from system
         self.browser.find_element_by_link_text('Log Out').click()
-        time.sleep(3)
+        time.sleep(1)
         # The email was sent to the researcher. The guy checks her email and
         # finds a message
         email = mail.outbox[0]
