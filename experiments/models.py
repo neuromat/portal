@@ -23,10 +23,14 @@ class Experiment(models.Model):
     title = models.CharField(max_length=150)
     description = models.TextField()
     data_acquisition_done = models.BooleanField(default=False)
-    ethics_committee_file = models.FileField(
-        'Project file approved by the ethics committee', blank=True, upload_to='uploads/%Y/%m/%d/'
-    )
     sent_date = models.DateField(auto_now=True)
+    project_url = models.CharField(max_length=255, blank=True, null=True)
+    ethics_committee_url = models.CharField(max_length=255, blank=True,
+                                            null=True)
+    ethics_committee_file = models.FileField(
+        'Project file approved by the ethics committee',
+        upload_to='uploads/%Y/%m/%d/', blank=True, null=True
+    )
     status = models.CharField(
         max_length=20, choices=STATUS_OPTIONS, default=RECEIVING
     )
@@ -184,6 +188,35 @@ class EEG(Step):
     eeg_setting = models.ForeignKey(EEGSetting)
 
 
+class EMG(Step):
+    emg_setting = models.ForeignKey(EMGSetting)
+
+
+class TMS(Step):
+    tms_setting = models.ForeignKey(TMSSetting)
+
+
+class Questionnaire(Step):
+    survey_name = models.CharField(max_length=255)
+    survey_metadata = models.TextField(null=True, blank=True)
+
+
+class Instruction(Step):
+    text = models.TextField(null=False, blank=False)
+
+
+class Stimulus(Step):
+    stimulus_type_name = models.CharField(null=False, blank=False, max_length=30)
+    media_file = models.FileField(null=True, blank=True, upload_to='uploads/%Y/%m/%d/')
+
+
+class DigitalGamePhase(Step):
+    software_name = models.CharField(max_length=150)
+    software_description = models.TextField(null=True, blank=True)
+    software_version = models.CharField(max_length=150)
+    context_tree = models.ForeignKey(ContextTree)
+
+
 class SetOfStep(Step):
     number_of_mandatory_steps = models.IntegerField(null=True, blank=True)
     is_sequential = models.BooleanField(default=False)
@@ -191,7 +224,7 @@ class SetOfStep(Step):
 
 class ExperimentalProtocol(models.Model):
     group = models.OneToOneField(Group, related_name='experimental_protocol')
-    image = models.FileField(null=True, blank=True)
+    image = models.FileField(null=True, blank=True, upload_to='uploads/%Y/%m/%d/')
     textual_description = models.TextField(null=True, blank=True)
     root_step = models.ForeignKey(Step, null=True, blank=True)
 
@@ -221,7 +254,45 @@ class DataFile(models.Model):
 
 class EEGData(DataCollection, DataFile):
     eeg_setting = models.ForeignKey(EEGSetting)
+    eeg_setting_reason_for_change = models.TextField(null=True, blank=True, default='')
     eeg_cap_size = models.CharField(max_length=30, null=True, blank=True)
+
+
+class EMGData(DataFile, DataCollection):
+    emg_setting = models.ForeignKey(EMGSetting)
+    emg_setting_reason_for_change = models.TextField(null=True, blank=True, default='')
+
+
+class TMSData(DataCollection):
+    # main data
+    tms_setting = models.ForeignKey(TMSSetting)
+    resting_motor_threshold = models.FloatField(null=True, blank=True)
+    test_pulse_intensity_of_simulation = models.FloatField(null=True, blank=True)
+    second_test_pulse_intensity = models.FloatField(null=True, blank=True)
+    interval_between_pulses = models.IntegerField(null=True, blank=True)
+    interval_between_pulses_unit = models.CharField(null=True, blank=True, max_length=15)
+    time_between_mep_trials = models.IntegerField(null=True, blank=True)
+    time_between_mep_trials_unit = models.CharField(null=True, blank=True, max_length=15)
+    repetitive_pulse_frequency = models.IntegerField(null=True, blank=True)
+    coil_orientation = models.CharField(null=True, blank=True, max_length=150)
+    coil_orientation_angle = models.IntegerField(null=True, blank=True)
+    direction_of_induced_current = models.CharField(null=True, blank=True, max_length=150)
+    description = models.TextField(null=False, blank=False)
+    # hotspot data
+    hotspot_name = models.CharField(max_length=50)
+    coordinate_x = models.IntegerField(null=True, blank=True)
+    coordinate_y = models.IntegerField(null=True, blank=True)
+    hot_spot_map = models.FileField(upload_to='uploads/%Y/%m/%d/', null=True, blank=True)
+    # localization system info
+    localization_system_name = models.CharField(null=False, max_length=50, blank=False)
+    localization_system_description = models.TextField(null=True, blank=True)
+    localization_system_image = models.FileField(upload_to='uploads/%Y/%m/%d/', null=True, blank=True)
+    # brain area info
+    brain_area_name = models.CharField(null=False, max_length=50, blank=False)
+    brain_area_description = models.TextField(null=True, blank=True)
+    # brain area system info
+    brain_area_system_name = models.CharField(null=False, max_length=50, blank=False)
+    brain_area_system_description = models.TextField(null=True, blank=True)
 
 
 class GoalkeeperGameData(DataCollection, DataFile):
@@ -236,3 +307,11 @@ class RejectJustification(models.Model):
 
 class QuestionnaireResponse(DataCollection):
     limesurvey_response = models.TextField()
+
+
+class GenericDataCollectionData(DataFile, DataCollection):
+    pass
+
+
+class AdditionalData(DataFile, DataCollection):
+    pass

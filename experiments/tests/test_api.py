@@ -38,11 +38,14 @@ class ExperimentAPITest(APITestCase):
                     'data_acquisition_done':
                         experiment1.data_acquisition_done,
                     'nes_id': experiment1.nes_id,
-                    'ethics_committee_file': None,
                     'owner': experiment1.owner.username,
                     'status': experiment1.status,
                     'protocol_components': [],
-                    'sent_date': experiment1.sent_date.strftime('%Y-%m-%d')
+                    'sent_date': experiment1.sent_date.strftime('%Y-%m-%d'),
+                    'project_url': experiment1.project_url,
+                    'ethics_committee_url': experiment1.ethics_committee_url,
+                    'ethics_committee_file': None
+
                 },
                 {
                     'id': experiment2.id,
@@ -51,11 +54,13 @@ class ExperimentAPITest(APITestCase):
                     'data_acquisition_done':
                         experiment2.data_acquisition_done,
                     'nes_id': experiment2.nes_id,
-                    'ethics_committee_file': None,
                     'owner': experiment2.owner.username,
                     'status': experiment2.status,
                     'protocol_components': [],
-                    'sent_date': experiment2.sent_date.strftime('%Y-%m-%d')
+                    'sent_date': experiment2.sent_date.strftime('%Y-%m-%d'),
+                    'project_url': experiment1.project_url,
+                    'ethics_committee_url': experiment1.ethics_committee_url,
+                    'ethics_committee_file': None
                 },
                 {
                     'id': experiment3.id,
@@ -64,11 +69,14 @@ class ExperimentAPITest(APITestCase):
                     'data_acquisition_done':
                         experiment3.data_acquisition_done,
                     'nes_id': experiment3.nes_id,
-                    'ethics_committee_file': None,
                     'owner': experiment3.owner.username,
                     'status': experiment3.status,
                     'protocol_components': [],
-                    'sent_date': experiment3.sent_date.strftime('%Y-%m-%d')
+                    'sent_date': experiment3.sent_date.strftime('%Y-%m-%d'),
+                    'project_url': experiment3.project_url,
+                    'ethics_committee_url': experiment3.ethics_committee_url,
+                    'ethics_committee_file': 'http://testserver' +
+                                             experiment3.ethics_committee_file.url
                 }
             ]
         )
@@ -154,8 +162,6 @@ class ExperimentAPITest(APITestCase):
         experiment_version_2 = Experiment.objects.last()
         self.assertEqual(experiment_version_2.version, 2)
 
-        self.client.logout()
-
     def test_PATCHing_an_existing_experiment(self):
         # TODO: get last version
         owner = User.objects.get(username='lab1')
@@ -192,11 +198,14 @@ class ExperimentAPITest(APITestCase):
                 'data_acquisition_done':
                     updated_experiment.data_acquisition_done,
                 'nes_id': updated_experiment.nes_id,
-                'ethics_committee_file': None,
                 'owner': updated_experiment.owner.username,
                 'protocol_components': [],
                 'status': updated_experiment.status,
-                'sent_date': updated_experiment.sent_date.strftime('%Y-%m-%d')
+                'sent_date': updated_experiment.sent_date.strftime('%Y-%m-%d'),
+                'project_url': updated_experiment.project_url,
+                'ethics_committee_url':
+                    updated_experiment.ethics_committee_url,
+                'ethics_committee_file': None
             }
         )
         self.client.logout()
@@ -227,8 +236,16 @@ class StudyAPITest(APITestCase):
         global_setup_ut()
 
     def test_get_returns_all_studies_short_url(self):
-        study1 = Study.objects.first()
-        study2 = Study.objects.last()
+        owner1 = User.objects.get(username='lab1')
+        owner2 = User.objects.get(username='lab2')
+
+        experiment1 = Experiment.objects.get(nes_id=1, owner=owner1)
+        experiment2 = Experiment.objects.get(nes_id=1, owner=owner2)
+        experiment3 = Experiment.objects.get(nes_id=2, owner=owner2)
+
+        study1 = Study.objects.get(experiment=experiment1)
+        study2 = Study.objects.get(experiment=experiment2)
+        study3 = Study.objects.get(experiment=experiment3)
         list_url = reverse('api_studies-list')
         response = self.client.get(list_url)
         self.assertEqual(
@@ -240,8 +257,8 @@ class StudyAPITest(APITestCase):
                     'description': study1.description,
                     'start_date': study1.start_date.strftime('%Y-%m-%d'),
                     'end_date': study1.end_date,
-                    'experiment': 'Experiment 1',
-                    'keywords': list(study1.keywords.all())
+                    'experiment': study1.experiment.title,
+                    'keywords': list(study1.keywords.values('name'))
                 },
                 {
                     'id': study2.id,
@@ -249,19 +266,34 @@ class StudyAPITest(APITestCase):
                     'description': study2.description,
                     'start_date': study2.start_date.strftime('%Y-%m-%d'),
                     'end_date': study2.end_date,
-                    'experiment': 'Experiment 2',
-                    'keywords': list(study1.keywords.all())
+                    'experiment': study2.experiment.title,
+                    'keywords': list(study2.keywords.values('name'))
                 },
+                {
+                    'id': study3.id,
+                    'title': study3.title,
+                    'description': study3.description,
+                    'start_date': study3.start_date.strftime('%Y-%m-%d'),
+                    'end_date': study3.end_date,
+                    'experiment': study3.experiment.title,
+                    'keywords': list(study3.keywords.values('name'))
+                }
             ]
         )
 
-    def test_get_returns_all_studies_long_url(self):
-        owner = User.objects.get(username='lab2')
-        experiment = Experiment.objects.get(nes_id=1, owner=owner)
-        study1 = Study.objects.first()
-        study2 = Study.objects.last()
+    def test_get_returns_all_studies_long_url_not_logged(self):
+        owner1 = User.objects.get(username='lab1')
+        owner2 = User.objects.get(username='lab2')
+
+        experiment1 = Experiment.objects.get(nes_id=1, owner=owner1)
+        experiment2 = Experiment.objects.get(nes_id=1, owner=owner2)
+        experiment3 = Experiment.objects.get(nes_id=2, owner=owner2)
+
+        study1 = Study.objects.get(experiment=experiment1)
+        study2 = Study.objects.get(experiment=experiment2)
+        study3 = Study.objects.get(experiment=experiment3)
         list_url = reverse('api_experiment_studies-list',
-                           kwargs={'experiment_nes_id': experiment.nes_id})
+                           kwargs={'experiment_nes_id': experiment1.nes_id})
         response = self.client.get(list_url)
         self.assertEqual(
             json.loads(response.content.decode('utf8')),
@@ -272,8 +304,8 @@ class StudyAPITest(APITestCase):
                     'description': study1.description,
                     'start_date': study1.start_date.strftime('%Y-%m-%d'),
                     'end_date': study1.end_date,
-                    'experiment': 'Experiment 1',
-                    'keywords': list(study1.keywords.all())
+                    'experiment': study1.experiment.title,
+                    'keywords': list(study1.keywords.values('name'))
                 },
                 {
                     'id': study2.id,
@@ -281,13 +313,22 @@ class StudyAPITest(APITestCase):
                     'description': study2.description,
                     'start_date': study2.start_date.strftime('%Y-%m-%d'),
                     'end_date': study2.end_date,
-                    'experiment': 'Experiment 2',
-                    'keywords': list(study2.keywords.all())
+                    'experiment': study2.experiment.title,
+                    'keywords': list(study2.keywords.values('name'))
                 },
+                {
+                    'id': study3.id,
+                    'title': study3.title,
+                    'description': study3.description,
+                    'start_date': study3.start_date.strftime('%Y-%m-%d'),
+                    'end_date': study3.end_date,
+                    'experiment': study3.experiment.title,
+                    'keywords': list(study3.keywords.values('name'))
+                }
             ]
         )
 
-    def test_get_returns_all_studies_of_an_experiment(self):
+    def test_get_returns_all_studies_long_url_logged(self):
         owner = User.objects.get(username='lab2')
         experiment = Experiment.objects.get(nes_id=1, owner=owner)
         study = Study.objects.get(experiment=experiment)
@@ -305,7 +346,7 @@ class StudyAPITest(APITestCase):
                     'start_date': study.start_date.strftime('%Y-%m-%d'),
                     'end_date': study.end_date,
                     'experiment': 'Experiment 2',
-                    'keywords': list(study.keywords.all())
+                    'keywords': list(study.keywords.values('name'))
                 },
             ]
         )
@@ -332,43 +373,43 @@ class StudyAPITest(APITestCase):
         new_study = Study.objects.get(experiment=experiment)
         self.assertEqual(new_study.title, 'New study')
 
-        # TODO: IMPORTANT! Test client can't POST (PUT etc.) to a model without
-        # been its owner. This requires adds, at first, an owner to all
-        # models, and ensure that only same client can POST to that model.
+        # TODO: IMPORTANT! Test client can't POST (PUT etc.) to Study model
+        # without been its owner (indirectly by experiment's study). Ensure
+        # that only same client can POST to that model.
 
-    # def test_PUTing_an_existing_study(self):
-    #     pass  # TODO: update test with new url
-    #     owner = User.objects.get(username='lab2')
-    #     study = Study.objects.get(owner=owner)
-    #     detail_url = reverse(
-    #         'api_studies-detail', kwargs={'nes_id': study.nes_id}
-    #     )
-    #     self.client.login(username=owner.username, password='nep-lab2')
-    #     resp_patch = self.client.patch(
-    #         detail_url,
-    #         {
-    #             'title': 'Changed title',
-    #             'description': 'Changed description',
-    #             'start_date': datetime.utcnow().strftime('%Y-%m-%d'),
-    #         }
-    #     )
-    #     self.assertEqual(resp_patch.status_code, status.HTTP_200_OK)
-    #
-    #     # Test study updated
-    #     resp_get = self.client.get(detail_url)
-    #     self.assertEqual(
-    #         json.loads(resp_get.content.decode('utf8')),
-    #         {
-    #             'id': study.id,
-    #             'title': 'Changed title',
-    #             'description': 'Changed description',
-    #             'start_date': study.start_date.strftime('%Y-%m-%d'),
-    #             'end_date': None,
-    #             'nes_id': study.nes_id,
-    #             'owner': study.owner.username
-    #         }
-    #     )
-    #     self.client.logout()
+        # def test_PUTing_an_existing_study(self):
+        #     pass  # TODO: update test with new url
+        #     owner = User.objects.get(username='lab2')
+        #     study = Study.objects.get(owner=owner)
+        #     detail_url = reverse(
+        #         'api_studies-detail', kwargs={'nes_id': study.nes_id}
+        #     )
+        #     self.client.login(username=owner.username, password='nep-lab2')
+        #     resp_patch = self.client.patch(
+        #         detail_url,
+        #         {
+        #             'title': 'Changed title',
+        #             'description': 'Changed description',
+        #             'start_date': datetime.utcnow().strftime('%Y-%m-%d'),
+        #         }
+        #     )
+        #     self.assertEqual(resp_patch.status_code, status.HTTP_200_OK)
+        #
+        #     # Test study updated
+        #     resp_get = self.client.get(detail_url)
+        #     self.assertEqual(
+        #         json.loads(resp_get.content.decode('utf8')),
+        #         {
+        #             'id': study.id,
+        #             'title': 'Changed title',
+        #             'description': 'Changed description',
+        #             'start_date': study.start_date.strftime('%Y-%m-%d'),
+        #             'end_date': None,
+        #             'nes_id': study.nes_id,
+        #             'owner': study.owner.username
+        #         }
+        #     )
+        #     self.client.logout()
 
 
 @apply_setup(global_setup_ut)

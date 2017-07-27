@@ -1,3 +1,5 @@
+from django.db.models import Count
+
 from experiments.models import Experiment
 from functional_tests.base import FunctionalTest
 
@@ -5,12 +7,9 @@ from functional_tests.base import FunctionalTest
 class NewVisitorTest(FunctionalTest):
 
     def test_can_view_initial_page(self):
-        experiment = Experiment.objects.filter(status=Experiment.APPROVED).first()
-
-        # A neuroscience researcher discovered a new site that
-        # provides a data base with neuroscience experiments.
-        # She goes to checkout its home page
-        self.browser.get(self.live_server_url)
+        experiment = Experiment.objects.filter(
+            status=Experiment.APPROVED
+        ).first()
 
         # In top of page she sees a link to login in the system
         login_link = self.browser.find_element_by_id('login-language').text
@@ -24,7 +23,7 @@ class NewVisitorTest(FunctionalTest):
 
         # She sees that in header bunner there is a search box invited her
         # to type terms/words that will be searched in the portal
-        searchbox = self.browser.find_element_by_id('id_search_box')
+        searchbox = self.browser.find_element_by_id('search_box')
         self.assertEqual(
             searchbox.get_attribute('placeholder'),
             'Type key terms/words to be searched'
@@ -60,9 +59,10 @@ class NewVisitorTest(FunctionalTest):
         )
         self.assertTrue(
             any(row.find_elements_by_tag_name('td')[2].text ==
-                str(experiment.groups.first().participants.count()) +
-                ' in ' + str(experiment.groups.count()) + ' groups' for row in
-                rows)
+                str(experiment.groups.aggregate(Count(
+                    'participants'))['participants__count']) +
+                ' in ' + str(experiment.groups.count()) + ' groups' for row
+                in rows)
         )
         self.assertTrue(
             any(row.find_elements_by_tag_name('td')[3].text ==

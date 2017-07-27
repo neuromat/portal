@@ -5,12 +5,12 @@
 {% endblock %}
 
 {% block content %}
-    <section class="container">
+    <section class="container nep-content">
         {% if messages %}
             {% include 'experiments/messages.html' %}
         {% endif %}
         <div id="id_table_title" class="table-title">
-            <h2>List of Experiments</h2>
+            <h2>{{ table_title }}</h2>
         </div>
         {% if experiments %}
             {% load experiment_extras %}
@@ -90,7 +90,7 @@
                 if (statuses.hasOwnProperty(key)) {
                     let checked = experiment.status === key ? 'checked' : '';
                     html += `
-                    <input type="radio" name="status" value=${key} ${checked}>${statuses[key]} <br>
+                    <input type="radio" name="status" value=${key}${checked}>&nbsp;&nbsp;${statuses[key]} <br>
                 `;
                 }
             }
@@ -102,7 +102,7 @@
                 <br>
                 <div class=modal-footer>
                     <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                    <input id="id_submit" type="submit" value="Save changes" class="btn btn-primary">
+                    <input id="submit" type="submit" value="Save changes" class="btn btn-primary">
                 </div>
             </form>
          `;

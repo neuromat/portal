@@ -1,5 +1,6 @@
 from django.conf import settings
 from django.conf.urls import url, include
+from django.conf.urls.static import static
 from django.contrib import admin
 from django.views.static import serve
 
@@ -7,6 +8,7 @@ from rest_framework.documentation import include_docs_urls
 
 from experiments import views
 from experiments import api_urls
+from downloads import urls
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
@@ -21,7 +23,14 @@ urlpatterns = [
         views.change_status, name='change-status'),
     url(r'^media/(?P<path>.*)$', serve,
         {'document_root': settings.MEDIA_ROOT, }),
+    url(r'^downloads/', include(urls)),
+
 
     # Ajax
-    url(r'^experiments/to_be_analysed/count/$', views.ajax_to_be_analysed, name='ajax-to_be_analysed')
+    url(r'^experiments/to_be_analysed/count/$', views.ajax_to_be_analysed,
+        name='ajax-to_be_analysed'),
+
+    # Search
+    url(r'^search_experiments/$', views.search_experiments,
+        name='search-experiments')
 ]
