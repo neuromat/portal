@@ -9,7 +9,6 @@ class SearchTest(FunctionalTest):
     pass
     # TODO: disabled by now, untile we have defined the search tool
     # def test_simple_word_returns_experiments(self):
-    #     self.browser.get(self.live_server_url)
     #
     #     # A researcher is interested in finding experiments that contains
     #     # Plexus in title. She sees that NEP system has a search box to

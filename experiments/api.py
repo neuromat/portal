@@ -39,6 +39,8 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class KeywordSerializer(serializers.Serializer):
+    name = serializers.CharField(max_length=50)
+
     class Meta:
         model = Keyword
         fields = ('name',)
@@ -68,7 +70,8 @@ class StudySerializer(serializers.ModelSerializer):
         if 'keywords' in self.initial_data:
             keywords_data = self.initial_data['keywords']
             for keyword_data in keywords_data:
-                keyword, created = Keyword.objects.get_or_create(name=keyword_data['name'])
+                keyword, created = \
+                    Keyword.objects.get_or_create(name=keyword_data['name'])
                 study.keywords.add(keyword)
         return study
 

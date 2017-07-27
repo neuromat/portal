@@ -145,7 +145,7 @@ class TrusteeTest(FunctionalTestTrustee):
                       self.browser.find_element_by_tag_name('body').text)
         # The work is done. She is satisfied and decides to log out from system
         self.browser.find_element_by_link_text('Log Out').click()
-        time.sleep(3)
+        time.sleep(1)
         # The email was sent to the researcher. The guy checks her email and
         # finds a message
         email = mail.outbox[0]
@@ -385,5 +385,38 @@ class TrusteeTest(FunctionalTestTrustee):
         self.assertIn('This experiment is already under analysis by '
                       'trustee roque.',
                       modal_body)
+
+    def test_can_view_ethics_committee_info(self):
+        experiment = Experiment.objects.filter(
+            status=Experiment.APPROVED
+        ).last()
+
+        # The trustee click in sixth experiment of the list
+        # Obs.: this experiment has ethics commitee info data that we will
+        # test as from tests helper
+        list_links = self.browser.find_elements_by_link_text('View')
+        list_links[5].click()
+        time.sleep(1)
+
+        # Bellow experiment description there's a link to ethics committee
+        # approval site, and a link to download the ethics committee file
+        # (because this experiment has that data posted via api)
+        ethics_commitee_url = self.browser.find_element_by_link_text(
+            'Ethics committee approval'
+        )
+        self.assertEqual(
+            experiment.ethics_committee_url,
+            ethics_commitee_url.get_attribute('href')
+        )
+        ethics_commitee_file = self.browser.find_element_by_link_text(
+            'Download project file approved'
+        )
+        # Obs.: self.assertIn because
+        # experiment.ethics_committee_info.file.url gives relative url
+        # here in test, but prepends url in template system
+        self.assertIn(
+            experiment.ethics_committee_file.url,
+            ethics_commitee_file.get_attribute('href')
+        )
 
         self.fail('Finish this test!')

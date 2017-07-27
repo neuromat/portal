@@ -224,11 +224,10 @@ def global_setup_ft():
     # TODO: when creating experiment UNDER_ANALYSIS, associate with a trustee
     create_experiment(2, choice([owner1, owner2]),
                       Experiment.UNDER_ANALYSIS)
-    create_experiment(2, choice([owner1, owner2]),
+    create_experiment(1, choice([owner1, owner2]),
                       Experiment.APPROVED)
-    experiment = Experiment.objects.last()
     # We create one experiment approved with ethics committee information
-    create_ethics_committee_info(experiment)
+    create_ethics_committee_info(Experiment.objects.last())
     create_experiment(1, choice([owner1, owner2]),
                       Experiment.NOT_APPROVED)
 
