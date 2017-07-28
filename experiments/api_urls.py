@@ -89,9 +89,94 @@ api_experiment_context_tree_list =\
         'post': 'create'
     })
 
-# Participants
+# Steps
 api_step_list =\
     api.StepViewSet.as_view({
+        'get': 'list',
+        'post': 'create'
+    })
+
+# EEG Steps
+api_eeg_step_list =\
+    api.EEGStepViewSet.as_view({
+        'get': 'list',
+        'post': 'create'
+    })
+
+
+# EMG Steps
+api_emg_step_list =\
+    api.EMGStepViewSet.as_view({
+        'get': 'list',
+        'post': 'create'
+    })
+
+# TMS Steps
+api_tms_step_list =\
+    api.TMSStepViewSet.as_view({
+        'get': 'list',
+        'post': 'create'
+    })
+
+# Instruction Steps
+api_instruction_step_list =\
+    api.InstructionStepViewSet.as_view({
+        'get': 'list',
+        'post': 'create'
+    })
+
+# Pause Steps
+api_pause_step_list =\
+    api.PauseStepViewSet.as_view({
+        'get': 'list',
+        'post': 'create'
+    })
+
+# Task Steps
+api_task_step_list =\
+    api.TaskStepViewSet.as_view({
+        'get': 'list',
+        'post': 'create'
+    })
+
+# Task for Experimenter Steps
+api_task_for_experimenter_step_list =\
+    api.TaskForExperimenterStepViewSet.as_view({
+        'get': 'list',
+        'post': 'create'
+    })
+
+# Task for Experimenter Steps
+api_generic_data_collection_step_list =\
+    api.GenericDataCollectionStepViewSet.as_view({
+        'get': 'list',
+        'post': 'create'
+    })
+
+# Stimulus Steps
+api_stimulus_step_list =\
+    api.StimulusStepViewSet.as_view({
+        'get': 'list',
+        'post': 'create'
+    })
+
+# Goalkeeper Game Steps
+api_goalkeeper_game_step_list =\
+    api.GoalkeeperGameStepViewSet.as_view({
+        'get': 'list',
+        'post': 'create'
+    })
+
+# Set of Steps
+api_set_of_step_list =\
+    api.SetOfStepViewSet.as_view({
+        'get': 'list',
+        'post': 'create'
+    })
+
+# Questionnaire Step
+api_questionnaire_step_list =\
+    api.QuestionnaireStepViewSet.as_view({
         'get': 'list',
         'post': 'create'
     })
@@ -208,6 +293,48 @@ urlpatterns = [
 
     # Step
     url(r'^groups/(?P<pk>[0-9]+)/step/$', api_step_list, name='api_step-list'),
+
+    # EEG Step
+    url(r'^groups/(?P<pk>[0-9]+)/eeg_step/$', api_eeg_step_list, name='api_eeg_step-list'),
+
+    # EMG Step
+    url(r'^groups/(?P<pk>[0-9]+)/emg_step/$', api_emg_step_list, name='api_emg_step-list'),
+
+    # TMS Step
+    url(r'^groups/(?P<pk>[0-9]+)/tms_step/$', api_tms_step_list, name='api_tms_step-list'),
+
+    # Instruction Step
+    url(r'^groups/(?P<pk>[0-9]+)/instruction_step/$', api_instruction_step_list, name='api_instruction_step-list'),
+
+    # Pause Step
+    url(r'^groups/(?P<pk>[0-9]+)/pause_step/$', api_pause_step_list, name='api_pause_step-list'),
+
+    # Task Step
+    url(r'^groups/(?P<pk>[0-9]+)/task_step/$', api_task_step_list, name='api_task_step-list'),
+
+    # Task For Experimenter Step
+    url(r'^groups/(?P<pk>[0-9]+)/task_for_experimenter_step/$',
+        api_task_for_experimenter_step_list, name='api_task_for_experimenter_step-list'),
+
+    # Generic Data Collection Step
+    url(r'^groups/(?P<pk>[0-9]+)/generic_data_collection_step/$',
+        api_generic_data_collection_step_list, name='api_generic_data_collection_step-list'),
+
+    # Stimulus Step
+    url(r'^groups/(?P<pk>[0-9]+)/stimulus_step/$',
+        api_stimulus_step_list, name='api_stimulus_step-list'),
+
+    # Goalkeeper Game Step
+    url(r'^groups/(?P<pk>[0-9]+)/goalkeeper_game_step/$',
+        api_goalkeeper_game_step_list, name='api_goalkeeper_game_step-list'),
+
+    # Set of Steps
+    url(r'^groups/(?P<pk>[0-9]+)/set_of_step/$',
+        api_set_of_step_list, name='api_set_of_step-list'),
+
+    # Questionnaire Step
+    url(r'^groups/(?P<pk>[0-9]+)/questionnaire_step/$',
+        api_questionnaire_step_list, name='api_questionnaire_step-list'),
 
     # File
     url(r'^files/$', api_file_list, name='api_file-list'),
