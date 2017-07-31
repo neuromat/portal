@@ -72,6 +72,17 @@ for i in range(4, 6):
         sent_date=datetime.utcnow(),
         status=Experiment.TO_BE_ANALYSED
     )
+    if i == 4:
+        experiment_owner2.title = 'Brachial Plexus'
+        experiment_owner2.save()
+    if i == 5:
+        experiment_owner2.description = \
+            'Brachial plexus repair by peripheral nerve ' \
+            'grafts directly into the spinal cord in rats ' \
+            'Behavioral and anatomical evidence of ' \
+            'functional recovery'
+        experiment_owner2.save()
+
     Study.objects.create(
         title=fake.word().title(),
         description=fake.text(),

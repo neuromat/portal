@@ -30,7 +30,6 @@ urlpatterns = [
     url(r'^experiments/to_be_analysed/count/$', views.ajax_to_be_analysed,
         name='ajax-to_be_analysed'),
 
-    # Search
-    url(r'^search_experiments/$', views.search_experiments,
-        name='search-experiments')
+    # Haystack search
+    url(r'^search/', include('haystack.urls'))
 ]
