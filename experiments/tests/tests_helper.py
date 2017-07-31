@@ -54,7 +54,8 @@ def create_experiment(qtty, owner, status):
             # genetates constraint violaton (nes_id, owner_id)
             owner=owner, version=1,
             sent_date=datetime.utcnow(),
-            status=status
+            status=status,
+            data_acquisition_done=choice([True, False])
         )
         create_study(experiment)
         create_experiment_groups(randint(2, 3), experiment)

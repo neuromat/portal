@@ -40,8 +40,8 @@ class ExperimentDetailTest(FunctionalTest):
             'id_detail_description').text
         self.assertEqual(experiment.description, experiment_description)
 
-        # Bellow experiment description there is a link to the project site,
-        # ( because experiment has that data posted via api)
+        # Bellow experiment description there is a link to the project site
+        # (because experiment has that data posted via api)
         ethics_commitee_project_info = \
             self.browser.find_element_by_link_text('Project Info')
         self.assertEqual(
@@ -49,14 +49,20 @@ class ExperimentDetailTest(FunctionalTest):
             ethics_commitee_project_info.get_attribute('href')
         )
 
-        # Right bellow she sees the study that the experiment belongs to
-        # at left, and if data acquisition was finished, at right
-        study_text = self.browser.find_element_by_id('id_detail_study').text
-        self.assertIn('Related study: ' + experiment.study.title, study_text)
+        # At the right side there is a warning telling that the data
+        # acquisition is not finished yet
         data_acquisition_text = self.browser.find_element_by_id(
             'id_detail_acquisition').text
-        self.assertIn('Data acquisition not finished yet',
-                      data_acquisition_text)
+        if experiment.data_acquisition_done:
+            self.assertIn('Data acquisition done', data_acquisition_text)
+        else:
+            self.assertIn('Data acquisition not finished',
+                          data_acquisition_text)
+
+        # Right bellow she sees the study that the experiment belongs to
+        # at left
+        study_text = self.browser.find_element_by_id('id_detail_study').text
+        self.assertIn('Related study: ' + experiment.study.title, study_text)
 
         # In right side bellow the data acquisition alert, she sees a button
         # to download of data
