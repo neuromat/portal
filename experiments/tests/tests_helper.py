@@ -273,6 +273,10 @@ def global_setup_ft():
     create_researchers()
 
 
+def global_setup_ft_search():
+    pass
+
+
 def global_setup_ut():
     """
     This global setup creates basic object models that are used in 
