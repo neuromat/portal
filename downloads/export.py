@@ -5,7 +5,7 @@ from django.conf import settings
 from django.shortcuts import get_object_or_404
 
 from experiments.models import Experiment, Group, Participant, EEGData, EMGData, EEGSetting, EMGSetting, TMSData, \
-    TMSSetting, AdditionalData
+    TMSSetting, AdditionalData, ContextTree
 
 DEFAULT_LANGUAGE = "pt-BR"
 
@@ -475,8 +475,7 @@ class ExportExecution:
                     if error_msg != "":
                         return error_msg
                     # ex. EXPERIMENT_DOWNLOAD/Group_group.title/Participants/PXXXX
-                    export_directory_group_participants = path.join(export_directory_group_participants,
-                                                                    participant_code)
+                    export_directory_participant = path.join(export_directory_group_participants, participant_code)
                     if 'eeg_data' in self.per_group_data[group_id]['data_per_participant'][participant_code]:
                         eeg_data_list = self.per_group_data[group_id]['data_per_participant'][participant_code][
                             'eeg_data']
@@ -489,7 +488,7 @@ class ExportExecution:
                                 if error_msg != "":
                                     return error_msg
                                 # ex. EXPERIMENT_DOWNLOAD/Group_group.title/Participants/PXXXX/Step_XX_EEG
-                                export_eeg_directory = path.join(export_directory_group_participants,
+                                export_eeg_directory = path.join(export_directory_participant,
                                                                  eeg_data['directory_step_name'])
 
                             eeg_data = get_object_or_404(EEGData, pk=eeg_data['data_id'])
@@ -527,14 +526,93 @@ class ExportExecution:
                         emg_data_list = self.per_group_data[group_id]['data_per_participant'][participant_code][
                             'emg_data']
                         for emg_data in emg_data_list:
+                            emg_directory_name = path.join(participant_directory, emg_data['directory_step_name'])
+                            # ex. Users/.../EXPERIMENT_DOWNLOAD/Group_group.title/Participants/PXXXX/Step_XX_EMG
+                            if not path.exists(emg_directory_name):
+                                error_msg, emg_directory = create_directory(participant_directory,
+                                                                            emg_data['directory_step_name'])
+                                if error_msg != "":
+                                    return error_msg
+                                # ex. EXPERIMENT_DOWNLOAD/Group_group.title/Participants/PXXXX/Step_XX_EMG
+                                export_emg_directory = path.join(export_directory_participant,
+                                                                 emg_data['directory_step_name'])
+
                             emg_data = get_object_or_404(EMGData, pk=emg_data['data_id'])
+                            # download emg raw data file
+                            emg_data_filename = emg_data.file.file.name.split('/')[-1]
+                            # ex. Users/.../EXPERIMENT_DOWNLOAD/Group_group.title/Participants/PXXXX/Step_XX_EMG/emg.raw
+                            complete_emg_data_filename = path.join(emg_directory, emg_data_filename)
+                            emg_raw_data_file = path.join(path.join(settings.BASE_DIR, "media/"),
+                                                          emg_data.file.file.name)
+
+                            with open(emg_raw_data_file, 'rb') as f:
+                                data = f.read()
+
+                            with open(complete_emg_data_filename, 'wb') as f:
+                                f.write(data)
+
+                            self.files_to_zip_list.append([complete_emg_data_filename, export_emg_directory])
+
+                            # download emg_setting_description
+                            emg_setting_description = get_emg_setting_description(emg_data.emg_setting_id)
+                            emg_setting_filename = "%s_%s.json" % (emg_data_filename.split(".")[0],
+                                                                   "setting_description")
+
+                            # ex. Users/.../EXPERIMENT_DOWNLOAD/Group_group.title/Participants/PXXXX/Step_XX_EMG/
+                            # emg_rawfilename_setting_description.json#
+                            complete_setting_filename = path.join(emg_directory, emg_setting_filename)
+
+                            self.files_to_zip_list.append([complete_setting_filename, export_emg_directory])
+
+                            with open(complete_setting_filename.encode('utf-8'), 'w', newline='',
+                                      encoding='UTF-8') as outfile:
+                                json.dump(emg_setting_description, outfile, indent=4)
 
                     if 'tms_data' in self.per_group_data[group_id]['data_per_participant'][participant_code]:
                         tms_data_list = self.per_group_data[group_id]['data_per_participant'][participant_code][
                             'tms_data']
                         for tms_data in tms_data_list:
+                            tms_directory_name = path.join(participant_directory, tms_data['directory_step_name'])
+                            # ex. Users/.../EXPERIMENT_DOWNLOAD/Group_group.title/Participants/PXXXX/Step_XX_TMS
+                            if not path.exists(tms_directory_name):
+                                error_msg, tms_directory = create_directory(participant_directory,
+                                                                            tms_data['directory_step_name'])
+                                if error_msg != "":
+                                    return error_msg
+                                # ex. EXPERIMENT_DOWNLOAD/Group_group.title/Participants/PXXXX/Step_XX_TMS
+                                export_tms_directory = path.join(export_directory_participant,
+                                                                 tms_data['directory_step_name'])
+
+                            tms_data_description = get_tms_data_description(tms_data['data_id'])
+                            tms_data_filename = "%s.json" % "tms_data_description"
+                            # ex. Users/.../EXPERIMENT_DOWNLOAD/Group_group.title/Participants/PXXXX/Step_XX_TMS
+                            # /tms_data_description.json
+                            complete_data_filename = path.join(tms_directory, tms_data_filename)
+
+                            self.files_to_zip_list.append([complete_data_filename, export_tms_directory])
+
+                            with open(complete_data_filename.encode('utf-8'), 'w', newline='', encoding='UTF-8') as \
+                                    outfile:
+                                json.dump(tms_data_description, outfile, indent=4)
+
+                            # TMS hotspot position image file
                             tms_data = get_object_or_404(TMSData, pk=tms_data['data_id'])
 
+                            if tms_data.localization_system_image:
+                                hotspot_image = tms_data.hot_spot_map.name
+                                if hotspot_image:
+                                    hotspot_map_filename = hotspot_image.split("/")[-1]
+                                    # ex. Users/.../EXPERIMENT_DOWNLOAD/Group_group.title/Participants/PXXXX/Step_XX_TMS
+                                    # /hotspot_image.png
+                                    complete_hotspot_filename = path.join(tms_directory, hotspot_map_filename)
+                                    path_hot_spot_image = path.join(settings.BASE_DIR, "media") + "/" + hotspot_image
+                                    with open(path_hot_spot_image, 'rb') as f:
+                                        data = f.read()
+
+                                    with open(complete_hotspot_filename, 'wb') as f:
+                                        f.write(data)
+
+                                    self.files_to_zip_list.append([complete_hotspot_filename, export_tms_directory])
 
         return error_msg
 
@@ -589,3 +667,108 @@ def get_eeg_setting_description(eeg_setting_id):
         # })
 
     return description
+
+
+def get_emg_setting_description(emg_setting_id):
+    emg_setting = get_object_or_404(EMGSetting, pk=emg_setting_id)
+
+    emg_description = {
+        'setting_description': {},
+        'ad_converter_setting': {},
+        'digital_filter_setting': {}
+    }
+
+    emg_description['setting_description'] = {
+        'name': emg_setting.name,
+        'description': emg_setting.description,
+        'acquisition_software_version': emg_setting.acquisition_software_version
+    }
+
+    # emg_description['ad_converter_setting'] = {
+    #     'sampling_rate': emg_setting.emg_ad_converter_setting.sampling_rate,
+    # }
+
+    # emg_digital_filter_setting = emg_setting.emg_digital_filter_setting
+    # emg_description['digital_filter_setting'] = {
+    #     'high_pass': emg_digital_filter_setting.high_pass,
+    #     'low_pass': emg_digital_filter_setting.low_pass,
+    #     'order': emg_digital_filter_setting.order,
+    #     'high_band_pass': emg_digital_filter_setting.high_band_pass,
+    #     'low_band_pass': emg_digital_filter_setting.low_band_pass,
+    #     'high_notch': emg_digital_filter_setting.high_notch,
+    #     'low_notch': emg_digital_filter_setting.low_notch
+    # }
+
+    return emg_description
+
+
+def get_tms_data_description(tms_data_id):
+    tms_data = get_object_or_404(TMSData, pk=tms_data_id)
+
+    tms_description = {
+        'setting_description': {},
+        'stimulation_description': {},
+        'hotspot_position': {},
+    }
+
+    tms_description['stimulation_description'] = {
+        'tms_stimulation_description': tms_data.description,
+        # 'pulse_stimulus': tms_data.tms_setting.tms_device_setting.pulse_stimulus_type,
+        'resting_motor threshold-RMT(%)': tms_data.resting_motor_threshold,
+        'test_pulse_intensity_of_simulation(% over the %RMT)': tms_data.test_pulse_intensity_of_simulation,
+        'interval_between_pulses': tms_data.interval_between_pulses,
+        'interval_between_pulses_unit': tms_data.interval_between_pulses_unit,
+        'repetitive_pulse_frequency': tms_data.repetitive_pulse_frequency,
+        'coil_orientation': tms_data.coil_orientation,
+        'coil_orientation_angle': tms_data.coil_orientation_angle,
+        'second_test_pulse_intensity (% over the %RMT)': tms_data.second_test_pulse_intensity,
+        'time_between_mep_trials': tms_data.time_between_mep_trials,
+        'time_between_mep_trials_unit': tms_data.time_between_mep_trials_unit,
+    }
+    # localization_system_selected = get_object_or_404(TMSLocalizationSystem,
+    #                                                  pk=tms_data.hotspot.tms_localization_system_id)
+    tms_description['hotspot_position'] = {
+        'tms_localization_system_name': tms_data.localization_system_name,
+        'tms_localization_system_description': tms_data.localization_system_description,
+        'brain_area': tms_data.brain_area_name,
+        'brain_area_system_name': tms_data.brain_area_system_name,
+        'brain_area_system_description': tms_data.brain_area_system_description
+    }
+
+    # tms_setting = get_object_or_404(TMSSetting, pk=tms_data.tms_setting_id)
+    #
+    # tms_description['setting_description'] = {
+    #     'name': tms_setting.name,
+    #     'description': tms_setting.description,
+    #     'pulse_stimulus_type': tms_setting.tms_device_setting.pulse_stimulus_type,
+    # }
+    #
+    return tms_description
+
+
+def get_tms_setting_description(tms_setting_id):
+    tms_setting = get_object_or_404(TMSSetting, pk=tms_setting_id)
+
+    tms_setting_description = {
+        'name': tms_setting.name,
+        'description': tms_setting.description,
+        # 'tms_device': tms_setting.tms_device_setting.coil_model.name,
+        # 'tms_device': tms_setting.tms_device_setting.tms_device.manufacturer.name,
+        # 'tms_device_description': tms_setting.tms_device_setting.tms_device.description,
+        # 'coil_model_description': tms_setting.tms_device_setting.coil_model.description,
+        # 'coil_model_design': tms_setting.tms_device_setting.coil_model.coil_design,
+        # 'pulse_stimulus_type': tms_setting.tms_device_setting.pulse_stimulus_type,
+    }
+
+    return tms_setting_description
+
+
+def get_context_tree_description(context_tree_id):
+    context_tree = get_object_or_404(ContextTree, pk=context_tree_id)
+    context_tree_description = {
+        'name': context_tree.name,
+        'description': context_tree.description,
+        'setting_text': context_tree.setting_text,
+    }
+
+    return context_tree_description
