@@ -4,7 +4,8 @@ from csv import writer
 from django.conf import settings
 from django.shortcuts import get_object_or_404
 
-from experiments.models import Experiment, Group, Participant, EEGData, EMGData, EEGSetting
+from experiments.models import Experiment, Group, Participant, EEGData, EMGData, EEGSetting, EMGSetting, TMSData, \
+    TMSSetting, AdditionalData
 
 DEFAULT_LANGUAGE = "pt-BR"
 
@@ -213,8 +214,8 @@ class ExportExecution:
                     self.files_to_zip_list.append([complete_filename_experimental_protocol,
                                                    export_directory_experimental_protocol])
 
-                    with open(complete_filename_experimental_protocol.encode('utf-8'), 'w', newline='', encoding='UTF-8') \
-                            as txt_file:
+                    with open(complete_filename_experimental_protocol.encode('utf-8'), 'w', newline='',
+                              encoding='UTF-8') as txt_file:
                         txt_file.writelines(group_resume)
                         txt_file.writelines(experimental_protocol_description)
 
@@ -234,87 +235,87 @@ class ExportExecution:
                     with open(complete_protocol_image_filename, 'wb') as f:
                         f.write(data)
 
-                        # Export data per Participant
-                    participant_list = Participant.objects.filter(group=group)
-                    # participant with data collection
-                    eeg_participant_id_list = EEGData.objects.filter(participant__in=participant_list).values(
-                        'participant_id')
-                    eeg_participant_list = []
-                    for eeg_participant in eeg_participant_id_list:
-                        eeg_participant_list.append(eeg_participant['participant_id'])
-                    emg_participant_list = []
-                    emg_participant_id_list = EMGData.objects.filter(participant__in=participant_list).values(
-                        'participant_id')
-                    for emg_participant in emg_participant_id_list:
-                        emg_participant_list.append(emg_participant['participant_id'])
+            # Export data per Participant
+            header_personal_data = ["Participant_code", "Age", "Gender"]
+            personal_data_list = []
+            participant_list = Participant.objects.filter(group=group)
+            for participant in participant_list:
+                # save personal data
+                data = [participant.code, participant.age, participant.gender]
+                personal_data_list.append(data)
 
-                    if eeg_participant_list or emg_participant_list:
-                        # ex. Users/.../EXPERIMENT_DOWNLOAD/Group_group.title/Participants
-                        error_msg, group_participant_directory = create_directory(group_directory, "Participants")
-                        if error_msg != "":
-                            return error_msg
-                        # ex. EXPERIMENT_DOWNLOAD/Group_group.title/Participants
-                        export_directory_group_participant = path.join(export_directory_group, "Participants")
+            # participant with data collection
+            # eeg_participant_id_list = EEGData.objects.filter(participant__in=participant_list).values('participant_id')
+            # eeg_participant_list = []
+            # for eeg_participant in eeg_participant_id_list:
+            #     eeg_participant_list.append(eeg_participant['participant_id'])
+            # emg_participant_list = []
+            # emg_participant_id_list = EMGData.objects.filter(participant__in=participant_list).values('participant_id')
+            # for emg_participant in emg_participant_id_list:
+            #     emg_participant_list.append(emg_participant['participant_id'])
+            #
+            # if eeg_participant_list or emg_participant_list:
+            #     # ex. Users/.../EXPERIMENT_DOWNLOAD/Group_group.title/Participants
+            #     error_msg, group_participant_directory = create_directory(group_directory, "Participants")
+            #     if error_msg != "":
+            #         return error_msg
+                # ex. EXPERIMENT_DOWNLOAD/Group_group.title/Participants
+                export_directory_group_participant = path.join(export_directory_group, "Participants")
 
-                    header_personal_data = ["Participant_code", "Age", "Gender"]
-                    personal_data_list = []
-                    for participant in participant_list:
-                        # save personal data
-                        data = [participant.code, participant.age, participant.gender]
-                        personal_data_list.append(data)
-                        if participant.id in eeg_participant_list:
-                            participant_name_directory = "Participant_" + participant.code
-                            # ex. Users/.../EXPERIMENT_DOWNLOAD/Group_group.title/Participants/Participant_PXXX
-                            participant_directory = path.join(group_participant_directory, participant_name_directory)
-                            if not path.exists(participant_directory):
-                                error_msg, participant_directory = create_directory(group_participant_directory,
-                                                                                    participant_name_directory)
-                                if error_msg != "":
-                                    return error_msg
-                                # ex. EXPERIMENT_DOWNLOAD/Group_group.title/Participants/Participant_PXXX
-                                export_directory_participant = path.join(export_directory_group_participant,
-                                                                         participant_name_directory)
-
-                            eeg_data_list = EEGData.objects.filter(participant_id=participant.id)
-                            for eeg_data in eeg_data_list:
-                                step_directory_name = "Step_" + str(eeg_data.step.numeration) + "_EEG"
-                                # ex. Users/.../EXPERIMENT_DOWNLOAD/Group_groupXX/Participants/Participant_PXXX/Step_X_EEG
-                                error_msg, step_eeg_directory = create_directory(participant_directory,
-                                                                                 step_directory_name)
-                                if error_msg != "":
-                                    return error_msg
-                                # ex. EXPERIMENT_DOWNLOAD/Group_group.title/Participants/Participant_PXXX
-                                export_directory_step_eeg = path.join(export_directory_participant, step_directory_name)
-
-                                eeg_data_filename = eeg_data.file.file.name.split('/')[-1]
-
-                                complete_eeg_data_filename = path.join(step_eeg_directory, eeg_data_filename)
-                                eeg_raw_data_file = path.join(path.join(settings.BASE_DIR, "media/"),
-                                                              eeg_data.file.file.name)
-
-                                with open(eeg_raw_data_file, 'rb') as f:
-                                    data = f.read()
-
-                                with open(complete_eeg_data_filename, 'wb') as f:
-                                    f.write(data)
-
-                                self.files_to_zip_list.append([complete_eeg_data_filename, export_directory_step_eeg])
-
-                                eeg_setting_description = get_eeg_setting_description(eeg_data.eeg_setting_id)
-
-                                if eeg_setting_description:
-                                    eeg_setting_filename = "%s.json" % "eeg_setting_description"
-
-                                    # ex. User/.../qdc/media/.../NES_EXPORT/Experiment_data/Group_xxxx/
-                                    # eeg_setting_description.json#
-                                    complete_setting_filename = path.join(step_eeg_directory, eeg_setting_filename)
-
-                                    self.files_to_zip_list.append(
-                                        [complete_setting_filename, export_directory_step_eeg])
-
-                                    with open(complete_setting_filename.encode('utf-8'), 'w', newline='',
-                                              encoding='UTF-8') as outfile:
-                                        json.dump(eeg_setting_description, outfile, indent=4)
+            # for participant in participant_list:
+            #     if participant.id in eeg_participant_list:
+            #         participant_name_directory = "Participant_" + participant.code
+            #         # ex. Users/.../EXPERIMENT_DOWNLOAD/Group_group.title/Participants/Participant_PXXX
+            #         participant_directory = path.join(group_participant_directory, participant_name_directory)
+            #         if not path.exists(participant_directory):
+            #             error_msg, participant_directory = create_directory(group_participant_directory,
+            #                                                                 participant_name_directory)
+            #             if error_msg != "":
+            #                 return error_msg
+            #             # ex. EXPERIMENT_DOWNLOAD/Group_group.title/Participants/Participant_PXXX
+            #             export_directory_participant = path.join(export_directory_group_participant,
+            #                                                      participant_name_directory)
+            #
+            #         eeg_data_list = EEGData.objects.filter(participant_id=participant.id)
+            #         for eeg_data in eeg_data_list:
+            #             step_directory_name = "Step_" + str(eeg_data.step.numeration) + "_EEG"
+            #             # ex. Users/.../EXPERIMENT_DOWNLOAD/Group_groupXX/Participants/Participant_PXXX/Step_X_EEG
+            #             error_msg, step_eeg_directory = create_directory(participant_directory,
+            #                                                              step_directory_name)
+            #             if error_msg != "":
+            #                 return error_msg
+            #             # ex. EXPERIMENT_DOWNLOAD/Group_group.title/Participants/Participant_PXXX
+            #             export_directory_step_eeg = path.join(export_directory_participant, step_directory_name)
+            #
+            #             eeg_data_filename = eeg_data.file.file.name.split('/')[-1]
+            #
+            #             complete_eeg_data_filename = path.join(step_eeg_directory, eeg_data_filename)
+            #             eeg_raw_data_file = path.join(path.join(settings.BASE_DIR, "media/"),
+            #                                           eeg_data.file.file.name)
+            #
+            #             with open(eeg_raw_data_file, 'rb') as f:
+            #                 data = f.read()
+            #
+            #             with open(complete_eeg_data_filename, 'wb') as f:
+            #                 f.write(data)
+            #
+            #             self.files_to_zip_list.append([complete_eeg_data_filename, export_directory_step_eeg])
+            #
+            #             eeg_setting_description = get_eeg_setting_description(eeg_data.eeg_setting_id)
+            #
+            #             if eeg_setting_description:
+            #                 eeg_setting_filename = "%s.json" % "eeg_setting_description"
+            #
+            #                 # ex. User/.../qdc/media/.../NES_EXPORT/Experiment_data/Group_xxxx/
+            #                 # eeg_setting_description.json#
+            #                 complete_setting_filename = path.join(step_eeg_directory, eeg_setting_filename)
+            #
+            #                 self.files_to_zip_list.append(
+            #                     [complete_setting_filename, export_directory_step_eeg])
+            #
+            #                 with open(complete_setting_filename.encode('utf-8'), 'w', newline='',
+            #                           encoding='UTF-8') as outfile:
+            #                     json.dump(eeg_setting_description, outfile, indent=4)
 
                 personal_data_list.insert(0, header_personal_data)
                 export_participant_filename = "%s.csv" % "Participants"
@@ -423,6 +424,121 @@ class ExportExecution:
         #                     f.write(data)
         #
         #                 self.files_to_zip_list.append([complete_stimulus_data_filename, export_directory_stimulus_data])
+
+        return error_msg
+
+    def include_data_from_group(self, experiment_id):
+        error_msg = ""
+        experiment = get_object_or_404(Experiment, pk=experiment_id)
+        group_list = Group.objects.filter(experiment=experiment)
+        for group in group_list:
+            group_id = group.id
+            if group.id not in self.per_group_data:
+                self.per_group_data[group_id] = {}
+            self.per_group_data[group_id]['group'] = {
+                'title': group.title,
+                'description': group.description,
+                'directory': '',
+                'export_directory': '',
+                'questionnaire_data_directory': '',
+                'questionnaire_data_export_directory': '',
+                'questionnaire_metadata_directory': '',
+                'questionnaire_metadata_export_directory': '',
+                'participant_data_directory': '',
+                'participant_data_export_directory': '',
+                'eeg_default_setting_id': '',
+                'emg_default_setting_id': '',
+                'tms_default_setting_id': '',
+                'context_tree_default_id': ''
+            }
+            group_name_directory = "Group_" + group.title
+            self.per_group_data[group_id]['group']['directory'] = path.join(self.get_export_directory(),
+                                                                            group_name_directory)
+
+            self.per_group_data[group_id]['data_per_participant'] = {}
+            self.per_group_data[group_id]['questionnaires_per_group'] = {}
+
+            participant_group_list = Participant.objects.filter(group=group)
+            self.per_group_data[group_id]['participant_list'] = []
+            for participant in participant_group_list:
+                self.per_group_data[group_id]['participant_list'].append(participant)
+
+            # participant with data collection
+            eeg_participant_list = EEGData.objects.filter(participant__in=participant_group_list)
+            for eeg_participant in eeg_participant_list:
+                participant_code = eeg_participant.participant.code
+                if participant_code not in self.per_group_data[group_id]['data_per_participant']:
+                    self.per_group_data[group_id]['data_per_participant'][participant_code] = {}
+                if 'eeg_data' not in self.per_group_data[group_id]['data_per_participant'][participant_code]:
+                    self.per_group_data[group_id]['data_per_participant'][participant_code]['eeg_data'] = []
+                self.per_group_data[group_id]['data_per_participant'][participant_code]['eeg_data'].append({
+                    'step_identification': eeg_participant.step.identification,
+                    'setting_id': eeg_participant.eeg_setting_id,
+                    'data_id': eeg_participant.id,
+                    'directory_step_name': "Step_" + str(eeg_participant.step_id) + "_EEG",
+                })
+
+            emg_participant_list = EMGData.objects.filter(participant__in=participant_group_list)
+            for emg_participant in emg_participant_list:
+                participant_code = emg_participant.participant.code
+                if participant_code not in self.per_group_data[group_id]['data_per_participant']:
+                    self.per_group_data[group_id]['data_per_participant'][participant_code] = {}
+                if 'emg_data' not in self.per_group_data[group_id]['data_per_participant'][participant_code]:
+                    self.per_group_data[group_id]['data_per_participant'][participant_code]['emg_data'] = []
+                self.per_group_data[group_id]['data_per_participant'][participant_code]['emg_data'].append({
+                    'step_identification': emg_participant.step.identification,
+                    'setting_id': emg_participant.emg_setting_id,
+                    'data_id': emg_participant.id,
+                    'directory_step_name': "Step_" + str(emg_participant.step_id) + "_EMG",
+                })
+
+            tms_participant_list = TMSData.objects.filter(participant__in=participant_group_list)
+            for tms_participant in tms_participant_list:
+                participant_code = tms_participant.participant.code
+                if participant_code not in self.per_group_data[group_id]['data_per_participant']:
+                    self.per_group_data[group_id]['data_per_participant'][participant_code] = {}
+                if 'tms_data' not in self.per_group_data[group_id]['data_per_participant'][participant_code]:
+                    self.per_group_data[group_id]['data_per_participant'][participant_code]['tms_data'] = []
+                self.per_group_data[group_id]['data_per_participant'][participant_code]['tms_data'].append({
+                    'step_identification': tms_participant.step.identification,
+                    'setting_id': tms_participant.tms_setting_id,
+                    'data_id': tms_participant.id,
+                    'directory_step_name': "Step_" + str(tms_participant.step_id) + "_TMS",
+                })
+
+            additional_data_list = AdditionalData.objects.filter(participant__in=participant_group_list)
+            for additional_data in additional_data_list:
+                participant_code = additional_data.participant.code
+                if participant_code not in self.per_group_data[group_id]['data_per_participant']:
+                    self.per_group_data[group_id]['data_per_participant'][participant_code] = {}
+                if 'additional_data' not in self.per_group_data[group_id]['data_per_participant'][participant_code]:
+                    self.per_group_data[group_id]['data_per_participant'][participant_code]['additional_data'] = []
+                self.per_group_data[group_id]['data_per_participant'][participant_code]['additional_data'].append({
+                    'step_identification': additional_data.step.identification,
+                    'setting_id': '',
+                    'data_id': additional_data.id,
+                    'directory_step_name': "Step_" + str(additional_data.step_id) + "_ADDITIONAL_DATA",
+                    # Qual componente ?
+                })
+
+        return error_msg
+
+    def download_data_per_participant(self):
+        error_msg = ""
+        for group_id in self.per_group_data:
+            if 'data_per_participant' in self.per_group_data[group_id]:
+                # # ex. Users/.../EXPERIMENT_DOWNLOAD/Group_group.title/Participants
+                # error_msg, group_participant_directory = create_directory(group_directory, "Participants")
+                # if error_msg != "":
+                #     return error_msg
+                # # ex. EXPERIMENT_DOWNLOAD/Group_group.title/Participants
+                # export_directory_group_participant = path.join(export_directory_group, "Participants")
+                for participant_code in self.per_group_data[group_id]['data_per_participant']:
+                    if 'eeg_data' in self.per_group_data[group_id]['data_per_participant'][participant_code]:
+                        eeg_data_list = self.per_group_data[group_id]['data_per_participant'][participant_code][
+                            'eeg_data']
+                        for eeg_data in eeg_data_list:
+                            eeg_data = get_object_or_404(EEGData, pk=eeg_data['data_id'])
 
         return error_msg
 
