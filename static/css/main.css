@@ -169,14 +169,14 @@ a:hover.nep-btn {
 }
 
 .detail-header-hr {
-  margin-bottom: 2px;
+  margin-bottom: 4px;
 }
 
 .detail-study {
   float: left;
 }
 
-.detail-acquisition {
+.align-right {
   float: right;
 }
 
