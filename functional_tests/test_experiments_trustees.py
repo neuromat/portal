@@ -387,15 +387,16 @@ class TrusteeTest(FunctionalTestTrustee):
                       modal_body)
 
     def test_can_view_ethics_committee_info(self):
+        # Last experiment approved has ethics committee info (tests helper)
         experiment = Experiment.objects.filter(
             status=Experiment.APPROVED
         ).last()
 
-        # The trustee click in sixth experiment of the list
-        # Obs.: this experiment has ethics commitee info data that we will
-        # test as from tests helper
-        list_links = self.browser.find_elements_by_link_text('View')
-        list_links[5].click()
+        # The trustee click in the experiment of the list that has ethics
+        # commitee info data
+        self.browser.find_element_by_link_text('View').find_element_by_xpath(
+            "//a[@href='/experiments/" + str(experiment.id) + "/']"
+        ).click()
         time.sleep(1)
 
         # Bellow experiment description there's a link to ethics committee
