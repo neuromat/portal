@@ -113,12 +113,12 @@ def export_create(request, export_id, input_filename, experiment_id, template_na
             # return render(request, template_name)
             return HttpResponse("Fail when create export directory ")
 
+        # load information of the data collection per participant in a dictionnary
+        error_msg = export.include_data_from_group(experiment_id)
         if error_msg != "":
             messages.error(request, error_msg)
             # return render(request, template_name)
             return HttpResponse("Fail in process_experiment_data ")
-        # load information of the data collection per participant in a dictionnary
-        error_msg = export.include_data_from_group(experiment_id)
 
         # Create arquivos para exportação
         # create files protocolo experimental and diagnosis/participant csv file for each group
