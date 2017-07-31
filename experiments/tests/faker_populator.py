@@ -52,7 +52,8 @@ for i in range(1, 4):
         nes_id=i,
         owner=owner1, version=1,
         sent_date=datetime.utcnow(),
-        status=Experiment.TO_BE_ANALYSED
+        status=Experiment.TO_BE_ANALYSED,
+        data_acquisition_done=choice([True, False])
     )
     Study.objects.create(
         title=fake.word().title(),

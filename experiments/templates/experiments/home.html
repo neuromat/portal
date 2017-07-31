@@ -90,7 +90,7 @@
                 if (statuses.hasOwnProperty(key)) {
                     let checked = experiment.status === key ? 'checked' : '';
                     html += `
-                    <input type="radio" name="status" value=${key} ${checked}>${statuses[key]} <br>
+                    <input type="radio" name="status" value=${key} ${checked}>&nbsp;&nbsp;${statuses[key]} <br>
                 `;
                 }
             }

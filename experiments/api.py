@@ -8,7 +8,8 @@ from experiments.models import Experiment, Study, User, ProtocolComponent, \
     Keyword, ClassificationOfDiseases, \
     EEGSetting, EMGSetting, TMSSetting, ContextTree, Step, File, \
     EEGData, EMGData, TMSData, GoalkeeperGameData, QuestionnaireResponse, \
-    AdditionalData, GenericDataCollectionData
+    AdditionalData, GenericDataCollectionData, EEG, EMG, TMS, Instruction, Pause, Task, TaskForTheExperimenter, \
+    GenericDataCollection, Stimulus, GoalkeeperGame, SetOfStep, Questionnaire
 
 
 ###################
@@ -39,6 +40,8 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class KeywordSerializer(serializers.Serializer):
+    name = serializers.CharField(max_length=50)
+
     class Meta:
         model = Keyword
         fields = ('name',)
@@ -68,7 +71,8 @@ class StudySerializer(serializers.ModelSerializer):
         if 'keywords' in self.initial_data:
             keywords_data = self.initial_data['keywords']
             for keyword_data in keywords_data:
-                keyword, created = Keyword.objects.get_or_create(name=keyword_data['name'])
+                keyword, created = \
+                    Keyword.objects.get_or_create(name=keyword_data['name'])
                 study.keywords.add(keyword)
         return study
 
@@ -186,6 +190,183 @@ class StepSerializer(serializers.ModelSerializer):
                   'interval_between_repetitions_value',
                   'interval_between_repetitions_unit',
                   'random_position')
+
+
+class EEGStepSerializer(serializers.ModelSerializer):
+    group = serializers.ReadOnlyField(source='group.title')
+
+    class Meta:
+        model = EEG
+        fields = ('id', 'group', 'identification', 'description',
+                  'duration_value', 'duration_unit', 'numeration',
+                  'type', 'parent', 'order',
+                  'number_of_repetitions',
+                  'interval_between_repetitions_value',
+                  'interval_between_repetitions_unit',
+                  'random_position',
+                  'eeg_setting')
+
+
+class EMGStepSerializer(serializers.ModelSerializer):
+    group = serializers.ReadOnlyField(source='group.title')
+
+    class Meta:
+        model = EMG
+        fields = ('id', 'group', 'identification', 'description',
+                  'duration_value', 'duration_unit', 'numeration',
+                  'type', 'parent', 'order',
+                  'number_of_repetitions',
+                  'interval_between_repetitions_value',
+                  'interval_between_repetitions_unit',
+                  'random_position',
+                  'emg_setting')
+
+
+class TMSStepSerializer(serializers.ModelSerializer):
+    group = serializers.ReadOnlyField(source='group.title')
+
+    class Meta:
+        model = TMS
+        fields = ('id', 'group', 'identification', 'description',
+                  'duration_value', 'duration_unit', 'numeration',
+                  'type', 'parent', 'order',
+                  'number_of_repetitions',
+                  'interval_between_repetitions_value',
+                  'interval_between_repetitions_unit',
+                  'random_position',
+                  'tms_setting')
+
+
+class InstructionStepSerializer(serializers.ModelSerializer):
+    group = serializers.ReadOnlyField(source='group.title')
+
+    class Meta:
+        model = Instruction
+        fields = ('id', 'group', 'identification', 'description',
+                  'duration_value', 'duration_unit', 'numeration',
+                  'type', 'parent', 'order',
+                  'number_of_repetitions',
+                  'interval_between_repetitions_value',
+                  'interval_between_repetitions_unit',
+                  'random_position',
+                  'text')
+
+
+class PauseStepSerializer(serializers.ModelSerializer):
+    group = serializers.ReadOnlyField(source='group.title')
+
+    class Meta:
+        model = Pause
+        fields = ('id', 'group', 'identification', 'description',
+                  'duration_value', 'duration_unit', 'numeration',
+                  'type', 'parent', 'order',
+                  'number_of_repetitions',
+                  'interval_between_repetitions_value',
+                  'interval_between_repetitions_unit',
+                  'random_position')
+
+
+class TaskStepSerializer(serializers.ModelSerializer):
+    group = serializers.ReadOnlyField(source='group.title')
+
+    class Meta:
+        model = Task
+        fields = ('id', 'group', 'identification', 'description',
+                  'duration_value', 'duration_unit', 'numeration',
+                  'type', 'parent', 'order',
+                  'number_of_repetitions',
+                  'interval_between_repetitions_value',
+                  'interval_between_repetitions_unit',
+                  'random_position')
+
+
+class TaskForExperimenterStepSerializer(serializers.ModelSerializer):
+    group = serializers.ReadOnlyField(source='group.title')
+
+    class Meta:
+        model = TaskForTheExperimenter
+        fields = ('id', 'group', 'identification', 'description',
+                  'duration_value', 'duration_unit', 'numeration',
+                  'type', 'parent', 'order',
+                  'number_of_repetitions',
+                  'interval_between_repetitions_value',
+                  'interval_between_repetitions_unit',
+                  'random_position')
+
+
+class GenericDataCollectionStepSerializer(serializers.ModelSerializer):
+    group = serializers.ReadOnlyField(source='group.title')
+
+    class Meta:
+        model = GenericDataCollection
+        fields = ('id', 'group', 'identification', 'description',
+                  'duration_value', 'duration_unit', 'numeration',
+                  'type', 'parent', 'order',
+                  'number_of_repetitions',
+                  'interval_between_repetitions_value',
+                  'interval_between_repetitions_unit',
+                  'random_position',
+                  'information_type_name', 'information_type_description')
+
+
+class StimulusStepSerializer(serializers.ModelSerializer):
+    group = serializers.ReadOnlyField(source='group.title')
+
+    class Meta:
+        model = Stimulus
+        fields = ('id', 'group', 'identification', 'description',
+                  'duration_value', 'duration_unit', 'numeration',
+                  'type', 'parent', 'order',
+                  'number_of_repetitions',
+                  'interval_between_repetitions_value',
+                  'interval_between_repetitions_unit',
+                  'random_position',
+                  'stimulus_type_name', 'media_file')
+
+
+class GoalkeeperGameStepSerializer(serializers.ModelSerializer):
+    group = serializers.ReadOnlyField(source='group.title')
+
+    class Meta:
+        model = GoalkeeperGame
+        fields = ('id', 'group', 'identification', 'description',
+                  'duration_value', 'duration_unit', 'numeration',
+                  'type', 'parent', 'order',
+                  'number_of_repetitions',
+                  'interval_between_repetitions_value',
+                  'interval_between_repetitions_unit',
+                  'random_position',
+                  'software_name', 'software_description', 'software_version', 'context_tree')
+
+
+class SetOfStepSerializer(serializers.ModelSerializer):
+    group = serializers.ReadOnlyField(source='group.title')
+
+    class Meta:
+        model = SetOfStep
+        fields = ('id', 'group', 'identification', 'description',
+                  'duration_value', 'duration_unit', 'numeration',
+                  'type', 'parent', 'order',
+                  'number_of_repetitions',
+                  'interval_between_repetitions_value',
+                  'interval_between_repetitions_unit',
+                  'random_position',
+                  'number_of_mandatory_steps', 'is_sequential')
+
+
+class QuestionnaireStepSerializer(serializers.ModelSerializer):
+    group = serializers.ReadOnlyField(source='group.title')
+
+    class Meta:
+        model = Questionnaire
+        fields = ('id', 'group', 'identification', 'description',
+                  'duration_value', 'duration_unit', 'numeration',
+                  'type', 'parent', 'order',
+                  'number_of_repetitions',
+                  'interval_between_repetitions_value',
+                  'interval_between_repetitions_unit',
+                  'random_position',
+                  'survey_name', 'survey_metadata')
 
 
 class FileSerializer(serializers.ModelSerializer):
@@ -556,6 +737,150 @@ class StepViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         return Step.objects.filter(group_id=self.kwargs['pk'])
+
+    def perform_create(self, serializer):
+        group = Group.objects.get(pk=self.kwargs['pk'])
+        serializer.save(group=group)
+
+
+class EEGStepViewSet(viewsets.ModelViewSet):
+    serializer_class = EEGStepSerializer
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
+
+    def get_queryset(self):
+        return EEG.objects.filter(group_id=self.kwargs['pk'])
+
+    def perform_create(self, serializer):
+        group = Group.objects.get(pk=self.kwargs['pk'])
+        serializer.save(group=group)
+
+
+class EMGStepViewSet(viewsets.ModelViewSet):
+    serializer_class = EMGStepSerializer
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
+
+    def get_queryset(self):
+        return EMG.objects.filter(group_id=self.kwargs['pk'])
+
+    def perform_create(self, serializer):
+        group = Group.objects.get(pk=self.kwargs['pk'])
+        serializer.save(group=group)
+
+
+class TMSStepViewSet(viewsets.ModelViewSet):
+    serializer_class = TMSStepSerializer
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
+
+    def get_queryset(self):
+        return TMS.objects.filter(group_id=self.kwargs['pk'])
+
+    def perform_create(self, serializer):
+        group = Group.objects.get(pk=self.kwargs['pk'])
+        serializer.save(group=group)
+
+
+class InstructionStepViewSet(viewsets.ModelViewSet):
+    serializer_class = InstructionStepSerializer
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
+
+    def get_queryset(self):
+        return Instruction.objects.filter(group_id=self.kwargs['pk'])
+
+    def perform_create(self, serializer):
+        group = Group.objects.get(pk=self.kwargs['pk'])
+        serializer.save(group=group)
+
+
+class PauseStepViewSet(viewsets.ModelViewSet):
+    serializer_class = PauseStepSerializer
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
+
+    def get_queryset(self):
+        return Pause.objects.filter(group_id=self.kwargs['pk'])
+
+    def perform_create(self, serializer):
+        group = Group.objects.get(pk=self.kwargs['pk'])
+        serializer.save(group=group)
+
+
+class TaskStepViewSet(viewsets.ModelViewSet):
+    serializer_class = TaskStepSerializer
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
+
+    def get_queryset(self):
+        return Task.objects.filter(group_id=self.kwargs['pk'])
+
+    def perform_create(self, serializer):
+        group = Group.objects.get(pk=self.kwargs['pk'])
+        serializer.save(group=group)
+
+
+class TaskForExperimenterStepViewSet(viewsets.ModelViewSet):
+    serializer_class = TaskForExperimenterStepSerializer
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
+
+    def get_queryset(self):
+        return TaskForTheExperimenter.objects.filter(group_id=self.kwargs['pk'])
+
+    def perform_create(self, serializer):
+        group = Group.objects.get(pk=self.kwargs['pk'])
+        serializer.save(group=group)
+
+
+class GenericDataCollectionStepViewSet(viewsets.ModelViewSet):
+    serializer_class = GenericDataCollectionStepSerializer
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
+
+    def get_queryset(self):
+        return GenericDataCollection.objects.filter(group_id=self.kwargs['pk'])
+
+    def perform_create(self, serializer):
+        group = Group.objects.get(pk=self.kwargs['pk'])
+        serializer.save(group=group)
+
+
+class StimulusStepViewSet(viewsets.ModelViewSet):
+    serializer_class = StimulusStepSerializer
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
+
+    def get_queryset(self):
+        return Stimulus.objects.filter(group_id=self.kwargs['pk'])
+
+    def perform_create(self, serializer):
+        group = Group.objects.get(pk=self.kwargs['pk'])
+        serializer.save(group=group)
+
+
+class GoalkeeperGameStepViewSet(viewsets.ModelViewSet):
+    serializer_class = GoalkeeperGameStepSerializer
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
+
+    def get_queryset(self):
+        return GoalkeeperGame.objects.filter(group_id=self.kwargs['pk'])
+
+    def perform_create(self, serializer):
+        group = Group.objects.get(pk=self.kwargs['pk'])
+        serializer.save(group=group)
+
+
+class SetOfStepViewSet(viewsets.ModelViewSet):
+    serializer_class = SetOfStepSerializer
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
+
+    def get_queryset(self):
+        return SetOfStep.objects.filter(group_id=self.kwargs['pk'])
+
+    def perform_create(self, serializer):
+        group = Group.objects.get(pk=self.kwargs['pk'])
+        serializer.save(group=group)
+
+
+class QuestionnaireStepViewSet(viewsets.ModelViewSet):
+    serializer_class = QuestionnaireStepSerializer
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
+
+    def get_queryset(self):
+        return Questionnaire.objects.filter(group_id=self.kwargs['pk'])
 
     def perform_create(self, serializer):
         group = Group.objects.get(pk=self.kwargs['pk'])

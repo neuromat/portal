@@ -188,6 +188,52 @@ class EEG(Step):
     eeg_setting = models.ForeignKey(EEGSetting)
 
 
+class EMG(Step):
+    emg_setting = models.ForeignKey(EMGSetting)
+
+
+class TMS(Step):
+    tms_setting = models.ForeignKey(TMSSetting)
+
+
+class Questionnaire(Step):
+    survey_name = models.CharField(max_length=255)
+    survey_metadata = models.TextField(null=True, blank=True)
+
+
+class Instruction(Step):
+    text = models.TextField(null=False, blank=False)
+
+
+class Stimulus(Step):
+    stimulus_type_name = models.CharField(null=False, blank=False, max_length=30)
+    media_file = models.FileField(null=True, blank=True, upload_to='uploads/%Y/%m/%d/')
+
+
+class GoalkeeperGame(Step):
+    software_name = models.CharField(max_length=150)
+    software_description = models.TextField(null=True, blank=True)
+    software_version = models.CharField(max_length=150)
+    context_tree = models.ForeignKey(ContextTree)
+
+
+class GenericDataCollection(Step):
+    information_type_name = models.CharField(max_length=150)
+    information_type_description = models.TextField(null=True, blank=True)
+
+
+class Pause(Step):
+    pass
+
+
+class Task(Step):
+    pass
+
+
+class TaskForTheExperimenter(Step):
+    pass
+
+
 class SetOfStep(Step):
     number_of_mandatory_steps = models.IntegerField(null=True, blank=True)
     is_sequential = models.BooleanField(default=False)

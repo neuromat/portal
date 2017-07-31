@@ -236,8 +236,16 @@ class StudyAPITest(APITestCase):
         global_setup_ut()
 
     def test_get_returns_all_studies_short_url(self):
-        study1 = Study.objects.first()
-        study2 = Study.objects.last()
+        owner1 = User.objects.get(username='lab1')
+        owner2 = User.objects.get(username='lab2')
+
+        experiment1 = Experiment.objects.get(nes_id=1, owner=owner1)
+        experiment2 = Experiment.objects.get(nes_id=1, owner=owner2)
+        experiment3 = Experiment.objects.get(nes_id=2, owner=owner2)
+
+        study1 = Study.objects.get(experiment=experiment1)
+        study2 = Study.objects.get(experiment=experiment2)
+        study3 = Study.objects.get(experiment=experiment3)
         list_url = reverse('api_studies-list')
         response = self.client.get(list_url)
         self.assertEqual(
@@ -249,8 +257,8 @@ class StudyAPITest(APITestCase):
                     'description': study1.description,
                     'start_date': study1.start_date.strftime('%Y-%m-%d'),
                     'end_date': study1.end_date,
-                    'experiment': 'Experiment 1',
-                    'keywords': list(study1.keywords.all())
+                    'experiment': study1.experiment.title,
+                    'keywords': list(study1.keywords.values('name'))
                 },
                 {
                     'id': study2.id,
@@ -258,19 +266,34 @@ class StudyAPITest(APITestCase):
                     'description': study2.description,
                     'start_date': study2.start_date.strftime('%Y-%m-%d'),
                     'end_date': study2.end_date,
-                    'experiment': 'Experiment 2',
-                    'keywords': list(study1.keywords.all())
+                    'experiment': study2.experiment.title,
+                    'keywords': list(study2.keywords.values('name'))
                 },
+                {
+                    'id': study3.id,
+                    'title': study3.title,
+                    'description': study3.description,
+                    'start_date': study3.start_date.strftime('%Y-%m-%d'),
+                    'end_date': study3.end_date,
+                    'experiment': study3.experiment.title,
+                    'keywords': list(study3.keywords.values('name'))
+                }
             ]
         )
 
     def test_get_returns_all_studies_long_url_not_logged(self):
-        owner = User.objects.get(username='lab2')
-        experiment = Experiment.objects.get(nes_id=1, owner=owner)
-        study1 = Study.objects.first()
-        study2 = Study.objects.last()
+        owner1 = User.objects.get(username='lab1')
+        owner2 = User.objects.get(username='lab2')
+
+        experiment1 = Experiment.objects.get(nes_id=1, owner=owner1)
+        experiment2 = Experiment.objects.get(nes_id=1, owner=owner2)
+        experiment3 = Experiment.objects.get(nes_id=2, owner=owner2)
+
+        study1 = Study.objects.get(experiment=experiment1)
+        study2 = Study.objects.get(experiment=experiment2)
+        study3 = Study.objects.get(experiment=experiment3)
         list_url = reverse('api_experiment_studies-list',
-                           kwargs={'experiment_nes_id': experiment.nes_id})
+                           kwargs={'experiment_nes_id': experiment1.nes_id})
         response = self.client.get(list_url)
         self.assertEqual(
             json.loads(response.content.decode('utf8')),
@@ -281,8 +304,8 @@ class StudyAPITest(APITestCase):
                     'description': study1.description,
                     'start_date': study1.start_date.strftime('%Y-%m-%d'),
                     'end_date': study1.end_date,
-                    'experiment': 'Experiment 1',
-                    'keywords': list(study1.keywords.all())
+                    'experiment': study1.experiment.title,
+                    'keywords': list(study1.keywords.values('name'))
                 },
                 {
                     'id': study2.id,
@@ -290,9 +313,18 @@ class StudyAPITest(APITestCase):
                     'description': study2.description,
                     'start_date': study2.start_date.strftime('%Y-%m-%d'),
                     'end_date': study2.end_date,
-                    'experiment': 'Experiment 2',
-                    'keywords': list(study2.keywords.all())
+                    'experiment': study2.experiment.title,
+                    'keywords': list(study2.keywords.values('name'))
                 },
+                {
+                    'id': study3.id,
+                    'title': study3.title,
+                    'description': study3.description,
+                    'start_date': study3.start_date.strftime('%Y-%m-%d'),
+                    'end_date': study3.end_date,
+                    'experiment': study3.experiment.title,
+                    'keywords': list(study3.keywords.values('name'))
+                }
             ]
         )
 
@@ -314,7 +346,7 @@ class StudyAPITest(APITestCase):
                     'start_date': study.start_date.strftime('%Y-%m-%d'),
                     'end_date': study.end_date,
                     'experiment': 'Experiment 2',
-                    'keywords': list(study.keywords.all())
+                    'keywords': list(study.keywords.values('name'))
                 },
             ]
         )
