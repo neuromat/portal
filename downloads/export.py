@@ -5,7 +5,7 @@ from django.conf import settings
 from django.shortcuts import get_object_or_404
 
 from experiments.models import Experiment, Group, Participant, EEGData, EMGData, EEGSetting, EMGSetting, TMSData, \
-    TMSSetting, AdditionalData, ContextTree, GenericDataCollectionData
+    TMSSetting, AdditionalData, ContextTree, GenericDataCollectionData, GoalkeeperGameData, Stimulus, Step
 
 DEFAULT_LANGUAGE = "pt-BR"
 
@@ -494,6 +494,28 @@ class ExportExecution:
                     'directory_step': path.join(participant_code_directory, directory_step_name),
                     'export_directory_step': path.join(export_participant_code_directory, directory_step_name),
                 })
+
+                goalkeeper_data_list = GoalkeeperGameData.objects.filter(participant__in=participant_group_list)
+                for goalkeeper_data in goalkeeper_data_list:
+                    participant_code = goalkeeper_data.participant.code
+                    directory_step_name = "Step_" + str(goalkeeper_data.step.numeration) + "_" + \
+                                          goalkeeper_data.step.type.upper()
+                    participant_code_directory = path.join(participant_directory, participant_code)
+                    export_participant_code_directory = path.join(export_participant_directory, participant_code)
+                    if participant_code not in self.per_group_data[group_id]['data_per_participant']:
+                        self.per_group_data[group_id]['data_per_participant'][participant_code] = {}
+                    if 'generic_data' not in self.per_group_data[group_id]['data_per_participant'][participant_code]:
+                        self.per_group_data[group_id]['data_per_participant'][participant_code]['goalkeeper_data'] = []
+                    self.per_group_data[group_id]['data_per_participant'][participant_code]['goalkeeper_data'].append({
+                        'step_identification': goalkeeper_data.step.identification,
+                        'setting_id': '',
+                        'data_id': goalkeeper_data.id,
+                        'directory_step_name': directory_step_name,
+                        'directory_step': path.join(participant_code_directory, directory_step_name),
+                        'export_directory_step': path.join(export_participant_code_directory, directory_step_name),
+                    })
+
+                # stimulus_data_list = Step.objects.filter(type='stimulus')
 
         return error_msg
 

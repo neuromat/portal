@@ -1,3 +1,4 @@
+
 <header class="container detail-header">
     <h2>Open Database for Experiments in Neuroscience</h2>
     <h4 id="id_detail_title" class="detail-title">{{ experiment.title }}</h4>
@@ -34,6 +35,19 @@
             {% endif %}
         </aside>
     {% endif %}
+    {% block content %}
+        <section class="container nep-content">
+            <div class="progress">
+                <div class="progress-bar progress-bar-warning progress-bar-striped" role="progressbar"
+                    aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width:60%">
+                    60% Complete
+                </div>
+            </div>
+            {% if messages %}
+                {% include 'experiments/messages.html' %}
+            {% endif %}
+        </section>
+    {% endblock %}
     <hr class="detail-header-hr">
     <div id="id_detail_study" class="detail-study">Related study: <a
             href="#" data-toggle="modal" data-target="#study_modal">{{ experiment.study.title }}</a></div>
