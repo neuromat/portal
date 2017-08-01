@@ -7,7 +7,8 @@ import time
 
 class SearchTest(FunctionalTest):
 
-    def rebuild_index(self):
+    @staticmethod
+    def rebuild_index():
         call_command('rebuild_index', verbosity=0, interactive=False)
 
     def test_two_words_searched_return_correct_objects(self):
@@ -24,23 +25,35 @@ class SearchTest(FunctionalTest):
         search_box.send_keys(Keys.ENTER)
         time.sleep(1)
         # The search engine searches in all the site content.
-        # As there are "Braquial Plexus", "braquial plexus", "Braquial",
-        # "braquial", "Plexus", and "plexus" in experiments data per se,
+        # As there are "Braquial Plexus", "braquial plexus" in experiments
+        # data per se, and the two words are also found separated,
+        # like 'brachial ... plexus' and 'plexus ... brachial', for intance, in
         # studies, groups, and study keywords, she sees in Search results
         # one list for each of them.
+        # One experiment has 'Brachial Plexus' in title, other has 'Brachial
+        # plexus' in description
         search_header_title = self.browser.find_element_by_tag_name('h3').text
         self.assertEqual(search_header_title, 'Search Results')
 
         table = self.browser.find_element_by_id('search_experiments_table')
         rows = table.find_element_by_tag_name(
             'tbody').find_elements_by_tag_name('tr')
-        self.assertTrue(
-            any(row.find_elements_by_tag_name('td')[0].text ==
-                'Brachial Plexus' for row in rows)
+        self.assertTrue(any('Brachial Plexus' in row.text for row in rows))
+        self.assertTrue(any('Brachial plexus' in row.text for row in rows))
+        # There's an experiment whose study has the word 'brachial' in study
+        # description. When there are matches in other models data besides
+        # experiment, a section below the experiment itself is displayed
+        # with that models' matches.
+        matches_other_models_text = \
+            self.browser.find_element_by_class_name(
+                'matches-not-experiment'
+            ).text
+        self.assertIn(
+            'Study:', matches_other_models_text
         )
-        self.assertTrue('Brachial plexus' in any(
-            row.find_elements_by_tag_name('td')[1].text) for row in rows
-                        )
+        self.assertIn(
+            'brachial', matches_other_models_text
+        )
 
         # As she clicks in all of the itens of that lists, she is redirected
         # the corresponding experiment detail view directly at the point

@@ -60,6 +60,14 @@ for i in range(1, 4):
         description=fake.text(),
         start_date=datetime.utcnow(), experiment=experiment_owner1
     )
+    # To test search
+    if i == 1:
+        study = Study.objects.last()
+        study.description = 'The brachial artery is the major blood vessel ' \
+                            'of  the (upper) arm. It\'s correlated with ' \
+                            'plexus.'
+        study.save()
+
     create_ethics_committee_info(experiment_owner1)
     create_experiment_groups(randint(1, 3), experiment_owner1)
 
@@ -72,6 +80,7 @@ for i in range(4, 6):
         sent_date=datetime.utcnow(),
         status=Experiment.TO_BE_ANALYSED
     )
+    # To test search
     if i == 4:
         experiment_owner2.title = 'Brachial Plexus'
         experiment_owner2.save()

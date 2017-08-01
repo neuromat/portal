@@ -20,7 +20,6 @@
                     <th>Description</th>
                     <th>Participants</th>
                     <th>Version</th>
-                    <th>Experiment</th>
                     <th></th>
                 </tr>
                 </thead>
@@ -37,7 +36,6 @@
                                 {{ result.object.groups.count }} groups </td>
                             <td>{{ result.object.version }}</td>
                             <td><a href="{% url 'experiment-detail' result.object.id %}">View</a></td>
-                            <td></td>
                         </tr>
                     {% endif %}
                     {% if result.model_name == 'study' %}
@@ -48,7 +46,21 @@
                                 {{ result.object.experiment.total_participants }} in {{ result.object.experiment.groups.count }} groups </td>
                             <td>{{ result.object.experiment.version }}</td>
                             <td><a href="{% url 'experiment-detail' result.object.experiment.id %}">View</a></td>
-                            <td></td>
+                        </tr>
+                        <tr class="matches-not-experiment">
+                        <td colspan="5">
+                            <strong>Study:</strong>
+                            <p>
+                                <strong>title: </strong>
+                                {% highlight result.object.title with query %}&nbsp;
+                                <strong>description: </strong>
+                                {% highlight result.object.description with query %}&nbsp;
+                                <strong>start date: </strong>
+                                {% highlight result.object.start_date with query %}&nbsp;
+                                <strong>end date: </strong>
+                                {% highlight result.object.end_date with query %}<br>
+                            </p>
+                        </td>
                         </tr>
                     {% endif %}
                 {% empty %}

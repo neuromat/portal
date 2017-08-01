@@ -233,6 +233,15 @@ def global_setup_ft():
     experiment.save()
     create_experiment(1, choice([owner1, owner2]),
                       Experiment.APPROVED)
+    # We change first experiment study approved to contain 'brachial' in
+    # study description, so it have to be found by search test
+    study = Study.objects.filter(
+        experiment__status=Experiment.APPROVED
+    ).first()
+    study.description = 'The brachial artery is the major blood vessel of ' \
+                        'the (upper) arm. It\'s correlated with plexus.'
+    study.save()
+    # We change experiment description to test search
     experiment = Experiment.objects.last()
     experiment.description = 'Brachial plexus repair by peripheral nerve ' \
                              'grafts directly into the spinal cord in rats ' \
