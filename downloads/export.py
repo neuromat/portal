@@ -5,7 +5,7 @@ from django.conf import settings
 from django.shortcuts import get_object_or_404
 
 from experiments.models import Experiment, Group, Participant, EEGData, EMGData, EEGSetting, EMGSetting, TMSData, \
-    TMSSetting, AdditionalData, ContextTree
+    TMSSetting, AdditionalData, ContextTree, GenericDataCollectionData
 
 DEFAULT_LANGUAGE = "pt-BR"
 
@@ -391,11 +391,17 @@ class ExportExecution:
             self.per_group_data[group_id]['participant_list'] = []
             for participant in participant_group_list:
                 self.per_group_data[group_id]['participant_list'].append(participant)
-
+            participant_directory = path.join(self.per_group_data[group_id]['group']['directory'], "Participants")
+            export_participant_directory = path.join(self.per_group_data[group_id]['group']['export_directory'],
+                                                     "Participants")
             # participant with data collection
             eeg_participant_list = EEGData.objects.filter(participant__in=participant_group_list)
             for eeg_participant in eeg_participant_list:
                 participant_code = eeg_participant.participant.code
+                directory_step_name = "Step_" + str(eeg_participant.step.numeration) + "_" + \
+                                      eeg_participant.step.type.upper()
+                participant_code_directory = path.join(participant_directory, participant_code)
+                export_participant_code_directory = path.join(export_participant_directory, participant_code)
                 if participant_code not in self.per_group_data[group_id]['data_per_participant']:
                     self.per_group_data[group_id]['data_per_participant'][participant_code] = {}
                 if 'eeg_data' not in self.per_group_data[group_id]['data_per_participant'][participant_code]:
@@ -404,13 +410,18 @@ class ExportExecution:
                     'step_identification': eeg_participant.step.identification,
                     'setting_id': eeg_participant.eeg_setting_id,
                     'data_id': eeg_participant.id,
-                    'directory_step_name': "Step_" + str(eeg_participant.step_id) + "_" +
-                                           eeg_participant.step.type.upper(),
+                    'directory_step_name': directory_step_name,
+                    'directory_step': path.join(participant_code_directory, directory_step_name),
+                    'export_directory_step': path.join(export_participant_code_directory, directory_step_name),
                 })
 
             emg_participant_list = EMGData.objects.filter(participant__in=participant_group_list)
             for emg_participant in emg_participant_list:
                 participant_code = emg_participant.participant.code
+                directory_step_name = "Step_" + str(emg_participant.step.numeration) + "_" + \
+                                      emg_participant.step.type.upper()
+                participant_code_directory = path.join(participant_directory, participant_code)
+                export_participant_code_directory = path.join(export_participant_directory, participant_code)
                 if participant_code not in self.per_group_data[group_id]['data_per_participant']:
                     self.per_group_data[group_id]['data_per_participant'][participant_code] = {}
                 if 'emg_data' not in self.per_group_data[group_id]['data_per_participant'][participant_code]:
@@ -419,13 +430,18 @@ class ExportExecution:
                     'step_identification': emg_participant.step.identification,
                     'setting_id': emg_participant.emg_setting_id,
                     'data_id': emg_participant.id,
-                    'directory_step_name': "Step_" + str(emg_participant.step_id) + "_" +
-                                           emg_participant.step.type.upper(),
+                    'directory_step_name': directory_step_name,
+                    'directory_step': path.join(participant_code_directory, directory_step_name),
+                    'export_directory_step': path.join(export_participant_code_directory, directory_step_name),
                 })
 
             tms_participant_list = TMSData.objects.filter(participant__in=participant_group_list)
             for tms_participant in tms_participant_list:
                 participant_code = tms_participant.participant.code
+                directory_step_name = "Step_" + str(tms_participant.step.numeration) + "_" + \
+                                      tms_participant.step.type.upper()
+                participant_code_directory = path.join(participant_directory, participant_code)
+                export_participant_code_directory = path.join(export_participant_directory, participant_code)
                 if participant_code not in self.per_group_data[group_id]['data_per_participant']:
                     self.per_group_data[group_id]['data_per_participant'][participant_code] = {}
                 if 'tms_data' not in self.per_group_data[group_id]['data_per_participant'][participant_code]:
@@ -434,13 +450,18 @@ class ExportExecution:
                     'step_identification': tms_participant.step.identification,
                     'setting_id': tms_participant.tms_setting_id,
                     'data_id': tms_participant.id,
-                    'directory_step_name': "Step_" + str(tms_participant.step_id) + "_" +
-                                           tms_participant.step.type.upper(),
+                    'directory_step_name': directory_step_name,
+                    'directory_step': path.join(participant_code_directory, directory_step_name),
+                    'export_directory_step': path.join(export_participant_code_directory, directory_step_name),
                 })
 
             additional_data_list = AdditionalData.objects.filter(participant__in=participant_group_list)
             for additional_data in additional_data_list:
                 participant_code = additional_data.participant.code
+                directory_step_name = "Step_" + str(additional_data.step.numeration) + "_" + \
+                                      additional_data.step.type.upper()
+                participant_code_directory = path.join(participant_directory, participant_code)
+                export_participant_code_directory = path.join(export_participant_directory, participant_code)
                 if participant_code not in self.per_group_data[group_id]['data_per_participant']:
                     self.per_group_data[group_id]['data_per_participant'][participant_code] = {}
                 if 'additional_data' not in self.per_group_data[group_id]['data_per_participant'][participant_code]:
@@ -449,9 +470,29 @@ class ExportExecution:
                     'step_identification': additional_data.step.identification,
                     'setting_id': '',
                     'data_id': additional_data.id,
-                    'directory_step_name': "Step_" + str(additional_data.step_id) + "_" +
-                                           additional_data.step.type.upper(),
-                    # Qual componente ?
+                    'directory_step_name': directory_step_name,
+                    'directory_step': path.join(participant_code_directory, directory_step_name),
+                    'export_directory_step': path.join(export_participant_code_directory, directory_step_name),
+                })
+
+            generic_data_list = GenericDataCollectionData.objects.filter(participant__in=participant_group_list)
+            for generic_data in generic_data_list:
+                participant_code = generic_data.participant.code
+                directory_step_name = "Step_" + str(generic_data.step.numeration) + "_" + \
+                                      generic_data.step.type.upper()
+                participant_code_directory = path.join(participant_directory, participant_code)
+                export_participant_code_directory = path.join(export_participant_directory, participant_code)
+                if participant_code not in self.per_group_data[group_id]['data_per_participant']:
+                    self.per_group_data[group_id]['data_per_participant'][participant_code] = {}
+                if 'generic_data' not in self.per_group_data[group_id]['data_per_participant'][participant_code]:
+                    self.per_group_data[group_id]['data_per_participant'][participant_code]['generic_data'] = []
+                self.per_group_data[group_id]['data_per_participant'][participant_code]['generic_data'].append({
+                    'step_identification': generic_data.step.identification,
+                    'setting_id': '',
+                    'data_id': generic_data.id,
+                    'directory_step_name': directory_step_name,
+                    'directory_step': path.join(participant_code_directory, directory_step_name),
+                    'export_directory_step': path.join(export_participant_code_directory, directory_step_name),
                 })
 
         return error_msg
@@ -480,16 +521,15 @@ class ExportExecution:
                         eeg_data_list = self.per_group_data[group_id]['data_per_participant'][participant_code][
                             'eeg_data']
                         for eeg_data in eeg_data_list:
-                            eeg_directory_name = path.join(participant_directory, eeg_data['directory_step_name'])
+                            eeg_directory = eeg_data['directory_step']
                             # ex. Users/.../EXPERIMENT_DOWNLOAD/Group_group.title/Participants/PXXXX/Step_XX_EEG
-                            if not path.exists(eeg_directory_name):
+                            if not path.exists(eeg_directory):
                                 error_msg, eeg_directory = create_directory(participant_directory,
                                                                             eeg_data['directory_step_name'])
                                 if error_msg != "":
                                     return error_msg
-                                # ex. EXPERIMENT_DOWNLOAD/Group_group.title/Participants/PXXXX/Step_XX_EEG
-                                export_eeg_directory = path.join(export_directory_participant,
-                                                                 eeg_data['directory_step_name'])
+                            # ex. EXPERIMENT_DOWNLOAD/Group_group.title/Participants/PXXXX/Step_XX_EEG
+                            export_eeg_directory = eeg_data['export_directory_step']
 
                             eeg_data = get_object_or_404(EEGData, pk=eeg_data['data_id'])
                             # download eeg raw data file
@@ -526,16 +566,15 @@ class ExportExecution:
                         emg_data_list = self.per_group_data[group_id]['data_per_participant'][participant_code][
                             'emg_data']
                         for emg_data in emg_data_list:
-                            emg_directory_name = path.join(participant_directory, emg_data['directory_step_name'])
+                            emg_directory = emg_data['directory_step']
                             # ex. Users/.../EXPERIMENT_DOWNLOAD/Group_group.title/Participants/PXXXX/Step_XX_EMG
-                            if not path.exists(emg_directory_name):
+                            if not path.exists(emg_directory):
                                 error_msg, emg_directory = create_directory(participant_directory,
                                                                             emg_data['directory_step_name'])
                                 if error_msg != "":
                                     return error_msg
-                                # ex. EXPERIMENT_DOWNLOAD/Group_group.title/Participants/PXXXX/Step_XX_EMG
-                                export_emg_directory = path.join(export_directory_participant,
-                                                                 emg_data['directory_step_name'])
+                            # ex. EXPERIMENT_DOWNLOAD/Group_group.title/Participants/PXXXX/Step_XX_EMG
+                            export_emg_directory = emg_data['export_directory_step']
 
                             emg_data = get_object_or_404(EMGData, pk=emg_data['data_id'])
                             # download emg raw data file
@@ -572,16 +611,15 @@ class ExportExecution:
                         tms_data_list = self.per_group_data[group_id]['data_per_participant'][participant_code][
                             'tms_data']
                         for tms_data in tms_data_list:
-                            tms_directory_name = path.join(participant_directory, tms_data['directory_step_name'])
+                            tms_directory = tms_data['directory_step']
                             # ex. Users/.../EXPERIMENT_DOWNLOAD/Group_group.title/Participants/PXXXX/Step_XX_TMS
-                            if not path.exists(tms_directory_name):
+                            if not path.exists(tms_directory):
                                 error_msg, tms_directory = create_directory(participant_directory,
                                                                             tms_data['directory_step_name'])
                                 if error_msg != "":
                                     return error_msg
-                                # ex. EXPERIMENT_DOWNLOAD/Group_group.title/Participants/PXXXX/Step_XX_TMS
-                                export_tms_directory = path.join(export_directory_participant,
-                                                                 tms_data['directory_step_name'])
+                            # ex. EXPERIMENT_DOWNLOAD/Group_group.title/Participants/PXXXX/Step_XX_TMS
+                            export_tms_directory = tms_data['export_directory_step']
 
                             tms_data_description = get_tms_data_description(tms_data['data_id'])
                             tms_data_filename = "%s.json" % "tms_data_description"
@@ -613,6 +651,37 @@ class ExportExecution:
                                         f.write(data)
 
                                     self.files_to_zip_list.append([complete_hotspot_filename, export_tms_directory])
+                    if 'additional_data' in self.per_group_data[group_id]['data_per_participant'][participant_code]:
+                        additional_data_list = self.per_group_data[group_id]['data_per_participant'][
+                            participant_code]['additional_data']
+                        for additional_data in additional_data_list:
+                            additional_data_directory = additional_data['directory_step']
+                            # ex. Users/.../EXPERIMENT_DOWNLOAD/Group_group.title/Participants/PXXXX/Step_XX_step_TYPE
+                            if not path.exists(additional_data_directory):
+                                error_msg, additional_data_directory = create_directory(
+                                    participant_directory, additional_data['directory_step_name'])
+                                if error_msg != "":
+                                    return error_msg
+                            # ex. EXPERIMENT_DOWNLOAD/Group_group.title/Participants/PXXXX/Step_XX_step_TYPE
+                            export_additional_data_directory = additional_data['export_directory_step']
+
+                            data_file = get_object_or_404(AdditionalData, pk=additional_data['data_id'])
+                            file_name = data_file.file.file.name.split('/')[-1]
+                            # read file from repository
+                            additional_data_filename = path.join(settings.BASE_DIR, 'media') + '/' + \
+                                                       data_file.file.file.name
+
+                            # ex. /Users/.../NES_EXPORT/Experiment_data/Group_XXX/Participants/PXXXX/
+                            # Step_XX_step_TYPE/file_name.format_type
+                            complete_additional_data_filename = path.join(additional_data_directory, file_name)
+                            with open(additional_data_filename, 'rb') as f:
+                                data = f.read()
+
+                            with open(complete_additional_data_filename, 'wb') as f:
+                                f.write(data)
+
+                            self.files_to_zip_list.append([complete_additional_data_filename,
+                                                           export_additional_data_directory])
 
         return error_msg
 
