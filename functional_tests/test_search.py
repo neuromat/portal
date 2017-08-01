@@ -48,12 +48,8 @@ class SearchTest(FunctionalTest):
             self.browser.find_element_by_class_name(
                 'matches-not-experiment'
             ).text
-        self.assertIn(
-            'Study:', matches_other_models_text
-        )
-        self.assertIn(
-            'brachial', matches_other_models_text
-        )
+        self.assertIn('Study:', matches_other_models_text)
+        self.assertIn('brachial', matches_other_models_text)
 
         # As she clicks in all of the itens of that lists, she is redirected
         # the corresponding experiment detail view directly at the point
