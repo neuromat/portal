@@ -98,6 +98,11 @@ for i in range(4, 6):
         start_date=datetime.utcnow(), experiment=experiment_owner2
     )
     create_experiment_groups(randint(1, 3), experiment_owner2)
+    # To test search
+    group1 = Group.objects.first()
+    group1.description = 'Plexus brachial is writed in wrong order. Correct ' \
+                         'is Brachial plexus.'
+    group1.save()
 
 # Create researchers associated to studies created above
 for study in Study.objects.all():

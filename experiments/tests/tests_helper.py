@@ -248,6 +248,12 @@ def global_setup_ft():
                              'Behavioral and anatomical evidence of ' \
                              'functional recovery'
     experiment.save()
+    # To test search
+    group = Group.objects.first()
+    group.description = 'Plexus brachial is writed in wrong order. Correct ' \
+                        'is Brachial plexus.'
+    group.save()
+
     # We create one experiment approved with ethics committee information
     create_ethics_committee_info(Experiment.objects.last())
     create_experiment(1, choice([owner1, owner2]),

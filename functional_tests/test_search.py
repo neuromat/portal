@@ -42,15 +42,27 @@ class SearchTest(FunctionalTest):
         self.assertTrue(any('Brachial plexus' in row.text for row in rows))
         # There's an experiment whose study has the word 'brachial' in study
         # description. When there are matches in other models data besides
-        # experiment, a section below the experiment itself is displayed
-        # with that models' matches.
-        matches_other_models_text = \
-            self.browser.find_element_by_class_name(
+        # experiment, a new line in the results displays other models'
+        # matches, below the experiment that model pertains.
+        rows_other_models = \
+            self.browser.find_elements_by_class_name(
                 'matches-not-experiment'
-            ).text
-        self.assertIn('Study:', matches_other_models_text)
-        self.assertIn('brachial', matches_other_models_text)
+            )
+        self.assertTrue(any('Study:' in row.text for row in rows_other_models))
+        self.assertTrue(
+            any('brachial' in row.text for row in rows_other_models)
+        )
+
+        # There are two groups with the string 'Plexus brachial' in
+        # description groups
+        self.assertTrue(
+            any('Groups:' in row.text for row in rows_other_models)
+        )
+        self.assertTrue(
+            any('Plexus brachial' in row.text for row in rows_other_models)
+        )
 
         # As she clicks in all of the itens of that lists, she is redirected
         # the corresponding experiment detail view directly at the point
-        # whose search found the terms. These terms are hilighted.
+        # whose search found the terms. These terms are hilighted. TODO?
+        self.fail('Finish this test!')
