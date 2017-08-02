@@ -7,5 +7,6 @@
         {{ result.object.total_participants }} in
         {{ result.object.groups.count }} groups </td>
     <td>{{ result.object.version }}</td>
-    <td><a href="{% url 'experiment-detail' result.object.id %}">View</a></td>
+    <td><a href="{% url 'experiment-detail' result.object.id %}"
+           class="nep-btn">View</a></td>
 </tr>

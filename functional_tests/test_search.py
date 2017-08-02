@@ -41,7 +41,8 @@ class SearchTest(FunctionalTest):
         self.assertTrue(any('Brachial Plexus' in row.text for row in rows))
         self.assertTrue(any('Brachial plexus' in row.text for row in rows))
         # There's an experiment whose study has the word 'brachial' in study
-        # description. When there are matches in other models data besides
+        # description, and 'brachial plexus' in one of the study keywords -
+        # when there are matches in other models data besides
         # experiment, a new line in the results displays other models'
         # matches, below the experiment that model pertains.
         rows_other_models = \
@@ -52,14 +53,20 @@ class SearchTest(FunctionalTest):
         self.assertTrue(
             any('brachial' in row.text for row in rows_other_models)
         )
+        self.assertTrue(
+            any('brachial plexus' in row.text for row in rows_other_models)
+        )
 
-        # There are two groups with the string 'Plexus brachial' in
-        # description groups
+        # There's one group with the string 'Plexus brachial' in
+        # group description, and 'brachial Plexus' in group inclusion criteria
         self.assertTrue(
             any('Groups:' in row.text for row in rows_other_models)
         )
         self.assertTrue(
             any('Plexus brachial' in row.text for row in rows_other_models)
+        )
+        self.assertTrue(
+            any('brachial Plexus' in row.text for row in rows_other_models)
         )
 
         # As she clicks in all of the itens of that lists, she is redirected

@@ -17,6 +17,7 @@ class ExperimentIndex(indexes.SearchIndex, indexes.Indexable):
 class StudyIndex(indexes.SearchIndex, indexes.Indexable):
     text = indexes.CharField(document=True, use_template=True)
     experiment = indexes.CharField(model_attr='experiment__id')
+    keywords = indexes.CharField(model_attr='keywords__name')
 
     def get_model(self):
         return Study
@@ -28,6 +29,7 @@ class StudyIndex(indexes.SearchIndex, indexes.Indexable):
 class GroupIndex(indexes.SearchIndex, indexes.Indexable):
     text = indexes.CharField(document=True, use_template=True)
     experiment = indexes.CharField(model_attr='experiment__id')
+    inclusion_criteria = indexes.CharField(model_attr='inclusion_criteria__id')
 
     def get_model(self):
         return Group

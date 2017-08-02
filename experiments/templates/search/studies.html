@@ -5,7 +5,8 @@
     <td>
         {{ result.object.experiment.total_participants }} in {{ result.object.experiment.groups.count }} groups </td>
     <td>{{ result.object.experiment.version }}</td>
-    <td><a href="{% url 'experiment-detail' result.object.experiment.id %}">View</a></td>
+    <td><a href="{% url 'experiment-detail' result.object.experiment.id %}"
+           class="nep-btn">View</a></td>
 </tr>
 <tr class="matches-not-experiment">
     <td colspan="5">
@@ -18,8 +19,14 @@
             <strong>start date: </strong>
             {% highlight result.object.start_date with query %}&nbsp;
             <strong>end date: </strong>
-            {% highlight result.object.end_date with query %}<br>
+            {% highlight result.object.end_date with query %}<br>&nbsp;
             {# TODO: keywords #}
+            <strong>keywords: </strong>
+            {% for keyword in result.object.keywords.all %}
+                {% highlight keyword with query %}&nbsp;
+            {% empty %}
+                No keywords
+            {% endfor %}
         </p>
     </td>
 </tr>

@@ -172,6 +172,8 @@ def create_keyword(qtty):
             if not Keyword.objects.filter(name=keyword):
                 break
         Keyword.objects.create(name=keyword)
+    # To test search
+    Keyword.objects.create(name='brachial plexus')
 
 
 def associate_experiments_to_trustees():
@@ -240,6 +242,9 @@ def global_setup_ft():
     ).first()
     study.description = 'The brachial artery is the major blood vessel of ' \
                         'the (upper) arm. It\'s correlated with plexus.'
+    # We put a keyword with the string 'brachial plexus' in the study to
+    # also be found by search test
+    study.keywords.add('brachial plexus')
     study.save()
     # We change experiment description to test search
     experiment = Experiment.objects.last()
@@ -252,6 +257,15 @@ def global_setup_ft():
     group = Group.objects.first()
     group.description = 'Plexus brachial is writed in wrong order. Correct ' \
                         'is Brachial plexus.'
+    # TODO: test for matches in code and description. Here only tests for
+    # TODO: matches in abbreviated_description, as this is the field returned
+    # TODO: in model __str__ method.
+    ic = ClassificationOfDiseases.objects.create(
+        code='BP', description='brachial Plexus',
+        abbreviated_description='brachial Plexus',
+        parent=None
+    )
+    group.inclusion_criteria.add(ic)
     group.save()
 
     # We create one experiment approved with ethics committee information
