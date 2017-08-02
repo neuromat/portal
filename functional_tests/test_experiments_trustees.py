@@ -75,7 +75,7 @@ class TrusteeTest(FunctionalTestTrustee):
         time.sleep(1)
         self.browser.find_element_by_link_text(
             'Under analysis').find_element_by_xpath(
-            "//a[@data-experiment_trustee='claudia'] "
+            "//a[@data-experiment_trustee='claudia']"
         ).click()
         time.sleep(1)
         status_choices_form = self.browser.find_element_by_id(
