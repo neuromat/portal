@@ -1,0 +1,12 @@
+{% load highlight %}
+<tr>
+    <td>{% highlight result.object.title with query %}</td>
+    <td>
+        {% highlight result.object.description with query %}</td>
+    <td>
+        {{ result.object.total_participants }} in
+        {{ result.object.groups.count }} groups </td>
+    <td>{{ result.object.version }}</td>
+    <td><a href="{% url 'experiment-detail' result.object.id %}"
+           class="nep-btn">View</a></td>
+</tr>

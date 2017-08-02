@@ -18,8 +18,12 @@ class ExperimentDetailTest(FunctionalTest):
         # She clicks in second "View" link and is redirected to experiment
         # detail page
         # TODO: frequently fails to catch second link
-        list_links = self.browser.find_elements_by_link_text('View')
-        list_links[0].click()
+        link = self.browser.find_element_by_xpath(
+            "//a[@href='/experiments/" + str(experiment.id) + "/']"
+        )
+        link.click()
+        # list_links = self.browser.find_elements_by_link_text('View')
+        # list_links[0].click()
         time.sleep(1)
 
         # She sees a new page with a header title: Open Database
@@ -93,7 +97,7 @@ class ExperimentDetailTest(FunctionalTest):
         self.assertIn('Start date:', study_start_date)
         # Obs.: code line right below is only to conform to study_start_date
         # format in browser
-        self.assertIn(experiment.study.start_date.strftime("%B %d, %Y")
+        self.assertIn(experiment.study.start_date.strftime("%b. %d, %Y")
                       .lstrip("0").replace(" 0", " "), study_start_date)
         study_end_date = self.browser.find_element_by_id(
             'study_enddate').text

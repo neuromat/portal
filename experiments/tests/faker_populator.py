@@ -60,6 +60,17 @@ for i in range(1, 4):
         description=fake.text(),
         start_date=datetime.utcnow(), experiment=experiment_owner1
     )
+    # To test search
+    if i == 1:
+        study = Study.objects.last()
+        study.description = 'The brachial artery is the major blood vessel ' \
+                            'of  the (upper) arm. It\'s correlated with ' \
+                            'plexus.'
+        # We put a keyword with the string 'brachial plexus' in the study to
+        # also be found by search test
+        study.keywords.add('brachial plexus')
+        study.save()
+
     create_ethics_committee_info(experiment_owner1)
     create_experiment_groups(randint(1, 3), experiment_owner1)
 
@@ -72,12 +83,35 @@ for i in range(4, 6):
         sent_date=datetime.utcnow(),
         status=Experiment.TO_BE_ANALYSED
     )
+    # To test search
+    if i == 4:
+        experiment_owner2.title = 'Brachial Plexus'
+        experiment_owner2.save()
+    if i == 5:
+        experiment_owner2.description = \
+            'Brachial plexus repair by peripheral nerve ' \
+            'grafts directly into the spinal cord in rats ' \
+            'Behavioral and anatomical evidence of ' \
+            'functional recovery'
+        experiment_owner2.save()
+
     Study.objects.create(
         title=fake.word().title(),
         description=fake.text(),
         start_date=datetime.utcnow(), experiment=experiment_owner2
     )
     create_experiment_groups(randint(1, 3), experiment_owner2)
+    # To test search
+    group = Group.objects.first()
+    group.description = 'Plexus brachial is writed in wrong order. Correct ' \
+                        'is Brachial plexus.'
+    ic = ClassificationOfDiseases.objects.create(
+        code='BP', description='brachial Plexus',
+        abbreviated_description='brachial Plexus',
+        parent=None
+    )
+    group.inclusion_criteria.add(ic)
+    group.save()
 
 # Create researchers associated to studies created above
 for study in Study.objects.all():

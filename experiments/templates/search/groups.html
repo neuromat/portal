@@ -1,0 +1,29 @@
+{% load highlight %}
+<tr>
+    <td>{{ result.object.experiment.title }}</td>
+    <td>{{ result.object.experiment.description }}</td>
+    <td>
+        {{ result.object.experiment.total_participants }} in {{ result.object.experiment.groups.count }} groups </td>
+    <td>{{ result.object.experiment.version }}</td>
+    <td><a href="{% url 'experiment-detail' result.object.experiment.id %}"
+           class="nep-btn">View</a></td>
+</tr>
+<tr class="matches-not-experiment">
+    <td colspan="5">
+        <strong>Groups:</strong>
+        <p>
+            <strong>title: </strong>
+            {% highlight result.object.title with query %}&nbsp;
+            <strong>description: </strong>
+            {% highlight result.object.description with query %}&nbsp;
+            <strong>Inclusion criteria: </strong>
+            {% for inclusion_criteria in result.object.inclusion_criteria.all %}
+                {% highlight inclusion_criteria with query %}&nbsp;
+            {% empty %}
+                No inclusion criteria
+            {% endfor %}
+            <strong>Protocol component: </strong>
+            {# TODO: protocol component? #}
+        </p>
+    </td>
+</tr>
