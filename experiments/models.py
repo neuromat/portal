@@ -104,7 +104,7 @@ class Group(models.Model):
         models.ManyToManyField(ClassificationOfDiseases, blank=True)
     protocol_component = models.ForeignKey(
         ProtocolComponent, null=True, blank=True
-    )  # TODO: define if Group has ProtocolComponent
+    )
 
 
 class Gender(models.Model):
@@ -125,6 +125,25 @@ class Participant(models.Model):
         unique_together = ('group', 'code')
 
 
+class Equipment(models.Model):
+    EQUIPMENT_TYPES = (
+        ("amplifier", "Amplifier"),
+        ("eeg_solution", "EEG Solution"),
+        ("filter", "Filter"),
+        ("eeg_electrode_net", "EEG Electrode Net"),
+        ("ad_converter", "A/D Converter"),
+        ("tms_device", "TMS device")
+    )
+    manufacturer_name = models.CharField(max_length=150)
+    equipment_type = models.CharField(null=True, blank=True, max_length=50, choices=EQUIPMENT_TYPES)
+    identification = models.CharField(max_length=150)
+    description = models.TextField(null=True, blank=True)
+    serial_number = models.CharField(max_length=50, null=True, blank=True)
+
+    class Meta:
+        abstract = True
+
+
 class ExperimentSetting(models.Model):
     experiment = models.ForeignKey(Experiment)
     name = models.CharField(max_length=150)
@@ -139,6 +158,127 @@ class ExperimentSetting(models.Model):
 
 class EEGSetting(ExperimentSetting):
     pass
+
+
+class Amplifier(Equipment):
+    gain = models.FloatField(null=True, blank=True)
+    number_of_channels = models.IntegerField(null=True, blank=True)
+    common_mode_rejection_ratio = models.FloatField(null=True, blank=True)
+    input_impedance = models.FloatField(null=True, blank=True)
+    input_impedance_unit = models.CharField(null=True, blank=True, max_length=15)
+    amplifier_detection_type_name = models.CharField(null=True, blank=True, max_length=150)
+    tethering_system_name = models.CharField(null=True, blank=True, max_length=150)
+
+
+class EEGAmplifierSetting(models.Model):
+    eeg_setting = models.OneToOneField(EEGSetting, primary_key=True, related_name='eeg_amplifier_setting')
+    eeg_amplifier = models.ForeignKey(Amplifier)
+    gain = models.FloatField(null=True, blank=True)
+    sampling_rate = models.FloatField(null=True, blank=True)
+    number_of_channels_used = models.IntegerField(null=True)
+
+
+class EEGSolution(models.Model):
+    manufacturer_name = models.CharField(max_length=150)
+    name = models.CharField(max_length=150)
+    components = models.TextField(null=True, blank=True)
+
+
+class EEGFilterSetting(models.Model):
+    eeg_setting = models.OneToOneField(EEGSetting, primary_key=True, related_name='eeg_filter_setting')
+    eeg_filter_type_name = models.CharField(max_length=150)
+    eeg_filter_type_description = models.TextField(null=True, blank=True)
+    high_pass = models.FloatField(null=True, blank=True)
+    low_pass = models.FloatField(null=True, blank=True)
+    high_band_pass = models.FloatField(null=True, blank=True)
+    low_band_pass = models.FloatField(null=True, blank=True)
+    high_notch = models.FloatField(null=True, blank=True)
+    low_notch = models.FloatField(null=True, blank=True)
+    order = models.IntegerField(null=True, blank=True)
+
+
+class EEGElectrodeNet(Equipment):
+    pass
+
+
+class EEGElectrodeLocalizationSystem(models.Model):
+    eeg_setting = models.OneToOneField(EEGSetting, primary_key=True, related_name='eeg_electrode_localization_system')
+    name = models.CharField(max_length=150)
+    description = models.TextField(null=True, blank=True)
+    map_image_file = models.FileField(upload_to="uploads/%Y/%m/%d/", null=True, blank=True)
+
+
+class ElectrodeModel(models.Model):
+    USABILITY_TYPES = (
+        ("disposable", "Disposable"),
+        ("reusable", "Reusable"),
+    )
+    ELECTRODE_TYPES = (
+        ("surface", "Surface"),
+        ("intramuscular", "Intramuscular"),
+        ("needle", "Needle"),
+    )
+    name = models.CharField(max_length=150)
+    description = models.TextField(null=True, blank=True)
+    material = models.CharField(null=True, blank=True, max_length=150)
+    usability = models.CharField(null=True, blank=True, max_length=50, choices=USABILITY_TYPES)
+    impedance = models.FloatField(null=True, blank=True)
+    impedance_unit = models.CharField(null=True, blank=True, max_length=15)
+    inter_electrode_distance = models.FloatField(null=True, blank=True)
+    inter_electrode_distance_unit = models.CharField(null=True, blank=True, max_length=10)
+    electrode_configuration_name = models.CharField(max_length=150)
+    electrode_type = models.CharField(max_length=50, choices=ELECTRODE_TYPES)
+
+    def __str__(self):
+        return self.name
+
+
+class SurfaceElectrode(ElectrodeModel):
+    CONDUCTION_TYPES = (
+        ("gelled", "Gelled"),
+        ("dry", "Dry"),
+    )
+    MODE_OPTIONS = (
+        ("active", "Active"),
+        ("passive", "Passive"),
+    )
+    conduction_type = models.CharField(max_length=20, choices=CONDUCTION_TYPES)
+    electrode_mode = models.CharField(max_length=20, choices=MODE_OPTIONS)
+    electrode_shape_name = models.CharField(max_length=150)
+    electrode_shape_measure_value = models.FloatField()
+    electrode_shape_measure_unit = models.CharField(max_length=150)
+
+
+class EEGElectrodePosition(models.Model):
+    eeg_electrode_localization_system = models.ForeignKey(EEGElectrodeLocalizationSystem,
+                                                          related_name="electrode_positions")
+    electrode_model = models.ForeignKey(ElectrodeModel)
+    name = models.CharField(max_length=150)
+    coordinate_x = models.IntegerField(null=True, blank=True)
+    coordinate_y = models.IntegerField(null=True, blank=True)
+    channel_default_index = models.IntegerField()
+
+
+class IntramuscularElectrode(ElectrodeModel):
+    STRAND_TYPES = (
+        ("single", "Single"),
+        ("multi", "Multi"),
+    )
+    strand = models.CharField(max_length=20, choices=STRAND_TYPES)
+    insulation_material_name = models.CharField(max_length=150)
+    insulation_material_description = models.TextField(null=True, blank=True)
+    length_of_exposed_tip = models.FloatField(null=True, blank=True)
+
+
+class NeedleElectrode(ElectrodeModel):
+    SIZE_UNIT = (
+        ("mm", "millimeter(s)"),
+        ("cm", "centimeter(s)"),
+    )
+    size = models.FloatField(null=True, blank=True)
+    size_unit = models.CharField(max_length=10, choices=SIZE_UNIT)
+    number_of_conductive_contact_points_at_the_tip = models.IntegerField(null=True, blank=True)
+    size_of_conductive_contact_points_at_the_tip = models.FloatField(null=True, blank=True)
 
 
 class EMGSetting(ExperimentSetting):
