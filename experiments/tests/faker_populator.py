@@ -8,7 +8,8 @@ from faker import Factory
 # python manage.py shell < experiments/tests/faker_populator.py
 # TODO: when executing from bash command line, final line identifier breaks
 # imports. We are kepping in Collaborator in same line
-from experiments.models import Gender, ClassificationOfDiseases, Keyword
+from experiments.models import Gender, ClassificationOfDiseases, Keyword, \
+    Collaborator
 from experiments.models import Experiment, Study, Group, Researcher
 from experiments.tests.tests_helper import create_experiment_groups, \
     create_ethics_committee_info
@@ -118,10 +119,18 @@ for study in Study.objects.all():
     Researcher.objects.create(name=fake.name(),
                               email='claudia.portal.neuromat@gmail.com',
                               study=study)
+# To test search
+researcher = Researcher.objects.last()
+researcher.name = 'Yolanda Fuentes'
+researcher.save()
 
 # Create study collaborators (requires creating studies before)
 for study in Study.objects.all():
     create_study_collaborator(randint(2, 3), study)
+# To test search
+collaborator = Collaborator.objects.last()
+collaborator.name = 'Pero Vaz'
+collaborator.save()
 
 # Create some keywords to associate with studies
 create_keyword(10)
@@ -149,6 +158,9 @@ for group in Group.objects.all():
     ic1 = choice(ClassificationOfDiseases.objects.all())
     ic2 = choice(ClassificationOfDiseases.objects.all())
     group.inclusion_criteria.add(ic1, ic2)
+
+# TODO: After populating models we call 'manage.py rebuild_index --noinput' to
+# TODO: rebuild haystack search index - to manually test searching.
 
 
 # TODO: why is necessary to keep two blank lines for script run until the end?

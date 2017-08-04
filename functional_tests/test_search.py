@@ -21,8 +21,8 @@ class SearchTest(FunctionalTest):
         # terms individually and in whatever order in the sentence, too.
         search_box = self.browser.find_element_by_id('id_q')
         search_box.send_keys('Brachial Plexus')
-        self.browser.find_element_by_id('submit_keys').click()
-        search_box.send_keys(Keys.ENTER)
+        self.browser.find_element_by_id('submit_terms').click()
+        # search_box.send_keys(Keys.ENTER)
         time.sleep(1)
         # The search engine searches in all the site content.
         # As there are "Braquial Plexus", "braquial plexus" in experiments
@@ -35,41 +35,51 @@ class SearchTest(FunctionalTest):
         search_header_title = self.browser.find_element_by_tag_name('h3').text
         self.assertEqual(search_header_title, 'Search Results')
 
-        table = self.browser.find_element_by_id('search_experiments_table')
-        rows = table.find_element_by_tag_name(
-            'tbody').find_elements_by_tag_name('tr')
-        self.assertTrue(any('Brachial Plexus' in row.text for row in rows))
-        self.assertTrue(any('Brachial plexus' in row.text for row in rows))
+        table = self.browser.find_element_by_id('search_table')
+        experiment_rows = \
+            table.find_elements_by_class_name('experiment_matches')
+        self.assertTrue(
+            any('Brachial Plexus' in row.text for row in experiment_rows)
+        )
+        self.assertTrue(
+            any('Brachial plexus' in row.text for row in experiment_rows)
+        )
         # There's an experiment whose study has the word 'brachial' in study
         # description, and 'brachial plexus' in one of the study keywords -
         # when there are matches in other models data besides
         # experiment, a new line in the results displays other models'
         # matches, below the experiment that model pertains.
-        rows_other_models = \
-            self.browser.find_elements_by_class_name(
-                'matches-not-experiment'
-            )
-        self.assertTrue(any('Study:' in row.text for row in rows_other_models))
+        study_rows = \
+            self.browser.find_elements_by_class_name('study_matches')
+        self.assertTrue(any('Study:' in row.text for row in study_rows))
+        self.assertTrue(any('brachial' in row.text for row in study_rows))
         self.assertTrue(
-            any('brachial' in row.text for row in rows_other_models)
-        )
-        self.assertTrue(
-            any('brachial plexus' in row.text for row in rows_other_models)
+            any('brachial plexus' in row.text for row in study_rows)
         )
 
         # There's one group with the string 'Plexus brachial' in
         # group description, and 'brachial Plexus' in group inclusion criteria
+        group_rows = self.browser.find_elements_by_class_name('group_matches')
+        self.assertTrue(any('Groups:' in row.text for row in group_rows))
         self.assertTrue(
-            any('Groups:' in row.text for row in rows_other_models)
+            any('Plexus brachial' in row.text for row in group_rows)
         )
         self.assertTrue(
-            any('Plexus brachial' in row.text for row in rows_other_models)
-        )
-        self.assertTrue(
-            any('brachial Plexus' in row.text for row in rows_other_models)
+            any('brachial Plexus' in row.text for row in group_rows)
         )
 
-        # As she clicks in all of the itens of that lists, she is redirected
-        # the corresponding experiment detail view directly at the point
-        # whose search found the terms. These terms are hilighted. TODO?
+        # The researcher now wishes to search for a study that has as
+        # collaborator a coleague of her, called Pero Vaz.
+        # She types 'Pero Vaz' in search box and hits Enter.
+        search_box = self.browser.find_element_by_id('id_q')
+        search_box.send_keys('Pero Vaz')
+        # self.browser.find_element_by_id('submit_terms').click()
+        search_box.send_keys(Keys.ENTER)
+        time.sleep(1)
+        # She sees that there is one Study whose one of collaborator is Pero
+        # Vaz.
+        study_rows = \
+            self.browser.find_elements_by_class_name('study_matches')
+        self.assertTrue(any('Pero Vaz' in row.text for row in study_rows))
+
         self.fail('Finish this test!')

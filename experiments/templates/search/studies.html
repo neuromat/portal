@@ -1,5 +1,5 @@
 {% load highlight %}
-<tr>
+<tr class="study_matches">
     <td>
         <strong>Study:</strong>
         {% highlight result.object.title with query %}&nbsp;
@@ -9,7 +9,15 @@
             <strong>start date: </strong>
             {% highlight result.object.start_date with query %}&nbsp;
             <strong>end date: </strong>
-            {% highlight result.object.end_date with query %}<br>&nbsp;
+            {% highlight result.object.end_date with query %}&nbsp;
+            <strong>researcher: </strong>
+            {% highlight result.object.researcher with query %}&nbsp;
+            <strong>collaborators: </strong>
+            {% for collaborator in result.object.collaborators.all %}
+                {% highlight collaborator with query %}&nbsp;
+            {% empty %}
+                No collaborators
+            {% endfor %}
             <strong>keywords: </strong>
             {% for keyword in result.object.keywords.all %}
                 {% highlight keyword with query %}&nbsp;

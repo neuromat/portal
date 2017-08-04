@@ -73,12 +73,18 @@ class Researcher(models.Model):
     name = models.CharField(max_length=200)
     email = models.EmailField()
 
+    def __str__(self):
+        return self.name
+
 
 class Collaborator(models.Model):
     name = models.CharField(max_length=200)
     team = models.CharField(max_length=200)
     coordinator = models.BooleanField(default=False)
     study = models.ForeignKey(Study, related_name='collaborators')
+
+    def __str__(self):
+        return self.name
 
 
 class ProtocolComponent(models.Model):
