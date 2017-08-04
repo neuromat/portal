@@ -1,5 +1,5 @@
 {% load highlight %}
-<tr class="group_matches">
+<tr class="group-matches">
     <td>
         <strong>Groups:</strong>
         {% highlight result.object.title with query %}&nbsp;
@@ -12,8 +12,6 @@
             {% empty %}
                 No inclusion criteria
             {% endfor %}
-            <strong>Protocol component: </strong>
-            {# TODO: protocol component? #}
         </p>
     </td>
     <td>
