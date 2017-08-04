@@ -4,7 +4,7 @@
 $(function () {
     var experimentId =  $("#experimentId").val();
     $("downloadButton").click(function () {
-        $.fileDownload($(this).attr('/downloads/experimentId/'), {
+        $.fileDownload($(this).prop('href'), {
             preparingMessageHtml: "The file download will begin shortly, please wait...",
             failMessageHtml: "There was a problem generating your data, please try again."
         });
