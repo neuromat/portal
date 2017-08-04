@@ -82,4 +82,5 @@ class SearchTest(FunctionalTest):
             self.browser.find_elements_by_class_name('study-matches')
         self.assertTrue(any('Pero Vaz' in row.text for row in study_rows))
 
+    def test_search_returns_only_last_version_experiment(self):
         self.fail('Finish this test!')
