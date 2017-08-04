@@ -19,6 +19,7 @@ class StudyIndex(indexes.SearchIndex, indexes.Indexable):
     experiment = indexes.CharField(model_attr='experiment__id')
     keywords = indexes.CharField(model_attr='keywords__name')
     researcher = indexes.CharField(model_attr='researcher__id')
+    collaborators = indexes.CharField(model_attr='collaborators__name')
 
     def get_model(self):
         return Study

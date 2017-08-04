@@ -2,4 +2,4 @@
 {{ object.description }}
 {{ object.experiment }}
 {{ object.researcher }}
-{{ object.collaborators }}
+{{ object.collaborators.all }}
