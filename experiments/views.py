@@ -3,7 +3,6 @@ from django.core.mail import send_mail
 from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import render
 
-from experiments import appclasses
 from experiments.models import Experiment, RejectJustification
 
 
@@ -13,7 +12,7 @@ def home_page(request):
     if request.user.is_authenticated and \
             request.user.groups.filter(name='trustees').exists():
         all_experiments = \
-            appclasses.CurrentExperiments().get_current_experiments_trustees()
+            Experiment.lastversion_objects.all()
         # We put experiments in following order:
         # TO_BE_ANALYSED, UNDER_ANALYSIS, NOT_APPROVED and APPROVED
         to_be_analysed = all_experiments.filter(
@@ -25,7 +24,9 @@ def home_page(request):
         experiments = to_be_analysed | under_analysis | not_approved | approved
         to_be_analysed_count = to_be_analysed.count()
     else:
-        experiments = appclasses.CurrentExperiments().get_current_experiments()
+        experiments = Experiment.lastversion_objects.filter(
+            status=Experiment.APPROVED
+        )
 
     for experiment in experiments:
         experiment.total_participants = \
@@ -43,8 +44,7 @@ def experiment_detail(request, experiment_id):
     # normal user
     if request.user.is_authenticated and \
             request.user.groups.filter(name='trustees').exists():
-        all_experiments = \
-            appclasses.CurrentExperiments().get_current_experiments_trustees()
+        all_experiments = Experiment.lastversion_objects.all()
         to_be_analysed_count = all_experiments.filter(
                 status=Experiment.TO_BE_ANALYSED).count()
 

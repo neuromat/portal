@@ -1,5 +1,21 @@
 from django.db import models
+from django.db.models import Max, Q
 from django.contrib.auth.models import User
+
+
+class CurrentExperimentManager(models.Manager):
+    def get_queryset(self):
+        experiment_max_version_set = \
+            Experiment.objects.values('owner', 'nes_id').annotate(
+                max_version=Max('version'))
+        q_statement = Q()
+        for experiment in experiment_max_version_set:
+            q_statement |= (Q(owner=experiment['owner']) &
+                            Q(nes_id=experiment['nes_id']) &
+                            Q(version=experiment['max_version']))
+
+        return super(CurrentExperimentManager, self).get_queryset()\
+            .filter(q_statement)
 
 
 class Experiment(models.Model):
@@ -36,6 +52,10 @@ class Experiment(models.Model):
     )
     trustee = models.ForeignKey(User, null=True,
                                 blank=True, related_name='experiments')
+
+    # Managers
+    objects = models.Manager()
+    lastversion_objects = CurrentExperimentManager()
 
     class Meta:
         unique_together = ('nes_id', 'owner', 'version')
