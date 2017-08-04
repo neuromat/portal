@@ -11,27 +11,23 @@
     <link rel="stylesheet" href="{% static 'bootstrap-3.3.7-dist/css/bootstrap.min.css' %}">
     <link rel="stylesheet" href="{% static 'css/main.css' %}">
     <link rel="stylesheet" href="{% static 'font-awesome-4.7.0/css/font-awesome.min.css' %}">
-    <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+{#    <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">#}
+    <link rel="stylesheet" href="{% static 'css/jquery-ui.min.css' %}">
     <link rel="stylesheet" href="//jqueryui.com/resources/demos/style.css">
-    <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
-    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
-    <script src="{% static 'js/download.js' %}"></script>
+    <style>
+        #progressbar {
+            margin-top: 20px;
+        }
+        .progress-label{
+            font-weight: bold;
+            text-shadow: 1px 1px 0 #fff;
+        }
+        .ui-dialog-titlebar-close{
+            display: none;
+        }
+    </style>
     {% block style %}
-        <style>
-            #progressbar {
-                margin-top: 20px;
-            }
-            .progress-label{
-                font-weight: bold;
-                text-shadow: 1px 1px 0 #fff;
-            }
-            .ui-dialog-titlebar-close{
-                display: none;
-            }
-        </style>
     {% endblock %}
-
-
 </head>
 <body>
 {% include 'experiments/top.html' %}
@@ -40,7 +36,7 @@
 {% block content %}
 {% endblock %}
 {% include 'experiments/footer.html' %}
-{#<script src="{% static 'jquery/jquery-3.2.1.min.js' %}"></script>#}
+<script src="{% static 'js/jquery-3.2.1.min.js' %}"></script>
 <script src="{% static 'bootstrap-3.3.7-dist/js/bootstrap.min.js' %}"></script>
 {% block script %}
 {% endblock %}
