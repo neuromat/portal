@@ -280,6 +280,10 @@ def global_setup_ft():
     # Create study collaborators (requires creating studies before)
     for study in Study.objects.all():
         create_study_collaborator(randint(2, 3), study)
+    # To test search
+    collaborator = Collaborator.objects.last()
+    collaborator.name = 'Pero Vaz'
+    collaborator.save()
 
     # Create some keywords to associate with studies
     create_keyword(10)

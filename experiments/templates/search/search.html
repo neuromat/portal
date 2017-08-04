@@ -10,19 +10,11 @@
             {% include 'experiments/messages.html' %}
         {% endif %}
 
-        <h3>Search Results</h3>
+        <div class="table-title">
+            <h3>Search Results</h3>
+        </div>
         {% if query %}
-            <table id="search_experiments_table" class="table table-hover
-        experiment-table">
-                <thead>
-                <tr>
-                    <th>Title</th>
-                    <th>Description</th>
-                    <th>Participants</th>
-                    <th>Version</th>
-                    <th></th>
-                </tr>
-                </thead>
+            <table id="search_table" class="table table-hover">
                 <tbody>
                 {% for result in page.object_list %}
                     {% if result.model_name == 'experiment' %}
@@ -49,7 +41,7 @@
             {% endif %}
         {% else %}
             <p>There was no results found to the give search terms</p>
-             Show some example queries to run, maybe query syntax, something else?
+            Show some example queries to run, maybe query syntax, something else?
         {% endif %}
 
 
