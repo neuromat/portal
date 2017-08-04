@@ -21,9 +21,10 @@ class NewVisitorTest(FunctionalTest):
         header_text = self.browser.find_element_by_tag_name('h1').text
         self.assertIn('Neuroscience Experiments Database', header_text)
 
-        # She sees that in header bunner there is a search box invited her
+        # She sees that in header bunner there is a search box inviting her
         # to type terms/words that will be searched in the portal
-        searchbox = self.browser.find_element_by_id('search_box')
+        # 'id_q' to haystack search system
+        searchbox = self.browser.find_element_by_id('id_q')
         self.assertEqual(
             searchbox.get_attribute('placeholder'),
             'Type key terms/words to be searched'

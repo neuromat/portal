@@ -312,3 +312,13 @@ a:hover.nep-btn {
   margin-right: auto;
   width: 97%;
 }
+
+/*
+  ========================================
+  Haystack
+  ========================================
+ */
+/* used when highlight haystack tag is used in template */
+.highlighted {
+  background: yellow;
+}

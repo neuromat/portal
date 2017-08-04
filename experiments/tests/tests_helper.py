@@ -172,6 +172,8 @@ def create_keyword(qtty):
             if not Keyword.objects.filter(name=keyword):
                 break
         Keyword.objects.create(name=keyword)
+    # To test search
+    Keyword.objects.create(name='brachial plexus')
 
 
 def associate_experiments_to_trustees():
@@ -225,8 +227,47 @@ def global_setup_ft():
     # TODO: when creating experiment UNDER_ANALYSIS, associate with a trustee
     create_experiment(2, choice([owner1, owner2]),
                       Experiment.UNDER_ANALYSIS)
+    create_experiment(4, choice([owner1, owner2]),
+                      Experiment.APPROVED)
+    # Put some non-random strings in two approved experiments to test search
+    experiment = Experiment.objects.last()
+    experiment.title = 'Brachial Plexus'
+    experiment.save()
     create_experiment(1, choice([owner1, owner2]),
                       Experiment.APPROVED)
+    # We change first experiment study approved to contain 'brachial' in
+    # study description, so it have to be found by search test
+    study = Study.objects.filter(
+        experiment__status=Experiment.APPROVED
+    ).first()
+    study.description = 'The brachial artery is the major blood vessel of ' \
+                        'the (upper) arm. It\'s correlated with plexus.'
+    # We put a keyword with the string 'brachial plexus' in the study to
+    # also be found by search test
+    study.keywords.add('brachial plexus')
+    study.save()
+    # We change experiment description to test search
+    experiment = Experiment.objects.last()
+    experiment.description = 'Brachial plexus repair by peripheral nerve ' \
+                             'grafts directly into the spinal cord in rats ' \
+                             'Behavioral and anatomical evidence of ' \
+                             'functional recovery'
+    experiment.save()
+    # To test search
+    group = Group.objects.first()
+    group.description = 'Plexus brachial is writed in wrong order. Correct ' \
+                        'is Brachial plexus.'
+    # TODO: test for matches in code and description. Here only tests for
+    # TODO: matches in abbreviated_description, as this is the field returned
+    # TODO: in model __str__ method.
+    ic = ClassificationOfDiseases.objects.create(
+        code='BP', description='brachial Plexus',
+        abbreviated_description='brachial Plexus',
+        parent=None
+    )
+    group.inclusion_criteria.add(ic)
+    group.save()
+
     # We create one experiment approved with ethics committee information
     create_ethics_committee_info(Experiment.objects.last())
     create_experiment(1, choice([owner1, owner2]),
@@ -239,6 +280,10 @@ def global_setup_ft():
     # Create study collaborators (requires creating studies before)
     for study in Study.objects.all():
         create_study_collaborator(randint(2, 3), study)
+    # To test search
+    collaborator = Collaborator.objects.last()
+    collaborator.name = 'Pero Vaz'
+    collaborator.save()
 
     # Create some keywords to associate with studies
     create_keyword(10)
@@ -272,6 +317,10 @@ def global_setup_ft():
     # create_experiment_and_study method
     # Requires running create_experiment_study_group before
     create_researchers()
+
+
+def global_setup_ft_search():
+    pass
 
 
 def global_setup_ut():
