@@ -2,13 +2,13 @@
 
 {% block header %}
     {% include 'experiments/header_detail.html' %}
-    <script>
-
-    </script>
 {% endblock %}
 
 {% block content %}
     <section class="container nep-content">
+        {% if messages %}
+            {% include 'experiments/messages.html' %}
+        {% endif %}
         <ul class="nav nav-tabs" role="tablist">
             <li role="presentation" class="active"><a href="#statistics_tab" role="tab" data-toggle="tab">Statistics</a></li>
             <li role="presentation"><a href="#groups_tab" role="tab" data-toggle="tab">Groups</a></li>
@@ -141,6 +141,14 @@
 {% endblock %}
 
 {% block script %}
+    {##}
+    {# Scripts related to experiments/header_detail.html #}
+    {##}
+    {% load static %}
+    <script src="{% static 'js/jquery-ui.min.js' %}"></script>
+    <script src="{% static 'js/jquery.fileDownload.js' %}"></script>
+    <script src="{% static 'js/download.js' %}"></script>
+
     {##}
     {# Script related to experiments/top.html #}
     {##}

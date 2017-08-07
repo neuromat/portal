@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -6,11 +7,25 @@
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>{% block title %} Neuroscience Experiments Database {% endblock %}</title>
-    {% load static %}
     <link rel="stylesheet" href="{% static 'css/normalize.css' %}">
     <link rel="stylesheet" href="{% static 'bootstrap-3.3.7-dist/css/bootstrap.min.css' %}">
     <link rel="stylesheet" href="{% static 'css/main.css' %}">
     <link rel="stylesheet" href="{% static 'font-awesome-4.7.0/css/font-awesome.min.css' %}">
+{#    <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">#}
+    <link rel="stylesheet" href="{% static 'css/jquery-ui.min.css' %}">
+    <link rel="stylesheet" href="//jqueryui.com/resources/demos/style.css">
+    <style>
+        #progressbar {
+            margin-top: 20px;
+        }
+        .progress-label{
+            font-weight: bold;
+            text-shadow: 1px 1px 0 #fff;
+        }
+        .ui-dialog-titlebar-close{
+            display: none;
+        }
+    </style>
     {% block style %}
     {% endblock %}
 </head>
