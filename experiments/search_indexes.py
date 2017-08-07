@@ -11,7 +11,7 @@ class ExperimentIndex(indexes.SearchIndex, indexes.Indexable):
         return Experiment
 
     def index_queryset(self, using=None):
-        return self.get_model().objects.all()
+        return self.get_model().lastversion_objects.all()
 
 
 class StudyIndex(indexes.SearchIndex, indexes.Indexable):
