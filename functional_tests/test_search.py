@@ -37,7 +37,7 @@ class SearchTest(FunctionalTest):
 
         table = self.browser.find_element_by_id('search_table')
         experiment_rows = \
-            table.find_elements_by_class_name('experiment_matches')
+            table.find_elements_by_class_name('experiment-matches')
         self.assertTrue(
             any('Brachial Plexus' in row.text for row in experiment_rows)
         )
@@ -50,7 +50,7 @@ class SearchTest(FunctionalTest):
         # experiment, a new line in the results displays other models'
         # matches, below the experiment that model pertains.
         study_rows = \
-            self.browser.find_elements_by_class_name('study_matches')
+            self.browser.find_elements_by_class_name('study-matches')
         self.assertTrue(any('Study:' in row.text for row in study_rows))
         self.assertTrue(any('brachial' in row.text for row in study_rows))
         self.assertTrue(
@@ -59,7 +59,7 @@ class SearchTest(FunctionalTest):
 
         # There's one group with the string 'Plexus brachial' in
         # group description, and 'brachial Plexus' in group inclusion criteria
-        group_rows = self.browser.find_elements_by_class_name('group_matches')
+        group_rows = self.browser.find_elements_by_class_name('group-matches')
         self.assertTrue(any('Groups:' in row.text for row in group_rows))
         self.assertTrue(
             any('Plexus brachial' in row.text for row in group_rows)
@@ -79,7 +79,8 @@ class SearchTest(FunctionalTest):
         # She sees that there is one Study whose one of collaborator is Pero
         # Vaz.
         study_rows = \
-            self.browser.find_elements_by_class_name('study_matches')
+            self.browser.find_elements_by_class_name('study-matches')
         self.assertTrue(any('Pero Vaz' in row.text for row in study_rows))
 
+    def test_search_returns_only_last_version_experiment(self):
         self.fail('Finish this test!')
