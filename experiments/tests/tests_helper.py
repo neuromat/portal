@@ -229,10 +229,21 @@ def global_setup_ft():
                       Experiment.UNDER_ANALYSIS)
     create_experiment(4, choice([owner1, owner2]),
                       Experiment.APPROVED)
-    # Put some non-random strings in two approved experiments to test search
+    # Put some non-random strings in one approved experiment to test search
     experiment = Experiment.objects.last()
     experiment.title = 'Brachial Plexus'
+    experiment.description = 'Ein Beschreibung.'
     experiment.save()
+    # Create version 2 of the experiment to test search - necessary to change
+    # some field other than title, to include a non-random text, because we
+    # are highlitghing the terms searched, and this put span's elements in
+    # html with search results, causing dificulty to search 'Brachial
+    # Plexus' in experiment title in test_search.py
+    # test_search_returns_only_last_version_experiment test.
+    experiment.pk = None
+    experiment.version = 2
+    experiment.save()
+
     create_experiment(1, choice([owner1, owner2]),
                       Experiment.APPROVED)
     # We change first experiment study approved to contain 'brachial' in
