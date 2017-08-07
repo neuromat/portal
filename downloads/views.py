@@ -29,7 +29,7 @@ def create_export_instance(user):
 
 def download_view(request, experiment_id):
     template_name = "experiments/detail.html"
-    if request.method == "POST":
+    if not request.method == "POST":
         export_instance = create_export_instance(request.user)
         input_export_file = path.join(EXPORT_DIRECTORY,
                                       path.join(str(request.user.id),
@@ -51,14 +51,14 @@ def download_view(request, experiment_id):
             zip_file = open(complete_filename, 'rb')
             response = HttpResponse(zip_file, content_type='application/zip')
             response['Content-Disposition'] = 'attachment; filename="export.zip"'
-            # response['Content-Length'] = path.getsize(complete_filename)
-            response['Set-Cookie'] = 'fileDownload=true; Path=/'
+            response['Content-Length'] = path.getsize(complete_filename)
+            response['Set-Cookie'] = 'fileDownload=true; path=/'
             return response
         else:
             messages.error(request, "Export data was not generated.")
-        context = {
-            experiment_id: experiment_id,
-        }
+    context = {
+        experiment_id: experiment_id,
+    }
     return render(request, template_name, context)
 
 

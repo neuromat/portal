@@ -42,16 +42,31 @@
         <input id="experimentId" type="text" value="{{ experiment.id }}">
     </div>
 
-    <form name="download" class="align-right" method="post" action="/downloads/{{ experiment.id }}/">
+{#    <form name="download" class="align-right" method="post" action="/downloads/{{ experiment.id }}/">#}
 {#        <input id="downloadButton" type="submit" value="Download experiment data"#}
 {#               class="detail-donwload nep-btn nep-btn-submit" href="/downloads/{{ experiment.id }}/" />#}
 {#        <div id="dialog" title="File Download">#}
 {#            <div class="progress-label">Starting download...</div>#}
 {#            <div id="progressbar"></div>#}
 {#        </div>#}
-        <button id="downloadButton">Start download</button>
-        {% csrf_token %}
-    </form>
+        <div class="align-right">
+{#            <button id="downloadButton">Start download</button>#}
+            <a href="/downloads/{{ experiment.id }}" class="fileDownloadSimpleRichExperience">Download File</a>
+        </div>
+
+    <div id="preparing-file-modal" title="Preparing download..." style="display: none">
+        We are preparing your download, please wait...
+
+        <!--Throw what you'd like for a progress indicator below-->
+        <div class="ui-progressbar-value ui-corner-left ui-corner-right" style="width: 100%; height:22px; margin-top: 20px;"></div>
+    </div>
+
+    <div id="error-modal" title="Error" style="display: none;">
+        There was a problem generating your download, please try again.
+    </div>
+
+{#        {% csrf_token %}#}
+{#    </form>#}
 
     <br><br>
 

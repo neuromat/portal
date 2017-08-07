@@ -2,15 +2,35 @@
  * Created by mruizo on 01/08/17.
  */
 $(function () {
-    var experimentId =  $("#experimentId").val();
-    $("downloadButton").click(function () {
-        $.fileDownload($(this).prop('href'), {
-            preparingMessageHtml: "The file download will begin shortly, please wait...",
-            failMessageHtml: "There was a problem generating your data, please try again."
-        });
-        return false;
-    });
+   $(document).on("click", "a.fileDownloadSimpleRichExperience", function () {
+       $.fileDownload($(this).prop('href'), {
+           preparingMessageHtml: "We are preparing your download, please wait...", 
+           failMessageHtml: "There was a problem generating your download, please try again." 
+       });
+       return false;
+   });
 });
+
+// $(function () {
+//     var experimentId =  $("#experimentId").val(),
+//         url = "/downloads/experimentId/";
+//     $(document).on("click", "a.fileDownloadCustomRichExperience",function () {
+//         var $preparingFileModal = $("preparing-file-modal");
+//         $preparingFileModal.dialog({modal: true});
+//         $.fileDownload($(this).prop('href'), {
+//             sucessCallback: function (url) {
+//                 $preparingFileModal.dialog('close');
+//             },
+//             failCallback: function (responseHtml, url) {
+//                 $preparingFileModal.dialog('close');
+//                 $("#error-modal").dialog({modal: true});
+//             }
+//             // preparingMessageHtml: "The file download will begin shortly, please wait...",
+//             // failMessageHtml: "There was a problem generating your data, please try again."
+//         });
+//         return false;
+//     });
+// });
 
 // $(function() {
 //     var progressTimer,
@@ -27,7 +47,8 @@ $(function () {
 //             resizable: false,
 //             buttons: dialogButtons,
 //             open: function() {
-//                 progressTimer = setTimeout( progress, 2000 );
+//                 // progressTimer = setTimeout( progress, 2000 );
+//                 downloadFile();
 //             },
 //             beforeClose: function() {
 //                 downloadButton.button( "option", {
@@ -37,17 +58,11 @@ $(function () {
 //             }
 //         }),
 //         downloadButton = $( "#downloadButton" ).button().on( "click", function() {
-//             // $( this ).button( "option", {
-//             //     disabled: true,
-//             //     label: "Downloading..."
-//             // });
-//             $.ajax({
-//                 type: "POST",
-//                 url: "/downloads/experimentId/",
-//                 success: function(data) {
-//                     dialog.dialog( "open" );
-//                 }
+//             $( this ).button( "option", {
+//                 disabled: true,
+//                 label: "Downloading..."
 //             });
+//             dialog.dialog( "open" );
 //
 //         });
 //
@@ -83,6 +98,18 @@ $(function () {
 //         progressLabel
 //             .text( "Starting download..." );
 //         downloadButton.trigger( "focus" );
+//     }
+//
+//     function downloadFile() {
+//         experimentId = $("#experimentId").val()
+//         $.ajax({
+//                 type: "POST",
+//                 url: "/downloads/7/",
+//                 success: function(data) {
+//                     dialog.dialog( "close" );
+//                 }
+//             });
+//         // dialog.dialog("close");
 //     }
 //
 // });
