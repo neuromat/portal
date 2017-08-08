@@ -484,7 +484,8 @@ $.extend({
         promise.abort = function() {
             cleanUp();
             $iframe.attr('src', '').html('');
-            internalCallbacks.onAbort(fileUrl);
+            // internalCallbacks.onAbort(fileUrl);
+            $iframe.remove();
         };
         return promise;
     }

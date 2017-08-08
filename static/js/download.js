@@ -1,36 +1,44 @@
 /**
  * Created by mruizo on 01/08/17.
  */
-$(function () {
-   $(document).on("click", "a.fileDownloadSimpleRichExperience", function () {
-       $.fileDownload($(this).prop('href'), {
-           preparingMessageHtml: "We are preparing your download, please wait...", 
-           failMessageHtml: "There was a problem generating your download, please try again." 
-       });
-       return false;
-   });
-});
-
 // $(function () {
-//     var experimentId =  $("#experimentId").val(),
-//         url = "/downloads/experimentId/";
-//     $(document).on("click", "a.fileDownloadCustomRichExperience",function () {
-//         var $preparingFileModal = $("preparing-file-modal");
-//         $preparingFileModal.dialog({modal: true});
-//         $.fileDownload($(this).prop('href'), {
-//             sucessCallback: function (url) {
-//                 $preparingFileModal.dialog('close');
-//             },
-//             failCallback: function (responseHtml, url) {
-//                 $preparingFileModal.dialog('close');
-//                 $("#error-modal").dialog({modal: true});
-//             }
-//             // preparingMessageHtml: "The file download will begin shortly, please wait...",
-//             // failMessageHtml: "There was a problem generating your data, please try again."
-//         });
-//         return false;
-//     });
+//     var experimentId = $("#experimentId").val();
+//    $(document).on("click", "a.fileDownloadSimpleRichExperience", function () {
+//        $.fileDownload($(this).prop('href'), {
+//            preparingMessageHtml: "We are preparing your download, please wait...",
+//            failMessageHtml: "There was a problem generating your download, please try again."
+//        }).done(function () {
+//            window.location = '/experiments/' + experimentId;
+//        });
+//
+//        return false;
+//    });
 // });
+
+$(function () {
+    var experimentId =  $("#experimentId").val();
+    $(document).on("click", "a.fileDownloadCustomRichExperience", function () {
+        var $preparingFileModal = $("#preparing-file-modal");
+        $preparingFileModal.dialog({modal: true});
+        $.fileDownload($(this).prop('href'), {
+            sucessCallback: function (url) {
+                $preparingFileModal.dialog('close');
+            },
+            failCallback: function (responseHtml, url) {
+                $preparingFileModal.dialog('close');
+                $("#error-modal").dialog({modal: true});
+            },
+            // abortCallback: function (responseHtml, url) {
+            //     $preparingFileModal.dialog('close');
+            //     $("#error-modal").dialog({modal: true});
+            // },
+        }).done(function () {
+            window.location = '/experiments/' + experimentId;
+        });
+
+        return false;
+    });
+});
 
 // $(function() {
 //     var progressTimer,

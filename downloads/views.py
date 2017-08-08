@@ -29,37 +29,35 @@ def create_export_instance(user):
 
 def download_view(request, experiment_id):
     template_name = "experiments/detail.html"
-    if not request.method == "POST":
-        export_instance = create_export_instance(request.user)
-        input_export_file = path.join(EXPORT_DIRECTORY,
-                                      path.join(str(request.user.id),
-                                                path.join(str(export_instance.id), str(JSON_FILENAME))))
-        input_filename = path.join(settings.MEDIA_ROOT, input_export_file)
 
-        create_directory(settings.MEDIA_ROOT, path.split(input_export_file)[0])
+    export_instance = create_export_instance(request.user)
+    input_export_file = path.join(EXPORT_DIRECTORY,
+                                  path.join(str(request.user.id),
+                                            path.join(str(export_instance.id), str(JSON_FILENAME))))
+    input_filename = path.join(settings.MEDIA_ROOT, input_export_file)
 
-        build_complete_export_structure(experiment_id, input_filename)
+    create_directory(settings.MEDIA_ROOT, path.split(input_export_file)[0])
 
-        complete_filename = export_create(request, export_instance.id, input_filename, experiment_id)
+    build_complete_export_structure(experiment_id, input_filename)
 
-        if complete_filename:
+    complete_filename = export_create(request, export_instance.id, input_filename, experiment_id)
 
-            messages.success(request, "Export was finished correctly")
+    if complete_filename:
 
-            print("antes do fim: httpResponse")
+        messages.success(request, "Export was finished correctly")
 
-            zip_file = open(complete_filename, 'rb')
-            response = HttpResponse(zip_file, content_type='application/zip')
-            response['Content-Disposition'] = 'attachment; filename="export.zip"'
-            response['Content-Length'] = path.getsize(complete_filename)
-            response['Set-Cookie'] = 'fileDownload=true; path=/'
-            return response
-        else:
-            messages.error(request, "Export data was not generated.")
-    context = {
-        experiment_id: experiment_id,
-    }
-    return render(request, template_name, context)
+        print("antes do fim: httpResponse")
+
+        zip_file = open(complete_filename, 'rb')
+        response = HttpResponse(zip_file, content_type='application/zip')
+        response['Content-Disposition'] = 'attachment; filename="export.zip"'
+        response['Content-Length'] = path.getsize(complete_filename)
+        response['Set-Cookie'] = 'fileDownload=true; path=/'
+        return response
+    else:
+        messages.error(request, "Export data was not generated.")
+
+    return HttpResponseRedirect(template_name)
 
 
 def get_export_instance(user, export_id):
