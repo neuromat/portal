@@ -7,12 +7,15 @@ import time
 
 class SearchTest(FunctionalTest):
 
+    def setUp(self):
+        super(SearchTest, self).setUp()
+        call_command('rebuild_index', verbosity=0, interactive=False)
+
     @staticmethod
     def rebuild_index():
         call_command('rebuild_index', verbosity=0, interactive=False)
 
     def test_two_words_searched_return_correct_objects(self):
-        self.rebuild_index()
 
         # A researcher is delighted with the NED Portal. She decides to
         # search for experiments that contains "Braquial Plexus" in whatever
@@ -22,7 +25,6 @@ class SearchTest(FunctionalTest):
         search_box = self.browser.find_element_by_id('id_q')
         search_box.send_keys('Brachial Plexus')
         self.browser.find_element_by_id('submit_terms').click()
-        # search_box.send_keys(Keys.ENTER)
         time.sleep(1)
         # The search engine searches in all the site content.
         # As there are "Braquial Plexus", "braquial plexus" in experiments
@@ -82,5 +84,47 @@ class SearchTest(FunctionalTest):
             self.browser.find_elements_by_class_name('study-matches')
         self.assertTrue(any('Pero Vaz' in row.text for row in study_rows))
 
-    def test_search_returns_only_last_version_experiment(self):
+    def test_search_returns_only_last_version_experiments(self):
+
+        # The researcher searches for 'Brachial Plexus'
+        search_box = self.browser.find_element_by_id('id_q')
+        search_box.send_keys('Brachial Plexus')
+        self.browser.find_element_by_id('submit_terms').click()
+        time.sleep(1)
+
+        # She want's to see only last experiments versions -
+        # as tests helper creates version 2 of an experiment, only version 2
+        # is supposed to appear in search results. Obs.: this test only
+        # tests for duplicate result, not for the correct version.
+        table = self.browser.find_element_by_id('search_table')
+        # we make experiment.description = Ein Beschreibung in tests helper
+        experiment_rows = \
+            table.find_elements_by_class_name('experiment-matches')
+        count = 0
+        for experiment in experiment_rows:
+            if 'Ein Beschreibung' in experiment.text:
+                count = count + 1
+        self.assertEqual(1, count)
+
+    def test_search_returns_only_approved_experiments(self):
+
+        # The researcher searches for 'Brachial Plexus'
+        search_box = self.browser.find_element_by_id('id_q')
+        search_box.send_keys('Brachial Plexus')
+        self.browser.find_element_by_id('submit_terms').click()
+        time.sleep(1)
+
+        # As there are 3 experiments with 'Brachial Plexus' in title,
+        # one approved, one under analysis, and one to be analysed (created
+        # in tests helper), it's supposed to only one match occurs, one that
+        # is Experiment and has title equals to 'Brachial Plexus'
+        table = self.browser.find_element_by_id('search_table')
+        experiment_rows = \
+            table.find_elements_by_class_name('experiment-matches')
+        count = 0
+        for experiment in experiment_rows:
+            if 'Brachial Plexus' in experiment.text:
+                count = count + 1
+        self.assertEqual(1, count)
+
         self.fail('Finish this test!')

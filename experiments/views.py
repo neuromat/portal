@@ -2,6 +2,7 @@ from django.contrib import messages
 from django.core.mail import send_mail
 from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import render
+from haystack.generic_views import SearchView
 
 from experiments.models import Experiment, RejectJustification
 
@@ -169,7 +170,19 @@ def ajax_to_be_analysed(request):
     return HttpResponse(to_be_analysed, content_type='application/json')
 
 
-def search_experiments(request):
-    return render(request, 'experiments/home.html',
-                  {'table_title': 'Search Results'})
+class NepSearchView(SearchView):
+    # TODO: not working. See
+    # https://stackoverflow.com/questions/45556274/custom-view-does-not-show-results-in-django-haystack-with-elastic-search
 
+    def get_queryset(self):
+        queryset = super(NepSearchView, self).get_queryset()
+        if not self.request.user.is_authenticated and \
+                self.request.user.groups.filter(name='trustees').exists():
+            return queryset
+        else:
+            return queryset
+
+    def get_context_data(self, *args, **kwargs):
+        context = super(NepSearchView, self).get_context_data(**kwargs)
+        # do something
+        return context
