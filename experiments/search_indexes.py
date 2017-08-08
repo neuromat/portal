@@ -11,7 +11,9 @@ class ExperimentIndex(indexes.SearchIndex, indexes.Indexable):
         return Experiment
 
     def index_queryset(self, using=None):
-        return self.get_model().lastversion_objects.all()
+        return self.get_model().lastversion_objects.filter(
+            status=Experiment.APPROVED
+        )
 
 
 class StudyIndex(indexes.SearchIndex, indexes.Indexable):
@@ -25,7 +27,10 @@ class StudyIndex(indexes.SearchIndex, indexes.Indexable):
         return Study
 
     def index_queryset(self, using=None):
-        return self.get_model().objects.all()
+        experiments = Experiment.lastversion_objects.filter(
+            status=Experiment.APPROVED
+        )
+        return self.get_model().objects.filter(experiment__in=experiments)
 
 
 class GroupIndex(indexes.SearchIndex, indexes.Indexable):
@@ -37,7 +42,10 @@ class GroupIndex(indexes.SearchIndex, indexes.Indexable):
         return Group
 
     def index_queryset(self, using=None):
-        return self.get_model().objects.all()
+        experiments = Experiment.lastversion_objects.filter(
+            status=Experiment.APPROVED
+        )
+        return self.get_model().objects.filter(experiment__in=experiments)
 
 
 class ExperimentalProtocolIndex(indexes.SearchIndex, indexes.Indexable):
@@ -48,4 +56,8 @@ class ExperimentalProtocolIndex(indexes.SearchIndex, indexes.Indexable):
         return ExperimentalProtocol
 
     def index_queryset(self, using=None):
-        return self.get_model().objects.all()
+        experiments = Experiment.lastversion_objects.filter(
+            status=Experiment.APPROVED
+        )
+        groups = Group.objects.filter(experiment__in=experiments)
+        return self.get_model().objects.filter(group__in=groups)
