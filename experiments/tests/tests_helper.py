@@ -224,15 +224,36 @@ def global_setup_ft():
     # created inside create_experiment_and_study)
     create_experiment(2, choice([owner1, owner2]),
                       Experiment.TO_BE_ANALYSED)
-    # TODO: when creating experiment UNDER_ANALYSIS, associate with a trustee
-    create_experiment(2, choice([owner1, owner2]),
-                      Experiment.UNDER_ANALYSIS)
-    create_experiment(4, choice([owner1, owner2]),
-                      Experiment.APPROVED)
-    # Put some non-random strings in two approved experiments to test search
+    # To test search
     experiment = Experiment.objects.last()
     experiment.title = 'Brachial Plexus'
     experiment.save()
+
+    # TODO: when creating experiment UNDER_ANALYSIS, associate with a trustee
+    create_experiment(2, choice([owner1, owner2]),
+                      Experiment.UNDER_ANALYSIS)
+    # To test search
+    experiment = Experiment.objects.last()
+    experiment.title = 'Brachial Plexus'
+    experiment.save()
+
+    create_experiment(4, choice([owner1, owner2]),
+                      Experiment.APPROVED)
+    # Put some non-random strings in one approved experiment to test search
+    experiment = Experiment.objects.last()
+    experiment.title = 'Brachial Plexus'
+    experiment.description = 'Ein Beschreibung.'
+    experiment.save()
+    # Create version 2 of the experiment to test search - necessary to change
+    # some field other than title, to include a non-random text, because we
+    # are highlitghing the terms searched, and this put span's elements in
+    # html with search results, causing dificulty to search 'Brachial
+    # Plexus' in experiment title in test_search.py
+    # test_search_returns_only_last_version_experiment test.
+    experiment.pk = None
+    experiment.version = 2
+    experiment.save()
+
     create_experiment(1, choice([owner1, owner2]),
                       Experiment.APPROVED)
     # We change first experiment study approved to contain 'brachial' in
@@ -254,7 +275,8 @@ def global_setup_ft():
                              'functional recovery'
     experiment.save()
     # To test search
-    group = Group.objects.first()
+    group = Group.objects.filter(
+        experiment__status=Experiment.APPROVED).first()
     group.description = 'Plexus brachial is writed in wrong order. Correct ' \
                         'is Brachial plexus.'
     # TODO: test for matches in code and description. Here only tests for
@@ -281,7 +303,10 @@ def global_setup_ft():
     for study in Study.objects.all():
         create_study_collaborator(randint(2, 3), study)
     # To test search
-    collaborator = Collaborator.objects.last()
+    study = Study.objects.filter(
+        experiment__status=Experiment.APPROVED
+    ).last()
+    collaborator = Collaborator.objects.filter(study=study).first()
     collaborator.name = 'Pero Vaz'
     collaborator.save()
 

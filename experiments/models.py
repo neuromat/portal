@@ -407,7 +407,8 @@ class SetOfStep(Step):
 
 class ExperimentalProtocol(models.Model):
     group = models.OneToOneField(Group, related_name='experimental_protocol')
-    image = models.FileField(null=True, blank=True, upload_to='uploads/%Y/%m/%d/')
+    image = models.FileField(null=True, blank=True,
+                             upload_to='uploads/%Y/%m/%d/')
     textual_description = models.TextField(null=True, blank=True)
     root_step = models.ForeignKey(Step, null=True, blank=True)
 

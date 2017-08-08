@@ -1,7 +1,6 @@
 from django.db.models import Max, Q
 
 from experiments import models
-from experiments.models import Experiment
 
 
 class ExperimentVersion:
