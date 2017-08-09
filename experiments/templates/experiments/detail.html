@@ -1,6 +1,7 @@
 {% extends 'experiments/base.html' %}
 
 {% block header %}
+    {% load i18n %}
     {% include 'experiments/header_detail.html' %}
 {% endblock %}
 
@@ -47,6 +48,7 @@
                                     <strong>{{ group.title }}</strong>
                                     <br>
                                     {{ group.participants.all.count }}
+                                    {% trans "participants" %}
                                     participants<br><br>
                                     <p>{{ group.description }}</p>
                                     {% if group.inclusion_criteria.all %}
