@@ -18,8 +18,12 @@ class ExperimentDetailTest(FunctionalTest):
         # She clicks in second "View" link and is redirected to experiment
         # detail page
         # TODO: frequently fails to catch second link
-        list_links = self.browser.find_elements_by_link_text('View')
-        list_links[0].click()
+        link = self.browser.find_element_by_xpath(
+            "//a[@href='/experiments/" + str(experiment.id) + "/']"
+        )
+        link.click()
+        # list_links = self.browser.find_elements_by_link_text('View')
+        # list_links[0].click()
         time.sleep(1)
 
         # She sees a new page with a header title: Open Database
@@ -40,8 +44,8 @@ class ExperimentDetailTest(FunctionalTest):
             'id_detail_description').text
         self.assertEqual(experiment.description, experiment_description)
 
-        # Bellow experiment description there is a link to the project site,
-        # ( because experiment has that data posted via api)
+        # Bellow experiment description there is a link to the project site
+        # (because experiment has that data posted via api)
         ethics_commitee_project_info = \
             self.browser.find_element_by_link_text('Project Info')
         self.assertEqual(
@@ -49,14 +53,20 @@ class ExperimentDetailTest(FunctionalTest):
             ethics_commitee_project_info.get_attribute('href')
         )
 
-        # Right bellow she sees the study that the experiment belongs to
-        # at left, and if data acquisition was finished, at right
-        study_text = self.browser.find_element_by_id('id_detail_study').text
-        self.assertIn('Related study: ' + experiment.study.title, study_text)
+        # At the right side there is a warning telling that the data
+        # acquisition is not finished yet
         data_acquisition_text = self.browser.find_element_by_id(
             'id_detail_acquisition').text
-        self.assertIn('Data acquisition not finished yet',
-                      data_acquisition_text)
+        if experiment.data_acquisition_done:
+            self.assertIn('Data acquisition done', data_acquisition_text)
+        else:
+            self.assertIn('Data acquisition not finished',
+                          data_acquisition_text)
+
+        # Right bellow she sees the study that the experiment belongs to
+        # at left
+        study_text = self.browser.find_element_by_id('id_detail_study').text
+        self.assertIn('Related study: ' + experiment.study.title, study_text)
 
         # In right side bellow the data acquisition alert, she sees a button
         # to download of data
@@ -64,7 +74,7 @@ class ExperimentDetailTest(FunctionalTest):
             'button_download')
         self.assertEqual(
             'Download experiment data',
-            button_download.get_attribute('value')
+            button_download.text
         )
 
         # She clicks in Related study link and see a modal with Study data
@@ -87,7 +97,7 @@ class ExperimentDetailTest(FunctionalTest):
         self.assertIn('Start date:', study_start_date)
         # Obs.: code line right below is only to conform to study_start_date
         # format in browser
-        self.assertIn(experiment.study.start_date.strftime("%B %d, %Y")
+        self.assertIn(experiment.study.start_date.strftime("%b. %d, %Y")
                       .lstrip("0").replace(" 0", " "), study_start_date)
         study_end_date = self.browser.find_element_by_id(
             'study_enddate').text

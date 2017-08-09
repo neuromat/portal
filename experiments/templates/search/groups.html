@@ -1,0 +1,21 @@
+{% load highlight %}
+<tr class="group-matches">
+    <td>
+        <strong>Groups:</strong>
+        {% highlight result.object.title with query %}&nbsp;
+        <p>
+            <strong>description: </strong>
+            {% highlight result.object.description with query %}&nbsp;
+            <strong>Inclusion criteria: </strong>
+            {% for inclusion_criteria in result.object.inclusion_criteria.all %}
+                {% highlight inclusion_criteria with query %}&nbsp;
+            {% empty %}
+                No inclusion criteria
+            {% endfor %}
+        </p>
+    </td>
+    <td>
+        <a href="{% url 'experiment-detail' result.object.experiment.id %}"
+           class="nep-btn">View</a>
+    </td>
+</tr>

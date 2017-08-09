@@ -5,6 +5,17 @@
         <a href="{% url 'home' %}" class="nep-btn">Back Search</a>
     </div>
     <div id="id_detail_description" class="detail-description">{{ experiment.description }}</div>
+    {% if experiment.data_acquisition_done %}
+        <div id="id_detail_acquisition" class="align-right">
+            <span class="label label-success">Data acquisition done</span>
+        </div>
+    {% else %}
+        <div id="id_detail_acquisition" class="align-right">
+            <span class="label label-warning">
+                Data acquisition not finished
+            </span>
+        </div>
+    {% endif %}
     {% if experiment.project_url %}
         <a href="{{ experiment.project_url }}">Project Info</a>&nbsp;
     {% endif %}
@@ -14,26 +25,52 @@
             {% if experiment.ethics_committee_url %}
                 <a href="{{ experiment.ethics_committee_url }}">Ethics committee approval</a>&nbsp;&nbsp;&nbsp;
             {% else %}
-                <span class="alert">There's no ethics committee url</span> &nbsp;
-                &nbsp;&nbsp;
+                <span class="label label-danger">There's no ethics committee url</span> &nbsp;
             {% endif %}
             {% if experiment.ethics_committee_file %}
                 <a href="{{ experiment.ethics_committee_file.url }}">Download project file approved</a>
             {% else %}
-                <span class="alert">There's no ethics committee approved file</span>
+                <span class="label label-danger">There's no ethics committee approved file</span>
             {% endif %}
         </aside>
     {% endif %}
+
     <hr class="detail-header-hr">
     <div id="id_detail_study" class="detail-study">Related study: <a
             href="#" data-toggle="modal" data-target="#study_modal">{{ experiment.study.title }}</a></div>
+    <div hidden="hidden">
+        <input id="experimentId" type="text" value="{{ experiment.id }}">
+    </div>
 
-    <div id="id_detail_acquisition" class="detail-acquisition">Data acquisition not finished yet</div>
-    <form name="download" method="post" action="/downloads/{{ experiment.id }}/">
-        <input id="button_download" type="submit" value="Download experiment data" class="detail-donwload nep-btn nep-btn-submit" href="/downloads
-         /{{ experiment.id }}/" />
-        {% csrf_token %}
-    </form>
+{#    <form name="download" class="align-right" method="post" action="/downloads/{{ experiment.id }}/">#}
+{#        <input id="downloadButton" type="submit" value="Download experiment data"#}
+{#               class="detail-donwload nep-btn nep-btn-submit" href="/downloads/{{ experiment.id }}/" />#}
+{#        <div id="dialog" title="File Download">#}
+{#            <div class="progress-label">Starting download...</div>#}
+{#            <div id="progressbar"></div>#}
+{#        </div>#}
+        <div class="align-right">
+{#            <button id="downloadButton">Start download</button>#}
+            <a id="button_download" href="/downloads/{{ experiment.id }}"
+                class="fileDownloadCustomRichExperience nep-btn">Download
+                experiment data</a>
+        </div>
+
+    <div id="preparing-file-modal" title="Preparing download..." style="display: none">
+        We are preparing your download, please wait...
+
+        <!--Throw what you'd like for a progress indicator below-->
+        <div class="ui-progressbar-value ui-corner-left ui-corner-right" style="width: 100%; height:22px; margin-top: 20px;"></div>
+    </div>
+
+    <div id="error-modal" title="Error" style="display: none;">
+        There was a problem generating your download, please try again.
+    </div>
+
+{#        {% csrf_token %}#}
+{#    </form>#}
+
+    <br><br>
 
     {# Study modal #}
     <div id="study_modal" class="modal fade" tabindex="-1" role="dialog">

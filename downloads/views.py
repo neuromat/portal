@@ -1,8 +1,8 @@
-import json
 from django.conf import settings
 from django.contrib import messages
 from django.shortcuts import render
-from django.http import HttpResponse
+from django.core.urlresolvers import reverse
+from django.http import HttpResponse, HttpResponseRedirect
 from .models import Export
 from os import path
 from zipfile import ZipFile
@@ -28,42 +28,36 @@ def create_export_instance(user):
 
 
 def download_view(request, experiment_id):
+    template_name = "experiments/detail.html"
 
-    if request.method == "POST":
-        export_instance = create_export_instance(request.user)
-        input_export_file = path.join(EXPORT_DIRECTORY,
-                                      path.join(str(request.user.id),
-                                                path.join(str(export_instance.id), str(JSON_FILENAME))))
-        input_filename = path.join(settings.MEDIA_ROOT, input_export_file)
+    export_instance = create_export_instance(request.user)
+    input_export_file = path.join(EXPORT_DIRECTORY,
+                                  path.join(str(request.user.id),
+                                            path.join(str(export_instance.id), str(JSON_FILENAME))))
+    input_filename = path.join(settings.MEDIA_ROOT, input_export_file)
 
-        create_directory(settings.MEDIA_ROOT, path.split(input_export_file)[0])
+    create_directory(settings.MEDIA_ROOT, path.split(input_export_file)[0])
 
-        build_complete_export_structure(experiment_id, input_filename)
+    build_complete_export_structure(experiment_id, input_filename)
 
-        complete_filename = export_create(request, export_instance.id, input_filename, experiment_id)
+    complete_filename = export_create(request, export_instance.id, input_filename, experiment_id)
 
-        if complete_filename:
+    if complete_filename:
 
-            messages.success(request, ("Export was finished correctly"))
+        messages.success(request, "Export was finished correctly")
 
-            print("antes do fim: httpResponse")
+        print("antes do fim: httpResponse")
 
-            zip_file = open(complete_filename, 'rb')
-            response = HttpResponse(zip_file, content_type='application/zip')
-            response['Content-Disposition'] = 'attachment; filename="export.zip"'
-            response['Content-Length'] = path.getsize(complete_filename)
-            return response
-        else:
-            messages.error(request, ("Export data was not generated."))
-            return HttpResponse("Export data from experiment " + experiment_id + " was not generated")
+        zip_file = open(complete_filename, 'rb')
+        response = HttpResponse(zip_file, content_type='application/zip')
+        response['Content-Disposition'] = 'attachment; filename="export.zip"'
+        response['Content-Length'] = path.getsize(complete_filename)
+        response['Set-Cookie'] = 'fileDownload=true; path=/'
+        return response
+    else:
+        messages.error(request, "Export data was not generated.")
 
-    return HttpResponse("Download experiment id " + experiment_id)
-    # description = ''
-    # context = {
-    #     description : "download",
-    # }
-    #
-    # return render(request, context)
+    return HttpResponseRedirect(template_name)
 
 
 def get_export_instance(user, export_id):
@@ -78,7 +72,7 @@ def update_export_instance(input_file, output_export, export_instance):
     export_instance.save()
 
 
-def export_create(request, export_id, input_filename, experiment_id, template_name="downloads/download_data.html"):
+def export_create(request, export_id, input_filename, experiment_id, template_name="experiments/detail.html"):
     try:
 
         export_instance = get_export_instance(request.user, export_id)
@@ -90,8 +84,7 @@ def export_create(request, export_id, input_filename, experiment_id, template_na
         error_msg, base_directory_name = create_directory(base_directory, path_to_create)
         if error_msg != "":
             messages.error(request, error_msg)
-            # return render(request, template_name)
-            return HttpResponse("Fail when create directory ")
+            return render(request, template_name)
         # ex. /Users/.../portal/media/download/user.id/export_instance.id/json_export.json
         input_export_file = path.join("export", path.join(str(request.user.id),
                                                           path.join(str(export_instance.id), str(input_filename))))
@@ -101,17 +94,21 @@ def export_create(request, export_id, input_filename, experiment_id, template_na
         input_data = export.read_configuration_data(input_filename)
 
         if not export.is_input_data_consistent() or not input_data:
-            messages.error(request, ("Inconsistent data read from json file"))
-            # return render(request, template_name)
-            return HttpResponse("json file inconsistent ")
+            messages.error(request, "Inconsistent data read from json file")
+            return render(request, template_name)
 
         # create directory base for export: /EXPERIMENT_DOWNLOAD
         error_msg = export.create_export_directory()
 
         if error_msg != "":
             messages.error(request, error_msg)
-            # return render(request, template_name)
-            return HttpResponse("Fail when create export directory ")
+            return render(request, template_name)
+
+        # load information of the data collection per participant in a dictionnary
+        error_msg = export.include_data_from_group(experiment_id)
+        if error_msg != "":
+            messages.error(request, error_msg)
+            return render(request, template_name)
 
         # Create arquivos para exportação
         # create files protocolo experimental and diagnosis/participant csv file for each group
@@ -119,8 +116,13 @@ def export_create(request, export_id, input_filename, experiment_id, template_na
 
         if error_msg != "":
             messages.error(request, error_msg)
-            # return render(request, template_name)
-            return HttpResponse("Fail in process_experiment_data ")
+            return render(request, template_name)
+        # process the data per participant
+        error_msg = export.download_data_per_participant()
+
+        if error_msg != "":
+            messages.error(request, error_msg)
+            return render(request, template_name)
 
         # create zip file and include files
         export_complete_filename = ""
@@ -148,7 +150,7 @@ def export_create(request, export_id, input_filename, experiment_id, template_na
         base_export_directory = export.get_export_directory()
         rmtree(base_export_directory)
 
-        # messages.success(request, _("Export was finished correctly"))
+        # messages.success(request, "Export was finished correctly")
         print("finalizado corretamente 2")
 
         return export_complete_filename
@@ -157,5 +159,4 @@ def export_create(request, export_id, input_filename, experiment_id, template_na
         print(e)
         error_msg = e
         messages.error(request, error_msg)
-        # return render(request, template_name)
-        return HttpResponse("Error in export create ")
+        return render(request, template_name)

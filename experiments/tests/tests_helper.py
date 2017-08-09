@@ -54,7 +54,8 @@ def create_experiment(qtty, owner, status):
             # genetates constraint violaton (nes_id, owner_id)
             owner=owner, version=1,
             sent_date=datetime.utcnow(),
-            status=status
+            status=status,
+            data_acquisition_done=choice([True, False])
         )
         create_study(experiment)
         create_experiment_groups(randint(2, 3), experiment)
@@ -171,6 +172,8 @@ def create_keyword(qtty):
             if not Keyword.objects.filter(name=keyword):
                 break
         Keyword.objects.create(name=keyword)
+    # To test search
+    Keyword.objects.create(name='brachial plexus')
 
 
 def associate_experiments_to_trustees():
@@ -221,11 +224,72 @@ def global_setup_ft():
     # created inside create_experiment_and_study)
     create_experiment(2, choice([owner1, owner2]),
                       Experiment.TO_BE_ANALYSED)
+    # To test search
+    experiment = Experiment.objects.last()
+    experiment.title = 'Brachial Plexus'
+    experiment.save()
+
     # TODO: when creating experiment UNDER_ANALYSIS, associate with a trustee
     create_experiment(2, choice([owner1, owner2]),
                       Experiment.UNDER_ANALYSIS)
+    # To test search
+    experiment = Experiment.objects.last()
+    experiment.title = 'Brachial Plexus'
+    experiment.save()
+
+    create_experiment(4, choice([owner1, owner2]),
+                      Experiment.APPROVED)
+    # Put some non-random strings in one approved experiment to test search
+    experiment = Experiment.objects.last()
+    experiment.title = 'Brachial Plexus'
+    experiment.description = 'Ein Beschreibung.'
+    experiment.save()
+    # Create version 2 of the experiment to test search - necessary to change
+    # some field other than title, to include a non-random text, because we
+    # are highlitghing the terms searched, and this put span's elements in
+    # html with search results, causing dificulty to search 'Brachial
+    # Plexus' in experiment title in test_search.py
+    # test_search_returns_only_last_version_experiment test.
+    experiment.pk = None
+    experiment.version = 2
+    experiment.save()
+
     create_experiment(1, choice([owner1, owner2]),
                       Experiment.APPROVED)
+    # We change first experiment study approved to contain 'brachial' in
+    # study description, so it have to be found by search test
+    study = Study.objects.filter(
+        experiment__status=Experiment.APPROVED
+    ).first()
+    study.description = 'The brachial artery is the major blood vessel of ' \
+                        'the (upper) arm. It\'s correlated with plexus.'
+    # We put a keyword with the string 'brachial plexus' in the study to
+    # also be found by search test
+    study.keywords.add('brachial plexus')
+    study.save()
+    # We change experiment description to test search
+    experiment = Experiment.objects.last()
+    experiment.description = 'Brachial plexus repair by peripheral nerve ' \
+                             'grafts directly into the spinal cord in rats ' \
+                             'Behavioral and anatomical evidence of ' \
+                             'functional recovery'
+    experiment.save()
+    # To test search
+    group = Group.objects.filter(
+        experiment__status=Experiment.APPROVED).first()
+    group.description = 'Plexus brachial is writed in wrong order. Correct ' \
+                        'is Brachial plexus.'
+    # TODO: test for matches in code and description. Here only tests for
+    # TODO: matches in abbreviated_description, as this is the field returned
+    # TODO: in model __str__ method.
+    ic = ClassificationOfDiseases.objects.create(
+        code='BP', description='brachial Plexus',
+        abbreviated_description='brachial Plexus',
+        parent=None
+    )
+    group.inclusion_criteria.add(ic)
+    group.save()
+
     # We create one experiment approved with ethics committee information
     create_ethics_committee_info(Experiment.objects.last())
     create_experiment(1, choice([owner1, owner2]),
@@ -238,6 +302,13 @@ def global_setup_ft():
     # Create study collaborators (requires creating studies before)
     for study in Study.objects.all():
         create_study_collaborator(randint(2, 3), study)
+    # To test search
+    study = Study.objects.filter(
+        experiment__status=Experiment.APPROVED
+    ).last()
+    collaborator = Collaborator.objects.filter(study=study).first()
+    collaborator.name = 'Pero Vaz'
+    collaborator.save()
 
     # Create some keywords to associate with studies
     create_keyword(10)
@@ -271,6 +342,10 @@ def global_setup_ft():
     # create_experiment_and_study method
     # Requires running create_experiment_study_group before
     create_researchers()
+
+
+def global_setup_ft_search():
+    pass
 
 
 def global_setup_ut():

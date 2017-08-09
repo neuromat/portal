@@ -169,14 +169,14 @@ a:hover.nep-btn {
 }
 
 .detail-header-hr {
-  margin-bottom: 2px;
+  margin-bottom: 4px;
 }
 
 .detail-study {
   float: left;
 }
 
-.detail-acquisition {
+.align-right {
   float: right;
 }
 
@@ -311,4 +311,14 @@ a:hover.nep-btn {
   margin-left: auto;
   margin-right: auto;
   width: 97%;
+}
+
+/*
+  ========================================
+  Haystack
+  ========================================
+ */
+/* used when highlight haystack tag is used in template */
+.highlighted {
+  background: yellow;
 }

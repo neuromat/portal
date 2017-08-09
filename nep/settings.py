@@ -29,8 +29,9 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+    'haystack',
     'experiments.apps.ExperimentsConfig',
-    'downloads'
+    'downloads',
 ]
 
 MIDDLEWARE = [
@@ -47,6 +48,16 @@ ROOT_URLCONF = 'nep.urls'
 
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/'
+
+# Haystack
+HAYSTACK_CONNECTIONS = {
+    'default': {
+        'ENGINE':
+            'haystack.backends.elasticsearch_backend.ElasticsearchSearchEngine',
+        'URL': 'http://127.0.0.1:9200/',
+        'INDEX_NAME': 'haystack',
+    }
+}
 
 TEMPLATES = [
     {
@@ -84,7 +95,6 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
-
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.10/topics/i18n/
