@@ -51,7 +51,9 @@
 {#        </div>#}
         <div class="align-right">
 {#            <button id="downloadButton">Start download</button>#}
-            <a href="/downloads/{{ experiment.id }}" class="fileDownloadCustomRichExperience">Download File</a>
+            <a id="button_download" href="/downloads/{{ experiment.id }}"
+                class="fileDownloadCustomRichExperience nep-btn">Download
+                experiment data</a>
         </div>
 
     <div id="preparing-file-modal" title="Preparing download..." style="display: none">
