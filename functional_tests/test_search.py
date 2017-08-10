@@ -53,7 +53,7 @@ class SearchTest(FunctionalTest):
         # line contains the field names and contents, starting with title.
         self.assertTrue(
             any(
-                'Experiment\ntitle:' in row.text for row in experiment_rows
+                'Experiment\n\ntitle:' in row.text for row in experiment_rows
             ), [row.text for row in experiment_rows]
         )
         # There's an experiment whose study has the word 'brachial' in study
@@ -69,7 +69,7 @@ class SearchTest(FunctionalTest):
         self.assertTrue(
             any(
                 'Experiment: ' + study.experiment.title +
-                ' > Study\ntitle:' in row.text for row in study_rows
+                ' > Study\n\ntitle:' in row.text for row in study_rows
             ), [row.text for row in study_rows]
         )
         self.assertTrue(any('brachial' in row.text for row in study_rows))
@@ -85,7 +85,7 @@ class SearchTest(FunctionalTest):
         group_rows = self.browser.find_elements_by_class_name('group-matches')
         self.assertTrue(
             any(
-                'Experiment: ' + group.experiment.title + ' > Groups\ntitle:'
+                'Experiment: ' + group.experiment.title + ' > Groups\n\ntitle:'
                 in row.text for row in group_rows
             ), [row.text for row in group_rows]
         )
