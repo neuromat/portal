@@ -1,9 +1,11 @@
 {% load highlight %}
 <tr class="experiment-matches">
     <td>
-        <strong>Experiment: </strong>
-        {% highlight result.object.title with query %}&nbsp;
+            <a href="{% url 'experiment-detail' result.object.id %}"
+           class="nep-btn"><strong>Experiment</strong></a><br><br>
         <p>
+            <strong>title: </strong>
+            {% highlight result.object.title with query %}&nbsp;
             <strong>description: </strong>
             {% highlight result.object.description with query %}&nbsp;
             {% if result.object.sent_date %}
@@ -11,9 +13,5 @@
                 {% highlight result.object.sent_date with query %}
             {% endif %}
         </p>
-    </td>
-    <td>
-        <a href="{% url 'experiment-detail' result.object.id %}"
-           class="nep-btn">View</a>
     </td>
 </tr>

@@ -48,6 +48,14 @@ class SearchTest(FunctionalTest):
         self.assertTrue(
             any('Brachial plexus' in row.text for row in experiment_rows)
         )
+        # The information of an experiment is organized this way: first line
+        # is the object that was matched - in this case: Experiment. Second
+        # line contains the field names and contents, starting with title.
+        self.assertTrue(
+            any(
+                'Experiment\ntitle:' in row.text for row in experiment_rows
+            ), [row.text for row in experiment_rows]
+        )
         # There's an experiment whose study has the word 'brachial' in study
         # description, and 'brachial plexus' in one of the study keywords -
         # when there are matches in other models data besides
@@ -60,11 +68,9 @@ class SearchTest(FunctionalTest):
             self.browser.find_elements_by_class_name('study-matches')
         self.assertTrue(
             any(
-                'Experiment: ' + study.experiment.title + ' > Study: ' +
-                study.title in row.text for row in study_rows
-            ),
-            'Experiment title is ' + study.experiment.title +
-            ', Study title is ' + study.title
+                'Experiment: ' + study.experiment.title +
+                ' > Study\ntitle:' in row.text for row in study_rows
+            ), [row.text for row in study_rows]
         )
         self.assertTrue(any('brachial' in row.text for row in study_rows))
         self.assertTrue(
@@ -79,11 +85,9 @@ class SearchTest(FunctionalTest):
         group_rows = self.browser.find_elements_by_class_name('group-matches')
         self.assertTrue(
             any(
-                'Experiment: ' + group.experiment.title + ' > Groups: ' +
-                group.title in row.text for row in group_rows
-            ),
-            'Experiment title is ' + group.experiment.title +
-            ', Group title is ' + group.title
+                'Experiment: ' + group.experiment.title + ' > Groups\ntitle:'
+                in row.text for row in group_rows
+            ), [row.text for row in group_rows]
         )
         self.assertTrue(
             any('Plexus brachial' in row.text for row in group_rows)
