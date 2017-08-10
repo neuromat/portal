@@ -28,7 +28,9 @@
                 <span class="label label-danger">There's no ethics committee url</span> &nbsp;
             {% endif %}
             {% if experiment.ethics_committee_file %}
-                <a href="{{ experiment.ethics_committee_file.url }}">Download project file approved</a>
+                <a href="{{ experiment.ethics_committee_file.url }}"
+                   class="nep-btn"
+                >Download project file approved</a>
             {% else %}
                 <span class="label label-danger">There's no ethics committee approved file</span>
             {% endif %}

@@ -1,5 +1,7 @@
 from django.core.management import call_command
 from selenium.webdriver.common.keys import Keys
+
+from experiments.models import Study, Experiment, Group
 from functional_tests.base import FunctionalTest
 
 import time
@@ -46,14 +48,30 @@ class SearchTest(FunctionalTest):
         self.assertTrue(
             any('Brachial plexus' in row.text for row in experiment_rows)
         )
+        # The information of an experiment is organized this way: first line
+        # is the object that was matched - in this case: Experiment. Second
+        # line contains the field names and contents, starting with title.
+        self.assertTrue(
+            any(
+                'Experiment\ntitle:' in row.text for row in experiment_rows
+            ), [row.text for row in experiment_rows]
+        )
         # There's an experiment whose study has the word 'brachial' in study
         # description, and 'brachial plexus' in one of the study keywords -
         # when there are matches in other models data besides
         # experiment, a new line in the results displays other models'
         # matches, below the experiment that model pertains.
+        study = Study.objects.filter(
+            experiment__status=Experiment.APPROVED
+        ).first()
         study_rows = \
             self.browser.find_elements_by_class_name('study-matches')
-        self.assertTrue(any('Study:' in row.text for row in study_rows))
+        self.assertTrue(
+            any(
+                'Experiment: ' + study.experiment.title +
+                ' > Study\ntitle:' in row.text for row in study_rows
+            ), [row.text for row in study_rows]
+        )
         self.assertTrue(any('brachial' in row.text for row in study_rows))
         self.assertTrue(
             any('brachial plexus' in row.text for row in study_rows)
@@ -61,8 +79,16 @@ class SearchTest(FunctionalTest):
 
         # There's one group with the string 'Plexus brachial' in
         # group description, and 'brachial Plexus' in group inclusion criteria
+        group = Group.objects.filter(
+            experiment__status=Experiment.APPROVED
+        ).first()
         group_rows = self.browser.find_elements_by_class_name('group-matches')
-        self.assertTrue(any('Groups:' in row.text for row in group_rows))
+        self.assertTrue(
+            any(
+                'Experiment: ' + group.experiment.title + ' > Groups\ntitle:'
+                in row.text for row in group_rows
+            ), [row.text for row in group_rows]
+        )
         self.assertTrue(
             any('Plexus brachial' in row.text for row in group_rows)
         )
