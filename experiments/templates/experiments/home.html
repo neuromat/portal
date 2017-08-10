@@ -11,7 +11,7 @@
             {% include 'experiments/messages.html' %}
         {% endif %}
         <div id="id_table_title" class="table-title">
-            <h2>{{ table_title }}</h2>
+            <h2>{% trans "List of Experiments" %}</h2>
         </div>
         {% if experiments %}
             {% load experiment_extras %}

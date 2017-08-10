@@ -3,17 +3,17 @@
     <h2>{% trans "Open Database for Experiments in Neuroscience" %}</h2>
     <h4 id="id_detail_title" class="detail-title">{{ experiment.title }}</h4>
     <div id="id_link_home" class="detail-back-search">
-        <a href="{% url 'home' %}" class="nep-btn">Back Search</a>
+        <a href="{% url 'home' %}" class="nep-btn">{% trans "Back to home" %}</a>
     </div>
     <div id="id_detail_description" class="detail-description">{{ experiment.description }}</div>
     {% if experiment.data_acquisition_done %}
         <div id="id_detail_acquisition" class="align-right">
-            <span class="label label-success">{% trans "Data acquisition done" %}</span>
+            <span class="label label-success">{% trans "The data acquisition was completed" %}</span>
         </div>
     {% else %}
         <div id="id_detail_acquisition" class="align-right">
             <span class="label label-warning">
-                {% trans "Data acquisition not finished" %}
+                {% trans "The data acquisition was not completed" %}
             </span>
         </div>
     {% endif %}
@@ -24,22 +24,25 @@
     {% if user.is_authenticated and user|has_group:'trustees' %}
         <aside id="ethics_committee_info">
             {% if experiment.ethics_committee_url %}
-                <a href="{{ experiment.ethics_committee_url }}">{% trans "Ethics committee approval" %}</a>&nbsp;&nbsp;&nbsp;
+                <a href="{{ experiment.ethics_committee_url }}">{% trans "Approval of the ethics committee" %}</a>&nbsp;
+                &nbsp;&nbsp;
             {% else %}
-                <span class="label label-danger">{% trans "There's no ethics committee url" %}</span> &nbsp;
+                <span class="label label-danger">{% trans "url address of the ethics committee not available" %}</span>
+                &nbsp;
             {% endif %}
             {% if experiment.ethics_committee_file %}
                 <a href="{{ experiment.ethics_committee_file.url }}"
                    class="nep-btn"
-                >Download project file approved</a>
+                >{% trans "Approval of the ethics committee" %}</a>
             {% else %}
-                <span class="label label-danger">{% trans "There's no ethics committee approved file" %}</span>
+                <span class="label label-danger">
+                    {% trans "Approval of the ethics committee not available" %}</span>
             {% endif %}
         </aside>
     {% endif %}
 
     <hr class="detail-header-hr">
-    <div id="id_detail_study" class="detail-study">{% trans "Related study" %}: <a
+    <div id="id_detail_study" class="detail-study">{% trans "From the study" %}: <a
             href="#" data-toggle="modal" data-target="#study_modal">{{ experiment.study.title }}</a></div>
     <div hidden="hidden">
         <input id="experimentId" type="text" value="{{ experiment.id }}">
@@ -48,8 +51,7 @@
         <div class="align-right">
 {#            <button id="downloadButton">Start download</button>#}
             <a id="button_download" href="/downloads/{{ experiment.id }}"
-                class="fileDownloadCustomRichExperience nep-btn">Download
-                experiment data</a>
+                class="fileDownloadCustomRichExperience nep-btn">{% trans "Download experiment data" %}</a>
         </div>
 
     <div id="preparing-file-modal" title="Preparing download..." style="display: none">

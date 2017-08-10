@@ -74,7 +74,7 @@
                             collapse out" role="tabpanel"
                                  aria-labelledby="heading{{ group.id }}">
                                 <div class="panel-body">
-                                    <strong>{% trans "Description textual" %}</strong>
+                                    <strong>{% trans "Textual description" %}</strong>
                                     <pre class="textual-protocol">{{ group.experimental_protocol.textual_description }}</pre>
                                 </div>
                             </div>
@@ -135,7 +135,7 @@
                         {# see script bellow #}
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-default" data-dismiss="modal">{% trans "Close" %}</button>
                     </div>
                 </div><!-- /.modal-content -->
             </div><!-- /.modal-dialog -->
