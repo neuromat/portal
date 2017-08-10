@@ -1,6 +1,8 @@
 <header class="container header-home">
-    <h1>Neuroscience Experiments Database</h1>
-    <h4>An Open Database for Experiments in Neuroscience</h4>
+    {% load i18n %}
+    <h1>{% trans "Neuroscience Experiments Database" %}</h1>
+{#    <h1>Neuroscience Experiments Database</h1>#}
+    <h4>{% trans "An Open Database for Experiments in Neuroscience" %}</h4>
     <form id="search_form" action="/search">
         {# id="id_q" and name="q" required to haystack search #}
         <div class="form-group">

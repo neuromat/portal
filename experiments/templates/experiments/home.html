@@ -6,6 +6,7 @@
 {% endblock %}
 
 {% block header %}
+    {% load i18n %}
     {% include 'experiments/header_home.html' %}
 {% endblock %}
 
@@ -25,7 +26,7 @@
                 {% include 'experiments/list_default.html' %}
             {% endif %}
         {% else %}
-            <p>There's no experiments yet.</p>
+            <p>{% trans "There are no experiments" %}</p>
         {% endif %}
     </section>
 {% endblock %}

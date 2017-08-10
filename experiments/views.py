@@ -3,6 +3,7 @@ from django.core.mail import send_mail
 from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import render
 from haystack.generic_views import SearchView
+from django.utils.translation import activate, LANGUAGE_SESSION_KEY, ugettext as _
 
 from experiments.models import Experiment, RejectJustification
 
@@ -186,3 +187,11 @@ class NepSearchView(SearchView):
         context = super(NepSearchView, self).get_context_data(**kwargs)
         # do something
         return context
+
+
+def language_change(request, language_code):
+
+    activate(language_code)
+    request.session[LANGUAGE_SESSION_KEY] = language_code
+
+    return HttpResponseRedirect(request.GET['next'])
