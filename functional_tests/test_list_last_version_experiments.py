@@ -36,9 +36,9 @@ class NewVisitorTest(FunctionalTest):
         selectbox = self.browser.find_element_by_id('id_selectbox')
         options = selectbox.find_elements_by_tag_name('option')
         placeholder = options[0]
-        self.assertTrue(
-            placeholder,
-            'Select one or more list itens to filter experiments that posess:'
+        self.assertEqual(
+            placeholder.text,
+            'Select one or more list itens to filter experiments that has:'
         )
         # The select box options are: EEG, TMS, EMG, Goalkeeper game
         # fase, Cinematic measures, Stabilometry, Answer time, Psychophysical
@@ -70,7 +70,6 @@ class NewVisitorTest(FunctionalTest):
         self.assertTrue(
             any(option.text == 'Unitary register' for option in options)
         )
-
         # As there are experiments sended to Portal, she sees the home
         # page have a list of experiments in a table.
         # She reads in "List of Experiments" in the table title.
