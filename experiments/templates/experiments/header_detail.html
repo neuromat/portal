@@ -1,5 +1,6 @@
 <header class="container detail-header">
-    <h2>Open Database for Experiments in Neuroscience</h2>
+    {% load i18n %}
+    <h2>{% trans "Open Database for Experiments in Neuroscience" %}</h2>
     <h4 id="id_detail_title" class="detail-title">{{ experiment.title }}</h4>
     <div id="id_link_home" class="detail-back-search">
         <a href="{% url 'home' %}" class="nep-btn">Back Search</a>
@@ -7,62 +8,55 @@
     <div id="id_detail_description" class="detail-description">{{ experiment.description }}</div>
     {% if experiment.data_acquisition_done %}
         <div id="id_detail_acquisition" class="align-right">
-            <span class="label label-success">Data acquisition done</span>
+            <span class="label label-success">{% trans "Data acquisition done" %}</span>
         </div>
     {% else %}
         <div id="id_detail_acquisition" class="align-right">
             <span class="label label-warning">
-                Data acquisition not finished
+                {% trans "Data acquisition not finished" %}
             </span>
         </div>
     {% endif %}
     {% if experiment.project_url %}
-        <a href="{{ experiment.project_url }}">Project Info</a>&nbsp;
+        <a href="{{ experiment.project_url }}">{% trans "Project Info" %}</a>&nbsp;
     {% endif %}
     {% load experiment_extras %}
     {% if user.is_authenticated and user|has_group:'trustees' %}
         <aside id="ethics_committee_info">
             {% if experiment.ethics_committee_url %}
-                <a href="{{ experiment.ethics_committee_url }}">Ethics committee approval</a>&nbsp;&nbsp;&nbsp;
+                <a href="{{ experiment.ethics_committee_url }}">{% trans "Ethics committee approval" %}</a>&nbsp;&nbsp;&nbsp;
             {% else %}
-                <span class="label label-danger">There's no ethics committee url</span> &nbsp;
+                <span class="label label-danger">{% trans "There's no ethics committee url" %}</span> &nbsp;
             {% endif %}
             {% if experiment.ethics_committee_file %}
-                <a href="{{ experiment.ethics_committee_file.url }}">Download project file approved</a>
+                <a href="{{ experiment.ethics_committee_file.url }}">{% trans "Download project file approved" %}</a>
             {% else %}
-                <span class="label label-danger">There's no ethics committee approved file</span>
+                <span class="label label-danger">{% trans "There's no ethics committee approved file" %}</span>
             {% endif %}
         </aside>
     {% endif %}
 
     <hr class="detail-header-hr">
-    <div id="id_detail_study" class="detail-study">Related study: <a
+    <div id="id_detail_study" class="detail-study">{% trans "Related study" %}: <a
             href="#" data-toggle="modal" data-target="#study_modal">{{ experiment.study.title }}</a></div>
     <div hidden="hidden">
         <input id="experimentId" type="text" value="{{ experiment.id }}">
     </div>
 
-{#    <form name="download" class="align-right" method="post" action="/downloads/{{ experiment.id }}/">#}
-{#        <input id="downloadButton" type="submit" value="Download experiment data"#}
-{#               class="detail-donwload nep-btn nep-btn-submit" href="/downloads/{{ experiment.id }}/" />#}
-{#        <div id="dialog" title="File Download">#}
-{#            <div class="progress-label">Starting download...</div>#}
-{#            <div id="progressbar"></div>#}
-{#        </div>#}
         <div class="align-right">
 {#            <button id="downloadButton">Start download</button>#}
             <a href="/downloads/{{ experiment.id }}" class="fileDownloadCustomRichExperience">Download File</a>
         </div>
 
     <div id="preparing-file-modal" title="Preparing download..." style="display: none">
-        We are preparing your download, please wait...
+        {% trans "We are preparing your download, please wait..." %}
 
         <!--Throw what you'd like for a progress indicator below-->
         <div class="ui-progressbar-value ui-corner-left ui-corner-right" style="width: 100%; height:22px; margin-top: 20px;"></div>
     </div>
 
     <div id="error-modal" title="Error" style="display: none;">
-        There was a problem generating your download, please try again.
+        {% trans "There was a problem generating your download, please try again." %}
     </div>
 
 {#        {% csrf_token %}#}
@@ -82,23 +76,23 @@
                 <div class="modal-body">
                     <p id="study_description">{{ experiment.study.description }}</p>
                     <section>
-                        <div id="study_researcher" class="col-md-6"><strong>Researcher:</strong>
+                        <div id="study_researcher" class="col-md-6"><strong>{% trans "Researcher" %}:</strong>
                             {{ experiment.study.researcher.name }}</div>
                         <div id="study_startdate"
-                             class="col-md-3"><strong>Start date:</strong><br>
+                             class="col-md-3"><strong>{% trans "Start date" %}:</strong><br>
                             {{ experiment.study.start_date }}</div>
                         <div id="study_enddate"
-                             class="col-md-3"><strong>End date:</strong><br>
+                             class="col-md-3"><strong>{% trans "End date" %}:</strong><br>
                             {{ experiment.study.end_date }}</div>
                     </section>
                     <section>
-                        <div id="study_contributors"><strong>Contributors:</strong></div>
+                        <div id="study_contributors"><strong>{% trans "Contributors" %}:</strong></div>
                         <table id="table_contributors" class="table">
                             <thead>
                             <tr>
-                                <th>Person</th>
-                                <th>Team</th>
-                                <th>Coordinator</th>
+                                <th>{% trans "Person" %}</th>
+                                <th>{% trans "Team" %}</th>
+                                <th>{% trans "Coordinator" %}</th>
                             </tr>
                             </thead>
                             <tbody>
@@ -113,7 +107,7 @@
                         </table>
                     </section>
                     <section>
-                        <div id="keywords"><strong>Keywords: </strong>
+                        <div id="keywords"><strong>{% trans "Keywords" %}: </strong>
                             {% for keyword in experiment.study.keywords.all %}
                                 {{ keyword.name }}{% if not forloop.last %} | {% endif %}
                             {% endfor %}
@@ -122,7 +116,7 @@
                 </div>
 
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">{% trans "Close" %}</button>
                 </div>
             </div><!-- /.modal-content -->
         </div><!-- /.modal-dialog -->

@@ -11,9 +11,10 @@
             {% include 'experiments/messages.html' %}
         {% endif %}
         <ul class="nav nav-tabs" role="tablist">
-            <li role="presentation" class="active"><a href="#statistics_tab" role="tab" data-toggle="tab">Statistics</a></li>
-            <li role="presentation"><a href="#groups_tab" role="tab" data-toggle="tab">Groups</a></li>
-            <li role="presentation"><a href="#settings_tab" role="tab" data-toggle="tab">Settings</a></li>
+            <li role="presentation" class="active"><a href="#statistics_tab" role="tab" data-toggle="tab">
+                {% trans "Statistics" %}</a></li>
+            <li role="presentation"><a href="#groups_tab" role="tab" data-toggle="tab">{% trans "Groups" %}</a></li>
+            <li role="presentation"><a href="#settings_tab" role="tab" data-toggle="tab">{% trans "Settings" %}</a></li>
         </ul>
 
         <!-- Tab panes -->
@@ -49,10 +50,10 @@
                                     <br>
                                     {{ group.participants.all.count }}
                                     {% trans "participants" %}
-                                    participants<br><br>
+                                    <br><br>
                                     <p>{{ group.description }}</p>
                                     {% if group.inclusion_criteria.all %}
-                                        Inclusion criterias:
+                                        {% trans "Inclusion criterias" %}:
                                         <br>
                                         {% for criteria in group.inclusion_criteria.all %}
                                             {{ criteria.code }} - {{ criteria.description }}{% if not forloop.last %},{% endif %}
@@ -65,7 +66,7 @@
                                    data-parent="#accordion"
                                    href="#collapse{{ group.id }}"
                                    aria-expanded="true"
-                                   aria-controls="collapse{{ group.id }}" class="nep-btn">Details</a>
+                                   aria-controls="collapse{{ group.id }}" class="nep-btn">{% trans "Details" %}</a>
                             </div>
                             <br>
                             <div id="collapse{{ group.id }}"
@@ -73,7 +74,7 @@
                             collapse out" role="tabpanel"
                                  aria-labelledby="heading{{ group.id }}">
                                 <div class="panel-body">
-                                    <strong>Textual description</strong>
+                                    <strong>{% trans "Description textual" %}</strong>
                                     <pre class="textual-protocol">{{ group.experimental_protocol.textual_description }}</pre>
                                 </div>
                             </div>
@@ -84,7 +85,7 @@
 
             <div role="tabpanel" class="tab-pane" id="settings_tab">
                 {% if experiment.eegsetting_set.all %}
-                    <strong>EEG Settings</strong>
+                    <strong>{% trans "EEG Settings" %}</strong>
                     {% for eeg_setting in experiment.eegsetting_set.all %}
                         <div class="panel panel-default nep-panel-group">
                             <strong>{{ eeg_setting.name }}</strong><br/>
@@ -93,7 +94,7 @@
                     {% endfor %}
                 {% endif %}
                 {% if experiment.emgsetting_set.all %}
-                    <strong>EMG Settings</strong>
+                    <strong>{% trans "EMG Settings" %}</strong>
                     {% for emg_setting in experiment.emgsetting_set.all %}
                         <div class="panel panel-default nep-panel-group">
                             <strong>{{ emg_setting.name }}</strong><br/>
@@ -102,7 +103,7 @@
                     {% endfor %}
                 {% endif %}
                 {% if experiment.tmssetting_set.all %}
-                    <strong>TMS Settings</strong>
+                    <strong>{% trans "TMS Settings" %}</strong>
                     {% for tms_setting in experiment.tmssetting_set.all %}
                         <div class="panel panel-default nep-panel-group">
                             <strong>{{ tms_setting.name }}</strong><br/>
@@ -111,7 +112,7 @@
                     {% endfor %}
                 {% endif %}
                 {% if experiment.contexttree_set.all %}
-                    <strong>Context trees</strong>
+                    <strong>{% trans "Context trees" %}</strong>
                     {% for context_tree in experiment.contexttree_set.all %}
                         <div class="panel panel-default nep-panel-group">
                             <strong>{{ context_tree.name }}</strong><br/>
@@ -128,7 +129,7 @@
                 <div class="modal-content">
                     <div class="modal-header">
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                        <h4 class="modal-title">Graphical representation</h4>
+                        <h4 class="modal-title">{% trans "Graphical representation" %}</h4>
                     </div>
                     <div class="modal-body">
                         {# see script bellow #}
