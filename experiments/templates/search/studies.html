@@ -1,8 +1,8 @@
 {% load highlight %}
 <tr class="study-matches">
     <td>
-        <strong>Study:</strong>
-        {% highlight result.object.title with query %}&nbsp;
+        <strong>Experiment: </strong>{{ result.object.experiment.title }} >
+        <strong>Study: </strong>{% highlight result.object.title with query %}&nbsp;
         <p>
             <strong>description: </strong>
             {% highlight result.object.description with query %}&nbsp;
