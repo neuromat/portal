@@ -74,7 +74,7 @@ class ExperimentDetailTest(FunctionalTest):
             'button_download')
         self.assertEqual(
             'Download experiment data',
-            button_download.get_attribute('value')
+            button_download.text
         )
 
         # She clicks in Related study link and see a modal with Study data

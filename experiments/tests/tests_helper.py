@@ -276,7 +276,8 @@ def global_setup_ft():
     experiment.save()
     # To test search
     group = Group.objects.filter(
-        experiment__status=Experiment.APPROVED).first()
+        experiment__status=Experiment.APPROVED
+    ).first()
     group.description = 'Plexus brachial is writed in wrong order. Correct ' \
                         'is Brachial plexus.'
     # TODO: test for matches in code and description. Here only tests for
