@@ -23,13 +23,53 @@ class NewVisitorTest(FunctionalTest):
 
         # She sees that in header bunner there is a search box inviting her
         # to type terms/words that will be searched in the portal
-        # 'id_q' to haystack search system
+        # Obs.: 'id_q' is the id name that haystack search system uses.
         searchbox = self.browser.find_element_by_id('id_q')
         self.assertEqual(
             searchbox.get_attribute('placeholder'),
             'Type key terms/words to be searched'
         )
-
+        # Bellow the search box there is a select box with a placeholder
+        # telling her that she can select experiments that has EEG, TMS,
+        # EMG, Gokeeper game fase etc., experiment elements that will
+        # determine if an experiment will be searched or not.
+        selectbox = self.browser.find_element_by_id('id_selectbox')
+        options = selectbox.find_elements_by_tag_name('option')
+        placeholder = options[0]
+        self.assertEqual(
+            placeholder.text,
+            'Select one or more list itens to filter experiments that has:'
+        )
+        # The select box options are: EEG, TMS, EMG, Goalkeeper game
+        # fase, Cinematic measures, Stabilometry, Answer time, Psychophysical
+        # measures, Verbal answer, Psychometric scales, Unitary register
+        self.assertTrue(any(option.text == 'EEG' for option in options))
+        self.assertTrue(any(option.text == 'TMS' for option in options))
+        self.assertTrue(any(option.text == 'EMG' for option in options))
+        self.assertTrue(
+            any(option.text == 'Goalkeeper game fase' for option in options)
+        )
+        self.assertTrue(
+            any(option.text == 'Cinematic measures' for option in options)
+        )
+        self.assertTrue(
+            any(option.text == 'Stabilometry' for option in options)
+        )
+        self.assertTrue(
+            any(option.text == 'Answer time' for option in options)
+        )
+        self.assertTrue(
+            any(option.text == 'Psychophysical measures' for option in options)
+        )
+        self.assertTrue(
+            any(option.text == 'Verbal answer' for option in options)
+        )
+        self.assertTrue(
+            any(option.text == 'Psychometric scales' for option in options)
+        )
+        self.assertTrue(
+            any(option.text == 'Unitary register' for option in options)
+        )
         # As there are experiments sended to Portal, she sees the home
         # page have a list of experiments in a table.
         # She reads in "List of Experiments" in the table title.

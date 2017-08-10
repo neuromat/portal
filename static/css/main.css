@@ -142,6 +142,10 @@ a:hover.nep-btn {
   margin-bottom: 20px;
 }
 
+.nep-search-select {
+  max-width: 50.2%; /* to align right with search input text box */
+}
+
 .detail-header {
   border-left: 1px solid #a6aaad;
   border-top: 1px solid #a6aaad;

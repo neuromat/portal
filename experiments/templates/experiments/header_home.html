@@ -3,8 +3,28 @@
     <h4>An Open Database for Experiments in Neuroscience</h4>
     <form id="search_form" action="/search">
         {# id="id_q" and name="q" required to haystack search #}
-        <input id="id_q" name="q" class="search-box" size="80" type="search"
-               placeholder="Type key terms/words to be searched">
-        <input id="submit_terms" type="submit" value="Search">
+        <div class="form-group">
+            <input id="id_q" name="q" size="80" type="search"
+                   placeholder="Type key terms/words to be searched">
+            <input id="submit_terms" type="submit" value="Search">
+        </div>
+        <div class="form-group">
+            <label for="id_selectbox"></label>
+            <select id = "id_selectbox" class="form-control selectpicker
+            nep-search-select">
+                <option value="">Select one or more list itens to filter experiments that has:</option>
+                <option value="eeg">EEG</option>
+                <option value="tms">TMS</option>
+                <option value="emg">EMG</option>
+                <option value="goalkeeper">Goalkeeper game fase</option>
+                <option value="cinematic">Cinematic measures</option>
+                <option value="stabilometry">Stabilometry</option>
+                <option value="answertime">Answer time</option>
+                <option value="psychophysical">Psychophysical measures</option>
+                <option value="verbal">Verbal answer</option>
+                <option value="psychometric">Psychometric scales</option>
+                <option value="unitary">Unitary register</option>
+            </select>
+        </div>
     </form>
 </header>
