@@ -1,0 +1,425 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2017-08-10 17:42-0300\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+#: experiments/templates/experiments/base.html:10
+#: experiments/templates/experiments/header_home.html:3
+msgid "Neuroscience Experiments Database"
+msgstr "Banco de dados de Experimentos de Neurociência"
+
+#: experiments/templates/experiments/detail.html:15
+msgid "Statistics"
+msgstr "Estatística"
+
+#: experiments/templates/experiments/detail.html:16
+#: experiments/templates/search/groups.html:7
+msgid "Groups"
+msgstr "Grupos"
+
+#: experiments/templates/experiments/detail.html:17
+msgid "Settings"
+msgstr "Configurações"
+
+#: experiments/templates/experiments/detail.html:52
+msgid "participants"
+msgstr "participantes"
+
+#: experiments/templates/experiments/detail.html:56
+msgid "Inclusion criterias"
+msgstr "Critérios de inclusão"
+
+#: experiments/templates/experiments/detail.html:69
+msgid "Details"
+msgstr "Detalhes"
+
+#: experiments/templates/experiments/detail.html:77
+msgid "Textual description"
+msgstr "Descrição textual"
+
+#: experiments/templates/experiments/detail.html:88
+msgid "EEG Settings"
+msgstr "Configurações de EEG"
+
+#: experiments/templates/experiments/detail.html:97
+msgid "EMG Settings"
+msgstr "Configurações de EMG"
+
+#: experiments/templates/experiments/detail.html:106
+msgid "TMS Settings"
+msgstr "Configurações de TMS"
+
+#: experiments/templates/experiments/detail.html:115
+msgid "Context trees"
+msgstr "Arvores de contexto"
+
+#: experiments/templates/experiments/detail.html:132
+msgid "Graphical representation"
+msgstr "Representação gráfica"
+
+#: experiments/templates/experiments/detail.html:138
+#: experiments/templates/experiments/header_detail.html:125
+msgid "Close"
+msgstr "Fechar"
+
+#: experiments/templates/experiments/footer.html:7
+msgid "Research"
+msgstr "Pesquisa"
+
+#: experiments/templates/experiments/footer.html:8
+msgid "Tools"
+msgstr "Ferramentas"
+
+#: experiments/templates/experiments/footer.html:9
+msgid "In the media"
+msgstr "Na imprensa"
+
+#: experiments/templates/experiments/footer.html:10
+msgid "Events"
+msgstr "Eventos"
+
+#: experiments/templates/experiments/footer.html:11
+msgid "Opportunities"
+msgstr "Oportunidades"
+
+#: experiments/templates/experiments/footer.html:15
+msgid "Follow us"
+msgstr "Siga-nos"
+
+#: experiments/templates/experiments/footer.html:23
+msgid "Contact"
+msgstr "Contato"
+
+#: experiments/templates/experiments/footer.html:26
+msgid "Address"
+msgstr "Endereço"
+
+#: experiments/templates/experiments/footer.html:30
+msgid "Phone"
+msgstr "Telefone"
+
+#: experiments/templates/experiments/footer.html:34
+msgid "Email"
+msgstr ""
+
+#: experiments/templates/experiments/footer.html:38
+msgid "Media contact"
+msgstr "Contato"
+
+#: experiments/templates/experiments/footer.html:45
+msgid "This site content is licensed under a "
+msgstr "O conteúdo deste site está licenciado com uma Licença "
+
+#: experiments/templates/experiments/header_detail.html:3
+msgid "Open Database for Experiments in Neuroscience"
+msgstr "Um banco de dados para experimentos em Neurociencia"
+
+#: experiments/templates/experiments/header_detail.html:6
+msgid "Back to home"
+msgstr "Voltar ao inicio"
+
+#: experiments/templates/experiments/header_detail.html:11
+msgid "The data acquisition was completed"
+msgstr "A aquisição de dados foi concluida"
+
+#: experiments/templates/experiments/header_detail.html:16
+msgid "The data acquisition was not completed"
+msgstr "A aquisição de dados não foi concluída"
+
+#: experiments/templates/experiments/header_detail.html:21
+msgid "Project Info"
+msgstr "Informação do projeto"
+
+#: experiments/templates/experiments/header_detail.html:27
+#: experiments/templates/experiments/header_detail.html:36
+msgid "Approval of the ethics committee"
+msgstr "Aprovação do comitê de ética"
+
+#: experiments/templates/experiments/header_detail.html:30
+msgid "url address of the ethics committee not available"
+msgstr "O endereço url do comitê de ética não esta disponível"
+
+#: experiments/templates/experiments/header_detail.html:39
+msgid "Approval of the ethics committee not available"
+msgstr "Aprovação do comitê de ética não esta disponível"
+
+#: experiments/templates/experiments/header_detail.html:45
+msgid "From the study"
+msgstr "Estudo"
+
+#: experiments/templates/experiments/header_detail.html:54
+msgid "Download experiment data"
+msgstr "Baixar dados de experimentos"
+
+#: experiments/templates/experiments/header_detail.html:58
+msgid "We are preparing your download, please wait..."
+msgstr "Estamos preparando os dados, por favor aguarde..."
+
+#: experiments/templates/experiments/header_detail.html:65
+msgid "There was a problem generating your download, please try again."
+msgstr "Houve um problema ao gerar o seu download, tente novamente"
+
+#: experiments/templates/experiments/header_detail.html:85
+msgid "Researcher"
+msgstr "Pesquisador"
+
+#: experiments/templates/experiments/header_detail.html:88
+msgid "Start date"
+msgstr "Data de inicio"
+
+#: experiments/templates/experiments/header_detail.html:91
+msgid "End date"
+msgstr "Data de fim"
+
+#: experiments/templates/experiments/header_detail.html:95
+msgid "Contributors"
+msgstr "Colaboradores"
+
+#: experiments/templates/experiments/header_detail.html:99
+msgid "Person"
+msgstr "Pessoa"
+
+#: experiments/templates/experiments/header_detail.html:100
+msgid "Team"
+msgstr "Equipe"
+
+#: experiments/templates/experiments/header_detail.html:101
+msgid "Coordinator"
+msgstr "Coordinador"
+
+#: experiments/templates/experiments/header_detail.html:116
+msgid "Keywords"
+msgstr "Paravras chave"
+
+#: experiments/templates/experiments/header_home.html:5
+msgid "An Open Database for Experiments in Neuroscience"
+msgstr "Um banco de dados aberto para experimentos em Neurociência"
+
+#: experiments/templates/experiments/home.html:14
+msgid "List of Experiments"
+msgstr "Lista de Experimentos"
+
+#: experiments/templates/experiments/home.html:24
+msgid "There are no experiments"
+msgstr "Não existem experimentos"
+
+#: experiments/templates/experiments/list_default.html:5
+#: experiments/templates/experiments/list_trustee.html:6
+msgid "Title"
+msgstr "Título"
+
+#: experiments/templates/experiments/list_default.html:6
+#: experiments/templates/experiments/list_trustee.html:7
+msgid "Description"
+msgstr "Descrição"
+
+#: experiments/templates/experiments/list_default.html:7
+#: experiments/templates/experiments/list_trustee.html:8
+msgid "Participants"
+msgstr "Participantes"
+
+#: experiments/templates/experiments/list_default.html:8
+#: experiments/templates/experiments/list_trustee.html:9
+msgid "Version"
+msgstr "Versão"
+
+#: experiments/templates/experiments/list_default.html:17
+#: experiments/templates/experiments/list_trustee.html:20
+msgid "in"
+msgstr "em"
+
+#: experiments/templates/experiments/list_default.html:17
+#: experiments/templates/experiments/list_trustee.html:20
+msgid "groups"
+msgstr "grupos"
+
+#: experiments/templates/experiments/list_default.html:20
+#: experiments/templates/experiments/list_trustee.html:35
+msgid "View"
+msgstr "Ver"
+
+#: experiments/templates/experiments/list_trustee.html:10
+msgid "Status"
+msgstr "Estado"
+
+#: experiments/templates/experiments/list_trustee.html:46
+msgid "Change status for"
+msgstr "Alterar status para"
+
+#: experiments/templates/experiments/list_trustee.html:50
+msgid "Please select an option"
+msgstr "Por favor selecione uma opção"
+
+#: experiments/templates/experiments/top.html:3
+msgid "Neuromat"
+msgstr ""
+
+#: experiments/templates/experiments/top.html:5
+msgid "Research, Innovation and Dissemination Center for Neuromathematics"
+msgstr "Centro de Pesquisa, Inovação e Difusão em Neuromatemática"
+
+#: experiments/templates/experiments/top.html:9
+#: experiments/templates/experiments/top.html:11
+msgid "Welcome"
+msgstr "Benvindo"
+
+#: experiments/templates/experiments/top.html:19
+msgid "Log Out"
+msgstr "Sair"
+
+#: experiments/templates/experiments/top.html:21
+#: experiments/templates/registration/login.html:10
+msgid "Log In"
+msgstr "Entrar"
+
+#: experiments/templates/registration/login.html:12
+msgid "Your username and password did not match. Please try again."
+msgstr ""
+"Seu nome de usuário e senha não corresponderam. Por favor, tente novamente"
+
+#: experiments/templates/registration/login.html:18
+msgid "Invalid account. Please sign in with a valid account."
+msgstr "Conta inválida. Por favor tente com uma conta válida."
+
+#: experiments/templates/registration/login.html:20
+msgid "Please sign in with your account to access this website."
+msgstr "Por favor faça login com sua conta para acessar este website."
+
+#: experiments/templates/registration/login.html:42
+msgid "Forgot password?"
+msgstr "Esqueçeu sua senha?"
+
+#: experiments/templates/search/experimental_protocol.html:7
+#: experiments/templates/search/experiments.html:6
+#: experiments/templates/search/groups.html:6
+#: experiments/templates/search/studies.html:6
+msgid "Experiment"
+msgstr "Experimento"
+
+#: experiments/templates/search/experimental_protocol.html:8
+#, fuzzy
+#| msgid "Groups"
+msgid "Group"
+msgstr "Grupos"
+
+#: experiments/templates/search/experimental_protocol.html:9
+msgid "Experimental Protocol"
+msgstr "Protocolo experimental"
+
+#: experiments/templates/search/experimental_protocol.html:11
+msgid "textual description"
+msgstr "descrição textual"
+
+#: experiments/templates/search/experiments.html:8
+#: experiments/templates/search/groups.html:9
+#: experiments/templates/search/studies.html:9
+msgid "title"
+msgstr "título"
+
+#: experiments/templates/search/experiments.html:10
+#: experiments/templates/search/groups.html:10
+#: experiments/templates/search/studies.html:11
+msgid "description"
+msgstr "descrição"
+
+#: experiments/templates/search/experiments.html:13
+msgid "sent date"
+msgstr "data de envio"
+
+#: experiments/templates/search/groups.html:12
+msgid "Inclusion criteria"
+msgstr "Critérios de inclusão"
+
+#: experiments/templates/search/groups.html:16
+msgid "No inclusion criteria"
+msgstr "Critérios de não inclusão"
+
+#: experiments/templates/search/search.html:15
+msgid "Search Results"
+msgstr "Buscar resultados"
+
+#: experiments/templates/search/search.html:34
+msgid "No results found"
+msgstr "Nenum resultado encontrado"
+
+#: experiments/templates/search/search.html:42
+msgid "Previous"
+msgstr "Anterior"
+
+#: experiments/templates/search/search.html:45
+msgid "Next"
+msgstr "Próximo"
+
+#: experiments/templates/search/search.html:50
+msgid "Sorry, no matches found for the terms used. Please try again."
+msgstr ""
+"Desculpe, nenhum resultado encontrado para os termos utilizados. Por favor, "
+"tente novamente"
+
+#: experiments/templates/search/search.html:51
+msgid "Search Suggestion:"
+msgstr "Sugestão de pesquisa"
+
+#: experiments/templates/search/search.html:53
+msgid "Check your spelling."
+msgstr "Verifique a ortografia"
+
+#: experiments/templates/search/search.html:54
+msgid "Try more general word."
+msgstr "Tente uma palavra com significado mais geral"
+
+#: experiments/templates/search/search.html:55
+msgid "Try different words that mean the same thing."
+msgstr "Tente palavras diferentes com o mesmo significado"
+
+#: experiments/templates/search/search.html:56
+msgid "Post a request for your search and we'll help you find it."
+msgstr "Coloque um pedido para sua pesquisa e nós ajudaremos a encontra-lo"
+
+#: experiments/templates/search/studies.html:7
+msgid "Study"
+msgstr "Estudo"
+
+#: experiments/templates/search/studies.html:13
+msgid "start date"
+msgstr "data de inicio"
+
+#: experiments/templates/search/studies.html:15
+msgid "end date"
+msgstr "data de fim"
+
+#: experiments/templates/search/studies.html:17
+msgid "researcher"
+msgstr "Pesquisa"
+
+#: experiments/templates/search/studies.html:19
+msgid "collaborators"
+msgstr "colaboradores"
+
+#: experiments/templates/search/studies.html:23
+msgid "No collaborators"
+msgstr "Nenhum colaborador"
+
+#: experiments/templates/search/studies.html:25
+msgid "keywords"
+msgstr "palavras chaves"
+
+#: experiments/templates/search/studies.html:29
+msgid "No keywords"
+msgstr "Nenhuma palavra chave"
+

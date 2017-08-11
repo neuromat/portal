@@ -1,15 +1,16 @@
 {% load highlight %}
+{% load i18n %}
 <tr class="experiment-matches">
     <td>
             <a href="{% url 'experiment-detail' result.object.id %}"
-           class="nep-btn"><strong>Experiment</strong></a><br><br>
+           class="nep-btn"><strong>{% trans "Experiment" %}</strong></a><br><br>
         <p>
-            <strong>title: </strong>
+            <strong>{% trans "title" %}: </strong>
             {% highlight result.object.title with query %}&nbsp;
-            <strong>description: </strong>
+            <strong>{% trans "description" %}: </strong>
             {% highlight result.object.description with query %}&nbsp;
             {% if result.object.sent_date %}
-                <strong>sent date: </strong>
+                <strong>{% trans "sent date" %}: </strong>
                 {% highlight result.object.sent_date with query %}
             {% endif %}
         </p>

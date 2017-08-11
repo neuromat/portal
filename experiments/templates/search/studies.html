@@ -1,31 +1,32 @@
 {% load highlight %}
+{% load i18n %}
 <tr class="study-matches">
     <td>
             <a href="{% url 'experiment-detail' result.object.experiment.id %}"
-           class="nep-btn"><strong>Experiment: </strong>{{ result.object.experiment.title }}
-            <strong>> Study</strong></a><br><br>
+           class="nep-btn"><strong>{% trans "Experiment" %}: </strong>{{ result.object.experiment.title }}
+            <strong>> {% trans "Study" %}</strong></a><br><br>
         <p>
-            <strong>title: </strong>
+            <strong>{% trans "title" %}: </strong>
             {% highlight result.object.title with query %}
-            <strong>description: </strong>
+            <strong>{% trans "description" %}: </strong>
             {% highlight result.object.description with query %}&nbsp;
-            <strong>start date: </strong>
+            <strong>{% trans "start date" %}: </strong>
             {% highlight result.object.start_date with query %}&nbsp;
-            <strong>end date: </strong>
+            <strong>{% trans "end date" %}: </strong>
             {% highlight result.object.end_date with query %}&nbsp;
-            <strong>researcher: </strong>
+            <strong>{% trans "researcher" %}: </strong>
             {% highlight result.object.researcher with query %}&nbsp;
-            <strong>collaborators: </strong>
+            <strong>{% trans "collaborators" %}: </strong>
             {% for collaborator in result.object.collaborators.all %}
                 {% highlight collaborator with query %}&nbsp;
             {% empty %}
-                No collaborators
+                {% trans "No collaborators" %}
             {% endfor %}
-            <strong>keywords: </strong>
+            <strong>{% trans "keywords" %}: </strong>
             {% for keyword in result.object.keywords.all %}
                 {% highlight keyword with query %}&nbsp;
             {% empty %}
-                No keywords
+                {% trans "No keywords" %}
             {% endfor %}
         </p>
     </td>

@@ -1,6 +1,12 @@
 {% extends 'experiments/base.html' %}
 
+{% block style %}
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'bootstrap-select-1.12.4-dist/css/bootstrap-select.min.css' %}">
+{% endblock %}
+
 {% block header %}
+    {% load i18n %}
     {% include 'experiments/header_home.html' %}
 {% endblock %}
 
@@ -10,7 +16,7 @@
             {% include 'experiments/messages.html' %}
         {% endif %}
         <div id="id_table_title" class="table-title">
-            <h2>{{ table_title }}</h2>
+            <h2>{% trans "List of Experiments" %}</h2>
         </div>
         {% if experiments %}
             {% load experiment_extras %}
@@ -20,15 +26,21 @@
                 {% include 'experiments/list_default.html' %}
             {% endif %}
         {% else %}
-            <p>There's no experiments yet.</p>
+            <p>{% trans "There are no experiments" %}</p>
         {% endif %}
     </section>
 {% endblock %}
 
 {% block script %}
     {##}
-    {## Prevent click in experiment if its status is approved or not approved #}
-    {## Related to list_trustee.html  #}
+    {## Scripts related to experiments/header_home.html #}
+    {##}
+    {% load static %}
+    <script src="
+{% static 'bootstrap-select-1.12.4-dist/js/bootstrap-select.js' %}"></script>
+    {##}
+    {## Script related to list_trustee.html  #}
+    {## Prevent click in experiment if its status is approved or not approved. #}
     {##}
     <script>
         let prevent_click = $('.prevent_click');

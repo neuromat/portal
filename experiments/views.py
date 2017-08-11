@@ -3,6 +3,7 @@ from django.core.mail import send_mail
 from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import render
 from haystack.generic_views import SearchView
+from django.utils.translation import activate, LANGUAGE_SESSION_KEY, ugettext as _
 
 from experiments.models import Experiment, RejectJustification
 
@@ -37,7 +38,7 @@ def home_page(request):
     return render(request, 'experiments/home.html',
                   {'experiments': experiments,
                    'to_be_analysed_count': to_be_analysed_count,
-                   'table_title': 'List of Experiments'})
+                   })
 
 
 def experiment_detail(request, experiment_id):
@@ -89,18 +90,18 @@ def change_status(request, experiment_id):
     if status == Experiment.NOT_APPROVED:
         if not justification:
             messages.warning(
-                request,
-                'The status of experiment ' + experiment.title + ' hasn\'t '
-                'changed to "Not approved" because you have not given a '
-                'justification. Please resubmit changing status.'
-            )
+                request, 'Please provide a reason justifying the change of the status of the experiment ' +
+                         experiment.title + 'to "Not approved". Resubmit changing status. ')
+                # 'The status of the experiment ' + experiment.title + ' hasn\'t '
+                # 'changed to "Not approved" because you have not given a '
+                # 'justification. Please resubmit changing status.'
+            # )
             return HttpResponseRedirect('/')
         else:
             # if has justification send email to researcher
             subject = 'Your experiment was rejected in NEDP portal'
-            message = 'Your experiment ' + experiment.title + \
-                      ' was rejected by the Portal committee. The reason ' \
-                      'was: ' + justification
+            message = 'The Evaluation Committee rejected your experiment ' + experiment.title + \
+                      '. The reason was: ' + justification
 
             send_mail(subject, message, from_email,
                       [experiment.study.researcher.email])
@@ -117,11 +118,15 @@ def change_status(request, experiment_id):
     # to experiment study researcher
     if status == Experiment.APPROVED:
         subject = 'Your experiment was approved in NEDP portal'
-        message = 'Congratulations, your experiment ' + experiment.title + \
-                  ' was approved by the Portal committee. Now it is public ' \
-                  'available under Creative Commons Share Alike license.\n' \
-                  'You can view your experiment data in ' + \
-                  'http://' + request.get_host()
+        message = 'Congratulations, your experiment ' + experiment.title + ' was approved by the Evaluation ' \
+                  'Committee. All data of submitted experiment will be available freely to the public consultation ' \
+                  'and shared under Creative Commons Share Alike license.\n' \
+                  'You can view your experiment data in http://' + request.get_host()
+        # message = 'Congratulations, your experiment ' + experiment.title + \
+        #           ' was approved by the Portal committee. Now it is public ' \
+        #           'available under Creative Commons Share Alike license.\n' \
+        #           'You can view your experiment data in ' + \
+        #           'http://' + request.get_host()
         send_mail(subject, message, from_email,
                   [experiment.study.researcher.email])
         messages.success(
@@ -186,3 +191,11 @@ class NepSearchView(SearchView):
         context = super(NepSearchView, self).get_context_data(**kwargs)
         # do something
         return context
+
+
+def language_change(request, language_code):
+
+    activate(language_code)
+    request.session[LANGUAGE_SESSION_KEY] = language_code
+
+    return HttpResponseRedirect(request.GET['next'])
