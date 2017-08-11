@@ -205,6 +205,7 @@ class EEGAmplifierSetting(models.Model):
 
 
 class EEGSolution(models.Model):
+    eeg_setting = models.OneToOneField(EEGSetting, primary_key=True, related_name='eeg_solution')
     manufacturer_name = models.CharField(max_length=150)
     name = models.CharField(max_length=150)
     components = models.TextField(null=True, blank=True)
@@ -224,6 +225,7 @@ class EEGFilterSetting(models.Model):
 
 
 class EEGElectrodeNet(Equipment):
+    eeg_setting = models.OneToOneField(EEGSetting, primary_key=True, related_name='eeg_electrode_net')
     pass
 
 

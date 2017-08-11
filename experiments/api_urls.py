@@ -82,6 +82,27 @@ api_experiment_eeg_amplifier_setting =\
         'post': 'create'
     })
 
+# EEG Solution Setting
+api_experiment_eeg_solution_setting =\
+    api.EEGSolutionSettingViewSet.as_view({
+        'get': 'list',
+        'post': 'create'
+    })
+
+# EEG Filter Setting
+api_experiment_eeg_filter_setting =\
+    api.EEGFilterSettingViewSet.as_view({
+        'get': 'list',
+        'post': 'create'
+    })
+
+# EEG Electrode Net Setting
+api_experiment_eeg_electrode_net_setting =\
+    api.EEGElectrodeNetSettingViewSet.as_view({
+        'get': 'list',
+        'post': 'create'
+    })
+
 # EMG setting
 api_experiment_emg_setting_list =\
     api.EMGSettingViewSet.as_view({
@@ -299,6 +320,13 @@ urlpatterns = [
         api_experiment_amplifier, name='api_experiment_amplifier'),
     url(r'^eeg_setting/(?P<pk>[0-9]+)/eeg_amplifier_setting/$',
         api_experiment_eeg_amplifier_setting, name='api_experiment_eeg_amplifier_setting'),
+    url(r'^eeg_setting/(?P<pk>[0-9]+)/eeg_solution_setting/$',
+        api_experiment_eeg_solution_setting, name='api_experiment_eeg_solution_setting'),
+    url(r'^eeg_setting/(?P<pk>[0-9]+)/eeg_filter_setting/$',
+        api_experiment_eeg_filter_setting, name='api_experiment_eeg_filter_setting'),
+    url(r'^eeg_setting/(?P<pk>[0-9]+)/eeg_electrode_net_setting/$',
+        api_experiment_eeg_electrode_net_setting, name='api_experiment_eeg_electrode_net_setting'),
+
     # EMG setting
     url(r'^experiments/(?P<experiment_nes_id>[0-9]+)/emg_setting/$',
         api_experiment_emg_setting_list, name='api_experiment_emg_setting-list'),
