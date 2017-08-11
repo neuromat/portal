@@ -90,25 +90,25 @@ def change_status(request, experiment_id):
     if status == Experiment.NOT_APPROVED:
         if not justification:
             messages.warning(
-                request, 'Please provide a reason justifying the change of the status of the experiment ' +
-                         experiment.title + 'to "Not approved". ')
+                request, _('Please provide a reason justifying the change of the status of the experiment ') +
+                experiment.title + _('to "Not approved". '))
 
             return HttpResponseRedirect('/')
         else:
             # if has justification send email to researcher
-            subject = 'Your experiment was rejected'
-            message = 'We regret to inform you that your experiment, ' + experiment.title + \
-                      ', has not been accepted to be published in the NeuroMat Open Database. Please check the ' \
-                      'reasons providing by the Neuromat Open Database Evaluation Committee:' + justification + '.\n' \
-                      'With best regards,\n' \
-                      'The Neuromat Open Database Evaluation Committee'
+            subject = _('Your experiment was rejected')
+            message = _('We regret to inform you that your experiment, ') + experiment.title +  \
+                      _(', has not been acceptted to be published in the NeuroMat Open Database. Please check the '
+                        'reasons providing by the Neuromat Open Database Evaluation Committee:') + justification + \
+                      _('.\nWith best regards,\n The Neuromat Open Database Evaluation Committee')
+
 
             send_mail(subject, message, from_email,
                       [experiment.study.researcher.email])
             messages.success(
                 request,
-                'An email was sent to ' + experiment.study.researcher.name +
-                ' warning that the experiment was rejected.'
+                _('An email was sent to ') + experiment.study.researcher.name +
+                _(' warning that the experiment was rejected.')
             )
             # Save the justification message
             RejectJustification.objects.create(message=justification,
@@ -117,35 +117,33 @@ def change_status(request, experiment_id):
     # if status changed to UNDER_ANALYSIS or APPROVED, send email
     # to experiment study researcher
     if status == Experiment.APPROVED:
-        subject = 'Your experiment was approved'
-        message = 'We are pleased to inform you that your experiment ' + experiment.title + ' was approved by ' \
-                  'NeuroMat Open Database Evaluation Committee. All data of the submitted experiment will be ' \
-                  'available freely to the public consultation and shared under ' \
-                  'Creative Commons Share Alike license.\n' \
-                  'You can access your experiment data by clicking on the link below \n http://' + request.get_host()\
-                  + '\n With best regards,\n' \
-                  'The NeuroMat Open Database Evaluation Committee'
+        subject = _('Your experiment was approved')
+        message = _('We are pleased to inform you that your experiment ') + experiment.title + \
+                  _(' was approved by Neuromat Open Database Evaluation Committee. All data of the submitted experiment'
+                    ' will be available freely to the public consultation and shared under Creative Commons Share '
+                    'Alike license.\n You can access your experiment data by clicking on the link below \n http://') + \
+                    request.get_host() + \
+                  _('\n With best regards,\n The NeuroMat Open Database Evaluation Committee.')
 
         send_mail(subject, message, from_email,
                   [experiment.study.researcher.email])
         messages.success(
             request,
-            'An email was sent to ' + experiment.study.researcher.name +
-            ' warning that the experiment changed status to Approved.'
+            _('An email was sent to ') + experiment.study.researcher.name +
+            _(' warning that the experiment changed status to Approved.')
         )
     if status == Experiment.UNDER_ANALYSIS:
-        subject = 'Your experiment is now under analysis'
-        message = 'Thank you for submitting your experiment ' + experiment.title + \
-                  '. The NeuroMat Open Database Evaluation Committee will be analyze your data and will try to ' \
-                  'respond as soon as possible.\n' \
-                  'With best regards,\n' \
-                  'The NeuroMat Open Database Evaluation Committee'
+        subject = _('Your experiment is now under analysis')
+        message = _('Thank you for submitting your experiment ') + experiment.title + \
+                  _('. The NeuroMat Open Database Evaluation Committee will be analyze your data and will try to '
+                    'respond as soon as possible.\n With best regards,\n The NeuroMat Open Database Evaluation '
+                    'Committee')
         send_mail(subject, message, from_email,
                   [experiment.study.researcher.email])
         messages.success(
             request,
-            'An email was sent to ' + experiment.study.researcher.name +
-            ' warning that the experiment is under analysis.'
+            _('An email was sent to ') + experiment.study.researcher.name +
+            _(' warning that the experiment is under analysis.')
         )
         # Associate experiment with trustee
         experiment.trustee = request.user
@@ -159,7 +157,7 @@ def change_status(request, experiment_id):
             experiment.trustee = None
             messages.warning(
                 request,
-                'The experiment data ' + experiment.title + ' was made available to be analysed by other trustee.'
+                _('The experiment data ') + experiment.title + _(' was made available to be analysed by other trustee.')
             )
 
     experiment.status = status
