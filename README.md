@@ -5,6 +5,10 @@ The NeuroMat Open Database is an initiative of NeuroMat to provide an open-acces
 
 Demostration enviroment: http://portal-dev.numec.prp.usp.br/
 
+Documentation: https://github.com/neuromat/portal/wiki
+
+Issue tracking system: https://neuromat.atlassian.net
+
 ### NES (Neuroscience Experiments System)
 
 NES is an open-source tool that aims to assist neuroscience research laboratories in routine procedures for data collection. NES supports the reproducibility of experiments, enables comparison of data across studies, and keeps data provenance. In addition, it promotes standardized formats for experiments and analyses reporting.
