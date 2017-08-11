@@ -8,6 +8,7 @@ from rest_framework.documentation import include_docs_urls
 
 from experiments import views
 from experiments import api_urls
+from experiments.views import NepSearchView
 from downloads import urls
 
 # internationalization
@@ -39,7 +40,7 @@ urlpatterns = [
         name='ajax-to_be_analysed'),
 
     # Haystack search
-    url(r'^search/', include('haystack.urls'))
+    url(r'^search/', NepSearchView.as_view(), name='search_view')
 ]
 
 

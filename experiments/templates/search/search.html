@@ -1,5 +1,11 @@
 {% extends 'experiments/base.html' %}
 
+{% block style %}
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'bootstrap-select-1.12.4-dist/css/bootstrap-select.min.css' %}">
+{% endblock %}
+
+
 {% block header %}
     {% include 'experiments/header_home.html' %}
 {% endblock %}
@@ -16,7 +22,7 @@
         {% if query %}
             <table id="search_table" class="table table-hover">
                 <tbody>
-                {% for result in page.object_list %}
+                {% for result in object_list %}
                     {% if result.model_name == 'experiment' %}
                         {% include 'search/experiments.html' %}
                     {% endif %}
@@ -49,4 +55,13 @@
 
 
     </section>
+{% endblock %}
+
+{% block script %}
+    {##}
+    {## Scripts related to experiments/header_home.html #}
+    {##}
+    {% load static %}
+    <script src="
+{% static 'bootstrap-select-1.12.4-dist/js/bootstrap-select.js' %}"></script>
 {% endblock %}
