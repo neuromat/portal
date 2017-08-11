@@ -1,5 +1,10 @@
 {% extends 'experiments/base.html' %}
 
+{% block style %}
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'bootstrap-select-1.12.4-dist/css/bootstrap-select.min.css' %}">
+{% endblock %}
+
 {% block header %}
     {% load i18n %}
     {% include 'experiments/header_home.html' %}
@@ -28,8 +33,14 @@
 
 {% block script %}
     {##}
-    {## Prevent click in experiment if its status is approved or not approved #}
-    {## Related to list_trustee.html  #}
+    {## Scripts related to experiments/header_home.html #}
+    {##}
+    {% load static %}
+    <script src="
+{% static 'bootstrap-select-1.12.4-dist/js/bootstrap-select.js' %}"></script>
+    {##}
+    {## Script related to list_trustee.html  #}
+    {## Prevent click in experiment if its status is approved or not approved. #}
     {##}
     <script>
         let prevent_click = $('.prevent_click');
