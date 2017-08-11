@@ -10,7 +10,7 @@ from experiments.models import Experiment, Study, User, ProtocolComponent, \
     EEGData, EMGData, TMSData, GoalkeeperGameData, QuestionnaireResponse, \
     AdditionalData, GenericDataCollectionData, EEG, EMG, TMS, Instruction, Pause, Task, TaskForTheExperimenter, \
     GenericDataCollection, Stimulus, GoalkeeperGame, SetOfStep, Questionnaire, \
-    EEGAmplifierSetting, Amplifier
+    EEGAmplifierSetting, Amplifier, EEGSolution, EEGFilterSetting, EEGElectrodeNet
 
 
 ###################
@@ -121,6 +121,32 @@ class EEGAmplifierSettingSerializer(serializers.ModelSerializer):
     class Meta:
         model = EEGAmplifierSetting
         fields = ('eeg_setting', 'eeg_amplifier', 'gain', 'sampling_rate', 'number_of_channels_used')
+
+
+class EEGSolutionSettingSerializer(serializers.ModelSerializer):
+    eeg_setting = serializers.ReadOnlyField(source='eeg_setting.name')
+
+    class Meta:
+        model = EEGSolution
+        fields = ('eeg_setting', 'manufacturer_name', 'name', 'components')
+
+
+class EEGFilterSettingSerializer(serializers.ModelSerializer):
+    eeg_setting = serializers.ReadOnlyField(source='eeg_setting.name')
+
+    class Meta:
+        model = EEGFilterSetting
+        fields = ('eeg_setting', 'eeg_filter_type_name', 'eeg_filter_type_description', 'high_pass', 'low_pass',
+                  'high_band_pass', 'low_band_pass', 'high_notch', 'low_notch', 'order')
+
+
+class EEGElectrodeNetSettingSerializer(serializers.ModelSerializer):
+    eeg_setting = serializers.ReadOnlyField(source='eeg_setting.name')
+
+    class Meta:
+        model = EEGElectrodeNet
+        fields = ('eeg_setting',
+                  'manufacturer_name', 'equipment_type', 'identification', 'description', 'serial_number')
 
 
 class EEGSettingSerializer(serializers.ModelSerializer):
@@ -697,6 +723,42 @@ class EEGAmplifierSettingViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         return EEGAmplifierSetting.objects.filter(eeg_setting_id=self.kwargs['pk'])
+
+    def perform_create(self, serializer):
+        eeg_setting = EEGSetting.objects.get(pk=self.kwargs['pk'])
+        serializer.save(eeg_setting=eeg_setting)
+
+
+class EEGSolutionSettingViewSet(viewsets.ModelViewSet):
+    serializer_class = EEGSolutionSettingSerializer
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
+
+    def get_queryset(self):
+        return EEGSolution.objects.filter(eeg_setting_id=self.kwargs['pk'])
+
+    def perform_create(self, serializer):
+        eeg_setting = EEGSetting.objects.get(pk=self.kwargs['pk'])
+        serializer.save(eeg_setting=eeg_setting)
+
+
+class EEGFilterSettingViewSet(viewsets.ModelViewSet):
+    serializer_class = EEGFilterSettingSerializer
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
+
+    def get_queryset(self):
+        return EEGFilterSetting.objects.filter(eeg_setting_id=self.kwargs['pk'])
+
+    def perform_create(self, serializer):
+        eeg_setting = EEGSetting.objects.get(pk=self.kwargs['pk'])
+        serializer.save(eeg_setting=eeg_setting)
+
+
+class EEGElectrodeNetSettingViewSet(viewsets.ModelViewSet):
+    serializer_class = EEGElectrodeNetSettingSerializer
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
+
+    def get_queryset(self):
+        return EEGElectrodeNet.objects.filter(eeg_setting_id=self.kwargs['pk'])
 
     def perform_create(self, serializer):
         eeg_setting = EEGSetting.objects.get(pk=self.kwargs['pk'])
