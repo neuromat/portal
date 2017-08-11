@@ -91,17 +91,17 @@ def change_status(request, experiment_id):
         if not justification:
             messages.warning(
                 request, 'Please provide a reason justifying the change of the status of the experiment ' +
-                         experiment.title + 'to "Not approved". Resubmit changing status. ')
-                # 'The status of the experiment ' + experiment.title + ' hasn\'t '
-                # 'changed to "Not approved" because you have not given a '
-                # 'justification. Please resubmit changing status.'
-            # )
+                         experiment.title + 'to "Not approved". ')
+
             return HttpResponseRedirect('/')
         else:
             # if has justification send email to researcher
-            subject = 'Your experiment was rejected in NEDP portal'
-            message = 'The Evaluation Committee rejected your experiment ' + experiment.title + \
-                      '. The reason was: ' + justification
+            subject = 'Your experiment was rejected'
+            message = 'We regret to inform you that your experiment, ' + experiment.title + \
+                      ', has not been accepted to be published in the NeuroMat Open Database. Please check the ' \
+                      'reasons providing by the Neuromat Open Database Evaluation Committee:' + justification + '.\n' \
+                      'With best regards,\n' \
+                      'The Neuromat Open Database Evaluation Committee'
 
             send_mail(subject, message, from_email,
                       [experiment.study.researcher.email])
@@ -117,16 +117,15 @@ def change_status(request, experiment_id):
     # if status changed to UNDER_ANALYSIS or APPROVED, send email
     # to experiment study researcher
     if status == Experiment.APPROVED:
-        subject = 'Your experiment was approved in NEDP portal'
-        message = 'Congratulations, your experiment ' + experiment.title + ' was approved by the Evaluation ' \
-                  'Committee. All data of submitted experiment will be available freely to the public consultation ' \
-                  'and shared under Creative Commons Share Alike license.\n' \
-                  'You can view your experiment data in http://' + request.get_host()
-        # message = 'Congratulations, your experiment ' + experiment.title + \
-        #           ' was approved by the Portal committee. Now it is public ' \
-        #           'available under Creative Commons Share Alike license.\n' \
-        #           'You can view your experiment data in ' + \
-        #           'http://' + request.get_host()
+        subject = 'Your experiment was approved'
+        message = 'We are pleased to inform you that your experiment ' + experiment.title + ' was approved by ' \
+                  'NeuroMat Open Database Evaluation Committee. All data of the submitted experiment will be ' \
+                  'available freely to the public consultation and shared under ' \
+                  'Creative Commons Share Alike license.\n' \
+                  'You can access your experiment data by clicking on the link below \n http://' + request.get_host()\
+                  + '\n With best regards,\n' \
+                  'The NeuroMat Open Database Evaluation Committee'
+
         send_mail(subject, message, from_email,
                   [experiment.study.researcher.email])
         messages.success(
@@ -135,9 +134,12 @@ def change_status(request, experiment_id):
             ' warning that the experiment changed status to Approved.'
         )
     if status == Experiment.UNDER_ANALYSIS:
-        subject = 'Your experiment is now under analysis in NEDP portal'
-        message = 'Your experiment ' + experiment.title + \
-                  ' is under analysis by the Portal committee.'
+        subject = 'Your experiment is now under analysis'
+        message = 'Thank you for submitting your experiment ' + experiment.title + \
+                  '. The NeuroMat Open Database Evaluation Committee will be analyze your data and will try to ' \
+                  'respond as soon as possible.\n' \
+                  'With best regards,\n' \
+                  'The NeuroMat Open Database Evaluation Committee'
         send_mail(subject, message, from_email,
                   [experiment.study.researcher.email])
         messages.success(
@@ -149,7 +151,7 @@ def change_status(request, experiment_id):
         experiment.trustee = request.user
 
     # If status posted is TO_BE_ANALYSED and current experiment status is
-    # UNDER_ANALYLIS disassociate trustee from experiment and warning
+    # UNDER_ANALYSIS disassociate trustee from experiment and warning
     # trustee that the experiment is going to be free for other trustee
     # analysis
     if status == Experiment.TO_BE_ANALYSED:
@@ -157,8 +159,7 @@ def change_status(request, experiment_id):
             experiment.trustee = None
             messages.warning(
                 request,
-                'You have liberate the experiment ' + experiment.title
-                + ' to be analysed by other trustee.'
+                'The experiment data ' + experiment.title + ' was made available to be analysed by other trustee.'
             )
 
     experiment.status = status
