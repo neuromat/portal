@@ -94,18 +94,12 @@ class CollaboratorSerializer(serializers.ModelSerializer):
         fields = ('id', 'name', 'team', 'coordinator', 'study')
 
 
-class AmplifierSerializer(serializers.Serializer):
-    gain = serializers.FloatField()
-    number_of_channels = serializers.IntegerField()
-    common_mode_rejection_ratio = serializers.FloatField()
-    input_impedance = serializers.FloatField()
-    input_impedance_unit = serializers.CharField(max_length=15)
-    amplifier_detection_type_name = serializers.CharField(max_length=150)
-    tethering_system_name = serializers.CharField(max_length=150)
+class AmplifierSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Amplifier
         fields = (
+            'id',
             'manufacturer_name',
             'equipment_type',
             'identification',
@@ -121,66 +115,20 @@ class AmplifierSerializer(serializers.Serializer):
         )
 
 
-class EEGAmplifierSettingSerializer(serializers.Serializer):
-    gain = serializers.FloatField()
-    sampling_rate = serializers.FloatField()
-    number_of_channels_used = serializers.IntegerField()
-    eeg_amplifier = AmplifierSerializer(many=False, read_only=True)
+class EEGAmplifierSettingSerializer(serializers.ModelSerializer):
+    eeg_setting = serializers.ReadOnlyField(source='eeg_setting.name')
 
     class Meta:
         model = EEGAmplifierSetting
-        fields = (
-            'eeg_amplifier',
-            'gain',
-            'sampling_rate',
-            'number_of_channels_used'
-        )
+        fields = ('eeg_setting', 'eeg_amplifier', 'gain', 'sampling_rate', 'number_of_channels_used')
 
 
 class EEGSettingSerializer(serializers.ModelSerializer):
     experiment = serializers.ReadOnlyField(source='experiment.title')
-    eeg_amplifier_setting = EEGAmplifierSettingSerializer(many=False, read_only=True)
 
     class Meta:
         model = EEGSetting
-        fields = ('id', 'experiment', 'name', 'description', 'eeg_amplifier_setting')
-
-    def create(self, validated_data):
-        eeg_setting = EEGSetting.objects.create(
-            experiment=validated_data['experiment'],
-            name=validated_data['name'],
-            description=validated_data['description']
-        )
-
-        if 'eeg_amplifier_setting' in self.initial_data:
-            eeg_amplifier_setting_data = self.initial_data['eeg_amplifier_setting']
-            if 'eeg_amplifier' in self.initial_data['eeg_amplifier_setting']:
-                eeg_amplifier=self.initial_data['eeg_amplifier_setting']['amplifier']
-
-                amplifier = Amplifier.objects.create(
-                    manufacturer_name=eeg_amplifier['manufacturer_name'],
-                    equipment_type=eeg_amplifier['equipment_type'],
-                    identification=eeg_amplifier['identification'],
-                    description=eeg_amplifier['description'],
-                    serial_number=eeg_amplifier['serial_number'],
-                    gain=eeg_amplifier['gain'],
-                    number_of_channels=eeg_amplifier['number_of_channels'],
-                    common_mode_rejection_ratio=eeg_amplifier['common_mode_rejection_ratio'],
-                    input_impedance=eeg_amplifier['input_impedance'],
-                    input_impedance_unit=eeg_amplifier['input_impedance_unit'],
-                    amplifier_detection_type_name=eeg_amplifier['amplifier_detection_type_name'],
-                    tethering_system_name=eeg_amplifier['tethering_system_name']
-                )
-
-                EEGAmplifierSetting.objects.create(
-                    eeg_setting=eeg_setting,
-                    eeg_amplifier=amplifier,
-                    gain=eeg_amplifier_setting_data['gain'],
-                    sampling_rate=eeg_amplifier_setting_data['sampling_rate'],
-                    number_of_channels_used=eeg_amplifier_setting_data['number_of_channels_used']
-                )
-
-        return eeg_setting
+        fields = ('id', 'experiment', 'name', 'description')
 
 
 class EMGSettingSerializer(serializers.ModelSerializer):
@@ -730,6 +678,29 @@ class EEGSettingViewSet(viewsets.ModelViewSet):
             nes_id=exp_nes_id, owner=owner, version=last_version
         )
         serializer.save(experiment=experiment)
+
+
+class AmplifierViewSet(viewsets.ModelViewSet):
+    serializer_class = AmplifierSerializer
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
+
+    def get_queryset(self):
+        return Amplifier.objects.filter(group_id=self.kwargs['pk'])
+
+    def perform_create(self, serializer):
+        serializer.save()
+
+
+class EEGAmplifierSettingViewSet(viewsets.ModelViewSet):
+    serializer_class = EEGAmplifierSettingSerializer
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
+
+    def get_queryset(self):
+        return EEGAmplifierSetting.objects.filter(eeg_setting_id=self.kwargs['pk'])
+
+    def perform_create(self, serializer):
+        eeg_setting = EEGSetting.objects.get(pk=self.kwargs['pk'])
+        serializer.save(eeg_setting=eeg_setting)
 
 
 class EMGSettingViewSet(viewsets.ModelViewSet):

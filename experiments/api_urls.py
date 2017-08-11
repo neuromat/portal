@@ -68,6 +68,20 @@ api_experiment_eeg_setting_list =\
         'post': 'create'
     })
 
+# Amplifier
+api_experiment_amplifier =\
+    api.AmplifierViewSet.as_view({
+        'get': 'list',
+        'post': 'create'
+    })
+
+# EEG Amplifier Setting
+api_experiment_eeg_amplifier_setting =\
+    api.EEGAmplifierSettingViewSet.as_view({
+        'get': 'list',
+        'post': 'create'
+    })
+
 # EMG setting
 api_experiment_emg_setting_list =\
     api.EMGSettingViewSet.as_view({
@@ -281,6 +295,10 @@ urlpatterns = [
     # EEG setting
     url(r'^experiments/(?P<experiment_nes_id>[0-9]+)/eeg_setting/$',
         api_experiment_eeg_setting_list, name='api_experiment_eeg_setting-list'),
+    url(r'^experiments/(?P<experiment_nes_id>[0-9]+)/amplifier/$',
+        api_experiment_amplifier, name='api_experiment_amplifier'),
+    url(r'^eeg_setting/(?P<pk>[0-9]+)/eeg_amplifier_setting/$',
+        api_experiment_eeg_amplifier_setting, name='api_experiment_eeg_amplifier_setting'),
     # EMG setting
     url(r'^experiments/(?P<experiment_nes_id>[0-9]+)/emg_setting/$',
         api_experiment_emg_setting_list, name='api_experiment_emg_setting-list'),
