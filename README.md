@@ -11,6 +11,6 @@ Issue tracking system: https://neuromat.atlassian.net
 
 ## License
 
-The access to the NeuroMat Open Database is public use and is licensed under Creative Commons CC-BY 4.0 International License.
+The access to the NeuroMat Open Database is public use and it is licensed under Creative Commons CC-BY 4.0 International License.
 
 
