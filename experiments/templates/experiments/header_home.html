@@ -5,7 +5,7 @@
     <h4>{% trans "An Open Database for Experiments in Neuroscience" %}</h4>
     <form id="search_form" action="/search">
         {% csrf_token %}
-        {{ form|bootstrap }}
+        {{ search_form|bootstrap }}
         <div class="form-group">
             <input id="submit_terms" type="submit" value="Search">
         </div>

@@ -1,5 +1,10 @@
 {% extends "experiments/base.html" %}
 
+{% block style %}
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'bootstrap-select-1.12.4-dist/css/bootstrap-select.min.css' %}">
+{% endblock %}
+
 {% block header %}
     {% include 'experiments/header_home.html' %}
 {% endblock %}
@@ -40,5 +45,13 @@
         {# Assumes you setup the password_reset view in your URLconf #}
         <p><a href="{% url 'password_reset' %}">Lost password?</a></p>
     </section>
+{% endblock %}
 
+{% block script %}
+    {##}
+    {## Scripts related to experiments/header_home.html #}
+    {##}
+    {% load static %}
+    <script src="
+{% static 'bootstrap-select-1.12.4-dist/js/bootstrap-select.js' %}"></script>
 {% endblock %}

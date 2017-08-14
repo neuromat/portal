@@ -22,6 +22,10 @@ urlpatterns = [
     url(r'^api/', include(api_urls)),
     url(r'^api/docs/', include_docs_urls(title='NEP API')),
     url(r'^$', views.home_page, name='home'),
+
+    # override login url to include extra context
+    url(r'^login/$', views.NepLoginView.as_view(), name='login'),
+
     url(r'^', include('django.contrib.auth.urls')),
     url(r'^experiments/(?P<experiment_id>[0-9]+)/$',
         views.experiment_detail, name='experiment-detail'),

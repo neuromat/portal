@@ -1,4 +1,5 @@
 from django.contrib import messages
+from django.contrib.auth.views import LoginView
 from django.core.mail import send_mail
 from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import render
@@ -40,7 +41,7 @@ def home_page(request):
                   {'experiments': experiments,
                    'to_be_analysed_count': to_be_analysed_count,
                    'table_title': 'List of Experiments',
-                   'form': NepSearchForm()})
+                   'search_form': NepSearchForm()})
 
 
 def experiment_detail(request, experiment_id):
@@ -186,6 +187,7 @@ def language_change(request, language_code):
 #
 class NepSearchView(SearchView):
     form_class = NepSearchForm
+    form_name = 'search_form'
 
     def get_queryset(self):
         queryset = super(NepSearchView, self).get_queryset()
@@ -205,3 +207,9 @@ class NepSearchView(SearchView):
         context['to_be_analysed_count'] = to_be_analysed_count
 
         return context
+
+
+# override LoginView to include search form besides login form
+class NepLoginView(LoginView):
+    search_form = NepSearchForm()
+    extra_context = {'search_form': search_form}
