@@ -26,6 +26,7 @@ class ExperimentDetailTest(FunctionalTest):
         # list_links[0].click()
         time.sleep(1)
 
+
         # She sees a new page with a header title: Open Database
         # for Experiments in Neuroscience.
         page_header_text = self.browser.find_element_by_tag_name('h2').text

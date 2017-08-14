@@ -73,7 +73,7 @@ class HomePageTest(TestCase):
 
         self.assertTrue(self.send_mail_called)
         self.assertEqual(self.subject,
-                         'Your experiment was approved in NEDP portal')
+                         'Your experiment was approved')
         self.assertEqual(self.from_email, 'noreplay@nep.prp.usp.br')
         self.assertEqual(self.to, [experiment.study.researcher.email])
 
