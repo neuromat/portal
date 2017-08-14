@@ -194,5 +194,16 @@ class NepSearchView(SearchView):
 
     def get_context_data(self, *args, **kwargs):
         context = super(NepSearchView, self).get_context_data(**kwargs)
-        # do something
+
+        # Related to the badge with number of experiments to be analysed in
+        # page top. It's displayed only if a trustee is logged.
+        to_be_analysed_count = None
+        if self.request.user.is_authenticated and \
+                self.request.user.groups.filter(name='trustees').exists():
+            to_be_analysed = Experiment.lastversion_objects.filter(
+                status=Experiment.TO_BE_ANALYSED)
+            to_be_analysed_count = to_be_analysed.count()
+
+        context['to_be_analysed_count'] = to_be_analysed_count
+
         return context

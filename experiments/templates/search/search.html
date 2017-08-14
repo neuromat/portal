@@ -64,4 +64,14 @@
     {% load static %}
     <script src="
 {% static 'bootstrap-select-1.12.4-dist/js/bootstrap-select.js' %}"></script>
+    {##}
+    {## Script related to experiments/top.html #}
+    {##}
+    <script>
+        let to_be_analysed_count = {{ to_be_analysed_count }};
+        if (to_be_analysed_count) {
+            $('head').append('<style>.badger::after{content:"' +
+                to_be_analysed_count + '"}</style>');
+        }
+    </script>
 {% endblock %}
