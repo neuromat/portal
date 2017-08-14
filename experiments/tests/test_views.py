@@ -161,10 +161,10 @@ class SearchTest(TestCase):
     def setUp(self):
         global_setup_ut()
 
-    def test_search_redirects_to_homepage_with_search_results(self):
-        response = self.client.post('/search/')
-        self.assertEqual(response.status_code, 200)
-        # TODO: is it needed to test for redirected page?
+    # def test_search_redirects_to_homepage_with_search_results(self):
+    #     response = self.client.post('/search/')
+    #     self.assertEqual(response.status_code, 200)
+    #     # TODO: is it needed to test for redirected page?
 
     def test_search_returns_only_approved_experiments(self):
         response = self.client.get('/search/', {'q': 'Braquial+Plexus'})
