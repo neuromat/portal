@@ -5,6 +5,7 @@ from django.shortcuts import render
 from haystack.generic_views import SearchView
 from django.utils.translation import activate, LANGUAGE_SESSION_KEY, ugettext as _
 
+from experiments.forms import NepSearchForm
 from experiments.models import Experiment, RejectJustification
 
 
@@ -38,7 +39,8 @@ def home_page(request):
     return render(request, 'experiments/home.html',
                   {'experiments': experiments,
                    'to_be_analysed_count': to_be_analysed_count,
-                   'table_title': 'List of Experiments'})
+                   'table_title': 'List of Experiments',
+                   'form': NepSearchForm()})
 
 
 def experiment_detail(request, experiment_id):

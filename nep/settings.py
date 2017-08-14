@@ -32,6 +32,7 @@ INSTALLED_APPS = [
     'haystack',
     'experiments.apps.ExperimentsConfig',
     'downloads',
+    'bootstrapform'
 ]
 
 MIDDLEWARE = [
