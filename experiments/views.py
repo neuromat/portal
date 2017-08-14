@@ -185,6 +185,7 @@ def language_change(request, language_code):
 # Class based views
 #
 class NepSearchView(SearchView):
+    form_class = NepSearchForm
     # TODO: not working. Returns empty queryset. See
     # https://stackoverflow.com/questions/45556274/custom-view-does-not-show-results-in-django-haystack-with-elastic-search
 
