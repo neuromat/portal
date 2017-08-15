@@ -8,6 +8,7 @@ from rest_framework.documentation import include_docs_urls
 
 from experiments import views
 from experiments import api_urls
+from experiments.views import NepSearchView
 from downloads import urls
 
 # internationalization
@@ -21,6 +22,10 @@ urlpatterns = [
     url(r'^api/', include(api_urls)),
     url(r'^api/docs/', include_docs_urls(title='NEP API')),
     url(r'^$', views.home_page, name='home'),
+
+    # override login url to include extra context
+    url(r'^login/$', views.NepLoginView.as_view(), name='login'),
+
     url(r'^', include('django.contrib.auth.urls')),
     url(r'^experiments/(?P<experiment_id>[0-9]+)/$',
         views.experiment_detail, name='experiment-detail'),
@@ -39,7 +44,7 @@ urlpatterns = [
         name='ajax-to_be_analysed'),
 
     # Haystack search
-    url(r'^search/', include('haystack.urls'))
+    url(r'^search/', NepSearchView.as_view(), name='search_view')
 ]
 
 

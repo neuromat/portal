@@ -1,7 +1,7 @@
 from django.core.management import call_command
 from selenium.webdriver.common.keys import Keys
 
-from experiments.models import Study, Experiment, Group
+from experiments.models import Study, Experiment, Group, Step
 from functional_tests.base import FunctionalTest
 
 import time
@@ -17,13 +17,24 @@ class SearchTest(FunctionalTest):
     def rebuild_index():
         call_command('rebuild_index', verbosity=0, interactive=False)
 
+    def verify_n_experiments_in_table_rows(self, n):
+        table = self.browser.find_element_by_id('search_table')
+        experiment_rows = \
+            table.find_elements_by_class_name('experiment-matches')
+        count = 0
+        for experiment in experiment_rows:
+            if 'Brachial Plexus' in experiment.text:
+                count = count + 1
+        self.assertEqual(n, count)
+
     def test_two_words_searched_return_correct_objects(self):
 
-        # A researcher is delighted with the NED Portal. She decides to
-        # search for experiments that contains "Braquial Plexus" in whatever
-        # part of the portal. The search engine is complex. Some of its
-        # facilities consists in ignoring upper/lower case letters, search for
-        # terms individually and in whatever order in the sentence, too.
+        # Joselina, a neuroscience researcher at Numec is delighted with the
+        # NED Portal. She decides to search for experiments that contains
+        # "Braquial Plexus" in whatever part of the portal. The search
+        # engine is complex. Some of its facilities consists in ignoring
+        # upper/lower case letters, search for terms individually and in
+        # whatever order in the sentence, too.
         search_box = self.browser.find_element_by_id('id_q')
         search_box.send_keys('Brachial Plexus')
         self.browser.find_element_by_id('submit_terms').click()
@@ -100,12 +111,13 @@ class SearchTest(FunctionalTest):
         # collaborator a coleague of her, called Pero Vaz.
         # She types 'Pero Vaz' in search box and hits Enter.
         search_box = self.browser.find_element_by_id('id_q')
+        search_box.clear()
         search_box.send_keys('Pero Vaz')
         # self.browser.find_element_by_id('submit_terms').click()
         search_box.send_keys(Keys.ENTER)
         time.sleep(1)
-        # She sees that there is one Study whose one of collaborator is Pero
-        # Vaz.
+        # She sees that there is one Study whose one of the collaborators is
+        # Pero Vaz.
         study_rows = \
             self.browser.find_elements_by_class_name('study-matches')
         self.assertTrue(any('Pero Vaz' in row.text for row in study_rows))
@@ -142,15 +154,33 @@ class SearchTest(FunctionalTest):
 
         # As there are 3 experiments with 'Brachial Plexus' in title,
         # one approved, one under analysis, and one to be analysed (created
-        # in tests helper), it's supposed to only one match occurs, one that
-        # is Experiment and has title equals to 'Brachial Plexus'
-        table = self.browser.find_element_by_id('search_table')
-        experiment_rows = \
-            table.find_elements_by_class_name('experiment-matches')
-        count = 0
-        for experiment in experiment_rows:
-            if 'Brachial Plexus' in experiment.text:
-                count = count + 1
-        self.assertEqual(1, count)
+        # in tests helper), it's supposed to only one match occurs (the
+        # experiment approved), one that is Experiment and has title equals
+        # to 'Brachial Plexus'
+        self.verify_n_experiments_in_table_rows(2)
 
+    def test_search_with_filters_returns_correct_objects(self):
+
+        # Joselina is happy. When she searched for Brachial Plexus, she found
+        # the experiment she recently sent to portal through NES. She wants to
+        # explore more in depth the portal search functionality.
+        # In select box bellow search box she can choose filters like EEG,
+        # TMS, EMS, among others. She types "brachial plexus" in search box,
+        # and selects EMG in select box. Then she clicks in search button.
+        search_box = self.browser.find_element_by_id('id_q')
+        search_box.send_keys('Brachial Plexus')
+        self.browser.find_element_by_xpath(
+            "//select/option[@value='" + Step.EMG + "']"
+        ).click()
+        self.browser.find_element_by_id('submit_terms').click()
+        time.sleep(1)
+
+        ##
+        # As there are 2 experiments with 'Brachial Title' in title,
+        # it's expected that Joselina sees only one Experiment search
+        # result, given that she chosen to filter experiments that has EMG
+        # Setting.
+        # The page refreshes displaying the results
+        self.verify_n_experiments_in_table_rows(1)
+        
         self.fail('Finish this test!')

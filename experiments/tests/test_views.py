@@ -73,7 +73,7 @@ class HomePageTest(TestCase):
 
         self.assertTrue(self.send_mail_called)
         self.assertEqual(self.subject,
-                         'Your experiment was approved in NEDP portal')
+                         'Your experiment was approved')
         self.assertEqual(self.from_email, 'noreplay@nep.prp.usp.br')
         self.assertEqual(self.to, [experiment.study.researcher.email])
 
@@ -167,6 +167,7 @@ class SearchTest(TestCase):
         # TODO: is it needed to test for redirected page?
 
     def test_search_returns_only_approved_experiments(self):
-        response = self.client.get('/search/', {'q': 'Braquial+Plexus'})
-        # TODO
+        response = self.client.get('/search/', {'q': 'Braquial+Plexus',
+                                                'filter': ''})
+        # TODO: complete this test!
 

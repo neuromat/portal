@@ -152,15 +152,20 @@ class TrusteeTest(FunctionalTestTrustee):
         email = mail.outbox[0]
         self.assertIn(experiment.study.researcher.email, email.to)
         self.assertEqual(email.subject,
-                         'Your experiment was approved in NEDP portal')
+                         'Your experiment was approved')
         # Inside it, there's a message with congratulations and a link to
         # the Portal
-        self.assertIn('Congratulations, your experiment ' + experiment.title
-                      + ' was approved by the Portal committee. Now it is '
-                        'public available under Creative Commons '
-                        'Share Alike license.\nYou can view your experiment '
-                        'data in ' +
-                        self.live_server_url, email.body)
+        self.assertIn('We are pleased to inform you that your experiment ' +
+                      experiment.title +
+                      ' was approved by Neuromat Open Database Evaluation '
+                      'Committee. All data of the submitted experiment '
+                      'will be available freely to the public '
+                      'consultation and shared under Creative Commons Share '
+                      'Alike license.\n You can access your experiment '
+                      'data by clicking on the link below\n' +
+                      self.live_server_url + '\n', email.body)
+        self.assertIn('With best regards,\n The NeuroMat Open Database '
+                      'Evaluation Committee.', email.body)
         url_search = re.search(r'http://.+$', email.body)
         if not url_search:
             self.fail('Could not find url in email body:\n' + email.body)
@@ -363,8 +368,8 @@ class TrusteeTest(FunctionalTestTrustee):
         ).text
         # Experiment.STATUS[1][1] == 'To be analysed'
         self.assertEqual(td_tag_status, Experiment.STATUS_OPTIONS[1][1])
-        self.assertIn('You have liberate the experiment ' + experiment.title
-                      + ' to be analysed by other trustee.',
+        self.assertIn('The experiment data ' + experiment.title
+                      + ' was made available to be analysed by other trustee.',
                       self.browser.find_element_by_tag_name('body').text)
 
     def test_can_change_status_from_under_analysis_to_other_only_if_trustee_is_the_owner(self):
@@ -404,14 +409,14 @@ class TrusteeTest(FunctionalTestTrustee):
         # approval site, and a link to download the ethics committee file
         # (because this experiment has that data posted via api)
         ethics_commitee_url = self.browser.find_element_by_link_text(
-            'Ethics committee approval'
+            'Approval of the ethics committee'
         )
         self.assertEqual(
             experiment.ethics_committee_url,
             ethics_commitee_url.get_attribute('href')
         )
         ethics_commitee_file = self.browser.find_element_by_link_text(
-            'Download project file approved'
+            'Approval of the ethics committee file'
         )
         # Obs.: self.assertIn because
         # experiment.ethics_committee_info.file.url gives relative url

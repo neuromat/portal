@@ -1,11 +1,13 @@
 from django.contrib import messages
+from django.contrib.auth.views import LoginView
 from django.core.mail import send_mail
 from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import render
 from haystack.generic_views import SearchView
 from django.utils.translation import activate, LANGUAGE_SESSION_KEY, ugettext as _
 
-from experiments.models import Experiment, RejectJustification
+from experiments.forms import NepSearchForm
+from experiments.models import Experiment, RejectJustification, Step
 
 
 def home_page(request):
@@ -38,7 +40,8 @@ def home_page(request):
     return render(request, 'experiments/home.html',
                   {'experiments': experiments,
                    'to_be_analysed_count': to_be_analysed_count,
-                   })
+                   'table_title': 'List of Experiments',
+                   'search_form': NepSearchForm()})
 
 
 def experiment_detail(request, experiment_id):
@@ -90,25 +93,25 @@ def change_status(request, experiment_id):
     if status == Experiment.NOT_APPROVED:
         if not justification:
             messages.warning(
-                request, 'Please provide a reason justifying the change of the status of the experiment ' +
-                         experiment.title + 'to "Not approved". ')
+                request, _('Please provide a reason justifying the change of the status of the experiment ') +
+                experiment.title + _('to "Not approved". '))
 
             return HttpResponseRedirect('/')
         else:
             # if has justification send email to researcher
-            subject = 'Your experiment was rejected'
-            message = 'We regret to inform you that your experiment, ' + experiment.title + \
-                      ', has not been accepted to be published in the NeuroMat Open Database. Please check the ' \
-                      'reasons providing by the Neuromat Open Database Evaluation Committee:' + justification + '.\n' \
-                      'With best regards,\n' \
-                      'The Neuromat Open Database Evaluation Committee'
+            subject = _('Your experiment was rejected')
+            message = _('We regret to inform you that your experiment, ') + experiment.title +  \
+                      _(', has not been acceptted to be published in the NeuroMat Open Database. Please check the '
+                        'reasons providing by the Neuromat Open Database Evaluation Committee:') + justification + \
+                      _('.\nWith best regards,\n The Neuromat Open Database Evaluation Committee')
+
 
             send_mail(subject, message, from_email,
                       [experiment.study.researcher.email])
             messages.success(
                 request,
-                'An email was sent to ' + experiment.study.researcher.name +
-                ' warning that the experiment was rejected.'
+                _('An email was sent to ') + experiment.study.researcher.name +
+                _(' warning that the experiment was rejected.')
             )
             # Save the justification message
             RejectJustification.objects.create(message=justification,
@@ -117,35 +120,33 @@ def change_status(request, experiment_id):
     # if status changed to UNDER_ANALYSIS or APPROVED, send email
     # to experiment study researcher
     if status == Experiment.APPROVED:
-        subject = 'Your experiment was approved'
-        message = 'We are pleased to inform you that your experiment ' + experiment.title + ' was approved by ' \
-                  'NeuroMat Open Database Evaluation Committee. All data of the submitted experiment will be ' \
-                  'available freely to the public consultation and shared under ' \
-                  'Creative Commons Share Alike license.\n' \
-                  'You can access your experiment data by clicking on the link below \n http://' + request.get_host()\
-                  + '\n With best regards,\n' \
-                  'The NeuroMat Open Database Evaluation Committee'
+        subject = _('Your experiment was approved')
+        message = _('We are pleased to inform you that your experiment ') + experiment.title + \
+                  _(' was approved by Neuromat Open Database Evaluation Committee. All data of the submitted experiment'
+                    ' will be available freely to the public consultation and shared under Creative Commons Share '
+                    'Alike license.\n You can access your experiment data by clicking on the link below\n') + 'http://' +\
+                  request.get_host() +\
+                  _('\nWith best regards,\n The NeuroMat Open Database Evaluation Committee.')
 
         send_mail(subject, message, from_email,
                   [experiment.study.researcher.email])
         messages.success(
             request,
-            'An email was sent to ' + experiment.study.researcher.name +
-            ' warning that the experiment changed status to Approved.'
+            _('An email was sent to ') + experiment.study.researcher.name +
+            _(' warning that the experiment changed status to Approved.')
         )
     if status == Experiment.UNDER_ANALYSIS:
-        subject = 'Your experiment is now under analysis'
-        message = 'Thank you for submitting your experiment ' + experiment.title + \
-                  '. The NeuroMat Open Database Evaluation Committee will be analyze your data and will try to ' \
-                  'respond as soon as possible.\n' \
-                  'With best regards,\n' \
-                  'The NeuroMat Open Database Evaluation Committee'
+        subject = _('Your experiment is now under analysis')
+        message = _('Thank you for submitting your experiment ') + experiment.title + \
+                  _('. The NeuroMat Open Database Evaluation Committee will be analyze your data and will try to '
+                    'respond as soon as possible.\n With best regards,\n The NeuroMat Open Database Evaluation '
+                    'Committee')
         send_mail(subject, message, from_email,
                   [experiment.study.researcher.email])
         messages.success(
             request,
-            'An email was sent to ' + experiment.study.researcher.name +
-            ' warning that the experiment is under analysis.'
+            _('An email was sent to ') + experiment.study.researcher.name +
+            _(' warning that the experiment is under analysis.')
         )
         # Associate experiment with trustee
         experiment.trustee = request.user
@@ -159,7 +160,7 @@ def change_status(request, experiment_id):
             experiment.trustee = None
             messages.warning(
                 request,
-                'The experiment data ' + experiment.title + ' was made available to be analysed by other trustee.'
+                _('The experiment data ') + experiment.title + _(' was made available to be analysed by other trustee.')
             )
 
     experiment.status = status
@@ -176,27 +177,66 @@ def ajax_to_be_analysed(request):
     return HttpResponse(to_be_analysed, content_type='application/json')
 
 
-class NepSearchView(SearchView):
-    # TODO: not working. See
-    # https://stackoverflow.com/questions/45556274/custom-view-does-not-show-results-in-django-haystack-with-elastic-search
-
-    def get_queryset(self):
-        queryset = super(NepSearchView, self).get_queryset()
-        if not self.request.user.is_authenticated and \
-                self.request.user.groups.filter(name='trustees').exists():
-            return queryset
-        else:
-            return queryset
-
-    def get_context_data(self, *args, **kwargs):
-        context = super(NepSearchView, self).get_context_data(**kwargs)
-        # do something
-        return context
-
-
 def language_change(request, language_code):
 
     activate(language_code)
     request.session[LANGUAGE_SESSION_KEY] = language_code
 
     return HttpResponseRedirect(request.GET['next'])
+
+
+##
+# Class based views
+#
+class NepSearchView(SearchView):
+    form_class = NepSearchForm
+    form_name = 'search_form'
+
+    def get_queryset(self):
+        queryset = super(NepSearchView, self).get_queryset()
+
+    def get_context_data(self, *args, **kwargs):
+        context = super(NepSearchView, self).get_context_data(**kwargs)
+
+        self.filter(context, self.request.GET['filter'])
+
+        # Related to the badge with number of experiments to be analysed in
+        # page top. It's displayed only if a trustee is logged.
+        to_be_analysed_count = None
+        if self.request.user.is_authenticated and \
+                self.request.user.groups.filter(name='trustees').exists():
+            to_be_analysed = Experiment.lastversion_objects.filter(
+                status=Experiment.TO_BE_ANALYSED)
+            to_be_analysed_count = to_be_analysed.count()
+
+        context['to_be_analysed_count'] = to_be_analysed_count
+
+        return context
+
+    @staticmethod
+    def filter(context, search_filter):
+        """
+        Filters search results by type of data collected in the experiment.
+        :param context: object_list returned by haystack search
+        :param search_filter: the filters chosen by the user
+        """
+        old_object_list = context['object_list']
+        indexes_to_remove = []
+        for i in range(0, len(old_object_list)):
+            if old_object_list[i].model_name == 'experiment':
+                # if result has EMG:
+                if search_filter == Step.EMG:
+                    for group in old_object_list[i].object.groups.all():
+                        if group.steps.filter(type=Step.EMG).count() > 0:
+                            indexes_to_remove.append(i)
+                            break
+
+        context['object_list'] = [v for i, v in enumerate(old_object_list)
+                                  if i not in indexes_to_remove]
+
+
+# inherit from LoginView to include search form besides login form
+class NepLoginView(LoginView):
+    search_form = NepSearchForm()
+    extra_context = {'search_form': search_form}
+

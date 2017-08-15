@@ -139,10 +139,11 @@ a:hover.nep-btn {
 }
 
 .search-box {
-  margin-bottom: 20px;
+  display: inline-block;
+  width: 60%;
 }
 
-.nep-search-select {
+.search-select {
   max-width: 50.2%; /* to align right with search input text box */
 }
 
