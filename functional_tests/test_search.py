@@ -17,14 +17,9 @@ class SearchTest(FunctionalTest):
     def rebuild_index():
         call_command('rebuild_index', verbosity=0, interactive=False)
 
-    def verify_n_experiments_in_table_rows(self, n):
+    def verify_n_objects_in_table_rows(self, n, row_class):
         table = self.browser.find_element_by_id('search_table')
-        experiment_rows = \
-            table.find_elements_by_class_name('experiment-matches')
-        count = 0
-        for experiment in experiment_rows:
-            if 'Brachial Plexus' in experiment.text:
-                count = count + 1
+        count = len(table.find_elements_by_class_name(row_class))
         self.assertEqual(n, count)
 
     def test_two_words_searched_return_correct_objects(self):
@@ -152,14 +147,14 @@ class SearchTest(FunctionalTest):
         self.browser.find_element_by_id('submit_terms').click()
         time.sleep(1)
 
-        # As there are 3 experiments with 'Brachial Plexus' in title,
-        # one approved, one under analysis, and one to be analysed (created
-        # in tests helper), it's supposed to only one match occurs (the
-        # experiment approved), one that is Experiment and has title equals
-        # to 'Brachial Plexus'
-        self.verify_n_experiments_in_table_rows(2)
+        # As there are 4 experiments with 'Brachial Plexus' in title,
+        # two approved, one under analysis, and one to be analysed (created
+        # in tests helper), it's supposed to two matches occurs (the
+        # experiments approved), the Experiment's tha has matches for
+        # 'Brachial Plexus' haystack search results.
+        self.verify_n_objects_in_table_rows(2, 'experiment-matches')
 
-    def test_search_with_filters_returns_correct_objects(self):
+    def test_search_with_one_filter_returns_correct_objects(self):
 
         # Joselina is happy. When she searched for Brachial Plexus, she found
         # the experiment she recently sent to portal through NES. She wants to
@@ -174,13 +169,39 @@ class SearchTest(FunctionalTest):
         ).click()
         self.browser.find_element_by_id('submit_terms').click()
         time.sleep(1)
-
         ##
         # As there are 2 experiments with 'Brachial Title' in title,
         # it's expected that Joselina sees only one Experiment search
         # result, given that she chosen to filter experiments that has EMG
         # Setting.
-        # The page refreshes displaying the results
-        self.verify_n_experiments_in_table_rows(1)
-        
+        # The page refreshes displaying the results.
+        ##
+        self.verify_n_objects_in_table_rows(1, 'experiment-matches')
+        self.verify_n_objects_in_table_rows(2, 'group-matches')
+
+    def test_search_with_two_filters_returns_correct_objects(self):
+        # Ok, Joselina now wants to search experiments that has EEG and EMG
+        # in groups data collection. She multiple choices box she clicks in
+        # EEG and EMG
+        search_box = self.browser.find_element_by_id('id_q')
+        search_box.send_keys('Brachial Plexus')
+        self.browser.find_element_by_id('filter_box').click()
+        self.browser.find_element_by_xpath(
+            "//select/option[@value='" + Step.EEG + "']"
+        ).click()
+        self.browser.find_element_by_xpath(
+            "//select/option[@value='" + Step.EMG + "']"
+        ).click()
+        self.browser.find_element_by_id('submit_terms').click()
+        time.sleep(1)
+
+        ##
+        # There's an experiment group that has one EEG step and one EMG
+        # step, besides "Plexus Brachial" in group description.
+        # On the other hand, there's a group that has "Brachial Plexus" in
+        # despcription, EEG step but not EMG step. So she will see only one
+        # of the two groups
+        ##
+        self.verify_n_objects_in_table_rows(1, 'group-matches')
+
         self.fail('Finish this test!')
