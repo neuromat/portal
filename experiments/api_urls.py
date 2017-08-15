@@ -103,6 +103,41 @@ api_experiment_eeg_electrode_net_setting =\
         'post': 'create'
     })
 
+# Surface Electrode
+api_experiment_surface_electrode =\
+    api.SurfaceElectrodeViewSet.as_view({
+        'get': 'list',
+        'post': 'create'
+    })
+
+# Needle Electrode
+api_experiment_needle_electrode =\
+    api.NeedleElectrodeViewSet.as_view({
+        'get': 'list',
+        'post': 'create'
+    })
+
+# Intramuscular Electrode
+api_experiment_intramuscular_electrode =\
+    api.IntramuscularElectrodeViewSet.as_view({
+        'get': 'list',
+        'post': 'create'
+    })
+
+# EEG Electrode Localization System
+api_experiment_eeg_electrode_localization_system =\
+    api.EEGElectrodeLocalizationSystemViewSet.as_view({
+        'get': 'list',
+        'post': 'create'
+    })
+
+# EEG Electrode Position
+api_experiment_eeg_electrode_position =\
+    api.EEGElectrodePositionViewSet.as_view({
+        'get': 'list',
+        'post': 'create'
+    })
+
 # EMG setting
 api_experiment_emg_setting_list =\
     api.EMGSettingViewSet.as_view({
@@ -326,6 +361,16 @@ urlpatterns = [
         api_experiment_eeg_filter_setting, name='api_experiment_eeg_filter_setting'),
     url(r'^eeg_setting/(?P<pk>[0-9]+)/eeg_electrode_net_setting/$',
         api_experiment_eeg_electrode_net_setting, name='api_experiment_eeg_electrode_net_setting'),
+    url(r'^experiments/(?P<experiment_nes_id>[0-9]+)/surface_electrode/$',
+        api_experiment_surface_electrode, name='api_experiment_surface_electrode'),
+    url(r'^experiments/(?P<experiment_nes_id>[0-9]+)/needle_electrode/$',
+        api_experiment_needle_electrode, name='api_experiment_needle_electrode'),
+    url(r'^experiments/(?P<experiment_nes_id>[0-9]+)/intramuscular_electrode/$',
+        api_experiment_intramuscular_electrode, name='api_experiment_intramuscular_electrode'),
+    url(r'^eeg_setting/(?P<pk>[0-9]+)/eeg_electrode_localization_system/$',
+        api_experiment_eeg_electrode_localization_system, name='api_experiment_eeg_electrode_localization_system'),
+    url(r'^eeg_setting/(?P<pk>[0-9]+)/eeg_electrode_position/$',
+        api_experiment_eeg_electrode_position, name='api_experiment_eeg_electrode_position'),
 
     # EMG setting
     url(r'^experiments/(?P<experiment_nes_id>[0-9]+)/emg_setting/$',

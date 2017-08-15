@@ -10,7 +10,8 @@ from experiments.models import Experiment, Study, User, ProtocolComponent, \
     EEGData, EMGData, TMSData, GoalkeeperGameData, QuestionnaireResponse, \
     AdditionalData, GenericDataCollectionData, EEG, EMG, TMS, Instruction, Pause, Task, TaskForTheExperimenter, \
     GenericDataCollection, Stimulus, GoalkeeperGame, SetOfStep, Questionnaire, \
-    EEGAmplifierSetting, Amplifier, EEGSolution, EEGFilterSetting, EEGElectrodeNet
+    EEGAmplifierSetting, Amplifier, EEGSolution, EEGFilterSetting, EEGElectrodeNet, \
+    SurfaceElectrode, NeedleElectrode, IntramuscularElectrode, EEGElectrodeLocalizationSystem, EEGElectrodePosition
 
 
 ###################
@@ -138,6 +139,97 @@ class EEGFilterSettingSerializer(serializers.ModelSerializer):
         model = EEGFilterSetting
         fields = ('eeg_setting', 'eeg_filter_type_name', 'eeg_filter_type_description', 'high_pass', 'low_pass',
                   'high_band_pass', 'low_band_pass', 'high_notch', 'low_notch', 'order')
+
+
+class SurfaceElectrodeSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = SurfaceElectrode
+        fields = (
+            'id',
+
+            'name',
+            'description',
+            'material',
+            'usability',
+            'impedance',
+            'impedance_unit',
+            'inter_electrode_distance',
+            'inter_electrode_distance_unit',
+            'electrode_configuration_name',
+            'electrode_type',
+
+            'conduction_type',
+            'electrode_mode',
+            'electrode_shape_name',
+            'electrode_shape_measure_value',
+            'electrode_shape_measure_unit'
+        )
+
+
+class NeedleElectrodeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = NeedleElectrode
+        fields = (
+            'id',
+
+            'name',
+            'description',
+            'material',
+            'usability',
+            'impedance',
+            'impedance_unit',
+            'inter_electrode_distance',
+            'inter_electrode_distance_unit',
+            'electrode_configuration_name',
+            'electrode_type',
+
+            'size',
+            'size_unit',
+            'number_of_conductive_contact_points_at_the_tip',
+            'size_of_conductive_contact_points_at_the_tip'
+        )
+
+
+class IntramuscularElectrodeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = IntramuscularElectrode
+        fields = (
+            'id',
+
+            'name',
+            'description',
+            'material',
+            'usability',
+            'impedance',
+            'impedance_unit',
+            'inter_electrode_distance',
+            'inter_electrode_distance_unit',
+            'electrode_configuration_name',
+            'electrode_type',
+
+            'strand',
+            'insulation_material_name',
+            'insulation_material_description',
+            'length_of_exposed_tip'
+        )
+
+
+class EEGElectrodeLocalizationSystemSerializer(serializers.ModelSerializer):
+    eeg_setting = serializers.ReadOnlyField(source='eeg_setting.name')
+
+    class Meta:
+        model = EEGElectrodeLocalizationSystem
+        fields = ('eeg_setting', 'name', 'description', 'map_image_file')
+
+
+class EEGElectrodePositionSerializer(serializers.ModelSerializer):
+    eeg_electrode_localization_system = serializers.ReadOnlyField(source='eeg_electrode_localization_system.name')
+
+    class Meta:
+        model = EEGElectrodePosition
+        fields = ('eeg_electrode_localization_system', 'electrode_model',
+                  'name', 'coordinate_x', 'coordinate_y', 'channel_index')
 
 
 class EEGElectrodeNetSettingSerializer(serializers.ModelSerializer):
@@ -763,6 +855,63 @@ class EEGElectrodeNetSettingViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         eeg_setting = EEGSetting.objects.get(pk=self.kwargs['pk'])
         serializer.save(eeg_setting=eeg_setting)
+
+
+class SurfaceElectrodeViewSet(viewsets.ModelViewSet):
+    serializer_class = SurfaceElectrodeSerializer
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
+
+    def get_queryset(self):
+        return SurfaceElectrode.objects.filter(group_id=self.kwargs['pk'])
+
+    def perform_create(self, serializer):
+        serializer.save()
+
+
+class NeedleElectrodeViewSet(viewsets.ModelViewSet):
+    serializer_class = NeedleElectrodeSerializer
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
+
+    def get_queryset(self):
+        return NeedleElectrode.objects.filter(group_id=self.kwargs['pk'])
+
+    def perform_create(self, serializer):
+        serializer.save()
+
+
+class IntramuscularElectrodeViewSet(viewsets.ModelViewSet):
+    serializer_class = IntramuscularElectrodeSerializer
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
+
+    def get_queryset(self):
+        return IntramuscularElectrode.objects.filter(group_id=self.kwargs['pk'])
+
+    def perform_create(self, serializer):
+        serializer.save()
+
+
+class EEGElectrodeLocalizationSystemViewSet(viewsets.ModelViewSet):
+    serializer_class = EEGElectrodeLocalizationSystemSerializer
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
+
+    def get_queryset(self):
+        return EEGElectrodeLocalizationSystem.objects.filter(eeg_setting_id=self.kwargs['pk'])
+
+    def perform_create(self, serializer):
+        eeg_setting = EEGSetting.objects.get(pk=self.kwargs['pk'])
+        serializer.save(eeg_setting=eeg_setting)
+
+
+class EEGElectrodePositionViewSet(viewsets.ModelViewSet):
+    serializer_class = EEGElectrodePositionSerializer
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
+
+    def get_queryset(self):
+        return EEGElectrodePosition.objects.filter(eeg_electrode_localization_system_id=self.kwargs['pk'])
+
+    def perform_create(self, serializer):
+        eeg_electrode_localization_system = EEGElectrodeLocalizationSystem(pk=self.kwargs['pk'])
+        serializer.save(eeg_electrode_localization_system=eeg_electrode_localization_system)
 
 
 class EMGSettingViewSet(viewsets.ModelViewSet):

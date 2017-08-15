@@ -254,7 +254,7 @@ class ElectrodeModel(models.Model):
     impedance_unit = models.CharField(null=True, blank=True, max_length=15)
     inter_electrode_distance = models.FloatField(null=True, blank=True)
     inter_electrode_distance_unit = models.CharField(null=True, blank=True, max_length=10)
-    electrode_configuration_name = models.CharField(max_length=150)
+    electrode_configuration_name = models.CharField(max_length=150, null=True, blank=True)
     electrode_type = models.CharField(max_length=50, choices=ELECTRODE_TYPES)
 
     def __str__(self):
@@ -270,11 +270,11 @@ class SurfaceElectrode(ElectrodeModel):
         ("active", "Active"),
         ("passive", "Passive"),
     )
-    conduction_type = models.CharField(max_length=20, choices=CONDUCTION_TYPES)
-    electrode_mode = models.CharField(max_length=20, choices=MODE_OPTIONS)
-    electrode_shape_name = models.CharField(max_length=150)
-    electrode_shape_measure_value = models.FloatField()
-    electrode_shape_measure_unit = models.CharField(max_length=150)
+    conduction_type = models.CharField(max_length=20, choices=CONDUCTION_TYPES, null=True, blank=True)
+    electrode_mode = models.CharField(max_length=20, choices=MODE_OPTIONS, null=True, blank=True)
+    electrode_shape_name = models.CharField(max_length=150, null=True, blank=True)
+    electrode_shape_measure_value = models.FloatField(null=True, blank=True)
+    electrode_shape_measure_unit = models.CharField(max_length=150, null=True, blank=True)
 
 
 class EEGElectrodePosition(models.Model):
@@ -284,7 +284,7 @@ class EEGElectrodePosition(models.Model):
     name = models.CharField(max_length=150)
     coordinate_x = models.IntegerField(null=True, blank=True)
     coordinate_y = models.IntegerField(null=True, blank=True)
-    channel_default_index = models.IntegerField()
+    channel_index = models.IntegerField()
 
 
 class IntramuscularElectrode(ElectrodeModel):
