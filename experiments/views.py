@@ -7,7 +7,7 @@ from haystack.generic_views import SearchView
 from django.utils.translation import activate, LANGUAGE_SESSION_KEY, ugettext as _
 
 from experiments.forms import NepSearchForm
-from experiments.models import Experiment, RejectJustification
+from experiments.models import Experiment, RejectJustification, Step
 
 
 def home_page(request):
@@ -195,6 +195,8 @@ class NepSearchView(SearchView):
     def get_context_data(self, *args, **kwargs):
         context = super(NepSearchView, self).get_context_data(**kwargs)
 
+        self.filter(context, self.request.GET['filter'])
+
         # Related to the badge with number of experiments to be analysed in
         # page top. It's displayed only if a trustee is logged.
         to_be_analysed_count = None
@@ -208,8 +210,29 @@ class NepSearchView(SearchView):
 
         return context
 
+    @staticmethod
+    def filter(context, search_filter):
+        """
+        Filters search results by type of data collected in the experiment.
+        :param context: object_list returned by haystack search
+        :param search_filter: the filters chosen by the user
+        """
+        old_object_list = context['object_list']
+        indexes_to_remove = []
+        for i in range(0, len(old_object_list)):
+            if old_object_list[i].model_name == 'experiment':
+                # if result has EMG:
+                if search_filter == Step.EMG:
+                    for group in old_object_list[i].object.groups.all():
+                        if group.steps.filter(type=Step.EMG).count() > 0:
+                            indexes_to_remove.append(i)
+                            break
 
-# override LoginView to include search form besides login form
+        context['object_list'] = [v for i, v in enumerate(old_object_list)
+                                  if i not in indexes_to_remove]
+
+
+# inherit from LoginView to include search form besides login form
 class NepLoginView(LoginView):
     search_form = NepSearchForm()
     extra_context = {'search_form': search_form}

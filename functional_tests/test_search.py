@@ -1,7 +1,7 @@
 from django.core.management import call_command
 from selenium.webdriver.common.keys import Keys
 
-from experiments.models import Study, Experiment, Group
+from experiments.models import Study, Experiment, Group, Step
 from functional_tests.base import FunctionalTest
 
 import time
@@ -115,8 +115,8 @@ class SearchTest(FunctionalTest):
         # self.browser.find_element_by_id('submit_terms').click()
         search_box.send_keys(Keys.ENTER)
         time.sleep(1)
-        # She sees that there is one Study whose one of collaborator is Pero
-        # Vaz.
+        # She sees that there is one Study whose one of the collaborators is
+        # Pero Vaz.
         study_rows = \
             self.browser.find_elements_by_class_name('study-matches')
         self.assertTrue(any('Pero Vaz' in row.text for row in study_rows))
@@ -168,11 +168,13 @@ class SearchTest(FunctionalTest):
         # and selects EMG in select box. Then she clicks in search button.
         search_box = self.browser.find_element_by_id('id_q')
         search_box.send_keys('Brachial Plexus')
-        self.browser.find_element_by_xpath("//select/option["
-                                           "@value='eeg']").click()
+        self.browser.find_element_by_xpath(
+            "//select/option[@value='" + Step.EMG + "']"
+        ).click()
         self.browser.find_element_by_id('submit_terms').click()
         time.sleep(1)
 
+        ##
         # As there are 2 experiments with 'Brachial Title' in title,
         # it's expected that Joselina sees only one Experiment search
         # result, given that she chosen to filter experiments that has EMG

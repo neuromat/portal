@@ -7,7 +7,7 @@ from faker import Factory
 from experiments.helpers import generate_image_file
 from experiments.models import Experiment, Study, Group, Researcher, \
     Collaborator, Participant, Gender, ExperimentalProtocol, \
-    ClassificationOfDiseases, Keyword, EMGSetting
+    ClassificationOfDiseases, Keyword, Step
 
 
 def create_experiment_groups(qtty, experiment):
@@ -206,7 +206,7 @@ def create_ethics_committee_info(experiment):
     experiment.save()
 
 
-def create_emgsetting(qtty, experiment):
+def create_emgstep(qtty, experiment):
     """
     :param qtty: number of emg settings
     :param experiment: Experiment model instance
@@ -214,11 +214,10 @@ def create_emgsetting(qtty, experiment):
     fake = Factory.create()
 
     for i in range(qtty):
-        EMGSetting.objects.create(
-            description=fake.text(max_nb_chars=150),
-            name=fake.text(max_nb_chars=15),
-            acquisition_software_version=2.1,
-            experiment=experiment
+        Step.objects.create(
+            group=experiment.groups.first(),
+            identification=fake.word(), numeration=fake.ssn(),
+            type=Step.EMG, order=randint(1, 20)
         )
 
 
@@ -280,7 +279,7 @@ def global_setup_ft():
     experiment.title = 'Brachial Plexus (with EMG Setting)'
     experiment.description = 'Ein Beschreibung.'
     experiment.save()
-    create_emgsetting(1, experiment)
+    create_emgstep(1, experiment)
 
     # We change first experiment study approved to contain 'brachial' in
     # study description, so it have to be found by search test
