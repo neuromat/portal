@@ -40,7 +40,7 @@ class ExperimentDetailTest(FunctionalTest):
             'id_detail_title').text
         self.assertEqual(experiment.title, experiment_title)
         link_home = self.browser.find_element_by_id('id_link_home').text
-        self.assertIn('Back Search', link_home)
+        self.assertIn('Back Home', link_home)
         experiment_description = self.browser.find_element_by_id(
             'id_detail_description').text
         self.assertEqual(experiment.description, experiment_description)
@@ -59,15 +59,16 @@ class ExperimentDetailTest(FunctionalTest):
         data_acquisition_text = self.browser.find_element_by_id(
             'id_detail_acquisition').text
         if experiment.data_acquisition_done:
-            self.assertIn('Data acquisition done', data_acquisition_text)
+            self.assertIn('Data acquisition was completed',
+                          data_acquisition_text)
         else:
-            self.assertIn('Data acquisition not finished',
+            self.assertIn('Data acquisition was not completed',
                           data_acquisition_text)
 
         # Right bellow she sees the study that the experiment belongs to
         # at left
         study_text = self.browser.find_element_by_id('id_detail_study').text
-        self.assertIn('Related study: ' + experiment.study.title, study_text)
+        self.assertIn('From study: ' + experiment.study.title, study_text)
 
         # In right side bellow the data acquisition alert, she sees a button
         # to download of data

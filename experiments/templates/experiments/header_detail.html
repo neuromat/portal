@@ -3,17 +3,18 @@
     <h2>{% trans "Open Database for Experiments in Neuroscience" %}</h2>
     <h4 id="id_detail_title" class="detail-title">{{ experiment.title }}</h4>
     <div id="id_link_home" class="detail-back-search">
-        <a href="{% url 'home' %}" class="nep-btn">{% trans "Back to home" %}</a>
+        <a href="{% url 'home' %}" class="nep-btn">{% trans "Back Home" %}</a>
     </div>
     <div id="id_detail_description" class="detail-description">{{ experiment.description }}</div>
     {% if experiment.data_acquisition_done %}
         <div id="id_detail_acquisition" class="align-right">
-            <span class="label label-success">{% trans "The data acquisition was completed" %}</span>
+            <span class="label label-success">
+                {% trans "Data acquisition was completed" %}</span>
         </div>
     {% else %}
         <div id="id_detail_acquisition" class="align-right">
             <span class="label label-warning">
-                {% trans "The data acquisition was not completed" %}
+                {% trans "Data acquisition was not completed" %}
             </span>
         </div>
     {% endif %}
@@ -33,7 +34,7 @@
             {% if experiment.ethics_committee_file %}
                 <a href="{{ experiment.ethics_committee_file.url }}"
                    class="nep-btn"
-                >{% trans "Approval of the ethics committee" %}</a>
+                >{% trans "Approval of the ethics committee file" %}</a>
             {% else %}
                 <span class="label label-danger">
                     {% trans "Approval of the ethics committee not available" %}</span>
@@ -42,7 +43,7 @@
     {% endif %}
 
     <hr class="detail-header-hr">
-    <div id="id_detail_study" class="detail-study">{% trans "From the study" %}: <a
+    <div id="id_detail_study" class="detail-study">{% trans "From study" %}: <a
             href="#" data-toggle="modal" data-target="#study_modal">{{ experiment.study.title }}</a></div>
     <div hidden="hidden">
         <input id="experimentId" type="text" value="{{ experiment.id }}">

@@ -33,7 +33,7 @@ class NewVisitorTest(FunctionalTest):
         # telling her that she can select experiments that has EEG, TMS,
         # EMG, Gokeeper game fase etc., experiment elements that will
         # determine if an experiment will be searched or not.
-        selectbox = self.browser.find_element_by_id('id_selectbox')
+        selectbox = self.browser.find_element_by_id('id_filter')
         options = selectbox.find_elements_by_tag_name('option')
         placeholder = options[0]
         self.assertEqual(
@@ -47,7 +47,7 @@ class NewVisitorTest(FunctionalTest):
         self.assertTrue(any(option.text == 'TMS' for option in options))
         self.assertTrue(any(option.text == 'EMG' for option in options))
         self.assertTrue(
-            any(option.text == 'Goalkeeper game fase' for option in options)
+            any(option.text == 'Goalkeeper game phase' for option in options)
         )
         self.assertTrue(
             any(option.text == 'Cinematic measures' for option in options)
@@ -119,7 +119,7 @@ class NewVisitorTest(FunctionalTest):
             'id_footer_contact').text
         self.assertIn('Address:', footer_content)
         self.assertIn('Matão St., 1010 - Cidade Universitária - São Paulo - '
-                      'SP - Brasil. 05508-090. Veja o mapa', footer_content)
+                      'SP - Brasil. 05508-090.', footer_content)
         self.assertIn('Phone:', footer_content)
         self.assertIn('+55 11 3091-1717', footer_content)
         self.assertIn('Email:', footer_content)
@@ -128,7 +128,7 @@ class NewVisitorTest(FunctionalTest):
         self.assertIn('comunicacao@numec.prp.usp.br', footer_content)
         footer_license_text = self.browser.find_element_by_id(
             'id_footer_license').text
-        self.assertIn('This site content is licensed with Creative Commons '
+        self.assertIn('This site content is licensed under a Creative Commons '
                       'Attributions 3.0', footer_license_text)
 
         self.fail('Finish this test!')

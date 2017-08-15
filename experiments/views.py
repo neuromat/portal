@@ -124,9 +124,9 @@ def change_status(request, experiment_id):
         message = _('We are pleased to inform you that your experiment ') + experiment.title + \
                   _(' was approved by Neuromat Open Database Evaluation Committee. All data of the submitted experiment'
                     ' will be available freely to the public consultation and shared under Creative Commons Share '
-                    'Alike license.\n You can access your experiment data by clicking on the link below \n http://') + \
-                    request.get_host() + \
-                  _('\n With best regards,\n The NeuroMat Open Database Evaluation Committee.')
+                    'Alike license.\n You can access your experiment data by clicking on the link below\n') + 'http://' +\
+                  request.get_host() +\
+                  _('\nWith best regards,\n The NeuroMat Open Database Evaluation Committee.')
 
         send_mail(subject, message, from_email,
                   [experiment.study.researcher.email])
