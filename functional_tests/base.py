@@ -11,6 +11,7 @@ class FunctionalTest(StaticLiveServerTestCase):
 
     def setUp(self):
         global_setup_ft()
+
         self.browser = webdriver.Firefox()
         # A neuroscience researcher discovered a new site that
         # provides a data base with neuroscience experiments.
@@ -18,7 +19,8 @@ class FunctionalTest(StaticLiveServerTestCase):
         self.browser.get(self.live_server_url)
 
     def tearDown(self):
-        self.browser.quit()
+        # self.browser.quit()
+        pass
 
 
 @apply_setup(global_setup_ft)
