@@ -36,14 +36,14 @@ class HomePageTest(TestCase):
         response = self.client.post(
             '/experiments/' + str(experiment.id) + '/change_status/',
             {'status': Experiment.UNDER_ANALYSIS},
-        )
+            )
         # Is it redirecting?
         self.assertEqual(response.status_code, 302)
         # experiment has changed status to UNDER_ANALYSIS?
         experiment = Experiment.objects.get(pk=experiment.id)
         self.assertEqual(experiment.status, Experiment.UNDER_ANALYSIS)
 
-    def test_sends_email_to_researcher_when_trustee_changes_status(self):
+    def test_send_email_to_researcher_when_trustee_changes_status(self):
         """
         We test for changing status from UNDER_ANALYSIS to APPROVED.
         Other are similar.
@@ -69,11 +69,11 @@ class HomePageTest(TestCase):
             '/experiments/' + str(experiment.id) + '/change_status/',
             {'status': Experiment.APPROVED, 'warning_email_to':
                 experiment.study.researcher.email},
-        )
+            )
 
         self.assertTrue(self.send_mail_called)
         self.assertEqual(self.subject,
-                         'Your experiment was approved in NEDP portal')
+                         'Your experiment was approved')
         self.assertEqual(self.from_email, 'noreplay@nep.prp.usp.br')
         self.assertEqual(self.to, [experiment.study.researcher.email])
 
@@ -105,7 +105,7 @@ class HomePageTest(TestCase):
         self.client.post(
             '/experiments/' + str(experiment.id) + '/change_status/',
             {'status': Experiment.NOT_APPROVED},
-        )
+            )
         # experiment has mantained status UNDER_ANALYSIS?
         experiment = Experiment.objects.get(pk=experiment.id)
         self.assertEqual(experiment.status, Experiment.UNDER_ANALYSIS)
@@ -122,7 +122,7 @@ class HomePageTest(TestCase):
             '/experiments/' + str(experiment.id) + '/change_status/',
             {'status': Experiment.NOT_APPROVED,
              'justification': '404 Bad experiment!'},
-        )
+            )
         experiment = Experiment.objects.get(pk=experiment.id)
         self.assertNotEqual('', experiment.justification)
 
@@ -136,7 +136,7 @@ class HomePageTest(TestCase):
         self.client.post(
             '/experiments/' + str(experiment.id) + '/change_status/',
             {'status': Experiment.UNDER_ANALYSIS},
-        )
+            )
         experiment = Experiment.objects.get(pk=experiment.id)
         self.assertEqual(trustee_user, experiment.trustee)
 
@@ -150,6 +150,24 @@ class HomePageTest(TestCase):
         self.client.post(
             '/experiments/' + str(experiment.id) + '/change_status/',
             {'status': Experiment.TO_BE_ANALYSED},
-        )
+            )
         experiment = Experiment.objects.get(pk=experiment.id)
         self.assertEqual(None, experiment.trustee)
+
+
+@apply_setup(global_setup_ut)
+class SearchTest(TestCase):
+
+    def setUp(self):
+        global_setup_ut()
+
+    def test_search_redirects_to_homepage_with_search_results(self):
+        response = self.client.post('/search/')
+        self.assertEqual(response.status_code, 200)
+        # TODO: is it needed to test for redirected page?
+
+    def test_search_returns_only_approved_experiments(self):
+        response = self.client.get('/search/', {'q': 'Braquial+Plexus',
+                                                'filter': ''})
+        # TODO: complete this test!
+

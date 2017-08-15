@@ -1,5 +1,12 @@
 <header class="container header-home">
-    <h1>Neuroscience Experiments Database</h1>
-    <h4>An Open Database for Experiments in Neuroscience</h4>
-    <input id="id_search_box" class="search-box" size="80" placeholder="Type key terms/words to be searched">
+    {% load i18n %}
+    {% load bootstrap %}
+    <h1>{% trans "Neuroscience Experiments Database" %}</h1>
+    <h4>{% trans "An Open Database for Experiments in Neuroscience" %}</h4>
+    <form id="search_form" action="/search">
+        {{ search_form|bootstrap }}
+        <div class="form-group">
+            <input id="submit_terms" type="submit" value="Search">
+        </div>
+    </form>
 </header>

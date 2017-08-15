@@ -7,11 +7,18 @@
 h1, h3, h4, h5, p {
   margin-bottom: 22px;
 }
+
 p.alert{
   color: red;
 }
+
 span.alert{
   color: red;
+  padding: 0;
+}
+
+pre.textual-protocol {
+  font-family: "Liberation Sans", serif;
 }
 
 /*
@@ -23,31 +30,64 @@ span.alert{
 a {
   color: #60c8a3;
 }
-a:hover {
+
+a:hover, a.nep-disabled {
   color: #a9b2b9;
   text-decoration: none;
 }
+
 *.icon-grey {
   color: grey;
 }
+
 i#new_experiments {
   width: 50px;
   text-align: center;
   vertical-align: middle;
   position: relative;
 }
+
 .badger:after {
-    position: absolute;
-    background: red;
-    height: 2rem;
-    top: -0.2rem;
-    right: 0.2rem;
-    width: 2rem;
-    text-align: center;
-    line-height: 2rem;
-    font-size: 1rem;
-    border-radius: 50%;
-    color: white;
+  position: absolute;
+  background: red;
+  height: 2rem;
+  top: -0.2rem;
+  right: 0.2rem;
+  width: 2rem;
+  text-align: center;
+  line-height: 2rem;
+  font-size: 1rem;
+  border-radius: 50%;
+  color: white;
+}
+
+/*
+  ========================================
+  Buttons
+  ========================================
+*/
+
+/* this is for removing shadow from submit buttons
+   it's used together with .nep-btn */
+.nep-btn-submit {
+  border: none;
+}
+
+.nep-btn {
+  background: #60c8a3;
+  color: #fff;
+  padding: 2px 12px;
+  border-radius: 18px;
+  vertical-align: middle;
+}
+
+a.nep-btn {
+  text-decoration: none;
+}
+
+a:hover.nep-btn {
+  color: #fff;
+  background: #a9b2b9;
 }
 
 /*
@@ -93,12 +133,18 @@ i#new_experiments {
 .header-home {
   background: #a6aaad;
   text-align: center;
-  border-radius: 3px;
+  border-top-left-radius: 7px;
+  border-top-right-radius: 7px;
   border-bottom: 5px solid #60c8a3;
 }
 
 .search-box {
-  margin-bottom: 20px;
+  display: inline-block;
+  width: 60%;
+}
+
+.search-select {
+  max-width: 50.2%; /* to align right with search input text box */
 }
 
 .detail-header {
@@ -128,14 +174,14 @@ i#new_experiments {
 }
 
 .detail-header-hr {
-  margin-bottom: 2px;
+  margin-bottom: 4px;
 }
 
 .detail-study {
   float: left;
 }
 
-.detail-acquisition {
+.align-right {
   float: right;
 }
 
@@ -154,7 +200,7 @@ i#new_experiments {
   text-align: center;
 }
 
-.toggable-tabs {
+.nep-content {
   border-left: 1px solid #a6aaad;
   border-right: 1px solid #a6aaad;
   border-bottom: 1px solid #a6aaad;
@@ -252,6 +298,32 @@ i#new_experiments {
 
 /*
   ========================================
-  Log In
+  Forms
   ========================================
  */
+
+.text-box-justification {
+  width: 100%;
+}
+
+/*
+  ========================================
+  Messages
+  ========================================
+ */
+
+.nep-alert {
+  margin-left: auto;
+  margin-right: auto;
+  width: 97%;
+}
+
+/*
+  ========================================
+  Haystack
+  ========================================
+ */
+/* used when highlight haystack tag is used in template */
+.highlighted {
+  background: yellow;
+}

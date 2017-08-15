@@ -1,20 +1,25 @@
 {% extends 'experiments/base.html' %}
 
 {% block header %}
+    {% load i18n %}
     {% include 'experiments/header_detail.html' %}
 {% endblock %}
 
 {% block content %}
-    <section class="container toggable-tabs">
+    <section class="container nep-content">
+        {% if messages %}
+            {% include 'experiments/messages.html' %}
+        {% endif %}
         <ul class="nav nav-tabs" role="tablist">
-            <li role="presentation" class="active"><a href="#statistics_tab" role="tab" data-toggle="tab">Statistics</a></li>
-            <li role="presentation"><a href="#groups_tab" role="tab" data-toggle="tab">Groups</a></li>
-            <li role="presentation"><a href="#settings_tab" role="tab" data-toggle="tab">Settings</a></li>
+            <li role="presentation" class="active"><a href="#statistics_tab" role="tab" data-toggle="tab">
+                {% trans "Statistics" %}</a></li>
+            <li role="presentation"><a href="#groups_tab" role="tab" data-toggle="tab">{% trans "Groups" %}</a></li>
+            <li role="presentation"><a href="#settings_tab" role="tab" data-toggle="tab">{% trans "Settings" %}</a></li>
         </ul>
 
         <!-- Tab panes -->
         <div class="tab-content portal-tab-content">
-
+            <!-- Statistics tab -->
             <div role="tabpanel" class="tab-pane active" id="statistics_tab">
                 <div class="row">
                     <div class="col-md-6">
@@ -25,7 +30,7 @@
                     </div>
                 </div>
             </div>
-
+            <!-- Groups tab -->
             <div role="tabpanel" class="tab-pane groups-tab" id="groups_tab">
                 <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
                     {% for group in experiment.groups.all %}
@@ -44,10 +49,11 @@
                                     <strong>{{ group.title }}</strong>
                                     <br>
                                     {{ group.participants.all.count }}
-                                    participants<br><br>
+                                    {% trans "participants" %}
+                                    <br><br>
                                     <p>{{ group.description }}</p>
                                     {% if group.inclusion_criteria.all %}
-                                        Inclusion criterias:
+                                        {% trans "Inclusion criterias" %}:
                                         <br>
                                         {% for criteria in group.inclusion_criteria.all %}
                                             {{ criteria.code }} - {{ criteria.description }}{% if not forloop.last %},{% endif %}
@@ -60,7 +66,7 @@
                                    data-parent="#accordion"
                                    href="#collapse{{ group.id }}"
                                    aria-expanded="true"
-                                   aria-controls="collapse{{ group.id }}">Details</a>
+                                   aria-controls="collapse{{ group.id }}" class="nep-btn">{% trans "Details" %}</a>
                             </div>
                             <br>
                             <div id="collapse{{ group.id }}"
@@ -68,9 +74,8 @@
                             collapse out" role="tabpanel"
                                  aria-labelledby="heading{{ group.id }}">
                                 <div class="panel-body">
-                                    <strong>Textual description</strong>
-                                    <br>
-                                    {{ group.experimental_protocol.textual_description }}
+                                    <strong>{% trans "Textual description" %}</strong>
+                                    <pre class="textual-protocol">{{ group.experimental_protocol.textual_description }}</pre>
                                 </div>
                             </div>
                         </div>
@@ -79,42 +84,42 @@
             </div>
 
             <div role="tabpanel" class="tab-pane" id="settings_tab">
-                    {% if experiment.eegsetting_set.all %}
-                        <strong>EEG Settings</strong>
-                        {% for eeg_setting in experiment.eegsetting_set.all %}
-                            <div class="panel panel-default nep-panel-group">
-                                <strong>{{ eeg_setting.name }}</strong><br/>
-                                {{ eeg_setting.description }}
-                            </div>
-                        {% endfor %}
-                    {% endif %}
-                    {% if experiment.emgsetting_set.all %}
-                        <strong>EMG Settings</strong>
-                        {% for emg_setting in experiment.emgsetting_set.all %}
-                            <div class="panel panel-default nep-panel-group">
-                                <strong>{{ emg_setting.name }}</strong><br/>
-                                {{ emg_setting.description }}
-                            </div>
-                        {% endfor %}
-                    {% endif %}
-                    {% if experiment.tmssetting_set.all %}
-                        <strong>TMS Settings</strong>
-                        {% for tms_setting in experiment.tmssetting_set.all %}
-                            <div class="panel panel-default nep-panel-group">
-                                <strong>{{ tms_setting.name }}</strong><br/>
-                                {{ tms_setting.description }}
-                            </div>
-                        {% endfor %}
-                    {% endif %}
-                    {% if experiment.contexttree_set.all %}
-                        <strong>Context trees</strong>
-                        {% for context_tree in experiment.contexttree_set.all %}
-                            <div class="panel panel-default nep-panel-group">
-                                <strong>{{ context_tree.name }}</strong><br/>
-                                {{ context_tree.description }}
-                            </div>
-                        {% endfor %}
-                    {% endif %}
+                {% if experiment.eegsetting_set.all %}
+                    <strong>{% trans "EEG Settings" %}</strong>
+                    {% for eeg_setting in experiment.eegsetting_set.all %}
+                        <div class="panel panel-default nep-panel-group">
+                            <strong>{{ eeg_setting.name }}</strong><br/>
+                            {{ eeg_setting.description }}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+                {% if experiment.emgsetting_set.all %}
+                    <strong>{% trans "EMG Settings" %}</strong>
+                    {% for emg_setting in experiment.emgsetting_set.all %}
+                        <div class="panel panel-default nep-panel-group">
+                            <strong>{{ emg_setting.name }}</strong><br/>
+                            {{ emg_setting.description }}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+                {% if experiment.tmssetting_set.all %}
+                    <strong>{% trans "TMS Settings" %}</strong>
+                    {% for tms_setting in experiment.tmssetting_set.all %}
+                        <div class="panel panel-default nep-panel-group">
+                            <strong>{{ tms_setting.name }}</strong><br/>
+                            {{ tms_setting.description }}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+                {% if experiment.contexttree_set.all %}
+                    <strong>{% trans "Context trees" %}</strong>
+                    {% for context_tree in experiment.contexttree_set.all %}
+                        <div class="panel panel-default nep-panel-group">
+                            <strong>{{ context_tree.name }}</strong><br/>
+                            {{ context_tree.description }}
+                        </div>
+                    {% endfor %}
+                {% endif %}
             </div>
         </div>
         {# Full protocol experiment image modal #}
@@ -124,13 +129,13 @@
                 <div class="modal-content">
                     <div class="modal-header">
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                        <h4 class="modal-title">Graphical representation</h4>
+                        <h4 class="modal-title">{% trans "Graphical representation" %}</h4>
                     </div>
                     <div class="modal-body">
                         {# see script bellow #}
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-default" data-dismiss="modal">{% trans "Close" %}</button>
                     </div>
                 </div><!-- /.modal-content -->
             </div><!-- /.modal-dialog -->
@@ -140,10 +145,23 @@
 
 {% block script %}
     {##}
-    {# Script related to experiments/top.html #}
+    {# Scripts related to experiments/header_detail.html #}
     {##}
     {% load static %}
-    <script src="{% static 'js/new_experiments_received.js' %}"></script>
+    <script src="{% static 'js/jquery-ui.min.js' %}"></script>
+    <script src="{% static 'js/jquery.fileDownload.js' %}"></script>
+    <script src="{% static 'js/download.js' %}"></script>
+
+    {##}
+    {# Script related to experiments/top.html #}
+    {##}
+    <script>
+        let to_be_analysed_count = {{ to_be_analysed_count }}
+        if (to_be_analysed_count) {
+            $('head').append('<style>.badger::after{content:"' +
+                to_be_analysed_count + '"}</style>');
+        }
+    </script>
 
     {# Display protocol experiment full image #}
     <script>
@@ -152,7 +170,7 @@
             let image_path = link.data('image_path');
             let modal = $(this);
             modal.find('.modal-body').empty().append(`<img id='full_image'
-            src=${image_path}/>`); // first empty to not repeat image
+            src=${image_path} />`); // first empty to not repeat image
         });
     </script>
 

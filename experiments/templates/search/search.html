@@ -1,0 +1,88 @@
+{% extends 'experiments/base.html' %}
+
+{% block style %}
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'bootstrap-select-1.12.4-dist/css/bootstrap-select.min.css' %}">
+{% endblock %}
+
+
+{% block header %}
+    {% load i18n %}
+    {% include 'experiments/header_home.html' %}
+{% endblock %}
+
+{% block content %}
+    <section class="container nep-content">
+        {% if messages %}
+            {% include 'experiments/messages.html' %}
+        {% endif %}
+
+        <div class="table-title">
+            <h3>{% trans "Search Results" %}</h3>
+        </div>
+        {% if query %}
+            <table id="search_table" class="table table-hover">
+                <tbody>
+                {% for result in object_list %}
+                    {% if result.model_name == 'experiment' %}
+                        {% include 'search/experiments.html' %}
+                    {% endif %}
+                    {% if result.model_name == 'study' %}
+                        {% include 'search/studies.html' %}
+                    {% endif %}
+                    {% if result.model_name == 'group' %}
+                        {% include 'search/groups.html' %}
+                    {% endif %}
+                    {% if result.model_name == 'experimentalprotocol' %}
+                        {% include 'search/experimental_protocol.html' %}
+                    {% endif %}
+                {% empty %}
+                    <p>{% trans "No results found" %}.</p>
+                {% endfor %}
+                </tbody>
+            </table>
+
+            {% if page.has_previous or page.has_next %}
+                <div>
+                    {% if page.has_previous %}<a href="?q={{ query }}&amp;page={{ page.previous_page_number }}">
+                    {% endif %}&laquo; {% trans "Previous" %}{% if page.has_previous %}</a>{% endif %}
+                    |
+                    {% if page.has_next %}<a href="?q={{ query }}&amp;page={{ page.next_page_number }}">{% endif %}
+                    {% trans "Next" %}
+                    &raquo;{% if page.has_next %}</a>{% endif %}
+                </div>
+            {% endif %}
+        {% else %}
+            <p>{% trans "Sorry, no matches found for the terms used. Please try again." %}</p>
+            {% trans "Search Suggestion:" %}
+            <ol>
+                <li>{% trans "Check your spelling." %}</li>
+                <li>{% trans "Try more general word." %}</li>
+                <li>{% trans "Try different words that mean the same thing." %}</li>
+                <li>{% trans "Post a request for your search and we'll help you find it." %}</li>
+            </ol>
+
+        {% endif %}
+
+
+    </section>
+{% endblock %}
+
+{% block script %}
+    {##}
+    {## Scripts related to experiments/header_home.html #}
+    {##}
+    {% load static %}
+    <script src="
+{% static 'bootstrap-select-1.12.4-dist/js/bootstrap-select.js' %}"></script>
+    {##}
+    {## Script related to experiments/top.html #}
+    {##}
+    <script>
+        let to_be_analysed_count = {{ to_be_analysed_count }};
+        if (to_be_analysed_count) {
+            $('head').append('<style>.badger::after{content:"' +
+                to_be_analysed_count + '"}</style>');
+        }
+    </script>
+{% endblock %}

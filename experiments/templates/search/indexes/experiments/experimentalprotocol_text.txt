@@ -1,0 +1,2 @@
+{{ object.textual_description }}
+{{ object.group }}

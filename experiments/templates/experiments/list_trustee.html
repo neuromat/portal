@@ -1,12 +1,13 @@
+{% load i18n %}
 <table id="id_experiments_table" class="table table-hover
         experiment-table">
     <thead>
     <tr>
-        <th>Title</th>
-        <th>Description</th>
-        <th>Participants</th>
-        <th>Version</th>
-        <th>Status</th>
+        <th>{% trans "Title" %}</th>
+        <th>{% trans "Description" %}</th>
+        <th>{% trans "Participants" %}</th>
+        <th>{% trans "Version" %}</th>
+        <th>{% trans "Status" %}</th>
         <th></th>
     </tr>
     </thead>
@@ -16,20 +17,22 @@
         <tr>
             <td>{{ experiment.title }}</td>
             <td>{{ experiment.description }}</td>
-            <td>{{ experiment.total_participants }} in {{ experiment.groups.count }} groups </td>
+            <td>{{ experiment.total_participants }} {% trans "in" %} {{ experiment.groups.count }} {% trans "groups" %} </td>
             <td>{{ experiment.version }}</td>
-            <td><a href="#" data-toggle="modal"
+            <td><a id="link_modal" href="#"
+                   data-toggle="modal"
                    data-target="#status_modal"
+                   class="{% if experiment.status == 'approved' or experiment.status == 'not_approved' %}prevent_click{% endif %}"
                    data-experiment_id="{{ experiment.id }}"
                    data-experiment_title="{{ experiment.title }}"
                    data-experiment_status="{{ experiment.status }}"
-                   data-experiment_trustee ="{{ experiment.trustee }}"
-                   data-experiment_statuses="{{ experiment.STATUS_OPTIONS|statuses_to_json:experiment.status }}"
                    data-experiment_trustee="{{ experiment.trustee }}"
+                   data-experiment_statuses="{{ experiment.STATUS_OPTIONS|statuses_to_json:experiment.status }}"
                    data-logged_user="{{ request.user }}">
                 {{ experiment.get_status_display }}</a>
             </td>
-            <td><a href="{% url 'experiment-detail' experiment.id %}">View</a></td>
+            <td><a href="{% url 'experiment-detail' experiment.id %}"
+                   class="nep-btn">{% trans "View" %}</a></td>
         </tr>
     {% endfor %}
     </tbody>
@@ -40,11 +43,11 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                    <h4 id="modal_status_title" class="modal-title">Change
-                        status for</h4> {# see script in block script in home.html #}
+                    <h4 id="modal_status_title" class="modal-title">{% trans "Change status for" %}</h4>
+                    {# see script in block script in home.html #}
                 </div>
                 <div id="status_body" class="modal-body">
-                    <p>Please select an option:</p>
+                    <p>{% trans "Please select an option" %}:</p>
                 </div>
             </div><!-- /.modal-content -->
         </div><!-- /.modal-dialog -->

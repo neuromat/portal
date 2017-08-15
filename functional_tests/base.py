@@ -1,4 +1,5 @@
 import time
+
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
@@ -11,7 +12,15 @@ class FunctionalTest(StaticLiveServerTestCase):
 
     def setUp(self):
         global_setup_ft()
-        self.browser = webdriver.Firefox()
+
+        profile = webdriver.FirefoxProfile()
+        profile.set_preference('intl.accept_languages', 'en')
+        self.browser = webdriver.Firefox(profile)
+
+        # A neuroscience researcher discovered a new site that
+        # provides a data base with neuroscience experiments.
+        # She goes to checkout its home page
+        self.browser.get(self.live_server_url)
 
     def tearDown(self):
         self.browser.quit()
@@ -22,7 +31,10 @@ class FunctionalTestTrustee(StaticLiveServerTestCase):
 
     def setUp(self):
         global_setup_ft()
-        self.browser = webdriver.Firefox()
+
+        profile = webdriver.FirefoxProfile()
+        profile.set_preference('intl.accept_languages', 'en')
+        self.browser = webdriver.Firefox(profile)
 
         # Trustee Claudia visit the home page and click in "Log In"
         self.browser.get(self.live_server_url)

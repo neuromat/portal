@@ -1,22 +1,28 @@
 {% extends "experiments/base.html" %}
 
+{% block style %}
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'bootstrap-select-1.12.4-dist/css/bootstrap-select.min.css' %}">
+{% endblock %}
+
 {% block header %}
+    {% load i18n %}
     {% include 'experiments/header_home.html' %}
 {% endblock %}
 
 {% block content %}
     <section class="container">
-        <h3>Log In</h3>
+        <h3>{% trans "Log In" %}</h3>
         {% if form.errors %}
-            <p>Your username and password didn't match. Please try again.</p>
+            <p>{% trans "Your username and password did not match. Please try again." %}</p>
         {% endif %}
 
         {% if next %}
             {% if user.is_authenticated %}
-                <p>Your account doesn't have access to this page. To proceed,
-                    please login with an account that has access.</p>
+                <p>
+                    {% trans "Invalid account. Please sign in with a valid account." %}</p>
             {% else %}
-                <p>Please login to see this page.</p>
+                <p>{% trans "Please sign in with your account to access this website." %}</p>
             {% endif %}
         {% endif %}
 
@@ -38,7 +44,15 @@
         </form>
 
         {# Assumes you setup the password_reset view in your URLconf #}
-        <p><a href="{% url 'password_reset' %}">Lost password?</a></p>
+        <p><a href="{% url 'password_reset' %}">{% trans "Forgot password?" %}</a></p>
     </section>
+{% endblock %}
 
+{% block script %}
+    {##}
+    {## Scripts related to experiments/header_home.html #}
+    {##}
+    {% load static %}
+    <script src="
+{% static 'bootstrap-select-1.12.4-dist/js/bootstrap-select.js' %}"></script>
 {% endblock %}

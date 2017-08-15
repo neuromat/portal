@@ -1,0 +1,33 @@
+{% load highlight %}
+{% load i18n %}
+<tr class="study-matches">
+    <td>
+            <a href="{% url 'experiment-detail' result.object.experiment.id %}"
+           class="nep-btn"><strong>{% trans "Experiment" %}: </strong>{{ result.object.experiment.title }}
+            <strong>> {% trans "Study" %}</strong></a><br><br>
+        <p>
+            <strong>{% trans "title" %}: </strong>
+            {% highlight result.object.title with query %}
+            <strong>{% trans "description" %}: </strong>
+            {% highlight result.object.description with query %}&nbsp;
+            <strong>{% trans "start date" %}: </strong>
+            {% highlight result.object.start_date with query %}&nbsp;
+            <strong>{% trans "end date" %}: </strong>
+            {% highlight result.object.end_date with query %}&nbsp;
+            <strong>{% trans "researcher" %}: </strong>
+            {% highlight result.object.researcher with query %}&nbsp;
+            <strong>{% trans "collaborators" %}: </strong>
+            {% for collaborator in result.object.collaborators.all %}
+                {% highlight collaborator with query %}&nbsp;
+            {% empty %}
+                {% trans "No collaborators" %}
+            {% endfor %}
+            <strong>{% trans "keywords" %}: </strong>
+            {% for keyword in result.object.keywords.all %}
+                {% highlight keyword with query %}&nbsp;
+            {% empty %}
+                {% trans "No keywords" %}
+            {% endfor %}
+        </p>
+    </td>
+</tr>

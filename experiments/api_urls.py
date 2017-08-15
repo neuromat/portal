@@ -26,7 +26,7 @@ api_experiment_studies_list = api.StudyViewSet.as_view({
     'post': 'create'
 })
 api_studies_list = api.StudyViewSet.as_view({
-    'get': 'list',
+    'get': 'list'
 })
 
 # Experimental protocols
@@ -68,6 +68,76 @@ api_experiment_eeg_setting_list =\
         'post': 'create'
     })
 
+# Amplifier
+api_experiment_amplifier =\
+    api.AmplifierViewSet.as_view({
+        'get': 'list',
+        'post': 'create'
+    })
+
+# EEG Amplifier Setting
+api_experiment_eeg_amplifier_setting =\
+    api.EEGAmplifierSettingViewSet.as_view({
+        'get': 'list',
+        'post': 'create'
+    })
+
+# EEG Solution Setting
+api_experiment_eeg_solution_setting =\
+    api.EEGSolutionSettingViewSet.as_view({
+        'get': 'list',
+        'post': 'create'
+    })
+
+# EEG Filter Setting
+api_experiment_eeg_filter_setting =\
+    api.EEGFilterSettingViewSet.as_view({
+        'get': 'list',
+        'post': 'create'
+    })
+
+# EEG Electrode Net Setting
+api_experiment_eeg_electrode_net_setting =\
+    api.EEGElectrodeNetSettingViewSet.as_view({
+        'get': 'list',
+        'post': 'create'
+    })
+
+# Surface Electrode
+api_experiment_surface_electrode =\
+    api.SurfaceElectrodeViewSet.as_view({
+        'get': 'list',
+        'post': 'create'
+    })
+
+# Needle Electrode
+api_experiment_needle_electrode =\
+    api.NeedleElectrodeViewSet.as_view({
+        'get': 'list',
+        'post': 'create'
+    })
+
+# Intramuscular Electrode
+api_experiment_intramuscular_electrode =\
+    api.IntramuscularElectrodeViewSet.as_view({
+        'get': 'list',
+        'post': 'create'
+    })
+
+# EEG Electrode Localization System
+api_experiment_eeg_electrode_localization_system =\
+    api.EEGElectrodeLocalizationSystemViewSet.as_view({
+        'get': 'list',
+        'post': 'create'
+    })
+
+# EEG Electrode Position
+api_experiment_eeg_electrode_position =\
+    api.EEGElectrodePositionViewSet.as_view({
+        'get': 'list',
+        'post': 'create'
+    })
+
 # EMG setting
 api_experiment_emg_setting_list =\
     api.EMGSettingViewSet.as_view({
@@ -89,12 +159,160 @@ api_experiment_context_tree_list =\
         'post': 'create'
     })
 
-# Participants
+# Steps
 api_step_list =\
     api.StepViewSet.as_view({
         'get': 'list',
         'post': 'create'
     })
+
+# EEG Steps
+api_eeg_step_list =\
+    api.EEGStepViewSet.as_view({
+        'get': 'list',
+        'post': 'create'
+    })
+
+
+# EMG Steps
+api_emg_step_list =\
+    api.EMGStepViewSet.as_view({
+        'get': 'list',
+        'post': 'create'
+    })
+
+# TMS Steps
+api_tms_step_list =\
+    api.TMSStepViewSet.as_view({
+        'get': 'list',
+        'post': 'create'
+    })
+
+# Instruction Steps
+api_instruction_step_list =\
+    api.InstructionStepViewSet.as_view({
+        'get': 'list',
+        'post': 'create'
+    })
+
+# Pause Steps
+api_pause_step_list =\
+    api.PauseStepViewSet.as_view({
+        'get': 'list',
+        'post': 'create'
+    })
+
+# Task Steps
+api_task_step_list =\
+    api.TaskStepViewSet.as_view({
+        'get': 'list',
+        'post': 'create'
+    })
+
+# Task for Experimenter Steps
+api_task_for_experimenter_step_list =\
+    api.TaskForExperimenterStepViewSet.as_view({
+        'get': 'list',
+        'post': 'create'
+    })
+
+# Task for Experimenter Steps
+api_generic_data_collection_step_list =\
+    api.GenericDataCollectionStepViewSet.as_view({
+        'get': 'list',
+        'post': 'create'
+    })
+
+# Stimulus Steps
+api_stimulus_step_list =\
+    api.StimulusStepViewSet.as_view({
+        'get': 'list',
+        'post': 'create'
+    })
+
+# Goalkeeper Game Steps
+api_goalkeeper_game_step_list =\
+    api.GoalkeeperGameStepViewSet.as_view({
+        'get': 'list',
+        'post': 'create'
+    })
+
+# Set of Steps
+api_set_of_step_list =\
+    api.SetOfStepViewSet.as_view({
+        'get': 'list',
+        'post': 'create'
+    })
+
+# Questionnaire Step
+api_questionnaire_step_list =\
+    api.QuestionnaireStepViewSet.as_view({
+        'get': 'list',
+        'post': 'create'
+    })
+
+# Files
+api_file_list =\
+    api.FileViewSet.as_view({
+        'get': 'list',
+        'post': 'create'
+    })
+
+# EEG data
+api_eeg_data_list =\
+    api.EEGDataViewSet.as_view({
+        'get': 'list',
+        'post': 'create'
+    })
+
+
+# EMG data
+api_emg_data_list =\
+    api.EMGDataViewSet.as_view({
+        'get': 'list',
+        'post': 'create'
+    })
+
+
+# TMS data
+api_tms_data_list =\
+    api.TMSDataViewSet.as_view({
+        'get': 'list',
+        'post': 'create'
+    })
+
+
+# Additional data
+api_additional_data_list =\
+    api.AdditionalDataViewSet.as_view({
+        'get': 'list',
+        'post': 'create'
+    })
+
+
+# Generic Data Collection data
+api_generic_data_collection_data_list =\
+    api.GenericDataCollectionDataViewSet.as_view({
+        'get': 'list',
+        'post': 'create'
+    })
+
+
+# Goalkeeper game data
+api_goalkeeper_game_data_list =\
+    api.GoalkeeperGameDataViewSet.as_view({
+        'get': 'list',
+        'post': 'create'
+    })
+
+
+# Questionnaire response
+api_questionnaire_response_list =\
+    api.QuestionnaireResponseViewSet.as_view({
+        'get': 'list',
+        'post': 'create'
+    })
+
 
 # Get rest framework schema view
 schema_view = get_schema_view(title='NEP API')
@@ -133,6 +351,27 @@ urlpatterns = [
     # EEG setting
     url(r'^experiments/(?P<experiment_nes_id>[0-9]+)/eeg_setting/$',
         api_experiment_eeg_setting_list, name='api_experiment_eeg_setting-list'),
+    url(r'^experiments/(?P<experiment_nes_id>[0-9]+)/amplifier/$',
+        api_experiment_amplifier, name='api_experiment_amplifier'),
+    url(r'^eeg_setting/(?P<pk>[0-9]+)/eeg_amplifier_setting/$',
+        api_experiment_eeg_amplifier_setting, name='api_experiment_eeg_amplifier_setting'),
+    url(r'^eeg_setting/(?P<pk>[0-9]+)/eeg_solution_setting/$',
+        api_experiment_eeg_solution_setting, name='api_experiment_eeg_solution_setting'),
+    url(r'^eeg_setting/(?P<pk>[0-9]+)/eeg_filter_setting/$',
+        api_experiment_eeg_filter_setting, name='api_experiment_eeg_filter_setting'),
+    url(r'^eeg_setting/(?P<pk>[0-9]+)/eeg_electrode_net_setting/$',
+        api_experiment_eeg_electrode_net_setting, name='api_experiment_eeg_electrode_net_setting'),
+    url(r'^experiments/(?P<experiment_nes_id>[0-9]+)/surface_electrode/$',
+        api_experiment_surface_electrode, name='api_experiment_surface_electrode'),
+    url(r'^experiments/(?P<experiment_nes_id>[0-9]+)/needle_electrode/$',
+        api_experiment_needle_electrode, name='api_experiment_needle_electrode'),
+    url(r'^experiments/(?P<experiment_nes_id>[0-9]+)/intramuscular_electrode/$',
+        api_experiment_intramuscular_electrode, name='api_experiment_intramuscular_electrode'),
+    url(r'^eeg_setting/(?P<pk>[0-9]+)/eeg_electrode_localization_system/$',
+        api_experiment_eeg_electrode_localization_system, name='api_experiment_eeg_electrode_localization_system'),
+    url(r'^eeg_setting/(?P<pk>[0-9]+)/eeg_electrode_position/$',
+        api_experiment_eeg_electrode_position, name='api_experiment_eeg_electrode_position'),
+
     # EMG setting
     url(r'^experiments/(?P<experiment_nes_id>[0-9]+)/emg_setting/$',
         api_experiment_emg_setting_list, name='api_experiment_emg_setting-list'),
@@ -145,4 +384,73 @@ urlpatterns = [
 
     # Step
     url(r'^groups/(?P<pk>[0-9]+)/step/$', api_step_list, name='api_step-list'),
+
+    # EEG Step
+    url(r'^groups/(?P<pk>[0-9]+)/eeg_step/$', api_eeg_step_list, name='api_eeg_step-list'),
+
+    # EMG Step
+    url(r'^groups/(?P<pk>[0-9]+)/emg_step/$', api_emg_step_list, name='api_emg_step-list'),
+
+    # TMS Step
+    url(r'^groups/(?P<pk>[0-9]+)/tms_step/$', api_tms_step_list, name='api_tms_step-list'),
+
+    # Instruction Step
+    url(r'^groups/(?P<pk>[0-9]+)/instruction_step/$', api_instruction_step_list, name='api_instruction_step-list'),
+
+    # Pause Step
+    url(r'^groups/(?P<pk>[0-9]+)/pause_step/$', api_pause_step_list, name='api_pause_step-list'),
+
+    # Task Step
+    url(r'^groups/(?P<pk>[0-9]+)/task_step/$', api_task_step_list, name='api_task_step-list'),
+
+    # Task For Experimenter Step
+    url(r'^groups/(?P<pk>[0-9]+)/task_for_experimenter_step/$',
+        api_task_for_experimenter_step_list, name='api_task_for_experimenter_step-list'),
+
+    # Generic Data Collection Step
+    url(r'^groups/(?P<pk>[0-9]+)/generic_data_collection_step/$',
+        api_generic_data_collection_step_list, name='api_generic_data_collection_step-list'),
+
+    # Stimulus Step
+    url(r'^groups/(?P<pk>[0-9]+)/stimulus_step/$',
+        api_stimulus_step_list, name='api_stimulus_step-list'),
+
+    # Goalkeeper Game Step
+    url(r'^groups/(?P<pk>[0-9]+)/goalkeeper_game_step/$',
+        api_goalkeeper_game_step_list, name='api_goalkeeper_game_step-list'),
+
+    # Set of Steps
+    url(r'^groups/(?P<pk>[0-9]+)/set_of_step/$',
+        api_set_of_step_list, name='api_set_of_step-list'),
+
+    # Questionnaire Step
+    url(r'^groups/(?P<pk>[0-9]+)/questionnaire_step/$',
+        api_questionnaire_step_list, name='api_questionnaire_step-list'),
+
+    # File
+    url(r'^files/$', api_file_list, name='api_file-list'),
+
+    # EEG data
+    url(r'^eeg_data/$', api_eeg_data_list, name='api_eeg_data-list'),
+
+    # EMG data
+    url(r'^emg_data/$', api_emg_data_list, name='api_emg_data-list'),
+
+    # TMS data
+    url(r'^tms_data/$', api_tms_data_list, name='api_tms_data-list'),
+
+    # Goalkeeper game data
+    url(r'^goalkeeper_game_data/$', api_goalkeeper_game_data_list, name='api_goalkeeper_game_data-list'),
+
+    # Questionnaire response
+    url(r'^questionnaire_response/$', api_questionnaire_response_list, name='api_questionnaire_response-list'),
+
+    # Additional data
+    url(r'^additional_data/$',
+        api_additional_data_list, name='api_additional_data-list'),
+
+    # Generic Data Collection data
+    url(r'^generic_data_collection_data/$',
+        api_generic_data_collection_data_list, name='api_generic_data_collection_data-list'),
+
 ]

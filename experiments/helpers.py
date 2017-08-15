@@ -14,7 +14,7 @@ def generate_image_file(width, height, filename):
     """
     file = io.BytesIO()
     image = Image.new(
-        'RGBA', size=(width, height),
+        'RGB', size=(width, height),
         color=(randint(0, 256), randint(0, 256), randint(0, 256))
     )
     file.name = filename

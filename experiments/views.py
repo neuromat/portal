@@ -1,17 +1,22 @@
 from django.contrib import messages
+from django.contrib.auth.views import LoginView
 from django.core.mail import send_mail
 from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import render
+from haystack.generic_views import SearchView
+from django.utils.translation import activate, LANGUAGE_SESSION_KEY, ugettext as _
 
-from experiments import appclasses
-from experiments.models import Experiment, RejectJustification
+from experiments.forms import NepSearchForm
+from experiments.models import Experiment, RejectJustification, Step
 
 
 def home_page(request):
+    to_be_analysed_count = None  # will be None if home contains the list of
+    # normal user
     if request.user.is_authenticated and \
             request.user.groups.filter(name='trustees').exists():
         all_experiments = \
-            appclasses.CurrentExperiments().get_current_experiments_trustees()
+            Experiment.lastversion_objects.all()
         # We put experiments in following order:
         # TO_BE_ANALYSED, UNDER_ANALYSIS, NOT_APPROVED and APPROVED
         to_be_analysed = all_experiments.filter(
@@ -21,8 +26,11 @@ def home_page(request):
         not_approved = all_experiments.filter(status=Experiment.NOT_APPROVED)
         approved = all_experiments.filter(status=Experiment.APPROVED)
         experiments = to_be_analysed | under_analysis | not_approved | approved
+        to_be_analysed_count = to_be_analysed.count()
     else:
-        experiments = appclasses.CurrentExperiments().get_current_experiments()
+        experiments = Experiment.lastversion_objects.filter(
+            status=Experiment.APPROVED
+        )
 
     for experiment in experiments:
         experiment.total_participants = \
@@ -30,10 +38,21 @@ def home_page(request):
                  for group in experiment.groups.all()])
 
     return render(request, 'experiments/home.html',
-                  {'experiments': experiments})
+                  {'experiments': experiments,
+                   'to_be_analysed_count': to_be_analysed_count,
+                   'table_title': 'List of Experiments',
+                   'search_form': NepSearchForm()})
 
 
 def experiment_detail(request, experiment_id):
+    to_be_analysed_count = None  # will be None if home contains the list of
+    # normal user
+    if request.user.is_authenticated and \
+            request.user.groups.filter(name='trustees').exists():
+        all_experiments = Experiment.lastversion_objects.all()
+        to_be_analysed_count = all_experiments.filter(
+                status=Experiment.TO_BE_ANALYSED).count()
+
     experiment = Experiment.objects.get(pk=experiment_id)
 
     gender_grouping = {}
@@ -50,9 +69,12 @@ def experiment_detail(request, experiment_id):
             age_grouping[int(participant.age)] += 1
 
     return render(
-        request, 'experiments/detail.html', {'experiment': experiment,
-                                             'gender_grouping': gender_grouping,
-                                             'age_grouping': age_grouping}
+        request, 'experiments/detail.html', {
+            'experiment': experiment,
+            'gender_grouping': gender_grouping,
+            'age_grouping': age_grouping,
+            'to_be_analysed_count': to_be_analysed_count
+        }
     )
 
 
@@ -71,25 +93,25 @@ def change_status(request, experiment_id):
     if status == Experiment.NOT_APPROVED:
         if not justification:
             messages.warning(
-                request,
-                'The status of experiment ' + experiment.title + ' hasn\'t '
-                'changed to "Not approved" because you have not given a '
-                'justification. Please resubmit changing status.'
-            )
+                request, _('Please provide a reason justifying the change of the status of the experiment ') +
+                experiment.title + _('to "Not approved". '))
+
             return HttpResponseRedirect('/')
         else:
             # if has justification send email to researcher
-            subject = 'Your experiment was rejected in NEDP portal'
-            message = 'Your experiment ' + experiment.title + \
-                      ' was rejected by the Portal committee. The reason ' \
-                      'was: ' + justification
+            subject = _('Your experiment was rejected')
+            message = _('We regret to inform you that your experiment, ') + experiment.title +  \
+                      _(', has not been acceptted to be published in the NeuroMat Open Database. Please check the '
+                        'reasons providing by the Neuromat Open Database Evaluation Committee:') + justification + \
+                      _('.\nWith best regards,\n The Neuromat Open Database Evaluation Committee')
+
 
             send_mail(subject, message, from_email,
                       [experiment.study.researcher.email])
             messages.success(
                 request,
-                'An email was sent to ' + experiment.study.researcher.name +
-                ' warning that the experiment was rejected.'
+                _('An email was sent to ') + experiment.study.researcher.name +
+                _(' warning that the experiment was rejected.')
             )
             # Save the justification message
             RejectJustification.objects.create(message=justification,
@@ -98,44 +120,47 @@ def change_status(request, experiment_id):
     # if status changed to UNDER_ANALYSIS or APPROVED, send email
     # to experiment study researcher
     if status == Experiment.APPROVED:
-        subject = 'Your experiment was approved in NEDP portal'
-        message = 'Congratulations, your experiment ' + experiment.title + \
-                  ' was approved by the Portal committee. Now it is public ' \
-                  'available under Creative Commons Share Alike license.\n' \
-                  'You can view your experiment data in ' + \
-                  'http://' + request.get_host()
+        subject = _('Your experiment was approved')
+        message = _('We are pleased to inform you that your experiment ') + experiment.title + \
+                  _(' was approved by Neuromat Open Database Evaluation Committee. All data of the submitted experiment'
+                    ' will be available freely to the public consultation and shared under Creative Commons Share '
+                    'Alike license.\n You can access your experiment data by clicking on the link below\n') + 'http://' +\
+                  request.get_host() +\
+                  _('\nWith best regards,\n The NeuroMat Open Database Evaluation Committee.')
+
         send_mail(subject, message, from_email,
                   [experiment.study.researcher.email])
         messages.success(
             request,
-            'An email was sent to ' + experiment.study.researcher.name +
-            ' warning that the experiment changed status to Approved.'
+            _('An email was sent to ') + experiment.study.researcher.name +
+            _(' warning that the experiment changed status to Approved.')
         )
     if status == Experiment.UNDER_ANALYSIS:
-        subject = 'Your experiment is now under analysis in NEDP portal'
-        message = 'Your experiment ' + experiment.title + \
-                  ' is under analysis by the Portal committee.'
+        subject = _('Your experiment is now under analysis')
+        message = _('Thank you for submitting your experiment ') + experiment.title + \
+                  _('. The NeuroMat Open Database Evaluation Committee will be analyze your data and will try to '
+                    'respond as soon as possible.\n With best regards,\n The NeuroMat Open Database Evaluation '
+                    'Committee')
         send_mail(subject, message, from_email,
                   [experiment.study.researcher.email])
         messages.success(
             request,
-            'An email was sent to ' + experiment.study.researcher.name +
-            ' warning that the experiment is under analysis.'
+            _('An email was sent to ') + experiment.study.researcher.name +
+            _(' warning that the experiment is under analysis.')
         )
         # Associate experiment with trustee
         experiment.trustee = request.user
 
     # If status posted is TO_BE_ANALYSED and current experiment status is
-    # UNDER_ANALYLIS disassociate trustee from experiment and warning
+    # UNDER_ANALYSIS disassociate trustee from experiment and warning
     # trustee that the experiment is going to be free for other trustee
     # analysis
     if status == Experiment.TO_BE_ANALYSED:
         if experiment.status == Experiment.UNDER_ANALYSIS:
             experiment.trustee = None
-            messages.success(
+            messages.warning(
                 request,
-                'You have liberate the experiment ' + experiment.title
-                + ' to be analysed by other trustee.'
+                _('The experiment data ') + experiment.title + _(' was made available to be analysed by other trustee.')
             )
 
     experiment.status = status
@@ -150,3 +175,68 @@ def ajax_to_be_analysed(request):
     ).count()
 
     return HttpResponse(to_be_analysed, content_type='application/json')
+
+
+def language_change(request, language_code):
+
+    activate(language_code)
+    request.session[LANGUAGE_SESSION_KEY] = language_code
+
+    return HttpResponseRedirect(request.GET['next'])
+
+
+##
+# Class based views
+#
+class NepSearchView(SearchView):
+    form_class = NepSearchForm
+    form_name = 'search_form'
+
+    def get_queryset(self):
+        queryset = super(NepSearchView, self).get_queryset()
+
+    def get_context_data(self, *args, **kwargs):
+        context = super(NepSearchView, self).get_context_data(**kwargs)
+
+        self.filter(context, self.request.GET['filter'])
+
+        # Related to the badge with number of experiments to be analysed in
+        # page top. It's displayed only if a trustee is logged.
+        to_be_analysed_count = None
+        if self.request.user.is_authenticated and \
+                self.request.user.groups.filter(name='trustees').exists():
+            to_be_analysed = Experiment.lastversion_objects.filter(
+                status=Experiment.TO_BE_ANALYSED)
+            to_be_analysed_count = to_be_analysed.count()
+
+        context['to_be_analysed_count'] = to_be_analysed_count
+
+        return context
+
+    @staticmethod
+    def filter(context, search_filter):
+        """
+        Filters search results by type of data collected in the experiment.
+        :param context: object_list returned by haystack search
+        :param search_filter: the filters chosen by the user
+        """
+        old_object_list = context['object_list']
+        indexes_to_remove = []
+        for i in range(0, len(old_object_list)):
+            if old_object_list[i].model_name == 'experiment':
+                # if result has EMG:
+                if search_filter == Step.EMG:
+                    for group in old_object_list[i].object.groups.all():
+                        if group.steps.filter(type=Step.EMG).count() > 0:
+                            indexes_to_remove.append(i)
+                            break
+
+        context['object_list'] = [v for i, v in enumerate(old_object_list)
+                                  if i not in indexes_to_remove]
+
+
+# inherit from LoginView to include search form besides login form
+class NepLoginView(LoginView):
+    search_form = NepSearchForm()
+    extra_context = {'search_form': search_form}
+

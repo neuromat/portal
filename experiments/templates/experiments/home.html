@@ -1,34 +1,22 @@
 {% extends 'experiments/base.html' %}
 
+{% block style %}
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'bootstrap-select-1.12.4-dist/css/bootstrap-select.min.css' %}">
+{% endblock %}
+
 {% block header %}
+    {% load i18n %}
     {% include 'experiments/header_home.html' %}
 {% endblock %}
 
 {% block content %}
-    <section class="container">
+    <section class="container nep-content">
         {% if messages %}
-            <div class="row warning-message">
-                {% for message in messages %}
-                    {% if message.level_tag == 'success' %}
-                        <div class="alert alert-success">
-                            <button type="button" class="close"
-                                    data-dismiss="alert"
-                                    aria-hidden="true">&times;</button>
-                            {{ message }}
-                        </div>
-                    {% else %}
-                        <div class="alert alert-warning">
-                            {# TODO: repeting button tag. Is there other solution? #}
-                            <button type="button" class="close"
-                                    data-dismiss="alert"aria-hidden="true">&times;</button>
-                            {{ message }}
-                        </div>
-                    {% endif %}
-                {% endfor %}
-            </div>
+            {% include 'experiments/messages.html' %}
         {% endif %}
         <div id="id_table_title" class="table-title">
-            <h2>List of Experiments</h2>
+            <h2>{% trans "List of Experiments" %}</h2>
         </div>
         {% if experiments %}
             {% load experiment_extras %}
@@ -38,12 +26,39 @@
                 {% include 'experiments/list_default.html' %}
             {% endif %}
         {% else %}
-            <p>There's no experiments yet.</p>
+            <p>{% trans "There are no experiments" %}</p>
         {% endif %}
     </section>
 {% endblock %}
 
 {% block script %}
+    {##}
+    {## Scripts related to experiments/header_home.html #}
+    {##}
+    {% load static %}
+    <script src="
+{% static 'bootstrap-select-1.12.4-dist/js/bootstrap-select.js' %}"></script>
+    {##}
+    {## Script related to list_trustee.html  #}
+    {## Prevent click in experiment if its status is approved or not approved. #}
+    {##}
+    <script>
+        let prevent_click = $('.prevent_click');
+        prevent_click.addClass('nep-disabled');
+        prevent_click.on('click', function (e) {
+            e.stopPropagation();
+        })
+    </script>
+    {##}
+    {## Script related to experiments/top.html #}
+    {##}
+    <script>
+        let to_be_analysed_count = {{ to_be_analysed_count }};
+        if (to_be_analysed_count) {
+            $('head').append('<style>.badger::after{content:"' +
+                to_be_analysed_count + '"}</style>');
+        }
+    </script>
     {##}
     {## Script related to experiments/list_trustee.html ##}
     {##}
@@ -54,7 +69,9 @@
          */
         function statuses_radio_options(experiment, statuses, logged_user) {
             // Does not display form to choose new experiment status if statuses is
-            // empty. Insted display a warning.
+            // empty - is empty because list_trustee.html bring satuses empty when
+            // experiment status is approved or not approved.
+            // Instead display a warning.
             if ($.isEmptyObject(statuses)) {
                 return `
                 <p class="alert">You can\'t change an experiment status that has already been approved or rejected.</p>
@@ -78,20 +95,26 @@
             {% csrf_token %}
         `;
             // Buid input radios with experiment.status === key checked
+            html += `
+            <div class="form-group">
+            `;
             for (let key in statuses) {
                 if (statuses.hasOwnProperty(key)) {
                     let checked = experiment.status === key ? 'checked' : '';
                     html += `
-                    <input type="radio" name="status" value=${key} ${checked}>${statuses[key]} <br>
+                    <input type="radio" name="status" value=${key} ${checked}>&nbsp;&nbsp;${statuses[key]} <br>
                 `;
                 }
             }
+            html += `
+            </div>
+            `;
             // Finish html form
             html += `<div id="justification_area"></div>
                 <br>
                 <div class=modal-footer>
                     <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                    <input id="id_submit" type="submit" value="Save changes" class="btn btn-primary">
+                    <input id="submit" type="submit" value="Save changes" class="btn btn-primary">
                 </div>
             </form>
          `;
@@ -123,35 +146,21 @@
                     === 'not_approved') { // TODO: should be something like Experiment.NOT_APPROVED. See statuses variable.
                     $('#justification_area').append(
                         `<br>
-                    <span class="alert">Justification is required to
+                    <label for="justification">
+                    Justification is required to
                     reject an experiment (this message will be sent to
-                    experiment researcher)*</span>
-                    <textarea rows="10" cols="50" id="not_approved_box"
-                    name="justification" placeholder="Please write a justification for rejecting this experiment"></textarea>`
-                    );
+                    experiment researcher)<span class="alert">*</span></label>
+                    <div class="form-group">
+                        <textarea rows="10" id="not_approved_box"
+                        required class="text-box-justification"
+                    name="justification" placeholder="Please write a justification for rejecting this experiment"></textarea>
+                    </div>
+                    `);
                 } else {
                     $('#justification_area').empty();
                 }
             });
-            {# TODO: Prevent submit changing status if user choose NOT_APPROVED and #}
-            {# doesn't fill in the justification message #}
-            {#        modal_form.submit(function (e) {#}
-            {#            if (#}
-            {#                $('input[name=status]:checked', '#id_status_choices').val()#}
-            {#                === 'not_approved' && $('#justification_area').is(':empty')#}
-            {#            ) {#}
-            {#                e.preventDefault();#}
-            {#            }#}
-            {#        });#}
         });
     </script>
 
-    {##}
-    {## Script related to experiments/top.html #}
-    {##}
-    {% load static %}
-    <script src="{% static 'js/new_experiments_received.js' %}"></script>
-    <script>
-        $('div.warning-message').delay(6000).slideUp(300);
-    </script>
 {% endblock %}

@@ -1,0 +1,15 @@
+{% load highlight %}
+{% load i18n %}
+<tr class="experimentalprotocol-matches">
+    <td>
+        <a href="
+{% url 'experiment-detail' result.object.group.experiment.id %}"
+           class="nep-btn"><strong>{% trans "Experiment" %}: </strong>
+            {{ result.object.group.experiment.title }} <strong>> {% trans "Group" %}: </strong>
+            {{ result.object.group.title }}&nbsp;<strong>> {% trans "Experimental Protocol" %}</strong></a><br><br>
+        <p>
+            <strong>{% trans "textual description" %}: </strong>
+            {% highlight result.object.textual_description with query %}&nbsp;
+        </p>
+    </td>
+</tr>

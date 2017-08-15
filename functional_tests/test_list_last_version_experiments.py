@@ -1,3 +1,5 @@
+from django.db.models import Count
+
 from experiments.models import Experiment
 from functional_tests.base import FunctionalTest
 
@@ -5,12 +7,9 @@ from functional_tests.base import FunctionalTest
 class NewVisitorTest(FunctionalTest):
 
     def test_can_view_initial_page(self):
-        experiment = Experiment.objects.filter(status=Experiment.APPROVED).first()
-
-        # A neuroscience researcher discovered a new site that
-        # provides a data base with neuroscience experiments.
-        # She goes to checkout its home page
-        self.browser.get(self.live_server_url)
+        experiment = Experiment.objects.filter(
+            status=Experiment.APPROVED
+        ).first()
 
         # In top of page she sees a link to login in the system
         login_link = self.browser.find_element_by_id('login-language').text
@@ -22,14 +21,55 @@ class NewVisitorTest(FunctionalTest):
         header_text = self.browser.find_element_by_tag_name('h1').text
         self.assertIn('Neuroscience Experiments Database', header_text)
 
-        # She sees that in header bunner there is a search box invited her
+        # She sees that in header bunner there is a search box inviting her
         # to type terms/words that will be searched in the portal
-        searchbox = self.browser.find_element_by_id('id_search_box')
+        # Obs.: 'id_q' is the id name that haystack search system uses.
+        searchbox = self.browser.find_element_by_id('id_q')
         self.assertEqual(
             searchbox.get_attribute('placeholder'),
             'Type key terms/words to be searched'
         )
-
+        # Bellow the search box there is a select box with a placeholder
+        # telling her that she can select experiments that has EEG, TMS,
+        # EMG, Gokeeper game fase etc., experiment elements that will
+        # determine if an experiment will be searched or not.
+        selectbox = self.browser.find_element_by_id('id_filter')
+        options = selectbox.find_elements_by_tag_name('option')
+        placeholder = options[0]
+        self.assertEqual(
+            placeholder.text,
+            'Select one or more list itens to filter experiments that has:'
+        )
+        # The select box options are: EEG, TMS, EMG, Goalkeeper game
+        # fase, Cinematic measures, Stabilometry, Answer time, Psychophysical
+        # measures, Verbal answer, Psychometric scales, Unitary register
+        self.assertTrue(any(option.text == 'EEG' for option in options))
+        self.assertTrue(any(option.text == 'TMS' for option in options))
+        self.assertTrue(any(option.text == 'EMG' for option in options))
+        self.assertTrue(
+            any(option.text == 'Goalkeeper game phase' for option in options)
+        )
+        self.assertTrue(
+            any(option.text == 'Cinematic measures' for option in options)
+        )
+        self.assertTrue(
+            any(option.text == 'Stabilometry' for option in options)
+        )
+        self.assertTrue(
+            any(option.text == 'Answer time' for option in options)
+        )
+        self.assertTrue(
+            any(option.text == 'Psychophysical measures' for option in options)
+        )
+        self.assertTrue(
+            any(option.text == 'Verbal answer' for option in options)
+        )
+        self.assertTrue(
+            any(option.text == 'Psychometric scales' for option in options)
+        )
+        self.assertTrue(
+            any(option.text == 'Unitary register' for option in options)
+        )
         # As there are experiments sended to Portal, she sees the home
         # page have a list of experiments in a table.
         # She reads in "List of Experiments" in the table title.
@@ -60,9 +100,10 @@ class NewVisitorTest(FunctionalTest):
         )
         self.assertTrue(
             any(row.find_elements_by_tag_name('td')[2].text ==
-                str(experiment.groups.first().participants.count()) +
-                ' in ' + str(experiment.groups.count()) + ' groups' for row in
-                rows)
+                str(experiment.groups.aggregate(Count(
+                    'participants'))['participants__count']) +
+                ' in ' + str(experiment.groups.count()) + ' groups' for row
+                in rows)
         )
         self.assertTrue(
             any(row.find_elements_by_tag_name('td')[3].text ==
@@ -78,7 +119,7 @@ class NewVisitorTest(FunctionalTest):
             'id_footer_contact').text
         self.assertIn('Address:', footer_content)
         self.assertIn('Matão St., 1010 - Cidade Universitária - São Paulo - '
-                      'SP - Brasil. 05508-090. Veja o mapa', footer_content)
+                      'SP - Brasil. 05508-090.', footer_content)
         self.assertIn('Phone:', footer_content)
         self.assertIn('+55 11 3091-1717', footer_content)
         self.assertIn('Email:', footer_content)
@@ -87,7 +128,7 @@ class NewVisitorTest(FunctionalTest):
         self.assertIn('comunicacao@numec.prp.usp.br', footer_content)
         footer_license_text = self.browser.find_element_by_id(
             'id_footer_license').text
-        self.assertIn('This site content is licensed with Creative Commons '
+        self.assertIn('This site content is licensed under a Creative Commons '
                       'Attributions 3.0', footer_license_text)
 
         self.fail('Finish this test!')

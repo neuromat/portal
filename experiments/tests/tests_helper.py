@@ -7,7 +7,7 @@ from faker import Factory
 from experiments.helpers import generate_image_file
 from experiments.models import Experiment, Study, Group, Researcher, \
     Collaborator, Participant, Gender, ExperimentalProtocol, \
-    ClassificationOfDiseases, Keyword
+    ClassificationOfDiseases, Keyword, Step
 
 
 def create_experiment_groups(qtty, experiment):
@@ -25,8 +25,20 @@ def create_experiment_groups(qtty, experiment):
         )
 
 
-# TODO: separate study creation from experiment creation
-def create_experiment_and_study(qtty, owner, status):
+def create_study(experiment):
+    """
+    :param experiment: Experiment to be associated with Study
+    """
+    fake = Factory.create()
+
+    Study.objects.create(
+        title=fake.text(max_nb_chars=15),
+        description=fake.text(max_nb_chars=200),
+        start_date=datetime.utcnow(), experiment=experiment
+    )
+
+
+def create_experiment(qtty, owner, status):
     """
     :param qtty: Number of experiments
     :param owner: Owner of experiment - User instance model
@@ -42,13 +54,10 @@ def create_experiment_and_study(qtty, owner, status):
             # genetates constraint violaton (nes_id, owner_id)
             owner=owner, version=1,
             sent_date=datetime.utcnow(),
-            status=status
+            status=status,
+            data_acquisition_done=choice([True, False])
         )
-        Study.objects.create(
-            title=fake.text(max_nb_chars=15),
-            description=fake.text(max_nb_chars=200),
-            start_date=datetime.utcnow(), experiment=experiment
-        )
+        create_study(experiment)
         create_experiment_groups(randint(2, 3), experiment)
 
 
@@ -88,14 +97,14 @@ def create_participants(qtty, group, gender):
     :param qtty:
     :param group: Group model instance
     """
-    fake = Factory.create()
-
+    code = randint(1, 1000)
     for j in range(qtty):
         Participant.objects.create(
-            code=fake.ssn(), age=randint(18, 80),
+            code=code, age=randint(18, 80),
             gender=gender,
             group=group
         )
+        code += 1
 
 
 def create_experiment_protocol(group):
@@ -129,7 +138,7 @@ def create_classification_of_deseases(qtty):
 
     for i in range(qtty):
         ClassificationOfDiseases.objects.create(
-            code=fake.ssn(), description=fake.text(),
+            code=randint(1, 1000), description=fake.text(),
             abbreviated_description=fake.text(max_nb_chars=100),
             parent=None
         )
@@ -163,6 +172,8 @@ def create_keyword(qtty):
             if not Keyword.objects.filter(name=keyword):
                 break
         Keyword.objects.create(name=keyword)
+    # To test search
+    Keyword.objects.create(name='brachial plexus')
 
 
 def associate_experiments_to_trustees():
@@ -184,6 +195,32 @@ def associate_experiments_to_trustees():
     exp2.save()
 
 
+def create_ethics_committee_info(experiment):
+    fake = Factory.create()
+
+    experiment.project_url = fake.uri()
+    experiment.ethics_committee_url = fake.uri()
+    # TODO: generate PDF
+    file = generate_image_file(500, 800, fake.word() + '.jpg')
+    experiment.ethics_committee_file.save(file.name, file)
+    experiment.save()
+
+
+def create_emgstep(qtty, experiment):
+    """
+    :param qtty: number of emg settings
+    :param experiment: Experiment model instance
+    """
+    fake = Factory.create()
+
+    for i in range(qtty):
+        Step.objects.create(
+            group=experiment.groups.first(),
+            identification=fake.word(), numeration=fake.ssn(),
+            type=Step.EMG, order=randint(1, 20)
+        )
+
+
 def global_setup_ft():
     """
     This global setup creates basic object models that are used in 
@@ -200,15 +237,89 @@ def global_setup_ft():
 
     # Create 5 experiments for 2 owners, randomly, and studies (groups are
     # created inside create_experiment_and_study)
-    create_experiment_and_study(2, choice([owner1, owner2]),
-                                Experiment.TO_BE_ANALYSED)
+    create_experiment(2, choice([owner1, owner2]),
+                      Experiment.TO_BE_ANALYSED)
+    # To test search
+    experiment = Experiment.objects.last()
+    experiment.title = 'Brachial Plexus'
+    experiment.save()
+
     # TODO: when creating experiment UNDER_ANALYSIS, associate with a trustee
-    create_experiment_and_study(2, choice([owner1, owner2]),
-                                Experiment.UNDER_ANALYSIS)
-    create_experiment_and_study(1, choice([owner1, owner2]),
-                                Experiment.APPROVED)
-    create_experiment_and_study(1, choice([owner1, owner2]),
-                                Experiment.NOT_APPROVED)
+    create_experiment(2, choice([owner1, owner2]),
+                      Experiment.UNDER_ANALYSIS)
+    # To test search
+    experiment = Experiment.objects.last()
+    experiment.title = 'Brachial Plexus'
+    experiment.save()
+
+    create_experiment(4, choice([owner1, owner2]),
+                      Experiment.APPROVED)
+    # Put some non-random strings in one approved experiment to test search
+    experiment = Experiment.objects.last()
+    experiment.title = 'Brachial Plexus'
+    experiment.description = 'Ein Beschreibung.'
+    experiment.save()
+    # Create version 2 of the experiment to test search - necessary to change
+    # some field other than title, to include a non-random text, because we
+    # are highlitghing the terms searched, and this put span's elements in
+    # html with search results, causing dificulty to search 'Brachial
+    # Plexus' in experiment title in test_search.py.
+    # Related to: test_search_returns_only_last_version_experiment test.
+    experiment.pk = None
+    experiment.version = 2
+    experiment.save()
+
+    # To test search: we've created one experiment approved with 'Brachial
+    # Plexus' in its title. We now create another experiment approved also
+    # with 'Brachial Plexus' in title, and with EMG settings, to test
+    # searching with filter.
+    create_experiment(1, choice([owner1, owner2]),
+                      Experiment.APPROVED)
+    experiment = Experiment.objects.last()
+    experiment.title = 'Brachial Plexus (with EMG Setting)'
+    experiment.description = 'Ein Beschreibung.'
+    experiment.save()
+    create_emgstep(1, experiment)
+
+    # We change first experiment study approved to contain 'brachial' in
+    # study description, so it have to be found by search test
+    study = Study.objects.filter(
+        experiment__status=Experiment.APPROVED
+    ).first()
+    study.description = 'The brachial artery is the major blood vessel of ' \
+                        'the (upper) arm. It\'s correlated with plexus.'
+    # We put a keyword with the string 'brachial plexus' in the study to
+    # also be found by search test
+    study.keywords.add('brachial plexus')
+    study.save()
+    # We change experiment description to test search
+    experiment = Experiment.objects.last()
+    experiment.description = 'Brachial plexus repair by peripheral nerve ' \
+                             'grafts directly into the spinal cord in rats ' \
+                             'Behavioral and anatomical evidence of ' \
+                             'functional recovery'
+    experiment.save()
+    # To test search
+    group = Group.objects.filter(
+        experiment__status=Experiment.APPROVED
+    ).first()
+    group.description = 'Plexus brachial is writed in wrong order. Correct ' \
+                        'is Brachial plexus.'
+    # TODO: test for matches in code and description. Here only tests for
+    # TODO: matches in abbreviated_description, as this is the field returned
+    # TODO: in model __str__ method.
+    ic = ClassificationOfDiseases.objects.create(
+        code='BP', description='brachial Plexus',
+        abbreviated_description='brachial Plexus',
+        parent=None
+    )
+    group.inclusion_criteria.add(ic)
+    group.save()
+
+    # We create one experiment approved with ethics committee information
+    create_ethics_committee_info(Experiment.objects.last())
+    create_experiment(1, choice([owner1, owner2]),
+                      Experiment.NOT_APPROVED)
 
     # Associate trustee to studies under analysis (requires create
     # experiments before)
@@ -217,6 +328,13 @@ def global_setup_ft():
     # Create study collaborators (requires creating studies before)
     for study in Study.objects.all():
         create_study_collaborator(randint(2, 3), study)
+    # To test search
+    study = Study.objects.filter(
+        experiment__status=Experiment.APPROVED
+    ).last()
+    collaborator = Collaborator.objects.filter(study=study).first()
+    collaborator.name = 'Pero Vaz'
+    collaborator.save()
 
     # Create some keywords to associate with studies
     create_keyword(10)
@@ -252,6 +370,10 @@ def global_setup_ft():
     create_researchers()
 
 
+def global_setup_ft_search():
+    pass
+
+
 def global_setup_ut():
     """
     This global setup creates basic object models that are used in 
@@ -281,6 +403,7 @@ def global_setup_ut():
         version=1, sent_date=datetime.utcnow(),
         status=Experiment.TO_BE_ANALYSED
     )
+    create_ethics_committee_info(experiment3)
 
     study1 = Study.objects.create(start_date=datetime.utcnow(),
                                   experiment=experiment1)
