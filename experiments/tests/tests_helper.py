@@ -7,7 +7,7 @@ from faker import Factory
 from experiments.helpers import generate_image_file
 from experiments.models import Experiment, Study, Group, Researcher, \
     Collaborator, Participant, Gender, ExperimentalProtocol, \
-    ClassificationOfDiseases, Keyword
+    ClassificationOfDiseases, Keyword, Step
 
 
 def create_experiment_groups(qtty, experiment):
@@ -206,6 +206,21 @@ def create_ethics_committee_info(experiment):
     experiment.save()
 
 
+def create_emgstep(qtty, experiment):
+    """
+    :param qtty: number of emg settings
+    :param experiment: Experiment model instance
+    """
+    fake = Factory.create()
+
+    for i in range(qtty):
+        Step.objects.create(
+            group=experiment.groups.first(),
+            identification=fake.word(), numeration=fake.ssn(),
+            type=Step.EMG, order=randint(1, 20)
+        )
+
+
 def global_setup_ft():
     """
     This global setup creates basic object models that are used in 
@@ -248,14 +263,24 @@ def global_setup_ft():
     # some field other than title, to include a non-random text, because we
     # are highlitghing the terms searched, and this put span's elements in
     # html with search results, causing dificulty to search 'Brachial
-    # Plexus' in experiment title in test_search.py
-    # test_search_returns_only_last_version_experiment test.
+    # Plexus' in experiment title in test_search.py.
+    # Related to: test_search_returns_only_last_version_experiment test.
     experiment.pk = None
     experiment.version = 2
     experiment.save()
 
+    # To test search: we've created one experiment approved with 'Brachial
+    # Plexus' in its title. We now create another experiment approved also
+    # with 'Brachial Plexus' in title, and with EMG settings, to test
+    # searching with filter.
     create_experiment(1, choice([owner1, owner2]),
                       Experiment.APPROVED)
+    experiment = Experiment.objects.last()
+    experiment.title = 'Brachial Plexus (with EMG Setting)'
+    experiment.description = 'Ein Beschreibung.'
+    experiment.save()
+    create_emgstep(1, experiment)
+
     # We change first experiment study approved to contain 'brachial' in
     # study description, so it have to be found by search test
     study = Study.objects.filter(

@@ -323,21 +323,33 @@ class ContextTree(ExperimentSetting):
 
 
 class Step(models.Model):
+    BLOCK = 'block'
+    INSTRUCTION = 'instruction'
+    PAUSE = 'pause'
+    QUESTIONAIRE = 'questionnaire'
+    STIMULUS = 'stimulus'
+    TASK = 'task'
+    TASK_EXPERIMENT = 'task_experiment'
+    EEG = 'eeg'
+    EMG = 'emg'
+    TMS = 'tms'
+    GOALKEEPER = 'goalkeeper_game'
+    GENERIC = 'generic_data_collection'
     STEP_TYPES = (
-        ("block", "Set of steps"),
-        ("instruction", "Instruction"),
-        ("pause", "Pause"),
-        ("questionnaire", "Questionnaire"),
-        ("stimulus", "Stimulus"),
-        ("task", "Task for participant"),
-        ("task_experiment", "Task for experimenter"),
-        ("eeg", "EEG"),
-        ("emg", "EMG"),
-        ("tms", "TMS"),
-        ("goalkeeper_game", "Goalkeeper game phase"),
-        ("generic_data_collection", "Generic data collection"),
+        (BLOCK, "Set of steps"),
+        (INSTRUCTION, "Instruction"),
+        (PAUSE, "Pause"),
+        (QUESTIONAIRE, "Questionnaire"),
+        (STIMULUS, "Stimulus"),
+        (TASK, "Task for participant"),
+        (TASK_EXPERIMENT, "Task for experimenter"),
+        (EEG, "EEG"),
+        (EMG, "EMG"),
+        (TMS, "TMS"),
+        (GOALKEEPER, "Goalkeeper game phase"),
+        (GENERIC, "Generic data collection"),
     )
-    group = models.ForeignKey(Group)
+    group = models.ForeignKey(Group, related_name='steps')
     identification = models.CharField(max_length=255)
     description = models.TextField(null=True, blank=True)
     duration_value = models.IntegerField(null=True, blank=True)

@@ -167,6 +167,7 @@ class SearchTest(TestCase):
         # TODO: is it needed to test for redirected page?
 
     def test_search_returns_only_approved_experiments(self):
-        response = self.client.get('/search/', {'q': 'Braquial+Plexus'})
-        # TODO
+        response = self.client.get('/search/', {'q': 'Braquial+Plexus',
+                                                'filter': ''})
+        # TODO: complete this test!
 
