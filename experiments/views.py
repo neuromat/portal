@@ -198,7 +198,8 @@ class NepSearchView(SearchView):
     def get_context_data(self, *args, **kwargs):
         context = super(NepSearchView, self).get_context_data(**kwargs)
 
-        self.filter(context, self.request.GET['filter'])
+        if 'filter' in self.request.GET:
+            self.filter(context, self.request.GET['filter'])
 
         # Related to the badge with number of experiments to be analysed in
         # page top. It's displayed only if a trustee is logged.
