@@ -111,6 +111,7 @@ class SearchTest(FunctionalTest):
         # collaborator a coleague of her, called Pero Vaz.
         # She types 'Pero Vaz' in search box and hits Enter.
         search_box = self.browser.find_element_by_id('id_q')
+        search_box.clear()
         search_box.send_keys('Pero Vaz')
         # self.browser.find_element_by_id('submit_terms').click()
         search_box.send_keys(Keys.ENTER)
