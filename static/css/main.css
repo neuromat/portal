@@ -138,15 +138,6 @@ a:hover.nep-btn {
   border-bottom: 5px solid #60c8a3;
 }
 
-.search-box {
-  display: inline-block;
-  width: 60%;
-}
-
-.search-select {
-  max-width: 50.2%; /* to align right with search input text box */
-}
-
 .detail-header {
   border-left: 1px solid #a6aaad;
   border-top: 1px solid #a6aaad;
@@ -222,6 +213,27 @@ a:hover.nep-btn {
 .detail-container {
   border: 1px solid #a6aaad;
 }
+
+/*
+  ========================================
+  Search
+  ========================================
+ */
+
+.search-box {
+  display: inline-block;
+  width: 60%;
+}
+
+.search-select {
+  max-width: 50.2%; /* to align right with search input text box */
+}
+
+h5.match {
+  font-size: 16px;
+  margin-bottom: 0px;
+}
+
 
 /*
   ========================================

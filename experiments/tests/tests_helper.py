@@ -206,18 +206,19 @@ def create_ethics_committee_info(experiment):
     experiment.save()
 
 
-def create_emgstep(qtty, experiment):
+def create_step(qtty, group, type):
     """
     :param qtty: number of emg settings
-    :param experiment: Experiment model instance
+    :param group: Experiment model instance
+    :param type: step type: eeg, emg, tms etc.
     """
     fake = Factory.create()
 
     for i in range(qtty):
         Step.objects.create(
-            group=experiment.groups.first(),
+            group=group,
             identification=fake.word(), numeration=fake.ssn(),
-            type=Step.EMG, order=randint(1, 20)
+            type=type, order=randint(1, 20)
         )
 
 
@@ -279,7 +280,7 @@ def global_setup_ft():
     experiment.title = 'Brachial Plexus (with EMG Setting)'
     experiment.description = 'Ein Beschreibung.'
     experiment.save()
-    create_emgstep(1, experiment)
+    create_step(1, experiment.groups.first(), Step.EMG)
 
     # We change first experiment study approved to contain 'brachial' in
     # study description, so it have to be found by search test
@@ -305,6 +306,10 @@ def global_setup_ft():
     ).first()
     group.description = 'Plexus brachial is writed in wrong order. Correct ' \
                         'is Brachial plexus.'
+    group.save()
+    create_step(1, group, Step.EEG)
+    create_step(1, group, Step.EMG)
+
     # TODO: test for matches in code and description. Here only tests for
     # TODO: matches in abbreviated_description, as this is the field returned
     # TODO: in model __str__ method.
@@ -315,6 +320,14 @@ def global_setup_ft():
     )
     group.inclusion_criteria.add(ic)
     group.save()
+
+    # To test search
+    group = Group.objects.filter(
+        experiment__status=Experiment.APPROVED
+    ).last()
+    group.description = 'Brachial plexus is a set of nerves.'
+    group.save()
+    create_step(1, group, Step.EMG)
 
     # We create one experiment approved with ethics committee information
     create_ethics_committee_info(Experiment.objects.last())
