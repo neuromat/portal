@@ -7,7 +7,7 @@ from haystack.generic_views import SearchView
 from django.utils.translation import activate, LANGUAGE_SESSION_KEY, ugettext as _
 
 from experiments.forms import NepSearchForm
-from experiments.models import Experiment, RejectJustification, Step
+from experiments.models import Experiment, RejectJustification
 
 
 def home_page(request):
