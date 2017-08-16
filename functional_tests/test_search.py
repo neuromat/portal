@@ -54,9 +54,11 @@ class SearchTest(FunctionalTest):
         self.assertTrue(
             any('Brachial plexus' in row.text for row in experiment_rows)
         )
+        ##
         # The information of an experiment is organized this way: first line
         # is the object that was matched - in this case: Experiment. Second
         # line contains the field names and contents, starting with title.
+        ##
         self.assertTrue(
             any(
                 'Experiment\n\ntitle:' in row.text for row in experiment_rows
