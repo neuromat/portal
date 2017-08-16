@@ -9,10 +9,10 @@ from faker import Factory
 # TODO: when executing from bash command line, final line identifier breaks
 # imports. We are kepping in Collaborator in same line
 from experiments.models import Gender, ClassificationOfDiseases, Keyword, \
-    Collaborator
+    Collaborator, Step
 from experiments.models import Experiment, Study, Group, Researcher
 from experiments.tests.tests_helper import create_experiment_groups, \
-    create_ethics_committee_info
+    create_ethics_committee_info, create_step
 from experiments.tests.tests_helper import create_classification_of_deseases
 from experiments.tests.tests_helper import create_experiment_protocol
 from experiments.tests.tests_helper import create_participants
@@ -21,7 +21,7 @@ from experiments.tests.tests_helper import create_keyword
 from nep.local_settings import BASE_DIR
 
 
-# Clear database and run migrate
+# Clear sqlite database and run migrate
 call(['rm', BASE_DIR + '/db.sqlite3'])
 call([BASE_DIR + '/manage.py', 'migrate'])
 
@@ -61,7 +61,8 @@ for i in range(1, 4):
         description=fake.text(),
         start_date=datetime.utcnow(), experiment=experiment_owner1
     )
-    # To test search
+    # to test search (necessary to approve experiment(s) in front-end or
+    # directly in database)
     if i == 1:
         study = Study.objects.last()
         study.description = 'The brachial artery is the major blood vessel ' \
@@ -84,7 +85,8 @@ for i in range(4, 6):
         sent_date=datetime.utcnow(),
         status=Experiment.TO_BE_ANALYSED
     )
-    # To test search
+    # to test search (necessary to approve experiment(s) in front-end or
+    # directly in database)
     if i == 4:
         experiment_owner2.title = 'Brachial Plexus'
         experiment_owner2.save()
@@ -102,24 +104,47 @@ for i in range(4, 6):
         start_date=datetime.utcnow(), experiment=experiment_owner2
     )
     create_experiment_groups(randint(1, 3), experiment_owner2)
-    # To test search
-    group = Group.objects.first()
-    group.description = 'Plexus brachial is writed in wrong order. Correct ' \
-                        'is Brachial plexus.'
-    ic = ClassificationOfDiseases.objects.create(
-        code='BP', description='brachial Plexus',
-        abbreviated_description='brachial Plexus',
-        parent=None
-    )
-    group.inclusion_criteria.add(ic)
-    group.save()
+
+# to test search (necessary to approve experiment(s) in front-end or
+# directly in database)
+group = Group.objects.first()
+group.description = 'Plexus brachial (com EMG) is writed in wrong order. ' \
+                    'Correct is Brachial plexus.'
+ic = ClassificationOfDiseases.objects.create(
+    code='BP', description='brachial Plexus',
+    abbreviated_description='brachial Plexus',
+    parent=None
+)
+group.inclusion_criteria.add(ic)
+group.save()
+# to test search with filter (necessary to approve experiment(s) in
+# front-end or directly in database)
+create_step(1, group, Step.EMG)
+
+# to test search with filter (necessary to approve experiment(s) in
+# front-end or directly in database)
+group = Group.objects.last()
+group.title = 'Brachial Plexus com EEG'
+group.save()
+create_step(1, group, Step.EEG)
+
+# to test search with filter (necessary to approve experiment(s) in
+# front-end or directly in database)
+group = Group.objects.get(
+    id=(Group.objects.last().id + Group.objects.first().id) // 2
+)
+group.title = 'Brachial Plexus com EEG e EMG'
+group.save()
+create_step(1, group, Step.EEG)
+create_step(1, group, Step.EMG)
 
 # Create researchers associated to studies created above
 for study in Study.objects.all():
     Researcher.objects.create(name=fake.name(),
                               email='claudia.portal.neuromat@gmail.com',
                               study=study)
-# To test search
+# to test search (necessary to approve experiment(s) in front-end or
+# directly in database)
 researcher = Researcher.objects.last()
 researcher.name = 'Yolanda Fuentes'
 researcher.save()
@@ -127,7 +152,8 @@ researcher.save()
 # Create study collaborators (requires creating studies before)
 for study in Study.objects.all():
     create_study_collaborator(randint(2, 3), study)
-# To test search
+# To test search (necessary to approve experiment(s) in front-end or
+# directly in database)
 collaborator = Collaborator.objects.last()
 collaborator.name = 'Pero Vaz'
 collaborator.save()

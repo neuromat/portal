@@ -51,7 +51,7 @@ def experiment_detail(request, experiment_id):
             request.user.groups.filter(name='trustees').exists():
         all_experiments = Experiment.lastversion_objects.all()
         to_be_analysed_count = all_experiments.filter(
-                status=Experiment.TO_BE_ANALYSED).count()
+            status=Experiment.TO_BE_ANALYSED).count()
 
     experiment = Experiment.objects.get(pk=experiment_id)
 
@@ -94,13 +94,13 @@ def change_status(request, experiment_id):
         if not justification:
             messages.warning(
                 request, _('Please provide a reason justifying the change of the status of the experiment ') +
-                experiment.title + _('to "Not approved". '))
+                         experiment.title + _('to "Not approved". '))
 
             return HttpResponseRedirect('/')
         else:
             # if has justification send email to researcher
             subject = _('Your experiment was rejected')
-            message = _('We regret to inform you that your experiment, ') + experiment.title +  \
+            message = _('We regret to inform you that your experiment, ') + experiment.title + \
                       _(', has not been acceptted to be published in the NeuroMat Open Database. Please check the '
                         'reasons providing by the Neuromat Open Database Evaluation Committee:') + justification + \
                       _('.\nWith best regards,\n The Neuromat Open Database Evaluation Committee')
@@ -124,8 +124,8 @@ def change_status(request, experiment_id):
         message = _('We are pleased to inform you that your experiment ') + experiment.title + \
                   _(' was approved by Neuromat Open Database Evaluation Committee. All data of the submitted experiment'
                     ' will be available freely to the public consultation and shared under Creative Commons Share '
-                    'Alike license.\n You can access your experiment data by clicking on the link below\n') + 'http://' +\
-                  request.get_host() +\
+                    'Alike license.\n You can access your experiment data by clicking on the link below\n') + 'http://' + \
+                  request.get_host() + \
                   _('\nWith best regards,\n The NeuroMat Open Database Evaluation Committee.')
 
         send_mail(subject, message, from_email,
@@ -199,7 +199,7 @@ class NepSearchView(SearchView):
         context = super(NepSearchView, self).get_context_data(**kwargs)
 
         if 'filter' in self.request.GET:
-            self.filter(context, self.request.GET['filter'])
+            self.filter(context, self.request.GET.getlist('filter'))
 
         # Related to the badge with number of experiments to be analysed in
         # page top. It's displayed only if a trustee is logged.
@@ -215,22 +215,19 @@ class NepSearchView(SearchView):
         return context
 
     @staticmethod
-    def filter(context, search_filter):
+    def filter(context, search_filters):
         """
         Filters search results by type of data collected in the experiment.
         :param context: object_list returned by haystack search
-        :param search_filter: the filters chosen by the user
+        :param search_filters: the filters chosen by the user
         """
         old_object_list = context['object_list']
         indexes_to_remove = []
         for i in range(0, len(old_object_list)):
-            if old_object_list[i].model_name == 'experiment':
-                # if result has EMG:
-                if search_filter == Step.EMG:
-                    for group in old_object_list[i].object.groups.all():
-                        if group.steps.filter(type=Step.EMG).count() > 0:
-                            indexes_to_remove.append(i)
-                            break
+                for group in old_object_list[i].object.groups.all():
+                    if group.steps.filter(type__in=search_filters).count() > 0:
+                        indexes_to_remove.append(i)
+                        break
 
         context['object_list'] = [v for i, v in enumerate(old_object_list)
                                   if i not in indexes_to_remove]

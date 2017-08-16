@@ -181,7 +181,7 @@ class SearchTest(FunctionalTest):
 
     def test_search_with_two_filters_returns_correct_objects(self):
         # Ok, Joselina now wants to search experiments that has EEG and EMG
-        # in groups data collection. She multiple choices box she clicks in
+        # in groups data collection. In multiple choices box she clicks in
         # EEG and EMG
         search_box = self.browser.find_element_by_id('id_q')
         search_box.send_keys('Brachial Plexus')
@@ -199,8 +199,8 @@ class SearchTest(FunctionalTest):
         # There's an experiment group that has one EEG step and one EMG
         # step, besides "Plexus Brachial" in group description.
         # On the other hand, there's a group that has "Brachial Plexus" in
-        # despcription, EEG step but not EMG step. So she will see only one
-        # of the two groups
+        # despcription, an EEG step but not an EMG step. So she will see only
+        # one of the two groups.
         ##
         self.verify_n_objects_in_table_rows(1, 'group-matches')
 

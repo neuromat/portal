@@ -12,7 +12,7 @@ class NepSearchForm(SearchForm):
         )
     )
 
-    filter = forms.ChoiceField(
+    filter = forms.MultipleChoiceField(
         required=False, label='',
         choices=[
             ('eeg', 'EEG'), ('tms', 'TMS'), ('emg', 'EMG'),
@@ -24,11 +24,8 @@ class NepSearchForm(SearchForm):
             ('psychometric', 'Psychometric scales'),
             ('unitary', 'Unitary register')
         ],
-        widget=forms.Select(
-            attrs=
-            {'id': 'filter_box',
-             'class': 'selectpicker search-select',
-             'multiple': ''}
+        widget=forms.SelectMultiple(
+            attrs={'id': 'filter_box', 'class': 'selectpicker search-select'}
         )
     )
 
