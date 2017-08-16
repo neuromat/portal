@@ -224,10 +224,24 @@ class NepSearchView(SearchView):
         old_object_list = context['object_list']
         indexes_to_remove = []
         for i in range(0, len(old_object_list)):
-                for group in old_object_list[i].object.groups.all():
-                    if group.steps.filter(type__in=search_filters).count() > 0:
-                        indexes_to_remove.append(i)
-                        break
+            if old_object_list[i].model_name == 'experiment':
+                groups = old_object_list[i].object.groups.all()
+            elif old_object_list[i].model_name == 'study':
+                groups = old_object_list[i].object.experiment.groups.all()
+            elif old_object_list[i].model_name == 'experimentalprotocol':
+                groups = [old_object_list[i].object.group]
+            elif old_object_list[i].model_name == 'group':
+                groups = [old_object_list[i].object]
+            else:
+                # TODO: generates exception: object not indexed
+                pass
+            count = 0
+            for group in groups:
+                for search_filter in search_filters:
+                    if group.steps.filter(type=search_filter).count() > 0:
+                        count = count + 1
+            if count < len(search_filters):
+                indexes_to_remove.append(i)
 
         context['object_list'] = [v for i, v in enumerate(old_object_list)
                                   if i not in indexes_to_remove]
