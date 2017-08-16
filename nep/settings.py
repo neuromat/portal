@@ -51,7 +51,7 @@ ROOT_URLCONF = 'nep.urls'
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/'
 
-# Haystack
+# Haystack - change 'URL' to reflect the elasticsearch server location/port
 HAYSTACK_CONNECTIONS = {
     'default': {
         'ENGINE':
