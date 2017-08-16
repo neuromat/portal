@@ -44,13 +44,13 @@
 
     <hr class="detail-header-hr">
     <div id="id_detail_study" class="detail-study">{% trans "From study" %}: <a
-            href="#" data-toggle="modal" data-target="#study_modal">{{ experiment.study.title }}</a></div>
+            href="#" data-toggle="modal" data-target="#study_modal">{{ experiment.study.title }}</a>
+    </div>
     <div hidden="hidden">
         <input id="experimentId" type="text" value="{{ experiment.id }}">
     </div>
 
         <div class="align-right">
-{#            <button id="downloadButton">Start download</button>#}
             <a id="button_download" href="/downloads/{{ experiment.id }}"
                 class="fileDownloadCustomRichExperience nep-btn">{% trans "Download experiment data" %}</a>
         </div>
@@ -66,8 +66,6 @@
         {% trans "There was a problem generating your download, please try again." %}
     </div>
 
-{#        {% csrf_token %}#}
-{#    </form>#}
 
     <br><br>
 
