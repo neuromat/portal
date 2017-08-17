@@ -51,7 +51,7 @@ ROOT_URLCONF = 'nep.urls'
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/'
 
-# Haystack
+# Haystack - change 'URL' to reflect the elasticsearch server location/port
 HAYSTACK_CONNECTIONS = {
     'default': {
         'ENGINE':
@@ -126,7 +126,6 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.10/howto/static-files/
 
 STATIC_URL = '/static/'
-STATICFILES_DIRS = 'static'
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'

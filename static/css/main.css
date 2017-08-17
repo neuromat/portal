@@ -99,6 +99,7 @@ a:hover.nep-btn {
 .nep-top {
   height: 60px;
 }
+
 .top-neuromat {
   font-weight: bold;
   position: relative;
@@ -106,6 +107,7 @@ a:hover.nep-btn {
   float: left;
   margin-right: 10px;
 }
+
 .top-small {
   font-size: smaller;
   display: inline-block;
@@ -115,14 +117,24 @@ a:hover.nep-btn {
   border-left: 2px solid #000;
   padding-left: 10px;
 }
+
 .top-login-language {
   float: right;
   position: relative;
   top: 30%;
 }
-.top-language {
-  font-size: small;
+
+
+/* override bootstrat navbar-nav class */
+.navbar-nav > li > a.top-language {
+  padding: 0;
 }
+
+/* override bootstrat navbar-nav class */
+.navbar-nav > li > a.top-language-logged {
+  padding: 3px;
+}
+
 
 /*
   ========================================
@@ -136,15 +148,6 @@ a:hover.nep-btn {
   border-top-left-radius: 7px;
   border-top-right-radius: 7px;
   border-bottom: 5px solid #60c8a3;
-}
-
-.search-box {
-  display: inline-block;
-  width: 60%;
-}
-
-.search-select {
-  max-width: 50.2%; /* to align right with search input text box */
 }
 
 .detail-header {
@@ -213,6 +216,11 @@ a:hover.nep-btn {
   margin-top: 20px;
 }
 
+.login-block {
+  display: table;
+  margin: 0 auto;
+}
+
 /*
   ========================================
   Container Detail Experiment
@@ -222,6 +230,27 @@ a:hover.nep-btn {
 .detail-container {
   border: 1px solid #a6aaad;
 }
+
+/*
+  ========================================
+  Search
+  ========================================
+ */
+
+.search-box {
+  display: inline-block;
+  width: 60%;
+}
+
+.search-select {
+  max-width: 50.2%; /* to align right with search input text box */
+}
+
+h5.match {
+  font-size: 16px;
+  margin-bottom: 0px;
+}
+
 
 /*
   ========================================
