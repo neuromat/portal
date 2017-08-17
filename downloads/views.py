@@ -19,8 +19,8 @@ EXPORT_EXPERIMENT_FILENAME = "download_experiment.zip"
 
 
 # Create your views here.
-def create_export_instance(user):
-    export_instance = Export(user=user)
+def create_export_instance():
+    export_instance = Export()
 
     export_instance.save()
 
@@ -30,10 +30,8 @@ def create_export_instance(user):
 def download_view(request, experiment_id):
     template_name = "experiments/detail.html"
 
-    export_instance = create_export_instance(request.user)
-    input_export_file = path.join(EXPORT_DIRECTORY,
-                                  path.join(str(request.user.id),
-                                            path.join(str(export_instance.id), str(JSON_FILENAME))))
+    export_instance = create_export_instance()
+    input_export_file = path.join(EXPORT_DIRECTORY, path.join(path.join(str(export_instance.id), str(JSON_FILENAME))))
     input_filename = path.join(settings.MEDIA_ROOT, input_export_file)
 
     create_directory(settings.MEDIA_ROOT, path.split(input_export_file)[0])
@@ -60,8 +58,8 @@ def download_view(request, experiment_id):
     return HttpResponseRedirect(template_name)
 
 
-def get_export_instance(user, export_id):
-    export_instance = Export.objects.get(user=user, id=export_id)
+def get_export_instance(export_id):
+    export_instance = Export.objects.get(id=export_id)
 
     return export_instance
 
@@ -75,19 +73,18 @@ def update_export_instance(input_file, output_export, export_instance):
 def export_create(request, export_id, input_filename, experiment_id, template_name="experiments/detail.html"):
     try:
 
-        export_instance = get_export_instance(request.user, export_id)
-        export = ExportExecution(export_instance.user.id, export_instance.id)
+        export_instance = get_export_instance(export_id)
+        export = ExportExecution(export_instance.id)
 
-        # set path of the directory base: ex. /Users/.../portal/media/download/user.id
+        # set path of the directory base: ex. /Users/.../portal/media/download/
         base_directory, path_to_create = path.split(export.get_directory_base())
-        # create directory base ex. /Users/.../portal/media/download/user.id/path_create
+        # create directory base ex. /Users/.../portal/media/download/path_create
         error_msg, base_directory_name = create_directory(base_directory, path_to_create)
         if error_msg != "":
             messages.error(request, error_msg)
             return render(request, template_name)
-        # ex. /Users/.../portal/media/download/user.id/export_instance.id/json_export.json
-        input_export_file = path.join("export", path.join(str(request.user.id),
-                                                          path.join(str(export_instance.id), str(input_filename))))
+        # ex. /Users/.../portal/media/download/export_instance.id/json_export.json
+        input_export_file = path.join("export", path.join(path.join(str(export_instance.id), str(input_filename))))
 
         # language_code = request.LANGUAGE_CODE
         # prepare data to be processed
@@ -139,8 +136,8 @@ def export_create(request, export_id, input_filename, experiment_id, template_na
 
             zip_file.close()
 
-            output_export_file = path.join("download", path.join(str(export_instance.user.id), path.join(str(
-                export_instance.id), str(export_filename))))
+            output_export_file = path.join("download", path.join(path.join(str(export_instance.id),
+                                                                           str(export_filename))))
 
             update_export_instance(input_export_file, output_export_file, export_instance)
 
