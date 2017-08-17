@@ -216,6 +216,11 @@ a:hover.nep-btn {
   margin-top: 20px;
 }
 
+.login-block {
+  display: table;
+  margin: 0 auto;
+}
+
 /*
   ========================================
   Container Detail Experiment
