@@ -420,27 +420,27 @@ msgstr "Próximo"
 msgid "Sorry, no matches found for the terms used. Please try again."
 msgstr ""
 "Desculpe, nenhum resultado encontrado para os termos utilizados. Por favor, "
-"tente novamente"
+"tente novamente."
 
 #: experiments/templates/search/search.html:51
 msgid "Search Suggestion:"
-msgstr "Sugestão de pesquisa"
+msgstr "Sugestão de pesquisa:"
 
 #: experiments/templates/search/search.html:53
 msgid "Check your spelling."
-msgstr "Verifique a ortografia"
+msgstr "Verifique a ortografia."
 
 #: experiments/templates/search/search.html:54
 msgid "Try more general word."
-msgstr "Tente uma palavra com significado mais geral"
+msgstr "Tente uma palavra com significado mais geral."
 
 #: experiments/templates/search/search.html:55
 msgid "Try different words that mean the same thing."
-msgstr "Tente palavras diferentes com o mesmo significado"
+msgstr "Tente palavras diferentes com o mesmo significado."
 
 #: experiments/templates/search/search.html:56
 msgid "Post a request for your search and we'll help you find it."
-msgstr "Coloque um pedido para sua pesquisa e nós ajudaremos a encontra-lo"
+msgstr "Envie um pedido para sua pesquisa e nós ajudaremos a encontra-lo"
 
 #: experiments/templates/search/studies.html:7
 msgid "Study"
@@ -456,7 +456,7 @@ msgstr "data de fim"
 
 #: experiments/templates/search/studies.html:17
 msgid "researcher"
-msgstr "Pesquisa"
+msgstr "pesquisador"
 
 #: experiments/templates/search/studies.html:19
 msgid "collaborators"
@@ -555,7 +555,7 @@ msgstr "Seu experimento esta agora em analise"
 
 #: experiments/views.py:137
 msgid "Thank you for submitting your experiment "
-msgstr "Obrigado por enviar seu experimento"
+msgstr "Obrigado por enviar seu experimento "
 
 #: experiments/views.py:138
 msgid ""
@@ -574,11 +574,9 @@ msgid " warning that the experiment is under analysis."
 msgstr " comunicando que seu experimento esta baixo analize"
 
 #: experiments/views.py:160
-#, fuzzy
-#| msgid "Download experiment data"
 msgid "The experiment data "
-msgstr "Baixar dados de experimentos"
+msgstr "Os dados do experimento "
 
 #: experiments/views.py:160
 msgid " was made available to be analysed by other trustee."
-msgstr " foi disponibilizado para ser analizado por outros curadores."
+msgstr " foram disponibilizados para ser analizados por outros curadores."
