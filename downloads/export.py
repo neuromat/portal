@@ -67,15 +67,14 @@ class ExportExecution:
             self.user_name = request.user.username
         return self.user_name
 
-    def set_directory_base(self, user_id, export_id):
-        self.directory_base = path.join(self.base_directory_name, str(user_id))
-        self.directory_base = path.join(self.directory_base, str(export_id))
+    def set_directory_base(self, export_id):
+        self.directory_base = path.join(self.base_directory_name, str(export_id))
 
     def get_directory_base(self):
 
-        return self.directory_base  # MEDIA_ROOT/download/username_id/export_id
+        return self.directory_base  # MEDIA_ROOT/download/export_id
 
-    def __init__(self, user_id, export_id):
+    def __init__(self, export_id):
         # self.get_session_key()
 
         # questionnaire_id = 0
@@ -85,7 +84,7 @@ class ExportExecution:
         self.directory_base = ''
         self.base_directory_name = path.join(settings.MEDIA_ROOT, "download")
         # self.directory_base = self.base_directory_name
-        self.set_directory_base(user_id, export_id)
+        self.set_directory_base(export_id)
         self.base_export_directory = ""
         self.user_name = None
         self.input_data = {}
@@ -149,36 +148,39 @@ class ExportExecution:
         # process of experiment description
 
         study = experiment.study
-        experiment_resume_header = 'Study' + '\t' + 'Study description' + '\t' + 'Start date' + '\t' + \
-                                   'End date' + '\t' + 'Experiment' + '\t' + \
-                                   'Experiment description' + '\t' + "\n"
-        experiment_resume = \
-            study.title + '\t' + study.description + '\t' + \
-            str(study.start_date) + '\t' + str(study.end_date) + '\t' + \
-            experiment.title + '\t' + experiment.description + '\t' + "\n"
+        experiment_resume_header = ['Study', 'Study description', 'Start date', 'End date', 'Experiment',
+                                    'Experiment description']
+        # experiment_resume_header = 'Study' + '\t' + 'Study description' + '\t' + 'Start date' + '\t' + \
+        #                            'End date' + '\t' + 'Experiment' + '\t' + \
+        #                            'Experiment description' + '\t' + "\n"
+        experiment_resume = [study.title, study.description, str(study.start_date), str(study.end_date),
+                             experiment.title, experiment.description]
+        # experiment_resume = \
+        #     study.title + '\t' + study.description + '\t' + \
+        #     str(study.start_date) + '\t' + str(study.end_date) + '\t' + \
+        #     experiment.title + '\t' + experiment.description + '\t' + "\n"
 
         filename_experiment_resume = "%s.csv" % "Experiment"
 
-        # path ex. /EXPERIMENT_DOWNLOAD/Experiment_data
-        # export_experiment_data = path.join(self.get_input_data("base_directory"),
-        #                                    self.get_input_data("experiment_data_directory"))
         # path ex. /EXPERIMENT_DOWNLOAD/
         export_experiment_data = self.get_input_data("base_directory")
 
-        # path ex. UserS/.../qdc/media/.../EXPERIMENT_DOWNLOAD/Experiment_data
-        # experiment_resume_directory = path.join(self.get_export_directory(),
-        #                                         self.get_input_data("experiment_data_directory"))
         # # path ex. UserS/.../qdc/media/.../EXPERIMENT_DOWNLOAD/
         experiment_resume_directory = self.get_export_directory()
         # Users/.../qdc/media/.../EXPERIMENT_DOWNLOAD/Experiment.csv
         complete_filename_experiment_resume = path.join(experiment_resume_directory, filename_experiment_resume)
 
+        experiment_description_fields = []
+        experiment_description_fields.insert(0, experiment_resume_header)
+        experiment_description_fields.insert(1, experiment_resume)
+        save_to_csv(complete_filename_experiment_resume, experiment_description_fields)
+
         self.files_to_zip_list.append([complete_filename_experiment_resume, export_experiment_data])
 
-        with open(complete_filename_experiment_resume.encode('utf-8'), 'w', newline='',
-                  encoding='UTF-8') as csv_file:
-            csv_file.writelines(experiment_resume_header)
-            csv_file.writelines(experiment_resume)
+        # with open(complete_filename_experiment_resume.encode('utf-8'), 'w', newline='',
+        #           encoding='UTF-8') as csv_file:
+        #     csv_file.writelines(experiment_resume_header)
+        #     csv_file.writelines(experiment_resume)
 
         # process data for each group
         group_list = Group.objects.filter(experiment=experiment)
@@ -238,13 +240,13 @@ class ExportExecution:
             # Export data per Participant
             header_personal_data = ["Participant_code", "Age", "Gender"]
             personal_data_list = []
+            personal_data_list.insert(0, header_personal_data)
             participant_list = Participant.objects.filter(group=group)
             for participant in participant_list:
                 # save personal data
                 data = [participant.code, participant.age, participant.gender]
                 personal_data_list.append(data)
 
-                personal_data_list.insert(0, header_personal_data)
                 export_participant_filename = "%s.csv" % "Participants"
                 # ex. ex. Users/..../EXPERIMENT_DOWNLOAD/Group_xxx/Participants.csv
                 complete_participant_filename = path.join(group_directory, export_participant_filename)
