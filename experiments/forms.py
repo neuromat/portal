@@ -1,4 +1,5 @@
 from django import forms
+from django.utils.translation import ugettext as _
 from haystack.forms import SearchForm
 
 
@@ -15,14 +16,16 @@ class NepSearchForm(SearchForm):
     filter = forms.MultipleChoiceField(
         required=False, label='',
         choices=[
-            ('eeg', 'EEG'), ('tms', 'TMS'), ('emg', 'EMG'),
-            ('goalkeeper', 'Goalkeeper game phase'),
-            ('cinematic', 'Cinematic measures'),
-            ('stabilometry', 'Stabilometry'), ('answertime', 'Answer time'),
-            ('psychophysical', 'Psychophysical measures'),
-            ('verbal', 'Verbal answer'),
-            ('psychometric', 'Psychometric scales'),
-            ('unitary', 'Unitary register')
+            ('eeg', _('EEG')), ('tms', _('TMS')), ('emg', _('EMG')),
+            ('goalkeeper', _('Goalkeeper game phase')),
+            ('cinematic', _('Kinematic measures')),
+            ('stabilometry', _('Stabilometry')),
+            ('answertime', _('Response time')),
+            ('psychophysical', _('Psychophysical measures')),
+            ('verbal', _('Verbal response')),
+            ('psychometric', _('Psychometric scales')),
+            ('unitary', _('Unitary recording')),
+            ('multiunit', _('Multiunit recording'))
         ],
         widget=forms.SelectMultiple(
             attrs={'id': 'filter_box', 'class': 'selectpicker search-select'}

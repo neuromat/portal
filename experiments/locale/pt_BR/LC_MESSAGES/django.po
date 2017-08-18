@@ -327,7 +327,7 @@ msgstr "Centro de Pesquisa, Inovação e Difusão em Neuromatemática"
 #: experiments/templates/experiments/top.html:9
 #: experiments/templates/experiments/top.html:11
 msgid "Welcome"
-msgstr "Benvindo"
+msgstr "Bem-vindo(a)"
 
 #: experiments/templates/experiments/top.html:19
 msgid "Log Out"
