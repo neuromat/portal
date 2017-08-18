@@ -8,3 +8,6 @@ nep/local_settings.py
 
 # IDE's
 .idea
+
+# Locale
+*.mo
