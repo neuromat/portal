@@ -24,7 +24,7 @@ class NepSearchForm(SearchForm):
             ('psychophysical', _('Psychophysical measures')),
             ('verbal', _('Verbal response')),
             ('psychometric', _('Psychometric scales')),
-            ('unitary', _('Unitary recording')),
+            ('unitary', _('Unit recording')),
             ('multiunit', _('Multiunit recording'))
         ],
         widget=forms.SelectMultiple(
