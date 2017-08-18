@@ -52,25 +52,28 @@ class NewVisitorTest(FunctionalTest):
             any(option.text == 'Goalkeeper game phase' for option in options)
         )
         self.assertTrue(
-            any(option.text == 'Cinematic measures' for option in options)
+            any(option.text == 'Kinematic measures' for option in options)
         )
         self.assertTrue(
             any(option.text == 'Stabilometry' for option in options)
         )
         self.assertTrue(
-            any(option.text == 'Answer time' for option in options)
+            any(option.text == 'Response time' for option in options)
         )
         self.assertTrue(
             any(option.text == 'Psychophysical measures' for option in options)
         )
         self.assertTrue(
-            any(option.text == 'Verbal answer' for option in options)
+            any(option.text == 'Verbal response' for option in options)
         )
         self.assertTrue(
             any(option.text == 'Psychometric scales' for option in options)
         )
         self.assertTrue(
-            any(option.text == 'Unitary register' for option in options)
+            any(option.text == 'Unit recording' for option in options)
+        )
+        self.assertTrue(
+            any(option.text == 'Multiunit recording' for option in options)
         )
         # As there are experiments sended to Portal, she sees the home
         # page have a list of experiments in a table.
