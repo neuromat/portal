@@ -234,4 +234,31 @@ class SearchTest(FunctionalTest):
         self.assertIn('brachial', study)
         self.assertIn('EEG', study)
 
+    def test_search_with_OR_modifier_returns_correct_objects(self):
+        # In a tooltip that pops up when hovering the mouse upon
+        # search box input text, Joselina sees that she can apply modifiers
+        # to do advanced search.
+        # So, she types "EMG OR EEG".
+        search_box = self.browser.find_element_by_id('id_q')
+        ##
+        # TODO: when change order - 'EEG OR EMG', test fails. Why?
+        ##
+        search_box.send_keys('EMG OR EEG')
+        self.browser.find_element_by_id('submit_terms').click()
+        time.sleep(1)
+
+        ##
+        # In tests helper, we have an experiment that has 'EMG' in title,
+        # and 'EEG' in description. There's a study with 'EEG' in study
+        # description. So, she's got two rows in Search Results.
+        self.verify_n_objects_in_table_rows(1, 'experiment-matches')
+        experiment = self.browser.find_element_by_class_name(
+            'experiment-matches').text
+        self.assertIn('EMG', experiment)
+        self.assertIn('EEG', experiment)
+        self.verify_n_objects_in_table_rows(1, 'study-matches')
+        study = self.browser.find_element_by_class_name(
+            'study-matches').text
+        self.assertIn('EEG', study)
+
         self.fail('Finish this test!')

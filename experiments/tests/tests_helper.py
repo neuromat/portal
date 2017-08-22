@@ -293,7 +293,7 @@ def global_setup_ft():
     ).first()
     study.description = 'The brachial artery is the major blood vessel of ' \
                         'the (upper) arm. It\'s correlated with plexus. ' \
-                        'This study should have an experiment with EEG'
+                        'This study should have an experiment with EEG.'
     # We put a keyword with the string 'brachial plexus' in the study to
     # also be found by search test
     study.keywords.add('brachial plexus')
@@ -303,7 +303,7 @@ def global_setup_ft():
     group = Group.objects.filter(
         experiment__status=Experiment.APPROVED
     ).first()
-    group.description = 'Plexus brachial is writed in wrong order. Correct ' \
+    group.description = 'Plexus brachial is written in wrong order. Correct ' \
                         'is Brachial plexus.'
     group.save()
     create_step(1, group, Step.EEG)
@@ -380,10 +380,6 @@ def global_setup_ft():
     # create_experiment_and_study method
     # Requires running create_experiment_study_group before
     create_researchers()
-
-
-def global_setup_ft_search():
-    pass
 
 
 def global_setup_ut():
