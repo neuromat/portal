@@ -278,7 +278,11 @@ def global_setup_ft():
                       Experiment.APPROVED)
     experiment = Experiment.objects.last()
     experiment.title = 'Brachial Plexus (with EMG Setting)'
-    experiment.description = 'Ein Beschreibung.'
+    experiment.description = 'Ein Beschreibung. Brachial plexus repair by ' \
+                             'peripheral nerve ' \
+                             'grafts directly into the spinal cord in rats ' \
+                             'Behavioral and anatomical evidence of ' \
+                             'functional recovery. The EEG text.'
     experiment.save()
     create_step(1, experiment.groups.first(), Step.EMG)
 
@@ -288,18 +292,13 @@ def global_setup_ft():
         experiment__status=Experiment.APPROVED
     ).first()
     study.description = 'The brachial artery is the major blood vessel of ' \
-                        'the (upper) arm. It\'s correlated with plexus.'
+                        'the (upper) arm. It\'s correlated with plexus. ' \
+                        'This study should have an experiment with EEG'
     # We put a keyword with the string 'brachial plexus' in the study to
     # also be found by search test
     study.keywords.add('brachial plexus')
     study.save()
-    # We change experiment description to test search
-    experiment = Experiment.objects.last()
-    experiment.description = 'Brachial plexus repair by peripheral nerve ' \
-                             'grafts directly into the spinal cord in rats ' \
-                             'Behavioral and anatomical evidence of ' \
-                             'functional recovery'
-    experiment.save()
+
     # To test search
     group = Group.objects.filter(
         experiment__status=Experiment.APPROVED

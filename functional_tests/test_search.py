@@ -1,3 +1,5 @@
+import re
+
 from django.core.management import call_command
 from selenium.webdriver.common.keys import Keys
 
@@ -11,7 +13,7 @@ class SearchTest(FunctionalTest):
 
     def setUp(self):
         super(SearchTest, self).setUp()
-        call_command('rebuild_index', verbosity=0, interactive=False)
+        self.rebuild_index()
 
     @staticmethod
     def rebuild_index():
@@ -59,11 +61,8 @@ class SearchTest(FunctionalTest):
         # is the object that was matched - in this case: Experiment. Second
         # line contains the field names and contents, starting with title.
         ##
-        self.assertTrue(
-            any(
-                'Experiment\n\ntitle:' in row.text for row in experiment_rows
-            ), [row.text for row in experiment_rows]
-        )
+        any(self.assertRegex(row.text, r'Experiment:.+\n\ntitle:')
+            for row in experiment_rows)
         # There's an experiment whose study has the word 'brachial' in study
         # description, and 'brachial plexus' in one of the study keywords -
         # when there are matches in other models data besides
@@ -77,8 +76,9 @@ class SearchTest(FunctionalTest):
         self.assertTrue(
             any(
                 'Experiment: ' + study.experiment.title +
-                ' > Study\n\ntitle:' in row.text for row in study_rows
-            ), [row.text for row in study_rows]
+                ' > Study: ' + study.title + '\n\ntitle:' in row.text
+                for row in study_rows
+            )
         )
         self.assertTrue(any('brachial' in row.text for row in study_rows))
         self.assertTrue(
@@ -93,7 +93,8 @@ class SearchTest(FunctionalTest):
         group_rows = self.browser.find_elements_by_class_name('group-matches')
         self.assertTrue(
             any(
-                'Experiment: ' + group.experiment.title + ' > Groups\n\ntitle:'
+                'Experiment: ' + group.experiment.title +
+                ' > Group: ' + group.title + '\n\ntitle:'
                 in row.text for row in group_rows
             ), [row.text for row in group_rows]
         )
@@ -205,5 +206,32 @@ class SearchTest(FunctionalTest):
         # one of the two groups.
         ##
         self.verify_n_objects_in_table_rows(1, 'group-matches')
+
+    def test_search_with_AND_modifier_returns_correct_objects(self):
+        # In a tooltip that pops up when hovering the mouse upon
+        # search box input text, Joselina sees that she can apply modifiers
+        # to do advanced search.
+        # So, she types "brachial AND EEG" in that.
+        search_box = self.browser.find_element_by_id('id_q')
+        search_box.send_keys('brachial AND EEG')
+        self.browser.find_element_by_id('submit_terms').click()
+        time.sleep(1)
+
+        ##
+        # As we created, in tests helper, an experiment with 'Brachial' in
+        # experiment  title, 'EEG' in experiment description, and a study
+        # with 'brachial ... EEG' in its description, the search results bring
+        # an experiment and a study.
+        ##
+        self.verify_n_objects_in_table_rows(1, 'experiment-matches')
+        experiment = self.browser.find_element_by_class_name(
+            'experiment-matches').text
+        self.assertIn('Brachial', experiment)
+        self.assertIn('EEG', experiment)
+        self.verify_n_objects_in_table_rows(1, 'study-matches')
+        study = self.browser.find_element_by_class_name(
+            'study-matches').text
+        self.assertIn('brachial', study)
+        self.assertIn('EEG', study)
 
         self.fail('Finish this test!')

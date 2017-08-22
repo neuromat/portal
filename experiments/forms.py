@@ -33,10 +33,33 @@ class NepSearchForm(SearchForm):
     )
 
     def search(self):
-        # First, store the SearchQuerySet received from other processing.
         sqs = super(NepSearchForm, self).search()
-
-        if not self.is_valid():
-            return self.no_query_found()
+        sqs = self._parse_query(self.cleaned_data['q'], sqs)
 
         return sqs
+
+    def _parse_query(self, query, sqs):
+        """
+        Parse query treating modifiers 'AND', 'OR', 'NOT' to make what they're
+        supposed to.
+        :param query: query entered in search input box in form
+        :param sqs: SearchQuerySet until now
+        :return: SearchQuerySet object
+        """
+        words = iter(query.split())
+        result = sqs
+
+        for word in words:
+            try:
+                if word == 'AND':
+                    result = result.filter_and(content=words.__next__())
+                # elif word == 'OR':
+                #     result = result.filter_or(content=words.__next__())
+                # elif word == 'NOT':
+                #     result = result.exclude(content=words.__next__())
+                else:
+                    result = result.filter(content=word)
+            except StopIteration:
+                return result
+
+        return result
