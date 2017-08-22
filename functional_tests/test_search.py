@@ -251,6 +251,7 @@ class SearchTest(FunctionalTest):
         # In tests helper, we have an experiment that has 'EMG' in title,
         # and 'EEG' in description. There's a study with 'EEG' in study
         # description. So, she's got two rows in Search Results.
+        ##
         self.verify_n_objects_in_table_rows(1, 'experiment-matches')
         experiment = self.browser.find_element_by_class_name(
             'experiment-matches').text
@@ -260,5 +261,29 @@ class SearchTest(FunctionalTest):
         study = self.browser.find_element_by_class_name(
             'study-matches').text
         self.assertIn('EEG', study)
+
+    def test_search_with_NOT_modifier_returns_correct_objects(self):
+        # In a tooltip that pops up when hovering the mouse upon
+        # search box input text, Joselina sees that she can apply modifiers
+        # to do advanced search.
+        # So, she types "brachial NOT plexus".
+        search_box = self.browser.find_element_by_id('id_q')
+        search_box.send_keys('brachial NOT plexus')
+        self.browser.find_element_by_id('submit_terms').click()
+        time.sleep(1)
+
+        ##
+        # In tests helper, we've created a group with only 'Brachial only'
+        # in title. As other objects that has 'brachial' as a substring in
+        # some field, has 'plexus' as a substring in some another field,
+        # we obtain just one row in Search results: that group with
+        # 'Brachial only' in title.
+        ##
+        self.verify_n_objects_in_table_rows(0, 'experiment-matches')
+        self.verify_n_objects_in_table_rows(0, 'study-matches')
+        self.verify_n_objects_in_table_rows(0, 'experimentalprotocol-matches')
+        self.verify_n_objects_in_table_rows(1, 'group-matches')
+        group = self.browser.find_element_by_class_name('group-matches').text
+        self.assertIn('Brachial', group)
 
         self.fail('Finish this test!')

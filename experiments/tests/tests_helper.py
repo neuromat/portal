@@ -328,6 +328,14 @@ def global_setup_ft():
     group.save()
     create_step(1, group, Step.EMG)
 
+    # To test search
+    create_experiment_groups(
+        1, Experiment.objects.filter(status=Experiment.APPROVED).first()
+    )
+    group = Group.objects.last()
+    group.title = 'Brachial only'
+    group.save()
+
     # We create one experiment approved with ethics committee information
     create_ethics_committee_info(Experiment.objects.last())
     create_experiment(1, choice([owner1, owner2]),

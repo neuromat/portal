@@ -33,12 +33,20 @@ class NepSearchForm(SearchForm):
     )
 
     def search(self):
-        sqs = super(NepSearchForm, self).search()
-        sqs = self._parse_query(self.cleaned_data['q'], sqs)
+        if not self.is_valid():
+            return self.no_query_found()
+
+        if not self.cleaned_data.get('q'):
+            return self.no_query_found()
+
+        sqs = self._parse_query(self.cleaned_data['q'])
+
+        if self.load_all:
+            sqs = sqs.load_all()
 
         return sqs
 
-    def _parse_query(self, query, sqs):
+    def _parse_query(self, query):
         """
         Parse query treating modifiers 'AND', 'OR', 'NOT' to make what they're
         supposed to.
@@ -47,7 +55,7 @@ class NepSearchForm(SearchForm):
         :return: SearchQuerySet object
         """
         words = iter(query.split())
-        result = sqs
+        result = self.searchqueryset
 
         for word in words:
             try:
@@ -58,8 +66,8 @@ class NepSearchForm(SearchForm):
                     # TODO: functional test:
                     # TODO: test_search_with_OR_modifier_returns_correct_objects
                     result = result.filter_or(content=words.__next__())
-                # elif word == 'NOT':
-                #     result = result.exclude(content=words.__next__())
+                elif word == 'NOT':
+                    result = result.exclude(content=words.__next__())
                 else:
                     result = result.filter(content=word)
             except StopIteration:
