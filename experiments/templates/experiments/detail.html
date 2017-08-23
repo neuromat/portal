@@ -90,6 +90,56 @@
                         <div class="panel panel-default nep-panel-group">
                             <strong>{{ eeg_setting.name }}</strong><br/>
                             {{ eeg_setting.description }}
+                            <div class="pull-right">
+                                <a role="button" data-toggle="collapse" data-parent="#accordion"
+                                   href="#collapse_eeg_setting_{{ eeg_setting.id }}"
+                                   aria-expanded="true" aria-controls="collapse_eeg_setting_{{ eeg_setting.id }}" class="nep-btn">
+                                    {% trans "Details" %}</a>
+                            </div>
+                            <div id="collapse_eeg_setting_{{ eeg_setting.id }}"
+                                 class="panel-collapse collapse out" role="tabpanel" aria-labelledby="heading_eeg_setting_{{ eeg_setting.id }}">
+                                {% if eeg_setting.eeg_amplifier_setting %}
+                                    <blockquote>
+                                        <h5><p>
+
+                                            <strong>{% trans "Amplifier: " %}{{ eeg_setting.eeg_amplifier_setting.eeg_amplifier.identification }}</strong><br/>
+                                            {{ eeg_setting.eeg_amplifier_setting.eeg_amplifier.description }}<br/>
+                                            {% if eeg_setting.eeg_amplifier_setting.eeg_amplifier.serial_number %}
+                                                {% trans "serial number: " %}{{ eeg_setting.eeg_amplifier_setting.eeg_amplifier.serial_number }}<br/>
+                                            {% endif %}
+                                            {% if eeg_setting.eeg_amplifier_setting.eeg_amplifier.gain %}
+                                                {% trans "gain: " %}{{ eeg_setting.eeg_amplifier_setting.eeg_amplifier.gain }}<br/>
+                                            {% endif %}
+                                            {% if eeg_setting.eeg_amplifier_setting.eeg_amplifier.number_of_channels %}
+                                                {% trans "number of channels: " %}{{ eeg_setting.eeg_amplifier_setting.eeg_amplifier.number_of_channels }}<br/>
+                                            {% endif %}
+                                            {% if eeg_setting.eeg_amplifier_setting.eeg_amplifier.common_mode_rejection_ratio %}
+                                                {% trans "common mode rejection ratio: " %}{{ eeg_setting.eeg_amplifier_setting.eeg_amplifier.common_mode_rejection_ratio }}<br/>
+                                            {% endif %}
+                                            {% if eeg_setting.eeg_amplifier_setting.eeg_amplifier.input_impedance %}
+                                                {% trans "input_impedance: " %}{{ eeg_setting.eeg_amplifier_setting.eeg_amplifier.input_impedance }} {{ eeg_setting.eeg_amplifier_setting.eeg_amplifier.input_impedance_unit }}<br/>
+                                            {% endif %}
+                                            {% if eeg_setting.eeg_amplifier_setting.eeg_amplifier.amplifier_detection_type_name %}
+                                                {% trans "amplifier detection type: " %}{{ eeg_setting.eeg_amplifier_setting.eeg_amplifier.amplifier_detection_type_name }}<br/>
+                                            {% endif %}
+                                            {% if eeg_setting.eeg_amplifier_setting.eeg_amplifier.tethering_system_name %}
+                                                {% trans "tethering system: " %}{{ eeg_setting.eeg_amplifier_setting.eeg_amplifier.tethering_system_name }}<br/>
+                                            {% endif %}
+                                            {% if eeg_setting.eeg_amplifier_setting.gain %}
+                                                {% trans "gain setting: " %}{{ eeg_setting.eeg_amplifier_setting.gain }}<br/>
+                                            {% endif %}
+                                            {% if eeg_setting.eeg_amplifier_setting.sampling_rate %}
+                                                {% trans "sampling rate: " %}{{ eeg_setting.eeg_amplifier_setting.sampling_rate }}<br/>
+                                            {% endif %}
+                                            {% if eeg_setting.eeg_amplifier_setting.number_of_channels_used %}
+                                                {% trans "number of used channels: " %}{{ eeg_setting.eeg_amplifier_setting.number_of_channels_used }}<br/>
+                                           {% endif %}
+
+                                        </p></h5>
+                                    </blockquote>
+
+                                {% endif %}
+                            </div>
                         </div>
                     {% endfor %}
                 {% endif %}
@@ -99,6 +149,12 @@
                         <div class="panel panel-default nep-panel-group">
                             <strong>{{ emg_setting.name }}</strong><br/>
                             {{ emg_setting.description }}
+                            <div class="pull-right">
+                                <a role="button" data-toggle="collapse" data-parent="#accordion"
+                                   href="#collapse_emg_setting_{{ emg_setting.id }}"
+                                   aria-expanded="true" aria-controls="collapse_emg_setting_{{ emg_setting.id }}" class="nep-btn">
+                                    {% trans "Details" %}</a>
+                            </div>
                         </div>
                     {% endfor %}
                 {% endif %}
@@ -108,6 +164,12 @@
                         <div class="panel panel-default nep-panel-group">
                             <strong>{{ tms_setting.name }}</strong><br/>
                             {{ tms_setting.description }}
+                            <div class="pull-right">
+                                <a role="button" data-toggle="collapse" data-parent="#accordion"
+                                   href="#collapse_tms_setting_{{ tms_setting.id }}"
+                                   aria-expanded="true" aria-controls="collapse_tms_setting_{{ tms_setting.id }}" class="nep-btn">
+                                    {% trans "Details" %}</a>
+                            </div>
                         </div>
                     {% endfor %}
                 {% endif %}
@@ -117,6 +179,19 @@
                         <div class="panel panel-default nep-panel-group">
                             <strong>{{ context_tree.name }}</strong><br/>
                             {{ context_tree.description }}
+                            <div class="pull-right">
+                                <a role="button" data-toggle="collapse" data-parent="#accordion"
+                                   href="#collapse_context_tree_{{ context_tree.id }}"
+                                   aria-expanded="true" aria-controls="collapse_context_tree_{{ context_tree.id }}" class="nep-btn">
+                                    {% trans "Details" %}</a>
+                            </div>
+                            <div id="collapse_context_tree_{{ context_tree.id }}"
+                                 class="panel-collapse collapse out" role="tabpanel" aria-labelledby="heading_context_tree_{{ context_tree.id }}">
+                                {% if context_tree.setting_text %}
+                                    <strong>{% trans "setting text: " %}</strong>
+                                    <pre class="textual-protocol">{{ context_tree.setting_text }}</pre>
+                                {% endif %}
+                            </div>
                         </div>
                     {% endfor %}
                 {% endif %}

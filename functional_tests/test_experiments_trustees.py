@@ -166,7 +166,7 @@ class TrusteeTest(FunctionalTestTrustee):
                       self.live_server_url + '\n', email.body)
         self.assertIn('With best regards,\n The NeuroMat Open Database '
                       'Evaluation Committee.', email.body)
-        url_search = re.search(r'http://.+$', email.body)
+        url_search = re.search(r'http://localhost:\d+', email.body)
         if not url_search:
             self.fail('Could not find url in email body:\n' + email.body)
         url = url_search.group(0)
