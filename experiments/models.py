@@ -317,6 +317,39 @@ class TMSSetting(ExperimentSetting):
     pass
 
 
+class TMSDevice(Equipment):
+    PULSE_TYPES = (
+        ("monophase", "Monophase"),
+        ("biphase", "Biphase"),
+    )
+    pulse_type = models.CharField(null=True, blank=True, max_length=50, choices=PULSE_TYPES)
+
+
+class CoilModel(models.Model):
+    COIL_DESIGN_OPTIONS = (
+        ("air_core_coil", "Air core coil"),
+        ("solid_core_coil", "Solid core coil"),
+    )
+    name = models.CharField(max_length=150)
+    description = models.TextField(null=True, blank=True)
+    coil_shape_name = models.CharField(max_length=150)
+    material_name = models.CharField(null=True, blank=True, max_length=150)
+    material_description = models.TextField(null=True, blank=True)
+    coil_design = models.CharField(null=True, blank=True, max_length=50, choices=COIL_DESIGN_OPTIONS)
+
+
+class TMSDeviceSetting(models.Model):
+    PULSE_STIMULUS_TYPES = (
+        ("single_pulse", "Single pulse"),
+        ("paired_pulse", "Paired pulse"),
+        ("repetitive_pulse", "Repetitive pulse")
+    )
+    tms_setting = models.OneToOneField(TMSSetting, primary_key=True, related_name='tms_device_setting')
+    tms_device = models.ForeignKey(TMSDevice)
+    pulse_stimulus_type = models.CharField(null=True, blank=True, max_length=50, choices=PULSE_STIMULUS_TYPES)
+    coil_model = models.ForeignKey(CoilModel)
+
+
 class ContextTree(ExperimentSetting):
     setting_text = models.TextField(null=True, blank=True)
     setting_file = models.FileField(upload_to='uploads/%Y/%m/%d/', null=True, blank=True)

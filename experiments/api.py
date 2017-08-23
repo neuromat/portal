@@ -11,7 +11,8 @@ from experiments.models import Experiment, Study, User, ProtocolComponent, \
     AdditionalData, GenericDataCollectionData, EEG, EMG, TMS, Instruction, Pause, Task, TaskForTheExperimenter, \
     GenericDataCollection, Stimulus, GoalkeeperGame, SetOfStep, Questionnaire, \
     EEGAmplifierSetting, Amplifier, EEGSolution, EEGFilterSetting, EEGElectrodeNet, \
-    SurfaceElectrode, NeedleElectrode, IntramuscularElectrode, EEGElectrodeLocalizationSystem, EEGElectrodePosition
+    SurfaceElectrode, NeedleElectrode, IntramuscularElectrode, EEGElectrodeLocalizationSystem, EEGElectrodePosition, \
+    TMSDeviceSetting, TMSDevice, CoilModel
 
 
 ###################
@@ -263,6 +264,45 @@ class TMSSettingSerializer(serializers.ModelSerializer):
     class Meta:
         model = TMSSetting
         fields = ('id', 'experiment', 'name', 'description')
+
+
+class TMSDeviceSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = TMSDevice
+        fields = (
+            'id',
+            'manufacturer_name',
+            'equipment_type',
+            'identification',
+            'description',
+            'serial_number',
+            'pulse_type'
+        )
+
+
+class CoilModelSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = CoilModel
+        fields = (
+            'id',
+
+            'name',
+            'description',
+            'coil_shape_name',
+            'material_name',
+            'material_description',
+            'coil_design'
+        )
+
+
+class TMSDeviceSettingSerializer(serializers.ModelSerializer):
+    tms_setting = serializers.ReadOnlyField(source='tms_setting.name')
+
+    class Meta:
+        model = TMSDeviceSetting
+        fields = ('tms_setting', 'tms_device', 'pulse_stimulus_type', 'coil_model')
 
 
 class ContextTreeSerializer(serializers.ModelSerializer):
@@ -966,6 +1006,40 @@ class TMSSettingViewSet(viewsets.ModelViewSet):
             nes_id=exp_nes_id, owner=owner, version=last_version
         )
         serializer.save(experiment=experiment)
+
+
+class TMSDeviceViewSet(viewsets.ModelViewSet):
+    serializer_class = TMSDeviceSerializer
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
+
+    def get_queryset(self):
+        return TMSDevice.objects.filter(group_id=self.kwargs['pk'])
+
+    def perform_create(self, serializer):
+        serializer.save()
+
+
+class CoilModelViewSet(viewsets.ModelViewSet):
+    serializer_class = CoilModelSerializer
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
+
+    def get_queryset(self):
+        return CoilModel.objects.filter(group_id=self.kwargs['pk'])
+
+    def perform_create(self, serializer):
+        serializer.save()
+
+
+class TMSDeviceSettingViewSet(viewsets.ModelViewSet):
+    serializer_class = TMSDeviceSettingSerializer
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
+
+    def get_queryset(self):
+        return TMSDeviceSetting.objects.filter(tms_setting_id=self.kwargs['pk'])
+
+    def perform_create(self, serializer):
+        tms_setting = TMSSetting.objects.get(pk=self.kwargs['pk'])
+        serializer.save(tms_setting=tms_setting)
 
 
 class ContextTreeViewSet(viewsets.ModelViewSet):
