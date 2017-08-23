@@ -11,7 +11,7 @@ class SearchTest(FunctionalTest):
 
     def setUp(self):
         super(SearchTest, self).setUp()
-        call_command('rebuild_index', verbosity=0, interactive=False)
+        self.rebuild_index()
 
     @staticmethod
     def rebuild_index():
@@ -22,6 +22,13 @@ class SearchTest(FunctionalTest):
         count = len(table.find_elements_by_class_name(row_class))
         self.assertEqual(n, count)
 
+    def search_for(self, string):
+        search_box = self.browser.find_element_by_id('id_q')
+        search_box.clear()
+        search_box.send_keys(string)
+        self.browser.find_element_by_id('submit_terms').click()
+        time.sleep(1)
+
     def test_two_words_searched_return_correct_objects(self):
 
         # Joselina, a neuroscience researcher at Numec is delighted with the
@@ -30,10 +37,7 @@ class SearchTest(FunctionalTest):
         # engine is complex. Some of its facilities consists in ignoring
         # upper/lower case letters, search for terms individually and in
         # whatever order in the sentence, too.
-        search_box = self.browser.find_element_by_id('id_q')
-        search_box.send_keys('Brachial Plexus')
-        self.browser.find_element_by_id('submit_terms').click()
-        time.sleep(1)
+        self.search_for('Brachial Plexus')
         # The search engine searches in all the site content.
         # As there are "Braquial Plexus", "braquial plexus" in experiments
         # data per se, and the two words are also found separated,
@@ -59,11 +63,8 @@ class SearchTest(FunctionalTest):
         # is the object that was matched - in this case: Experiment. Second
         # line contains the field names and contents, starting with title.
         ##
-        self.assertTrue(
-            any(
-                'Experiment\n\ntitle:' in row.text for row in experiment_rows
-            ), [row.text for row in experiment_rows]
-        )
+        any(self.assertRegex(row.text, r'Experiment:.+\n\ntitle:')
+            for row in experiment_rows)
         # There's an experiment whose study has the word 'brachial' in study
         # description, and 'brachial plexus' in one of the study keywords -
         # when there are matches in other models data besides
@@ -77,8 +78,9 @@ class SearchTest(FunctionalTest):
         self.assertTrue(
             any(
                 'Experiment: ' + study.experiment.title +
-                ' > Study\n\ntitle:' in row.text for row in study_rows
-            ), [row.text for row in study_rows]
+                ' > Study: ' + study.title + '\n\ntitle:' in row.text
+                for row in study_rows
+            )
         )
         self.assertTrue(any('brachial' in row.text for row in study_rows))
         self.assertTrue(
@@ -93,7 +95,8 @@ class SearchTest(FunctionalTest):
         group_rows = self.browser.find_elements_by_class_name('group-matches')
         self.assertTrue(
             any(
-                'Experiment: ' + group.experiment.title + ' > Groups\n\ntitle:'
+                'Experiment: ' + group.experiment.title +
+                ' > Group: ' + group.title + '\n\ntitle:'
                 in row.text for row in group_rows
             ), [row.text for row in group_rows]
         )
@@ -107,12 +110,7 @@ class SearchTest(FunctionalTest):
         # The researcher now wishes to search for a study that has as
         # collaborator a coleague of her, called Pero Vaz.
         # She types 'Pero Vaz' in search box and hits Enter.
-        search_box = self.browser.find_element_by_id('id_q')
-        search_box.clear()
-        search_box.send_keys('Pero Vaz')
-        # self.browser.find_element_by_id('submit_terms').click()
-        search_box.send_keys(Keys.ENTER)
-        time.sleep(1)
+        self.search_for('Pero Vaz')
         # She sees that there is one Study whose one of the collaborators is
         # Pero Vaz.
         study_rows = \
@@ -122,10 +120,7 @@ class SearchTest(FunctionalTest):
     def test_search_returns_only_last_version_experiments(self):
 
         # The researcher searches for 'Brachial Plexus'
-        search_box = self.browser.find_element_by_id('id_q')
-        search_box.send_keys('Brachial Plexus')
-        self.browser.find_element_by_id('submit_terms').click()
-        time.sleep(1)
+        self.search_for('Brachial Plexus')
 
         # She want's to see only last experiments versions -
         # as tests helper creates version 2 of an experiment, only version 2
@@ -144,10 +139,7 @@ class SearchTest(FunctionalTest):
     def test_search_returns_only_approved_experiments(self):
 
         # The researcher searches for 'Brachial Plexus'
-        search_box = self.browser.find_element_by_id('id_q')
-        search_box.send_keys('Brachial Plexus')
-        self.browser.find_element_by_id('submit_terms').click()
-        time.sleep(1)
+        self.search_for('Brachial Plexus')
 
         # As there are 4 experiments with 'Brachial Plexus' in title,
         # two approved, one under analysis, and one to be analysed (created
@@ -205,5 +197,118 @@ class SearchTest(FunctionalTest):
         # one of the two groups.
         ##
         self.verify_n_objects_in_table_rows(1, 'group-matches')
+
+    def test_search_with_AND_modifier_returns_correct_objects(self):
+        # In a tooltip that pops up when hovering the mouse upon
+        # search box input text, Joselina sees that she can apply modifiers
+        # to do advanced search.
+        # So, she types "brachial AND EEG" in that.
+        self.search_for('brachial AND EEG')
+
+        ##
+        # As we created, in tests helper, an experiment with 'Brachial' in
+        # experiment  title, 'EEG' in experiment description, and a study
+        # with 'brachial ... EEG' in its description, the search results bring
+        # an experiment and a study.
+        ##
+        self.verify_n_objects_in_table_rows(1, 'experiment-matches')
+        experiment = self.browser.find_element_by_class_name(
+            'experiment-matches').text
+        self.assertIn('Brachial', experiment)
+        self.assertIn('EEG', experiment)
+        self.verify_n_objects_in_table_rows(1, 'study-matches')
+        study = self.browser.find_element_by_class_name(
+            'study-matches').text
+        self.assertIn('brachial', study)
+        self.assertIn('EEG', study)
+
+    def test_search_with_OR_modifier_returns_correct_objects(self):
+        # In a tooltip that pops up when hovering the mouse upon
+        # search box input text, Joselina sees that she can apply modifiers
+        # to do advanced search.
+        # So, she types "EMG OR EEG".
+        ##
+        # TODO: when change order - 'EEG OR EMG', test fails. Why?
+        ##
+        self.search_for('EMG OR EEG')
+
+        ##
+        # In tests helper, we have an experiment that has 'EMG' in title,
+        # and 'EEG' in description. There's a study with 'EEG' in study
+        # description. So, she's got two rows in Search Results.
+        ##
+        self.verify_n_objects_in_table_rows(1, 'experiment-matches')
+        experiment = self.browser.find_element_by_class_name(
+            'experiment-matches').text
+        self.assertIn('EMG', experiment)
+        self.assertIn('EEG', experiment)
+        self.verify_n_objects_in_table_rows(1, 'study-matches')
+        study = self.browser.find_element_by_class_name(
+            'study-matches').text
+        self.assertIn('EEG', study)
+
+    def test_search_with_NOT_modifier_returns_correct_objects(self):
+        # In a tooltip that pops up when hovering the mouse upon
+        # search box input text, Joselina sees that she can apply modifiers
+        # to do advanced search.
+        # So, she types "brachial NOT plexus".
+        self.search_for('brachial NOT plexus')
+
+        ##
+        # In tests helper, we've created a group with only 'Brachial only'
+        # in title. As other objects that has 'brachial' as a substring in
+        # some field, has 'plexus' as a substring in some another field,
+        # we obtain just one row in Search results: that group with
+        # 'Brachial only' in title.
+        ##
+        self.verify_n_objects_in_table_rows(0, 'experiment-matches')
+        self.verify_n_objects_in_table_rows(0, 'study-matches')
+        self.verify_n_objects_in_table_rows(0, 'experimentalprotocol-matches')
+        self.verify_n_objects_in_table_rows(1, 'group-matches')
+        group_text = self.browser.find_element_by_class_name(
+            'group-matches'
+        ).text
+        self.assertIn('Brachial', group_text)
+
+    def test_search_with_quotes_returns_correct_objects(self):
+        # Joselina sees in tooltip, when hovering mouse onto it, that she
+        # can search by exact terms inside quotes.
+        self.search_for('\"Plexus brachial\"')
+
+        # As we have only one description in one group that has exactly
+        # this string, Joselina will see only one row in Search Results list,
+        # one that matches this group
+        ##
+        # Haystack SearchQuerySet filter method, content__exact attribute
+        # does not differentiate by upper or lower case in that attribute.
+        ##
+        self.verify_n_objects_in_table_rows(0, 'experiment-matches')
+        self.verify_n_objects_in_table_rows(0, 'study-matches')
+        self.verify_n_objects_in_table_rows(0, 'experimentalprotocol-matches')
+        self.verify_n_objects_in_table_rows(1, 'group-matches')
+        group_text = self.browser.find_element_by_class_name(
+            'group-matches'
+        ).text
+        self.assertIn('Plexus brachial', group_text)
+
+    def test_hover_mouse_over_search_box_display_tooltip(self):
+        # In exploring the search tools, Joselina sees that when she hover
+        # the mouse in search box, a tooltip is shown, with tips on advanced
+        # searches
+        search_box = self.browser.find_element_by_id('id_q')
+        tooltip_text = search_box.get_attribute('title')
+        self.assertEqual(
+            'You can search for terms in quotes to search for exact terms.\n'
+            'You can use the modifiers AND, OR, '
+            'NOT to combine terms to '
+            'search. For instance:\nterm1 AND term2\nterm1 OR term2\nterm1 '
+            'NOT term2\nAll kind of combinations with AND, OR, NOT are '
+            'accepted in advanced searching.\nBy default, searching for '
+            'terms separated with one or more spaces will apply the AND '
+            'modifier.'
+            , tooltip_text
+        )
+        tooltip_data_toggle = search_box.get_attribute('data-toggle')
+        self.assertEqual('tooltip', tooltip_data_toggle)
 
         self.fail('Finish this test!')

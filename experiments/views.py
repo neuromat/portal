@@ -192,6 +192,7 @@ class NepSearchView(SearchView):
     form_class = NepSearchForm
     form_name = 'search_form'
 
+    # TODO: see if it's necessary
     def get_queryset(self):
         queryset = super(NepSearchView, self).get_queryset()
 
@@ -211,6 +212,15 @@ class NepSearchView(SearchView):
             to_be_analysed_count = to_be_analysed.count()
 
         context['to_be_analysed_count'] = to_be_analysed_count
+
+        # We exclude search modifiers: OR, AND, NOT to query element from
+        # context dict. That's for avoid highlight this words in search
+        # templates
+        words_wo_modifiers = str.replace(context['query'], 'OR', '')
+        words_wo_modifiers = str.replace(words_wo_modifiers, 'AND', '')
+        words_wo_modifiers = str.replace(words_wo_modifiers, 'NOT', '')
+
+        context['query'] = words_wo_modifiers
 
         return context
 
