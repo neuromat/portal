@@ -1,5 +1,3 @@
-import re
-
 from django.core.management import call_command
 from selenium.webdriver.common.keys import Keys
 
@@ -285,5 +283,23 @@ class SearchTest(FunctionalTest):
         self.verify_n_objects_in_table_rows(1, 'group-matches')
         group = self.browser.find_element_by_class_name('group-matches').text
         self.assertIn('Brachial', group)
+
+    def test_hover_mouse_over_search_box_display_tooltip(self):
+        # In exploring the search tools, Joselina sees that when she hover
+        # the mouse in search box, a tooltip is shown, with tips on advanced
+        # searches
+        search_box = self.browser.find_element_by_id('id_q')
+        tooltip_text = search_box.get_attribute('title')
+        self.assertEqual(
+            'You can use the modifiers AND, OR, NOT to combine terms to '
+            'search. For instance:\nterm1 AND term2\nterm1 OR term2\nterm1 '
+            'NOT term2\nAll kind of combinations with AND, OR, NOT are '
+            'accepted in advanced searching.\nBy default, searching for '
+            'terms separated with one or more spaces will apply the AND '
+            'modifier.'
+            , tooltip_text
+        )
+        tooltip_data_toggle = search_box.get_attribute('data-toggle')
+        self.assertEqual('tooltip', tooltip_data_toggle)
 
         self.fail('Finish this test!')

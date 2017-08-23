@@ -8,8 +8,18 @@ class NepSearchForm(SearchForm):
         required=True, label='',
         widget=forms.TextInput(
             attrs={'type': 'search',
-                   'placeholder': 'Type key terms/words to be searched',
-                   'class': 'search-box'}
+                   'placeholder': _('Type key terms/words to be searched'),
+                   'class': 'search-box',
+                   'data-toggle': 'tooltip',
+                   'data-placement': 'bottom',
+                   'title': _('You can use the modifiers AND, OR, NOT to '
+                              'combine terms to search. For instance:\nterm1 '
+                              'AND term2\nterm1 OR term2\nterm1 NOT '
+                              'term2\nAll kind of combinations with AND, OR, '
+                              'NOT are accepted in advanced searching.\nBy '
+                              'default, searching for terms separated with '
+                              'one or more spaces will apply the AND '
+                              'modifier.')}
         )
     )
 
