@@ -1,3 +1,5 @@
+import shlex
+
 from django import forms
 from django.utils.translation import ugettext as _
 from haystack.forms import SearchForm
@@ -12,7 +14,9 @@ class NepSearchForm(SearchForm):
                    'class': 'search-box',
                    'data-toggle': 'tooltip',
                    'data-placement': 'bottom',
-                   'title': _('You can use the modifiers AND, OR, NOT to '
+                   'title': _('You can search for terms in quotes to search '
+                              'for exact terms.\nYou can use the modifiers '
+                              'AND, OR, NOT to '
                               'combine terms to search. For instance:\nterm1 '
                               'AND term2\nterm1 OR term2\nterm1 NOT '
                               'term2\nAll kind of combinations with AND, OR, '
@@ -64,7 +68,7 @@ class NepSearchForm(SearchForm):
         :param sqs: SearchQuerySet until now
         :return: SearchQuerySet object
         """
-        words = iter(query.split())
+        words = iter(shlex.split(query))
         result = self.searchqueryset
 
         for word in words:
@@ -78,6 +82,8 @@ class NepSearchForm(SearchForm):
                     result = result.filter_or(content=words.__next__())
                 elif word == 'NOT':
                     result = result.exclude(content=words.__next__())
+                elif len(word.split()) > 1:
+                    result = result.filter(content__exact=word)
                 else:
                     result = result.filter(content=word)
             except StopIteration:
