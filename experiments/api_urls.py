@@ -152,6 +152,27 @@ api_experiment_tms_setting_list =\
         'post': 'create'
     })
 
+# TMS device
+api_experiment_tms_device =\
+    api.TMSDeviceViewSet.as_view({
+        'get': 'list',
+        'post': 'create'
+    })
+
+# Coil Model
+api_experiment_coil_model =\
+    api.CoilModelViewSet.as_view({
+        'get': 'list',
+        'post': 'create'
+    })
+
+# TMS Device Setting
+api_experiment_tms_device_setting =\
+    api.TMSDeviceSettingViewSet.as_view({
+        'get': 'list',
+        'post': 'create'
+    })
+
 # Context tree
 api_experiment_context_tree_list =\
     api.ContextTreeViewSet.as_view({
@@ -378,6 +399,12 @@ urlpatterns = [
     # TMS setting
     url(r'^experiments/(?P<experiment_nes_id>[0-9]+)/tms_setting/$',
         api_experiment_tms_setting_list, name='api_experiment_tms_setting-list'),
+    url(r'^experiments/(?P<experiment_nes_id>[0-9]+)/tms_device/$',
+        api_experiment_tms_device, name='api_experiment_tmd_device'),
+    url(r'^experiments/(?P<experiment_nes_id>[0-9]+)/coil_model/$',
+        api_experiment_coil_model, name='api_experiment_coil_model'),
+    url(r'^tms_setting/(?P<pk>[0-9]+)/tms_device_setting/$',
+        api_experiment_tms_device_setting, name='api_experiment_tms_device_setting'),
     # Context tree
     url(r'^experiments/(?P<experiment_nes_id>[0-9]+)/context_tree/$',
         api_experiment_context_tree_list, name='api_experiment_context_tree-list'),
