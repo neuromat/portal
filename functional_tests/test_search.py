@@ -310,4 +310,33 @@ class SearchTest(FunctionalTest):
         tooltip_data_toggle = search_box.get_attribute('data-toggle')
         self.assertEqual('tooltip', tooltip_data_toggle)
 
+    def test_search_only_by_filter_return_correct_results(self):
+        # Joselina wishes to search only experiments that has EMG and EEG
+        # settings, regardless of search terms.
+        self.browser.find_element_by_id('filter_box').click()
+        self.browser.find_element_by_xpath(
+            "//select/option[@value='" + Step.EEG + "']"
+        ).click()
+        self.browser.find_element_by_xpath(
+            "//select/option[@value='" + Step.EMG + "']"
+        ).click()
+        self.browser.find_element_by_id('submit_terms').click()
+        time.sleep(2)
+
+        # As we have only one group with EMG and EEG steps, Joselina gets
+        # only one row tha correspondes to that the experiment group
+        ##
+        # If user searches only with filters selected (without a query in
+        # search box, we display in search results, only experiment rows
+        ##
+        self.verify_n_objects_in_table_rows(1, 'experiment-matches')
+        self.verify_n_objects_in_table_rows(0, 'study-matches')
+        self.verify_n_objects_in_table_rows(0, 'group-matches')
+        self.verify_n_objects_in_table_rows(0, 'experimentalprotocol-matches')
+        experiment_text = self.browser.find_element_by_class_name(
+            'experiment-matches'
+        ).text
+        self.assertIn('Experiment changed to test filter only',
+                      experiment_text)
+
         self.fail('Finish this test!')
