@@ -1,4 +1,5 @@
 from django.contrib.auth.models import User
+from django.core.management import call_command
 from django.test import TestCase
 
 from experiments import views
@@ -160,9 +161,10 @@ class SearchTest(TestCase):
 
     def setUp(self):
         global_setup_ut()
+        call_command('rebuild_index', verbosity=0, interactive=False)
 
     def test_search_redirects_to_homepage_with_search_results(self):
-        response = self.client.post('/search/', {'q': ''})
+        response = self.client.get('/search/', {'q': 'plexus'})
         self.assertEqual(response.status_code, 200)
         # TODO: is it needed to test for redirected page?
 
