@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-08-11 14:50-0300\n"
+"POT-Creation-Date: 2017-08-23 16:22-0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -18,8 +18,85 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
+#: experiments/forms.py:13
+#, fuzzy
+#| msgid "Type keywords to run a search"
+msgid "Type key terms/words to be searched"
+msgstr "Digite palavras chave para executar sua pesquisa"
+
+#: experiments/forms.py:17
+msgid ""
+"You can search for terms in quotes to search for exact terms.\n"
+"You can use the modifiers AND, OR, NOT to combine terms to search. For "
+"instance:\n"
+"term1 AND term2\n"
+"term1 OR term2\n"
+"term1 NOT term2\n"
+"All kind of combinations with AND, OR, NOT are accepted in advanced "
+"searching.\n"
+"By default, searching for terms separated with one or more spaces will apply "
+"the AND modifier."
+msgstr ""
+"Você pode buscar por termos entre aspas para buscas por termos exatos.\n"
+"Use os modificadores AND, OR, NOT para combinar termos de busca. Por "
+"exemplo:\n"
+"termo1 AND termo2\n"
+"termo1 OR termo2\n"
+"termo1 NOT termo2\n"
+"Todo tipo de combinação com AND, OR, NOT é aceito em buscas avançadas.\n"
+"Por padrão, buscas por termos separados por um ou mais espaços, são o mesmo "
+"que aplicar o modificador AND entre os termos de busca."
+
+#: experiments/forms.py:33
+msgid "EEG"
+msgstr ""
+
+#: experiments/forms.py:33
+msgid "TMS"
+msgstr ""
+
+#: experiments/forms.py:33
+msgid "EMG"
+msgstr ""
+
+#: experiments/forms.py:34
+msgid "Goalkeeper game phase"
+msgstr "Fase do Jogo do goleiro"
+
+#: experiments/forms.py:35
+msgid "Kinematic measures"
+msgstr "Medidas cinemáticas"
+
+#: experiments/forms.py:36
+msgid "Stabilometry"
+msgstr "Estabilometria"
+
+#: experiments/forms.py:37
+msgid "Response time"
+msgstr "Tempo de resposta"
+
+#: experiments/forms.py:38
+msgid "Psychophysical measures"
+msgstr "Medidas psicofísicas"
+
+#: experiments/forms.py:39
+msgid "Verbal response"
+msgstr "Resposta verbal"
+
+#: experiments/forms.py:40
+msgid "Psychometric scales"
+msgstr "Escalas psicométricas"
+
+#: experiments/forms.py:41
+msgid "Unit recording"
+msgstr "Unidade de gravação"
+
+#: experiments/forms.py:42
+msgid "Multiunit recording"
+msgstr "Multiunidade de gravação"
+
 #: experiments/templates/experiments/base.html:10
-#: experiments/templates/experiments/header_home.html:3
+#: experiments/templates/experiments/header_home.html:4
 msgid "Neuroscience Experiments Database"
 msgstr "Banco de dados de Experimentos de Neurociência"
 
@@ -28,7 +105,6 @@ msgid "Statistics"
 msgstr "Estatística"
 
 #: experiments/templates/experiments/detail.html:16
-#: experiments/templates/search/groups.html:7
 msgid "Groups"
 msgstr "Grupos"
 
@@ -73,7 +149,7 @@ msgid "Graphical representation"
 msgstr "Representação gráfica"
 
 #: experiments/templates/experiments/detail.html:138
-#: experiments/templates/experiments/header_detail.html:125
+#: experiments/templates/experiments/header_detail.html:126
 msgid "Close"
 msgstr "Fechar"
 
@@ -130,136 +206,98 @@ msgid "Open Database for Experiments in Neuroscience"
 msgstr "Um banco de dados para experimentos em Neurociencia"
 
 #: experiments/templates/experiments/header_detail.html:6
-msgid "Back to home"
+#, fuzzy
+#| msgid "Back to home"
+msgid "Back Home"
 msgstr "Voltar ao inicio"
 
-#: experiments/templates/experiments/header_detail.html:11
-msgid "The data acquisition was completed"
+#: experiments/templates/experiments/header_detail.html:12
+#, fuzzy
+#| msgid "The data acquisition was completed"
+msgid "Data acquisition was completed"
 msgstr "A aquisição de dados foi concluida"
 
-#: experiments/templates/experiments/header_detail.html:16
-msgid "The data acquisition was not completed"
+#: experiments/templates/experiments/header_detail.html:17
+#, fuzzy
+#| msgid "The data acquisition was not completed"
+msgid "Data acquisition was not completed"
 msgstr "A aquisição de dados não foi concluída"
 
-#: experiments/templates/experiments/header_detail.html:21
+#: experiments/templates/experiments/header_detail.html:22
 msgid "Project Info"
 msgstr "Informação do projeto"
 
-#: experiments/templates/experiments/header_detail.html:27
-#: experiments/templates/experiments/header_detail.html:36
+#: experiments/templates/experiments/header_detail.html:31
 msgid "Approval of the ethics committee"
 msgstr "Aprovação do comitê de ética"
 
-#: experiments/templates/experiments/header_detail.html:30
+#: experiments/templates/experiments/header_detail.html:34
 msgid "url address of the ethics committee not available"
 msgstr "O endereço url do comitê de ética não esta disponível"
 
-#: experiments/templates/experiments/header_detail.html:39
+#: experiments/templates/experiments/header_detail.html:40
+#, fuzzy
+#| msgid "Approval of the ethics committee"
+msgid "Approval of the ethics committee file"
+msgstr "Aprovação do comitê de ética"
+
+#: experiments/templates/experiments/header_detail.html:43
 msgid "Approval of the ethics committee not available"
 msgstr "Aprovação do comitê de ética não esta disponível"
 
-#: experiments/templates/experiments/header_detail.html:45
-msgid "From the study"
+#: experiments/templates/experiments/header_detail.html:49
+#, fuzzy
+#| msgid "From the study"
+msgid "From study"
 msgstr "Estudo"
 
-#: experiments/templates/experiments/header_detail.html:54
+#: experiments/templates/experiments/header_detail.html:57
 msgid "Download experiment data"
 msgstr "Baixar dados de experimentos"
 
-#: experiments/templates/experiments/header_detail.html:58
+#: experiments/templates/experiments/header_detail.html:61
 msgid "We are preparing your download, please wait..."
 msgstr "Estamos preparando os dados, por favor aguarde..."
 
-#: experiments/templates/experiments/header_detail.html:65
+#: experiments/templates/experiments/header_detail.html:68
 msgid "There was a problem generating your download, please try again."
 msgstr "Houve um problema ao gerar o seu download, tente novamente"
 
-#: experiments/templates/experiments/header_detail.html:85
+#: experiments/templates/experiments/header_detail.html:86
 msgid "Researcher"
 msgstr "Pesquisador"
 
-#: experiments/templates/experiments/header_detail.html:88
+#: experiments/templates/experiments/header_detail.html:89
 msgid "Start date"
 msgstr "Data de inicio"
 
-#: experiments/templates/experiments/header_detail.html:91
+#: experiments/templates/experiments/header_detail.html:92
 msgid "End date"
 msgstr "Data de fim"
 
-#: experiments/templates/experiments/header_detail.html:95
+#: experiments/templates/experiments/header_detail.html:96
 msgid "Contributors"
 msgstr "Colaboradores"
 
-#: experiments/templates/experiments/header_detail.html:99
+#: experiments/templates/experiments/header_detail.html:100
 msgid "Person"
 msgstr "Pessoa"
 
-#: experiments/templates/experiments/header_detail.html:100
+#: experiments/templates/experiments/header_detail.html:101
 msgid "Team"
 msgstr "Equipe"
 
-#: experiments/templates/experiments/header_detail.html:101
+#: experiments/templates/experiments/header_detail.html:102
 msgid "Coordinator"
 msgstr "Coordinador"
 
-#: experiments/templates/experiments/header_detail.html:116
+#: experiments/templates/experiments/header_detail.html:117
 msgid "Keywords"
 msgstr "Paravras chave"
 
 #: experiments/templates/experiments/header_home.html:5
 msgid "An Open Database for Experiments in Neuroscience"
 msgstr "Um banco de dados aberto para experimentos em Neurociência"
-
-#: experiments/templates/experiments/header_home.html:10
-msgid "Type keywords to run a search"
-msgstr "Digite palavras chave para executar sua pesquisa"
-
-#: experiments/templates/experiments/header_home.html:11
-#, fuzzy
-#| msgid "Research"
-msgid "Search"
-msgstr "Pesquisa"
-
-#: experiments/templates/experiments/header_home.html:18
-msgid ""
-"Refine your search criteria by selecting one or more fields from the list "
-msgstr "Refine sua pesquisa, seleccionando um ou mais campos da lista "
-
-#: experiments/templates/experiments/header_home.html:22
-msgid "Goalkeeper game phase"
-msgstr "Fase do Jogo do goleiro"
-
-#: experiments/templates/experiments/header_home.html:23
-msgid "Kinematic measures"
-msgstr "Medidas cinemáticas"
-
-#: experiments/templates/experiments/header_home.html:24
-msgid "Stabilometry"
-msgstr "Estabilometria"
-
-#: experiments/templates/experiments/header_home.html:25
-msgid "Response time"
-msgstr "Tempo de resposta"
-
-#: experiments/templates/experiments/header_home.html:26
-msgid "Psychophysical measures"
-msgstr "Medidas psicofísicas"
-
-#: experiments/templates/experiments/header_home.html:27
-msgid "Verbal response"
-msgstr "Resposta verbal"
-
-#: experiments/templates/experiments/header_home.html:28
-msgid "Psychometric scales"
-msgstr "Escalas psicométricas"
-
-#: experiments/templates/experiments/header_home.html:29
-msgid "Unit recording"
-msgstr "Unidade de gravação"
-
-#: experiments/templates/experiments/header_home.html:30
-msgid "Multiunit recording"
-msgstr "Multiunidade de gravação"
 
 #: experiments/templates/experiments/home.html:19
 msgid "List of Experiments"
@@ -320,12 +358,12 @@ msgstr "Por favor selecione uma opção"
 msgid "Neuromat"
 msgstr ""
 
-#: experiments/templates/experiments/top.html:5
+#: experiments/templates/experiments/top.html:4
 msgid "Research, Innovation and Dissemination Center for Neuromathematics"
 msgstr "Centro de Pesquisa, Inovação e Difusão em Neuromatemática"
 
-#: experiments/templates/experiments/top.html:9
-#: experiments/templates/experiments/top.html:11
+#: experiments/templates/experiments/top.html:8
+#: experiments/templates/experiments/top.html:10
 msgid "Welcome"
 msgstr "Bem-vindo(a)"
 
@@ -334,111 +372,112 @@ msgid "Log Out"
 msgstr "Sair"
 
 #: experiments/templates/experiments/top.html:21
-#: experiments/templates/registration/login.html:10
+#: experiments/templates/registration/login.html:16
 msgid "Log In"
 msgstr "Entrar"
 
-#: experiments/templates/registration/login.html:12
+#: experiments/templates/registration/login.html:18
 msgid "Your username and password did not match. Please try again."
 msgstr ""
 "Seu nome de usuário e senha não corresponderam. Por favor, tente novamente"
 
-#: experiments/templates/registration/login.html:18
+#: experiments/templates/registration/login.html:24
 msgid "Invalid account. Please sign in with a valid account."
 msgstr "Conta inválida. Por favor tente com uma conta válida."
 
-#: experiments/templates/registration/login.html:20
+#: experiments/templates/registration/login.html:26
 msgid "Please sign in with your account to access this website."
 msgstr "Por favor faça login com sua conta para acessar este website."
 
-#: experiments/templates/registration/login.html:42
+#: experiments/templates/registration/login.html:49
 msgid "Forgot password?"
 msgstr "Esqueçeu sua senha?"
 
 #: experiments/templates/search/experimental_protocol.html:7
-#: experiments/templates/search/experiments.html:6
+#: experiments/templates/search/experiments.html:7
 #: experiments/templates/search/groups.html:6
 #: experiments/templates/search/studies.html:6
 msgid "Experiment"
 msgstr "Experimento"
 
 #: experiments/templates/search/experimental_protocol.html:8
+#: experiments/templates/search/groups.html:7
 #, fuzzy
 #| msgid "Groups"
 msgid "Group"
 msgstr "Grupos"
 
-#: experiments/templates/search/experimental_protocol.html:9
+#: experiments/templates/search/experimental_protocol.html:10
 msgid "Experimental Protocol"
 msgstr "Protocolo experimental"
 
-#: experiments/templates/search/experimental_protocol.html:11
+#: experiments/templates/search/experimental_protocol.html:12
 msgid "textual description"
 msgstr "descrição textual"
 
-#: experiments/templates/search/experiments.html:8
-#: experiments/templates/search/groups.html:9
-#: experiments/templates/search/studies.html:9
+#: experiments/templates/search/experiments.html:9
+#: experiments/templates/search/groups.html:10
+#: experiments/templates/search/studies.html:10
 msgid "title"
 msgstr "título"
 
-#: experiments/templates/search/experiments.html:10
-#: experiments/templates/search/groups.html:10
-#: experiments/templates/search/studies.html:11
+#: experiments/templates/search/experiments.html:11
+#: experiments/templates/search/groups.html:11
+#: experiments/templates/search/studies.html:12
 msgid "description"
 msgstr "descrição"
 
-#: experiments/templates/search/experiments.html:13
+#: experiments/templates/search/experiments.html:14
 msgid "sent date"
 msgstr "data de envio"
 
-#: experiments/templates/search/groups.html:12
+#: experiments/templates/search/groups.html:13
 msgid "Inclusion criteria"
 msgstr "Critérios de inclusão"
 
-#: experiments/templates/search/groups.html:16
+#: experiments/templates/search/groups.html:17
 msgid "No inclusion criteria"
 msgstr "Critérios de não inclusão"
 
-#: experiments/templates/search/search.html:15
+#: experiments/templates/search/search.html:21
 msgid "Search Results"
 msgstr "Buscar resultados"
 
-#: experiments/templates/search/search.html:34
+#: experiments/templates/search/search.html:40
 msgid "No results found"
 msgstr "Nenum resultado encontrado"
 
-#: experiments/templates/search/search.html:42
+#: experiments/templates/search/search.html:48
 msgid "Previous"
 msgstr "Anterior"
 
-#: experiments/templates/search/search.html:45
+#: experiments/templates/search/search.html:51
 msgid "Next"
 msgstr "Próximo"
 
-#: experiments/templates/search/search.html:50
+#: experiments/templates/search/search.html:56
 msgid "Sorry, no matches found for the terms used. Please try again."
 msgstr ""
 "Desculpe, nenhum resultado encontrado para os termos utilizados. Por favor, "
 "tente novamente."
 
-#: experiments/templates/search/search.html:51
+#: experiments/templates/search/search.html:57
 msgid "Search Suggestion:"
 msgstr "Sugestão de pesquisa:"
 
-#: experiments/templates/search/search.html:53
+#: experiments/templates/search/search.html:59
 msgid "Check your spelling."
 msgstr "Verifique a ortografia."
 
-#: experiments/templates/search/search.html:54
+#: experiments/templates/search/search.html:60
 msgid "Try more general word."
 msgstr "Tente uma palavra com significado mais geral."
 
-#: experiments/templates/search/search.html:55
+#: experiments/templates/search/search.html:61
 msgid "Try different words that mean the same thing."
 msgstr "Tente palavras diferentes com o mesmo significado."
 
-#: experiments/templates/search/search.html:56
+#: experiments/templates/search/search.html:62
 msgid "Post a request for your search and we'll help you find it."
 msgstr "Envie um pedido para sua pesquisa e nós ajudaremos a encontra-lo"
 
@@ -446,137 +485,167 @@ msgstr "Envie um pedido para sua pesquisa e nós ajudaremos a encontra-lo"
 msgid "Study"
 msgstr "Estudo"
 
-#: experiments/templates/search/studies.html:13
+#: experiments/templates/search/studies.html:14
 msgid "start date"
 msgstr "data de inicio"
 
-#: experiments/templates/search/studies.html:15
+#: experiments/templates/search/studies.html:16
 msgid "end date"
 msgstr "data de fim"
 
-#: experiments/templates/search/studies.html:17
+#: experiments/templates/search/studies.html:18
 msgid "researcher"
 msgstr "pesquisador"
 
-#: experiments/templates/search/studies.html:19
+#: experiments/templates/search/studies.html:20
 msgid "collaborators"
 msgstr "colaboradores"
 
-#: experiments/templates/search/studies.html:23
+#: experiments/templates/search/studies.html:24
 msgid "No collaborators"
 msgstr "Nenhum colaborador"
 
-#: experiments/templates/search/studies.html:25
+#: experiments/templates/search/studies.html:26
 msgid "keywords"
 msgstr "palavras chaves"
 
-#: experiments/templates/search/studies.html:29
+#: experiments/templates/search/studies.html:30
 msgid "No keywords"
 msgstr "Nenhuma palavra chave"
 
-#: experiments/views.py:93
+#: experiments/views.py:96
 msgid ""
 "Please provide a reason justifying the change of the status of the "
 "experiment "
-msgstr "Por favor, forneça uma razão que justifique a mudança do status do experimento "
+msgstr ""
+"Por favor, forneça uma razão que justifique a mudança do status do "
+"experimento "
 
-#: experiments/views.py:94
+#: experiments/views.py:97
 msgid "to \"Not approved\". "
 msgstr "para \"Não aprovado\". "
 
-#: experiments/views.py:99
+#: experiments/views.py:102
 msgid "Your experiment was rejected"
 msgstr "Seu experimento foi rejeitado"
 
-#: experiments/views.py:100
+#: experiments/views.py:103
 msgid "We regret to inform you that your experiment, "
 msgstr "Lamentamos informar-lhe que seu experimento, "
 
-#: experiments/views.py:101
+#: experiments/views.py:104
 msgid ""
 ", has not been acceptted to be published in the NeuroMat Open Database. "
 "Please check the reasons providing by the Neuromat Open Database Evaluation "
 "Committee:"
-msgstr ", não foi aceito para ser publicado no Banco de dados aberto de NeuroMat. "
-"Por favor, verifique as razões fornecidas pelo comité de avaliação do Banco de dados aberto de NeuroMat:"
+msgstr ""
+", não foi aceito para ser publicado no Banco de dados aberto de NeuroMat. "
+"Por favor, verifique as razões fornecidas pelo comité de avaliação do Banco "
+"de dados aberto de NeuroMat:"
 
-#: experiments/views.py:103
+#: experiments/views.py:106
 msgid ""
 ".\n"
 "With best regards,\n"
 " The Neuromat Open Database Evaluation Committee"
-msgstr ".\nCordiais saudações,\n"
+msgstr ""
+".\n"
+"Cordiais saudações,\n"
 " Comité de Avaliação do Banco de dados aberto de NeuroMat."
 
-#: experiments/views.py:110 experiments/views.py:132 experiments/views.py:145
+#: experiments/views.py:113 experiments/views.py:135 experiments/views.py:148
 msgid "An email was sent to "
 msgstr "Um email foi enviado para "
 
-#: experiments/views.py:111
+#: experiments/views.py:114
 msgid " warning that the experiment was rejected."
 msgstr " comunicando que o experimento foi rejeitado."
 
-#: experiments/views.py:120
+#: experiments/views.py:123
 msgid "Your experiment was approved"
 msgstr "Seu experimento foi aprovado"
 
-#: experiments/views.py:121
+#: experiments/views.py:124
 msgid "We are pleased to inform you that your experiment "
 msgstr "Temos o prazer de informá-lo que o seu experimento "
 
-#: experiments/views.py:122
+#: experiments/views.py:125
+#, fuzzy
+#| msgid ""
+#| " was approved by Neuromat Open Database Evaluation Committee. All data of "
+#| "the submitted experiment will be available freely to the public "
+#| "consultation and shared under Creative Commons Share Alike license.\n"
+#| " You can access your experiment data by clicking on the link below \n"
+#| " http://"
 msgid ""
 " was approved by Neuromat Open Database Evaluation Committee. All data of "
 "the submitted experiment will be available freely to the public consultation "
 "and shared under Creative Commons Share Alike license.\n"
-" You can access your experiment data by clicking on the link below \n"
+" You can access your experiment data by clicking on the link below\n"
+msgstr ""
+" foi aprovado pelo Comité de Avaliação do Banco de dados aberto de NeuroMat. "
+"Todos os dados do experimento submetido se encontrarão disponíveis de "
+"maneira livre para consulta de todo o público e compartilhado baixo a "
+"licença de Creative Commons Share Alike.\n"
+"Você pode acessar os dados do seu experimento clicando no link abaixo \n"
 " http://"
-msgstr " foi aprovado pelo Comité de Avaliação do Banco de dados aberto de NeuroMat. Todos os dados do "
-"experimento submetido se encontrarão disponíveis de maneira livre para consulta de todo o público "
-"e compartilhado baixo a licença de Creative Commons Share Alike.\n"
-"Você pode acessar os dados do seu experimento clicando no link abaixo \n http://"
 
-#: experiments/views.py:126
+#: experiments/views.py:129
+#, fuzzy
+#| msgid ""
+#| "\n"
+#| " With best regards,\n"
+#| " The NeuroMat Open Database Evaluation Committee."
 msgid ""
 "\n"
-" With best regards,\n"
+"With best regards,\n"
 " The NeuroMat Open Database Evaluation Committee."
-msgstr "\n"
+msgstr ""
+"\n"
 " Cordiais saudações,\n"
 " Comité de Avaliação do Banco de dados aberto de NeuroMat."
 
-#: experiments/views.py:133
+#: experiments/views.py:136
 msgid " warning that the experiment changed status to Approved."
 msgstr " comunicando que o experimento mudou seu estado para aprovado."
 
-#: experiments/views.py:136
+#: experiments/views.py:139
 msgid "Your experiment is now under analysis"
 msgstr "Seu experimento esta agora em analise"
 
-#: experiments/views.py:137
+#: experiments/views.py:140
 msgid "Thank you for submitting your experiment "
 msgstr "Obrigado por enviar seu experimento "
 
-#: experiments/views.py:138
+#: experiments/views.py:141
 msgid ""
 ". The NeuroMat Open Database Evaluation Committee will be analyze your data "
 "and will try to respond as soon as possible.\n"
 " With best regards,\n"
 " The NeuroMat Open Database Evaluation Committee"
-msgstr ". O Comité de Avaliação do Banco de dados aberto de NeuroMat analizara seus dados "
-"e respondera tão pronto como seja possível.\n"
+msgstr ""
+". O Comité de Avaliação do Banco de dados aberto de NeuroMat analizara seus "
+"dados e respondera tão pronto como seja possível.\n"
 "Cordiais saudações,\n"
 "Comité de Avaliação do Banco de dados aberto de NeuroMat."
 
-
-#: experiments/views.py:146
+#: experiments/views.py:149
 msgid " warning that the experiment is under analysis."
 msgstr " comunicando que seu experimento esta baixo analize"
 
-#: experiments/views.py:160
+#: experiments/views.py:163
 msgid "The experiment data "
 msgstr "Os dados do experimento "
 
-#: experiments/views.py:160
+#: experiments/views.py:163
 msgid " was made available to be analysed by other trustee."
 msgstr " foram disponibilizados para ser analizados por outros curadores."
+
+#, fuzzy
+#~| msgid "Research"
+#~ msgid "Search"
+#~ msgstr "Pesquisa"
+
+#~ msgid ""
+#~ "Refine your search criteria by selecting one or more fields from the list "
+#~ msgstr "Refine sua pesquisa, seleccionando um ou mais campos da lista "
