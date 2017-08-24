@@ -20,7 +20,7 @@
         <div class="table-title">
             <h3>{% trans "Search Results" %}</h3>
         </div>
-        {% if query %}
+{#        {% if query %}#}
             <table id="search_table" class="table table-hover">
                 <tbody>
                 {% for result in page_obj.object_list %}
@@ -52,17 +52,17 @@
                     &raquo;{% if page.has_next %}</a>{% endif %}
                 </div>
             {% endif %}
-        {% else %}
-            <p>{% trans "Sorry, no matches found for the terms used. Please try again." %}</p>
-            {% trans "Search Suggestion:" %}
-            <ol>
-                <li>{% trans "Check your spelling." %}</li>
-                <li>{% trans "Try more general word." %}</li>
-                <li>{% trans "Try different words that mean the same thing." %}</li>
-                <li>{% trans "Post a request for your search and we'll help you find it." %}</li>
-            </ol>
-
-        {% endif %}
+{#        {% else %}#}
+{#            <p>{% trans "Sorry, no matches found for the terms used. Please try again." %}</p>#}
+{#            {% trans "Search Suggestion:" %}#}
+{#            <ol>#}
+{#                <li>{% trans "Check your spelling." %}</li>#}
+{#                <li>{% trans "Try more general word." %}</li>#}
+{#                <li>{% trans "Try different words that mean the same thing." %}</li>#}
+{#                <li>{% trans "Post a request for your search and we'll help you find it." %}</li>#}
+{#            </ol>#}
+{##}
+{#        {% endif %}#}
 
 
     </section>

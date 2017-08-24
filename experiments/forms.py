@@ -7,7 +7,7 @@ from haystack.forms import SearchForm
 
 class NepSearchForm(SearchForm):
     q = forms.CharField(
-        required=True, label='',
+        required=False, label='',
         widget=forms.TextInput(
             attrs={'type': 'search',
                    'placeholder': _('Type key terms/words to be searched'),
@@ -59,6 +59,9 @@ class NepSearchForm(SearchForm):
             sqs = sqs.load_all()
 
         return sqs
+
+    def no_query_found(self):
+        return self.searchqueryset.all()
 
     def _parse_query(self, query):
         """

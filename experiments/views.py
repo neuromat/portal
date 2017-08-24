@@ -233,25 +233,44 @@ class NepSearchView(SearchView):
         """
         old_object_list = context['page_obj'].object_list
         indexes_to_remove = []
-        for i in range(0, len(old_object_list)):
-            if old_object_list[i].model_name == 'experiment':
-                groups = old_object_list[i].object.groups.all()
-            elif old_object_list[i].model_name == 'study':
-                groups = old_object_list[i].object.experiment.groups.all()
-            elif old_object_list[i].model_name == 'experimentalprotocol':
-                groups = [old_object_list[i].object.group]
-            elif old_object_list[i].model_name == 'group':
-                groups = [old_object_list[i].object]
-            else:
-                # TODO: generates exception: object not indexed
-                pass
-            count = 0
-            for group in groups:
-                for search_filter in search_filters:
-                    if group.steps.filter(type=search_filter).count() > 0:
-                        count = count + 1
-            if count < len(search_filters):
-                indexes_to_remove.append(i)
+        # If context['query'] is empty the search is only by filter,
+        # so we search for matches only in experiments
+        if not context['query']:
+            for i in range(0, len(old_object_list)):
+                if old_object_list[i].model_name == 'experiment':
+                    groups = old_object_list[i].object.groups.all()
+                    count = 0
+                    for search_filter in search_filters:
+                        for group in groups:
+                            if group.steps.filter(
+                                    type=search_filter
+                            ).count() > 0:
+                                count = count + 1
+                                break
+                    if count < len(search_filters):
+                        indexes_to_remove.append(i)
+                else:
+                    indexes_to_remove.append(i)
+        else:
+            for i in range(0, len(old_object_list)):
+                if old_object_list[i].model_name == 'experiment':
+                    groups = old_object_list[i].object.groups.all()
+                elif old_object_list[i].model_name == 'study':
+                    groups = old_object_list[i].object.experiment.groups.all()
+                elif old_object_list[i].model_name == 'experimentalprotocol':
+                    groups = [old_object_list[i].object.group]
+                elif old_object_list[i].model_name == 'group':
+                    groups = [old_object_list[i].object]
+                else:
+                    # TODO: generates exception: object not indexed
+                    pass
+                count = 0
+                for group in groups:
+                    for search_filter in search_filters:
+                        if group.steps.filter(type=search_filter).count() > 0:
+                            count = count + 1
+                if count < len(search_filters):
+                    indexes_to_remove.append(i)
 
         context['page_obj'].object_list = \
             [v for i, v in enumerate(old_object_list)

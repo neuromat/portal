@@ -308,6 +308,9 @@ def global_setup_ft():
     group.save()
     create_step(1, group, Step.EEG)
     create_step(1, group, Step.EMG)
+    # To test search
+    group.experiment.title = 'Experiment changed to test filter only'
+    group.experiment.save()
 
     # TODO: test for matches in code and description. Here only tests for
     # TODO: matches in abbreviated_description, as this is the field returned
