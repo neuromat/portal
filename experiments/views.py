@@ -231,7 +231,7 @@ class NepSearchView(SearchView):
         :param context: object_list returned by haystack search
         :param search_filters: the filters chosen by the user
         """
-        old_object_list = context['object_list']
+        old_object_list = context['page_obj'].object_list
         indexes_to_remove = []
         for i in range(0, len(old_object_list)):
             if old_object_list[i].model_name == 'experiment':
@@ -253,8 +253,9 @@ class NepSearchView(SearchView):
             if count < len(search_filters):
                 indexes_to_remove.append(i)
 
-        context['object_list'] = [v for i, v in enumerate(old_object_list)
-                                  if i not in indexes_to_remove]
+        context['page_obj'].object_list = \
+            [v for i, v in enumerate(old_object_list)
+             if i not in indexes_to_remove]
 
 
 # inherit from LoginView to include search form besides login form

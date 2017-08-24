@@ -1,5 +1,4 @@
 from django.core.management import call_command
-from selenium.webdriver.common.keys import Keys
 
 from experiments.models import Study, Experiment, Group, Step
 from functional_tests.base import FunctionalTest
@@ -187,7 +186,7 @@ class SearchTest(FunctionalTest):
             "//select/option[@value='" + Step.EMG + "']"
         ).click()
         self.browser.find_element_by_id('submit_terms').click()
-        time.sleep(1)
+        time.sleep(2)
 
         ##
         # There's an experiment group that has one EEG step and one EMG
