@@ -23,7 +23,7 @@
         {% if query %}
             <table id="search_table" class="table table-hover">
                 <tbody>
-                {% for result in object_list %}
+                {% for result in page_obj.object_list %}
                     {% if result.model_name == 'experiment' %}
                         {% include 'search/experiments.html' %}
                     {% endif %}
