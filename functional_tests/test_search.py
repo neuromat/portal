@@ -310,9 +310,9 @@ class SearchTest(FunctionalTest):
         tooltip_data_toggle = search_box.get_attribute('data-toggle')
         self.assertEqual('tooltip', tooltip_data_toggle)
 
-    def test_search_only_by_filter_return_correct_results(self):
+    def test_search_only_with_two_filters_returns_correct_results(self):
         # Joselina wishes to search only experiments that has EMG and EEG
-        # settings, regardless of search terms.
+        # steps, regardless of search terms.
         self.browser.find_element_by_id('filter_box').click()
         self.browser.find_element_by_xpath(
             "//select/option[@value='" + Step.EEG + "']"
@@ -323,12 +323,34 @@ class SearchTest(FunctionalTest):
         self.browser.find_element_by_id('submit_terms').click()
         time.sleep(2)
 
-        # As we have only one group with EMG and EEG steps, Joselina gets
-        # only one row tha correspondes to that the experiment group
+        # As we have only one experiment with EMG and EEG steps, Joselina gets
+        # only one row tha corresponds to that the experiment
         ##
         # If user searches only with filters selected (without a query in
-        # search box, we display in search results, only experiment rows
+        # search box, we display in search results, only experiment rows)
         ##
+        self.verify_n_objects_in_table_rows(1, 'experiment-matches')
+        self.verify_n_objects_in_table_rows(0, 'study-matches')
+        self.verify_n_objects_in_table_rows(0, 'group-matches')
+        self.verify_n_objects_in_table_rows(0, 'experimentalprotocol-matches')
+        experiment_text = self.browser.find_element_by_class_name(
+            'experiment-matches'
+        ).text
+        self.assertIn('Experiment changed to test filter only',
+                      experiment_text)
+
+    def test_search_only_with_EEG_filter_returns_correct_results(self):
+        # Joselina wishes to search only experiments that has EEG
+        # settings, regardless of search terms.
+        self.browser.find_element_by_id('filter_box').click()
+        self.browser.find_element_by_xpath(
+            "//select/option[@value='" + Step.EEG + "']"
+        ).click()
+        self.browser.find_element_by_id('submit_terms').click()
+        time.sleep(2)
+
+        # As we have only one experiment with EEG step, Joselina
+        # gets only one row that corresponds to that the experiment
         self.verify_n_objects_in_table_rows(1, 'experiment-matches')
         self.verify_n_objects_in_table_rows(0, 'study-matches')
         self.verify_n_objects_in_table_rows(0, 'group-matches')
