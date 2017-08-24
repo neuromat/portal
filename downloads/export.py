@@ -150,15 +150,9 @@ class ExportExecution:
         study = experiment.study
         experiment_resume_header = ['Study', 'Study description', 'Start date', 'End date', 'Experiment',
                                     'Experiment description']
-        # experiment_resume_header = 'Study' + '\t' + 'Study description' + '\t' + 'Start date' + '\t' + \
-        #                            'End date' + '\t' + 'Experiment' + '\t' + \
-        #                            'Experiment description' + '\t' + "\n"
+
         experiment_resume = [study.title, study.description, str(study.start_date), str(study.end_date),
                              experiment.title, experiment.description]
-        # experiment_resume = \
-        #     study.title + '\t' + study.description + '\t' + \
-        #     str(study.start_date) + '\t' + str(study.end_date) + '\t' + \
-        #     experiment.title + '\t' + experiment.description + '\t' + "\n"
 
         filename_experiment_resume = "%s.csv" % "Experiment"
 
@@ -176,11 +170,6 @@ class ExportExecution:
         save_to_csv(complete_filename_experiment_resume, experiment_description_fields)
 
         self.files_to_zip_list.append([complete_filename_experiment_resume, export_experiment_data])
-
-        # with open(complete_filename_experiment_resume.encode('utf-8'), 'w', newline='',
-        #           encoding='UTF-8') as csv_file:
-        #     csv_file.writelines(experiment_resume_header)
-        #     csv_file.writelines(experiment_resume)
 
         # process data for each group
         group_list = Group.objects.filter(experiment=experiment)
