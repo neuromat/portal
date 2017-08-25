@@ -339,9 +339,9 @@ class SearchTest(FunctionalTest):
         self.assertIn('Experiment changed to test filter only',
                       experiment_text)
 
-    def test_search_only_with_EEG_filter_returns_correct_results(self):
+    def test_search_only_with_one_filter_returns_correct_results_1(self):
         # Joselina wishes to search only experiments that has EEG
-        # settings, regardless of search terms.
+        # stpes, regardless of search terms.
         self.browser.find_element_by_id('filter_box').click()
         self.browser.find_element_by_xpath(
             "//select/option[@value='" + Step.EEG + "']"
@@ -360,5 +360,34 @@ class SearchTest(FunctionalTest):
         ).text
         self.assertIn('Experiment changed to test filter only',
                       experiment_text)
+
+        self.fail('Finish this test!')
+
+    def test_search_only_with_one_filter_returns_correct_results_2(self):
+        # Joselina wishes to search only experiments that has EMG
+        # steps, regardless of search terms.
+        self.browser.find_element_by_id('filter_box').click()
+        self.browser.find_element_by_xpath(
+            "//select/option[@value='" + Step.EMG + "']"
+        ).click()
+        self.browser.find_element_by_id('submit_terms').click()
+        time.sleep(2)
+
+        # As we have two experiments with EMG steps, Joselina
+        # gets two rows that corresponds to that the experiments
+        self.verify_n_objects_in_table_rows(2, 'experiment-matches')
+        self.verify_n_objects_in_table_rows(0, 'study-matches')
+        self.verify_n_objects_in_table_rows(0, 'group-matches')
+        self.verify_n_objects_in_table_rows(0, 'experimentalprotocol-matches')
+        table = self.browser.find_element_by_id('search_table')
+        experiment_rows =  \
+            table.find_elements_by_class_name('experiment-matches')
+        count = 0
+        for experiment in experiment_rows:
+            if 'Brachial Plexus (with EMG Setting)' in experiment.text:
+                count = count + 1
+            if 'Experiment changed to test filter only' in experiment.text:
+                count = count + 1
+        self.assertEqual(2, count)
 
         self.fail('Finish this test!')
