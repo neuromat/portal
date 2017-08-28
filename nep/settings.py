@@ -33,6 +33,7 @@ INSTALLED_APPS = [
     'experiments.apps.ExperimentsConfig',
     'downloads',
     'bootstrapform',
+    'django_celery_results',
 ]
 
 MIDDLEWARE = [
@@ -129,6 +130,9 @@ STATIC_URL = '/static/'
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
+
+# Celery
+CELERY_RESULT_BACKEND = 'django-db'
 
 # Import local settings
 try:

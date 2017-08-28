@@ -361,8 +361,6 @@ class SearchTest(FunctionalTest):
         self.assertIn('Experiment changed to test filter only',
                       experiment_text)
 
-        self.fail('Finish this test!')
-
     def test_search_only_with_one_filter_returns_correct_results_2(self):
         # Joselina wishes to search only experiments that has EMG
         # steps, regardless of search terms.
