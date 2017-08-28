@@ -245,7 +245,6 @@ def global_setup_ft():
     experiment.title = 'Brachial Plexus'
     experiment.save()
 
-    # TODO: when creating experiment UNDER_ANALYSIS, associate with a trustee
     create_experiment(2, choice([owner1, owner2]),
                       Experiment.UNDER_ANALYSIS)
     # To test search
@@ -344,9 +343,16 @@ def global_setup_ft():
     create_experiment(1, choice([owner1, owner2]),
                       Experiment.NOT_APPROVED)
 
-    # Associate trustee to studies under analysis (requires create
+    # Associate trustee to experiments under analysis (requires create
     # experiments before)
     associate_experiments_to_trustees()
+
+    # To test search
+    experiment = Experiment.objects.get(
+        trustee=models.User.objects.get(username='claudia')
+    )
+    experiment.title = 'Experiment analysed by Claudia'
+    experiment.save()
 
     # Create study collaborators (requires creating studies before)
     for study in Study.objects.all():

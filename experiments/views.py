@@ -8,6 +8,7 @@ from django.utils.translation import activate, LANGUAGE_SESSION_KEY, ugettext as
 
 from experiments.forms import NepSearchForm
 from experiments.models import Experiment, RejectJustification
+from experiments.tasks import rebuild_haystack_index
 
 
 def home_page(request):
@@ -163,8 +164,14 @@ def change_status(request, experiment_id):
                 _('The experiment data ') + experiment.title + _(' was made available to be analysed by other trustee.')
             )
 
+    # TODO: wrong order. Save first, before send message to user that the
+    # TODO: status was changed. Does not make sense tell user that the
+    # TODO: status was changed, before save the change.
     experiment.status = status
     experiment.save()
+
+    if experiment.status == Experiment.APPROVED:
+        rebuild_haystack_index.delay()
 
     return HttpResponseRedirect('/')
 
