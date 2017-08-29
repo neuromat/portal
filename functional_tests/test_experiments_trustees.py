@@ -477,7 +477,7 @@ class TrusteeTest(FunctionalTestTrustee):
         # after Claudia logged out from Portal, and searches for
         # the experiment that Claudia has just changed from under analysis
         # to approved.
-        self.search_for('Experiment analysed by Claudia')
+        self.search_for('\"Experiment analysed by Claudia\"')
 
         # When a trustee changes experiment status from under analysis to
         # approved the system makes search reindexing, so the researcher will
