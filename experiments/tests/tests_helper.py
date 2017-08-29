@@ -311,9 +311,9 @@ def global_setup_ft():
     group.experiment.title = 'Experiment changed to test filter only'
     group.experiment.save()
 
-    # TODO: test for matches in code and description. Here only tests for
+    # TODO: test for matches in code and description! Here only tests for
     # TODO: matches in abbreviated_description, as this is the field returned
-    # TODO: in model __str__ method.
+    # TODO: in ClassificationOfDiseases model __str__ method.
     ic = ClassificationOfDiseases.objects.create(
         code='BP', description='brachial Plexus',
         abbreviated_description='brachial Plexus',

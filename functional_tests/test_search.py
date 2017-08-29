@@ -28,7 +28,7 @@ class SearchTest(FunctionalTest):
         self.browser.find_element_by_id('submit_terms').click()
         time.sleep(1)
 
-    def test_two_words_searched_return_correct_objects(self):
+    def test_search_two_words_returns_correct_objects(self):
 
         # Joselina, a neuroscience researcher at Numec is delighted with the
         # NED Portal. She decides to search for experiments that contains
