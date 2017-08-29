@@ -45,7 +45,7 @@ class SearchTest(FunctionalTest):
         # one list for each of them.
         # One experiment has 'Brachial Plexus' in title, other has 'Brachial
         # plexus' in description
-        search_header_title = self.browser.find_element_by_tag_name('h3').text
+        search_header_title = self.browser.find_element_by_tag_name('h2').text
         self.assertEqual(search_header_title, 'Search Results')
 
         table = self.browser.find_element_by_id('search_table')
@@ -387,5 +387,19 @@ class SearchTest(FunctionalTest):
             if 'Experiment changed to test filter only' in experiment.text:
                 count = count + 1
         self.assertEqual(2, count)
+
+    def test_search_display_backhome_button(self):
+        # When Joselina makes searches, a button to back homepage is
+        # displayed on the right side, above the list of search results
+        self.search_for('brachial plexus')
+        link_home = self.browser.find_element_by_id('link_home')
+        self.assertEqual('Back Home', link_home.text)
+        link_home.click()
+        time.sleep(1)
+
+        # Joselina is back homepage
+        table_title = self.browser.find_element_by_id(
+            'id_table_title').find_element_by_tag_name('h2').text
+        self.assertEqual('List of Experiments', table_title)
 
         self.fail('Finish this test!')
