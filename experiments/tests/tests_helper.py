@@ -7,7 +7,7 @@ from faker import Factory
 from experiments.helpers import generate_image_file
 from experiments.models import Experiment, Study, Group, Researcher, \
     Collaborator, Participant, Gender, ExperimentalProtocol, \
-    ClassificationOfDiseases, Keyword, Step
+    ClassificationOfDiseases, Keyword, Step, TMSSetting
 
 
 def create_experiment_groups(qtty, experiment):
@@ -222,6 +222,21 @@ def create_step(qtty, group, type):
         )
 
 
+def create_tmssetting(qtty, experiment):
+    """
+    :param qtty: number of tmssetting settings
+    :param experiment: Experiment model instance
+    """
+    fake = Factory.create()
+
+    for i in range(qtty):
+        TMSSetting.objects.create(
+            experiment=experiment,
+            name=fake.word(),
+            description=fake.text()
+        )
+
+
 def global_setup_ft():
     """
     This global setup creates basic object models that are used in 
@@ -311,9 +326,7 @@ def global_setup_ft():
     group.experiment.title = 'Experiment changed to test filter only'
     group.experiment.save()
 
-    # TODO: test for matches in code and description! Here only tests for
-    # TODO: matches in abbreviated_description, as this is the field returned
-    # TODO: in ClassificationOfDiseases model __str__ method.
+    # TODO: test for matches Classification of Diseases
     ic = ClassificationOfDiseases.objects.create(
         code='BP', description='brachial Plexus',
         abbreviated_description='brachial Plexus',
@@ -397,6 +410,14 @@ def global_setup_ft():
     # create_experiment_and_study method
     # Requires running create_experiment_study_group before
     create_researchers()
+
+    # Create TMSSetting from an experiment Approved, to test search
+    experiment = Experiment.objects.filter(status=Experiment.APPROVED).first()
+    create_tmssetting(1, experiment)
+    tmssetting = TMSSetting.objects.first()
+    tmssetting.name = 'tmssettingname'
+    tmssetting.save()
+
 
 
 def global_setup_ut():
