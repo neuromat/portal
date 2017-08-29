@@ -28,7 +28,7 @@ class SearchTest(FunctionalTest):
         self.browser.find_element_by_id('submit_terms').click()
         time.sleep(1)
 
-    def test_two_words_searched_return_correct_objects(self):
+    def test_search_two_words_returns_correct_objects(self):
 
         # Joselina, a neuroscience researcher at Numec is delighted with the
         # NED Portal. She decides to search for experiments that contains
@@ -401,5 +401,22 @@ class SearchTest(FunctionalTest):
         table_title = self.browser.find_element_by_id(
             'id_table_title').find_element_by_tag_name('h2').text
         self.assertEqual('List of Experiments', table_title)
+
+    def test_search_tmssetting_returns_correct_object(self):
+        # Joselina searches for a TMS whose name is 'tmssettingname'
+        self.search_for('tmssettingname')
+
+        # As there is one TMSSetting object with that name, she sees just
+        # one row in Search Results list
+        self.verify_n_objects_in_table_rows(1, 'tmssetting-matches')
+        self.verify_n_objects_in_table_rows(0, 'experiment-matches')
+        self.verify_n_objects_in_table_rows(0, 'study-matches')
+        self.verify_n_objects_in_table_rows(0, 'group-matches')
+        self.verify_n_objects_in_table_rows(0, 'experimentalprotocol-matches')
+        tmssetting_text = self.browser.find_element_by_class_name(
+            'tmssetting-matches'
+        ).text
+        self.assertIn('Experiment changed to test filter only',
+                      tmssetting_text)
 
         self.fail('Finish this test!')
