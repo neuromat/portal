@@ -491,5 +491,3 @@ class TrusteeTest(FunctionalTestTrustee):
             'experiment-matches'
         ).text
         self.assertIn('Experiment analysed by Claudia', experiment_text)
-
-        self.fail('Finish this test!')

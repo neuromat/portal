@@ -4,12 +4,16 @@
     <td>
         <h5 class="match">
             <a href="{% url 'experiment-detail' result.object.experiment.id %}"><strong>{% trans "Experiment" %}: </strong>{{ result.object.experiment.title }}
-                <strong>> {% trans "TMSSetting" %}: </strong>
+                <strong>> {% trans "TMS Setting" %}: </strong>
                 {{ result.object.name }}</a><br><br>
         </h5>
         <strong>{% trans "name" %}: </strong>
         {% highlight result.object.name with query %}&nbsp;
         <strong>{% trans "description" %}: </strong>
         {% highlight result.object.description with query %}&nbsp;
+        {% if result.object.tms_device_setting.pulse_stimulus_type %}
+            <strong>{% trans "pulse_stimulus_type" %}: </strong>
+            {% highlight result.object.tms_device_setting.pulse_stimulus_type with query %}&nbsp;
+        {% endif %}
     </td>
 </tr>

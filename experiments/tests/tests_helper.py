@@ -7,7 +7,8 @@ from faker import Factory
 from experiments.helpers import generate_image_file
 from experiments.models import Experiment, Study, Group, Researcher, \
     Collaborator, Participant, Gender, ExperimentalProtocol, \
-    ClassificationOfDiseases, Keyword, Step, TMSSetting
+    ClassificationOfDiseases, Keyword, Step, TMSSetting, TMSDevice, CoilModel, \
+    TMSDeviceSetting
 
 
 def create_experiment_groups(qtty, experiment):
@@ -418,6 +419,17 @@ def global_setup_ft():
     tmssetting.name = 'tmssettingname'
     tmssetting.save()
 
+    # Create TMSDeviceSetting from a TMSSetting, to test search
+    # Required creating TMSSetting from experimenta Approved, first
+    tms_device = TMSDevice.objects.create(pulse_type='monophase')
+    coil = CoilModel.objects.create(
+        name='Super Coil', coil_shape_name='Coil good shape name',
+        coil_design='air_core_coil'
+    )
+    TMSDeviceSetting.objects.create(
+        tms_setting=tmssetting, tms_device=tms_device, coil_model=coil,
+        pulse_stimulus_type='single_pulse'
+    )
 
 
 def global_setup_ut():

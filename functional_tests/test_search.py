@@ -403,7 +403,7 @@ class SearchTest(FunctionalTest):
         self.assertEqual('List of Experiments', table_title)
 
     def test_search_tmssetting_returns_correct_object(self):
-        # Joselina searches for a TMS whose name is 'tmssettingname'
+        # Joselina searches for a TMS Setting whose name is 'tmssettingname'
         self.search_for('tmssettingname')
 
         # As there is one TMSSetting object with that name, she sees just
@@ -416,7 +416,23 @@ class SearchTest(FunctionalTest):
         tmssetting_text = self.browser.find_element_by_class_name(
             'tmssetting-matches'
         ).text
-        self.assertIn('Experiment changed to test filter only',
-                      tmssetting_text)
+        self.assertIn('tmssettingname', tmssetting_text)
 
-        self.fail('Finish this test!')
+    def test_search_tmsdevicesetting_returns_correct_object(self):
+        # Joselina searches for a TMS Device Setting whose name is
+        # 'tmsdevicesettingname'
+        # TODO: test for choice representation!
+        self.search_for('single_pulse')
+
+        # As there is one TMSDeviceSetting object with that name, she sees just
+        # one row in Search Results list
+        self.verify_n_objects_in_table_rows(1, 'tmsdevicesetting-matches')
+        self.verify_n_objects_in_table_rows(0, 'tmssetting-matches')
+        self.verify_n_objects_in_table_rows(0, 'experiment-matches')
+        self.verify_n_objects_in_table_rows(0, 'study-matches')
+        self.verify_n_objects_in_table_rows(0, 'group-matches')
+        self.verify_n_objects_in_table_rows(0, 'experimentalprotocol-matches')
+        tmsdevicesetting_text = self.browser.find_element_by_class_name(
+            'tmsdevicesetting-matches'
+        ).text
+        self.assertIn('Single pulse', tmsdevicesetting_text)

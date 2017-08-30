@@ -40,6 +40,9 @@
                 {% if result.model_name == 'tmssetting' %}
                     {% include 'search/tmssetting.html' %}
                 {% endif %}
+                {% if result.model_name == 'tmsdevicesetting' %}
+                    {% include 'search/tmsdevicesetting.html' %}
+                {% endif %}
             {% empty %}
                 <p>{% trans "No results found" %}.</p>
             {% endfor %}

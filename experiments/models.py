@@ -346,7 +346,8 @@ class TMSDeviceSetting(models.Model):
         ("paired_pulse", "Paired pulse"),
         ("repetitive_pulse", "Repetitive pulse")
     )
-    tms_setting = models.OneToOneField(TMSSetting, primary_key=True, related_name='tms_device_setting')
+    tms_setting = models.OneToOneField(TMSSetting, primary_key=True,
+                                       related_name='tms_device_setting')
     tms_device = models.ForeignKey(TMSDevice)
     pulse_stimulus_type = models.CharField(null=True, blank=True, max_length=50, choices=PULSE_STIMULUS_TYPES)
     coil_model = models.ForeignKey(CoilModel)
