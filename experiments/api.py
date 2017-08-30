@@ -12,7 +12,11 @@ from experiments.models import Experiment, Study, User, ProtocolComponent, \
     GenericDataCollection, Stimulus, GoalkeeperGame, SetOfStep, Questionnaire, \
     EEGAmplifierSetting, Amplifier, EEGSolution, EEGFilterSetting, EEGElectrodeNet, \
     SurfaceElectrode, NeedleElectrode, IntramuscularElectrode, EEGElectrodeLocalizationSystem, EEGElectrodePosition, \
-    TMSDeviceSetting, TMSDevice, CoilModel
+    TMSDeviceSetting, TMSDevice, CoilModel, \
+    EMGDigitalFilterSetting, ADConverter, EMGADConverterSetting, EMGElectrodeSetting, \
+    EMGPreamplifierSetting, EMGAmplifierSetting, EMGPreamplifierFilterSetting, EMGAnalogFilterSetting, \
+    EMGElectrodePlacementSetting, \
+    EMGSurfacePlacement, EMGIntramuscularPlacement, EMGNeedlePlacement
 
 
 ###################
@@ -256,6 +260,152 @@ class EMGSettingSerializer(serializers.ModelSerializer):
     class Meta:
         model = EMGSetting
         fields = ('id', 'experiment', 'name', 'description', 'acquisition_software_version')
+
+
+class EMGDigitalFilterSettingSerializer(serializers.ModelSerializer):
+    emg_setting = serializers.ReadOnlyField(source='emg_setting.name')
+
+    class Meta:
+        model = EMGDigitalFilterSetting
+        fields = ('emg_setting', 'filter_type_name', 'filter_type_description', 'low_pass', 'high_pass',
+                  'low_band_pass', 'high_band_pass', 'low_notch', 'high_notch', 'order')
+
+
+class ADConverterSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = ADConverter
+        fields = (
+            'id',
+            'manufacturer_name',
+            'equipment_type',
+            'identification',
+            'description',
+            'serial_number',
+            'signal_to_noise_rate',
+            'sampling_rate',
+            'resolution')
+
+
+class EMGADConverterSettingSerializer(serializers.ModelSerializer):
+    emg_setting = serializers.ReadOnlyField(source='emg_setting.name')
+
+    class Meta:
+        model = EMGADConverterSetting
+        fields = ('emg_setting', 'ad_converter', 'sampling_rate')
+
+
+class EMGElectrodeSettingSerializer(serializers.ModelSerializer):
+    emg_setting = serializers.ReadOnlyField(source='emg_setting.name')
+
+    class Meta:
+        model = EMGElectrodeSetting
+        fields = ('id', 'emg_setting', 'electrode_model')
+
+
+class EMGPreamplifierSettingSerializer(serializers.ModelSerializer):
+    emg_electrode_setting = serializers.ReadOnlyField(source='emg_electrode_setting.name')
+
+    class Meta:
+        model = EMGPreamplifierSetting
+        fields = ('emg_electrode_setting', 'amplifier', 'gain')
+
+
+class EMGAmplifierSettingSerializer(serializers.ModelSerializer):
+    emg_electrode_setting = serializers.ReadOnlyField(source='emg_electrode_setting.name')
+
+    class Meta:
+        model = EMGAmplifierSetting
+        fields = ('emg_electrode_setting', 'amplifier', 'gain')
+
+
+class EMGPreamplifierFilterSettingSerializer(serializers.ModelSerializer):
+    emg_electrode_setting = serializers.ReadOnlyField(source='emg_electrode_setting.name')
+
+    class Meta:
+        model = EMGPreamplifierFilterSetting
+        fields = ('emg_electrode_setting',
+                  'low_pass', 'high_pass',
+                  'low_band_pass', 'low_notch',
+                  'high_band_pass', 'high_notch', 'order')
+
+
+class EMGAnalogFilterSettingSerializer(serializers.ModelSerializer):
+    emg_electrode_setting = serializers.ReadOnlyField(source='emg_electrode_setting.name')
+
+    class Meta:
+        model = EMGAnalogFilterSetting
+        fields = ('emg_electrode_setting',
+                  'low_pass', 'high_pass',
+                  'low_band_pass', 'low_notch',
+                  'high_band_pass', 'high_notch', 'order')
+
+
+class EMGElectrodePlacementSettingSerializer(serializers.ModelSerializer):
+    emg_electrode_setting = serializers.ReadOnlyField(source='emg_electrode_setting.name')
+
+    class Meta:
+        model = EMGElectrodePlacementSetting
+        fields = ('emg_electrode_setting', 'emg_electrode_placement', 'muscle_side', 'muscle_name', 'remarks')
+
+
+class EMGSurfacePlacementSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = EMGSurfacePlacement
+        fields = (
+            'id',
+            'standardization_system_name',
+            'standardization_system_description',
+            'muscle_anatomy_origin',
+            'muscle_anatomy_insertion',
+            'muscle_anatomy_function',
+            'photo',
+            'location',
+            'placement_type',
+
+            'start_posture',
+            'orientation',
+            'fixation_on_the_skin',
+            'reference_electrode',
+            'clinical_test')
+
+
+class EMGIntramuscularPlacementSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = EMGIntramuscularPlacement
+        fields = (
+            'id',
+            'standardization_system_name',
+            'standardization_system_description',
+            'muscle_anatomy_origin',
+            'muscle_anatomy_insertion',
+            'muscle_anatomy_function',
+            'photo',
+            'location',
+            'placement_type',
+
+            'method_of_insertion',
+            'depth_of_insertion')
+
+
+class EMGNeedlePlacementSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = EMGNeedlePlacement
+        fields = (
+            'id',
+            'standardization_system_name',
+            'standardization_system_description',
+            'muscle_anatomy_origin',
+            'muscle_anatomy_insertion',
+            'muscle_anatomy_function',
+            'photo',
+            'location',
+            'placement_type',
+
+            'depth_of_insertion')
 
 
 class TMSSettingSerializer(serializers.ModelSerializer):
@@ -979,6 +1129,146 @@ class EMGSettingViewSet(viewsets.ModelViewSet):
             nes_id=exp_nes_id, owner=owner, version=last_version
         )
         serializer.save(experiment=experiment)
+
+
+class EMGDigitalFilterSettingViewSet(viewsets.ModelViewSet):
+    serializer_class = EMGDigitalFilterSettingSerializer
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
+
+    def get_queryset(self):
+        return EMGDigitalFilterSetting.objects.filter(emg_setting_id=self.kwargs['pk'])
+
+    def perform_create(self, serializer):
+        emg_setting = EMGSetting.objects.get(pk=self.kwargs['pk'])
+        serializer.save(emg_setting=emg_setting)
+
+
+class ADConverterViewSet(viewsets.ModelViewSet):
+    serializer_class = ADConverterSerializer
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
+
+    def get_queryset(self):
+        return ADConverter.objects.filter(group_id=self.kwargs['pk'])
+
+    def perform_create(self, serializer):
+        serializer.save()
+
+
+class EMGADConverterSettingViewSet(viewsets.ModelViewSet):
+    serializer_class = EMGADConverterSettingSerializer
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
+
+    def get_queryset(self):
+        return EMGADConverterSetting.objects.filter(emg_setting_id=self.kwargs['pk'])
+
+    def perform_create(self, serializer):
+        emg_setting = EMGSetting.objects.get(pk=self.kwargs['pk'])
+        serializer.save(emg_setting=emg_setting)
+
+
+class EMGElectrodeSettingViewSet(viewsets.ModelViewSet):
+    serializer_class = EMGElectrodeSettingSerializer
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
+
+    def get_queryset(self):
+        return EMGElectrodeSetting.objects.filter(emg_setting_id=self.kwargs['pk'])
+
+    def perform_create(self, serializer):
+        emg_setting = EMGSetting.objects.get(pk=self.kwargs['pk'])
+        serializer.save(emg_setting=emg_setting)
+
+
+class EMGPreamplifierSettingViewSet(viewsets.ModelViewSet):
+    serializer_class = EMGPreamplifierSettingSerializer
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
+
+    def get_queryset(self):
+        return EMGPreamplifierSetting.objects.filter(id=self.kwargs['pk'])
+
+    def perform_create(self, serializer):
+        emg_electrode_setting = EMGElectrodeSetting.objects.get(pk=self.kwargs['pk'])
+        serializer.save(emg_electrode_setting=emg_electrode_setting)
+
+
+class EMGAmplifierSettingViewSet(viewsets.ModelViewSet):
+    serializer_class = EMGAmplifierSettingSerializer
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
+
+    def get_queryset(self):
+        return EMGAmplifierSetting.objects.filter(id=self.kwargs['pk'])
+
+    def perform_create(self, serializer):
+        emg_electrode_setting = EMGElectrodeSetting.objects.get(pk=self.kwargs['pk'])
+        serializer.save(emg_electrode_setting=emg_electrode_setting)
+
+
+class EMGPreamplifierFilterSettingViewSet(viewsets.ModelViewSet):
+    serializer_class = EMGPreamplifierFilterSettingSerializer
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
+
+    def get_queryset(self):
+        return EMGPreamplifierFilterSetting.objects.filter(id=self.kwargs['pk'])
+
+    def perform_create(self, serializer):
+        emg_preamplifier_setting = EMGPreamplifierSetting.objects.get(pk=self.kwargs['pk'])
+        serializer.save(emg_preamplifier_setting=emg_preamplifier_setting)
+
+
+class EMGAnalogFilterSettingViewSet(viewsets.ModelViewSet):
+    serializer_class = EMGAnalogFilterSettingSerializer
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
+
+    def get_queryset(self):
+        return EMGAnalogFilterSetting.objects.filter(id=self.kwargs['pk'])
+
+    def perform_create(self, serializer):
+        emg_amplifier_setting = EMGAmplifierSetting.objects.get(pk=self.kwargs['pk'])
+        serializer.save(emg_amplifier_setting=emg_amplifier_setting)
+
+
+class EMGElectrodePlacementSettingViewSet(viewsets.ModelViewSet):
+    serializer_class = EMGElectrodePlacementSettingSerializer
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
+
+    def get_queryset(self):
+        return EMGElectrodePlacementSetting.objects.filter(id=self.kwargs['pk'])
+
+    def perform_create(self, serializer):
+        emg_electrode_setting = EMGElectrodeSetting.objects.get(pk=self.kwargs['pk'])
+        serializer.save(emg_electrode_setting=emg_electrode_setting)
+
+
+class EMGSurfacePlacementViewSet(viewsets.ModelViewSet):
+    serializer_class = EMGSurfacePlacementSerializer
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
+
+    def get_queryset(self):
+        return EMGSurfacePlacement.objects.filter(id=self.kwargs['pk'])
+
+    def perform_create(self, serializer):
+        serializer.save()
+
+
+class EMGIntramuscularPlacementViewSet(viewsets.ModelViewSet):
+    serializer_class = EMGIntramuscularPlacementSerializer
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
+
+    def get_queryset(self):
+        return EMGIntramuscularPlacement.objects.filter(id=self.kwargs['pk'])
+
+    def perform_create(self, serializer):
+        serializer.save()
+
+
+class EMGNeedlePlacementViewSet(viewsets.ModelViewSet):
+    serializer_class = EMGNeedlePlacementSerializer
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
+
+    def get_queryset(self):
+        return EMGNeedlePlacement.objects.filter(id=self.kwargs['pk'])
+
+    def perform_create(self, serializer):
+        serializer.save()
 
 
 class TMSSettingViewSet(viewsets.ModelViewSet):
