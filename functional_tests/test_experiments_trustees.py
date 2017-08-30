@@ -2,6 +2,7 @@ import re
 import time
 
 from django.core import mail
+from django.core.management import call_command
 from selenium.webdriver.common.keys import Keys
 
 from experiments.models import Experiment
@@ -9,6 +10,20 @@ from functional_tests.base import FunctionalTestTrustee
 
 
 class TrusteeTest(FunctionalTestTrustee):
+
+    # TODO: repeated from test_search.SearchTest
+    def search_for(self, string):
+        search_box = self.browser.find_element_by_id('id_q')
+        search_box.clear()
+        search_box.send_keys(string)
+        self.browser.find_element_by_id('submit_terms').click()
+        time.sleep(1)
+
+    # TODO: repeated from test_search.SearchTest
+    def verify_n_objects_in_table_rows(self, n, row_class):
+        table = self.browser.find_element_by_id('search_table')
+        count = len(table.find_elements_by_class_name(row_class))
+        self.assertEqual(n, count)
 
     def test_trustee_can_view_initial_page(self):
         experiment = Experiment.objects.first()
@@ -425,5 +440,56 @@ class TrusteeTest(FunctionalTestTrustee):
             experiment.ethics_committee_file.url,
             ethics_commitee_file.get_attribute('href')
         )
+
+        self.fail('Finish this test!')
+
+    def test_change_status_from_under_analysis_to_approved_reindex_haystack(self):
+
+        # The trustee Claudia changes an experiment under analysis to approved
+        experiment_links = self.browser.find_elements_by_link_text(
+                'Under analysis')
+        for experiment_link in experiment_links:
+            if experiment_link.get_attribute('data-experiment_trustee') == \
+                    'claudia':
+                experiment_link.click()
+        time.sleep(1)
+        status_choices_form = self.browser.find_element_by_id(
+            'id_status_choices')
+        status_choices_form.find_element_by_xpath(
+            '//input[@type="radio" and  @value=' + '"' +
+            Experiment.APPROVED + '"]').click()
+        submit_button = self.browser.find_element_by_id('submit')
+        submit_button.send_keys(Keys.ENTER)
+        time.sleep(1)
+
+        # Claudia is redirected to home page. She logs out the system
+        self.browser.find_element_by_link_text('Log Out').click()
+        # TODO: we're running rebuild_index manually, because the celery
+        # TODO: task is TODO: not beeing recognized by tests. See:
+        # TODO: https://stackoverflow.com/questions/4055860/unit-testing-with
+        # TODO: -django-celery
+        # TODO: http://bwreilly.github.io/blog/2013/07/21/testing-search
+        # TODO: -haystack-in-django/
+        # TODO: https://buxty.com/b/2012/12/testing-django-haystack-whoosh/
+        call_command('rebuild_index', verbosity=0, interactive=False)
+
+        # Coincidentally a researcher arrives to the site, just a few moments
+        # after Claudia logged out from Portal, and searches for
+        # the experiment that Claudia has just changed from under analysis
+        # to approved.
+        self.search_for('\"Experiment analysed by Claudia\"')
+
+        # When a trustee changes experiment status from under analysis to
+        # approved the system makes search reindexing, so the researcher will
+        # see one line that corresponds to the experiment with 'Experiment
+        # 2' in experiment title and nothing more.
+        self.verify_n_objects_in_table_rows(1, 'experiment-matches')
+        self.verify_n_objects_in_table_rows(0, 'study-matches')
+        self.verify_n_objects_in_table_rows(0, 'experimentalprotocol-matches')
+        self.verify_n_objects_in_table_rows(0, 'group-matches')
+        experiment_text = self.browser.find_element_by_class_name(
+            'experiment-matches'
+        ).text
+        self.assertIn('Experiment analysed by Claudia', experiment_text)
 
         self.fail('Finish this test!')

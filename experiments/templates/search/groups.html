@@ -10,11 +10,11 @@
         <strong>{% trans "title" %}: </strong>{% highlight result.object.title with query %}&nbsp;
         <strong>{% trans "description" %}: </strong>
         {% highlight result.object.description with query %}&nbsp;
-        <strong>{% trans "Inclusion criteria" %}: </strong>
+        <strong>{% trans "inclusion criteria" %}: </strong>
         {% for inclusion_criteria in result.object.inclusion_criteria.all %}
             {% highlight inclusion_criteria with query %}&nbsp;
         {% empty %}
-            {% trans "No inclusion criteria" %}
+            {% trans "no inclusion criteria" %}
         {% endfor %}
     </td>
 </tr>

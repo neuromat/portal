@@ -1,6 +1,7 @@
 from haystack import indexes
 
-from experiments.models import Experiment, Study, Group, ExperimentalProtocol
+from experiments.models import Experiment, Study, Group, ExperimentalProtocol, \
+    TMSSetting
 
 
 class ExperimentIndex(indexes.SearchIndex, indexes.Indexable):
@@ -61,3 +62,17 @@ class ExperimentalProtocolIndex(indexes.SearchIndex, indexes.Indexable):
         )
         groups = Group.objects.filter(experiment__in=experiments)
         return self.get_model().objects.filter(group__in=groups)
+
+
+class TMSSettingIndex(indexes.SearchIndex, indexes.Indexable):
+    text = indexes.CharField(document=True, use_template=True)
+    experiment = indexes.CharField(model_attr='experiment__id')
+
+    def get_model(self):
+        return TMSSetting
+
+    def index_queryset(self, using=None):
+        experiments = Experiment.lastversion_objects.filter(
+            status=Experiment.APPROVED
+        )
+        return self.get_model().objects.filter(experiment__in=experiments)

@@ -3,6 +3,7 @@ from django.db.models import Max, Q
 from django.contrib.auth.models import User
 
 
+# custom managers
 class CurrentExperimentManager(models.Manager):
     def get_queryset(self):
         experiment_max_version_set = \
@@ -18,6 +19,7 @@ class CurrentExperimentManager(models.Manager):
             .filter(q_statement)
 
 
+# models
 class Experiment(models.Model):
     RECEIVING = 'receiving'
     TO_BE_ANALYSED = 'to_be_analysed'
