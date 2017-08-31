@@ -1,0 +1,6 @@
+{{ object.manufacturer_name }}
+{{ object.equipment_type }}
+{{ object.identification }}
+{{ object.description }}
+{{ object.pulse_type }}
+{{ object.tms_device_settings.all }}

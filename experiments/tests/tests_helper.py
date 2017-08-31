@@ -238,6 +238,52 @@ def create_tmssetting(qtty, experiment):
         )
 
 
+def create_tmsdevice(qtty):
+    """
+    :param qtty: number of tms device objects to create
+    """
+    fake = Factory.create()
+
+    for i in range(qtty):
+        TMSDevice.objects.create(
+            manufacturer_name=fake.word(),
+            equipment_type=fake.word(),
+            identification=fake.word(),
+            description=fake.text(),
+            serial_number=fake.ssn(),
+            pulse_type=choice(['monophase', 'biphase'])
+        )
+
+
+def create_coil_model(qtty):
+    """
+    :param qtty: number of coil model objects to create
+    """
+    fake = Factory.create()
+    for i in range(qtty):
+        CoilModel.objects.create(
+            name=fake.word(), coil_shape_name=fake.word(),
+            coil_design=choice(['air_core_coil', 'biphase']),
+            description=fake.text(), material_name=fake.word(),
+            material_description=fake.text(),
+        )
+
+
+def create_tms_device_setting(qtty, tms_setting, tms_device, coil_model):
+    """
+    :param qtty: number of tms device setting objects to create
+    :param tms_setting: TMSSetting model instance
+    :param tms_device: TMSDevice model instance
+    :param coil_model: CoilModel model instance
+    """
+    for i in range(qtty):
+        TMSDeviceSetting.objects.create(
+            tms_setting=tms_setting, tms_device=tms_device, coil_model=coil_model,
+            pulse_stimulus_type=choice(['single_pulse', 'paired_pulse',
+                                        'repetitive_pulse'])
+        )
+
+
 def global_setup_ft():
     """
     This global setup creates basic object models that are used in 
@@ -415,21 +461,29 @@ def global_setup_ft():
     # Create TMSSetting from an experiment Approved, to test search
     experiment = Experiment.objects.filter(status=Experiment.APPROVED).first()
     create_tmssetting(1, experiment)
-    tmssetting = TMSSetting.objects.first()
-    tmssetting.name = 'tmssettingname'
-    tmssetting.save()
+    tms_setting = TMSSetting.objects.last()
+    tms_setting.name = 'tmssettingname'
+    tms_setting.save()
 
-    # Create TMSDeviceSetting from a TMSSetting, to test search
+    # Create TMSDeviceSetting from a TMSSetting to test search
     # Required creating TMSSetting from experimenta Approved, first
-    tms_device = TMSDevice.objects.create(pulse_type='monophase')
-    coil = CoilModel.objects.create(
-        name='Super Coil', coil_shape_name='Coil good shape name',
-        coil_design='air_core_coil'
-    )
-    TMSDeviceSetting.objects.create(
-        tms_setting=tmssetting, tms_device=tms_device, coil_model=coil,
-        pulse_stimulus_type='single_pulse'
-    )
+    create_tmsdevice(1)
+    tms_device = TMSDevice.objects.last()
+    create_coil_model(1)
+    coil_model = CoilModel.objects.last()
+    create_tms_device_setting(1, tms_setting, tms_device, coil_model)
+    tms_device_setting = TMSDeviceSetting.objects.last()
+    tms_device_setting.pulse_stimulus_type = 'single_pulse'
+    tms_device_setting.save()
+
+    # Create TMSDevice to test search
+    tms_device.manufacturer_name = 'Siemens'
+    tms_device.save()
+    # Create another TMSSetting and associate with same TMSDeviceSetting
+    # created above to test searching
+    create_tmssetting(1, experiment)
+    tms_setting = TMSSetting.objects.last()
+    create_tms_device_setting(1, tms_setting, tms_device, coil_model)
 
 
 def global_setup_ut():
