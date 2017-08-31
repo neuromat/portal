@@ -462,7 +462,8 @@ class TMSDeviceSetting(models.Model):
         TMSDevice, related_name='tms_device_settings'
     )
     pulse_stimulus_type = models.CharField(null=True, blank=True, max_length=50, choices=PULSE_STIMULUS_TYPES)
-    coil_model = models.ForeignKey(CoilModel)
+    coil_model = models.ForeignKey(CoilModel,
+                                   related_name='tms_device_settings')
 
 
 class ContextTree(ExperimentSetting):
