@@ -445,7 +445,7 @@ class SearchTest(FunctionalTest):
         # As there is one TMSDevice object that has Siemens as manufacturer,
         # but two TMSDeviceSetting objects that has that TMSDevice object as
         # a Foreign Key, she sees just two rows in Search Results list
-        self.verify_n_objects_in_table_rows(2, 'tmsdevice-matches')
+        self.verify_n_objects_in_table_rows(3, 'tmsdevice-matches')
         self.verify_n_objects_in_table_rows(0, 'tmsdevicesetting-matches')
         self.verify_n_objects_in_table_rows(0, 'tmssetting-matches')
         self.verify_n_objects_in_table_rows(0, 'experiment-matches')
