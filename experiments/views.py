@@ -8,7 +8,7 @@ from django.utils.translation import activate, LANGUAGE_SESSION_KEY, ugettext as
 
 from experiments.forms import NepSearchForm
 from experiments.models import Experiment, RejectJustification
-from experiments.tasks import rebuild_haystack_index
+from experiments.tasks import rebuild_haystack_index, build_download_file
 
 
 def home_page(request):
@@ -172,6 +172,7 @@ def change_status(request, experiment_id):
 
     if experiment.status == Experiment.APPROVED:
         rebuild_haystack_index.delay()
+        build_download_file.delay()
 
     return HttpResponseRedirect('/')
 
