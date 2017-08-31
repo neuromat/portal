@@ -9,10 +9,11 @@ from faker import Factory
 # TODO: when executing from bash command line, final line identifier breaks
 # imports. We are kepping in Collaborator in same line
 from experiments.models import Gender, ClassificationOfDiseases, Keyword, \
-    Collaborator, Step
+    Collaborator, Step, TMSSetting, TMSDevice, CoilModel, TMSDeviceSetting
 from experiments.models import Experiment, Study, Group, Researcher
 from experiments.tests.tests_helper import create_experiment_groups, \
-    create_ethics_committee_info, create_step
+    create_ethics_committee_info, create_step, create_tmssetting, \
+    create_tmsdevice, create_coil_model, create_tms_device_setting
 from experiments.tests.tests_helper import create_classification_of_deseases
 from experiments.tests.tests_helper import create_experiment_protocol
 from experiments.tests.tests_helper import create_participants
@@ -184,6 +185,35 @@ for group in Group.objects.all():
     ic1 = choice(ClassificationOfDiseases.objects.all())
     ic2 = choice(ClassificationOfDiseases.objects.all())
     group.inclusion_criteria.add(ic1, ic2)
+
+# Create TMSSetting from an experiment Approved, to test search.
+# Obs.: TO VERIFY SEARCH TMS things, change Experiment status to APPROVED
+# after run this faker populator
+experiment = Experiment.objects.first()
+create_tmssetting(1, experiment)
+tms_setting = TMSSetting.objects.last()
+tms_setting.name = 'tmssettingname'
+tms_setting.save()
+
+# Create TMSDeviceSetting from a TMSSetting to test search
+# Required creating TMSSetting from experiment Approved, first
+create_tmsdevice(1)
+tms_device = TMSDevice.objects.last()
+create_coil_model(1)
+coil_model = CoilModel.objects.last()
+create_tms_device_setting(1, tms_setting, tms_device, coil_model)
+tms_device_setting = TMSDeviceSetting.objects.last()
+tms_device_setting.pulse_stimulus_type = 'single_pulse'
+tms_device_setting.save()
+
+# Create TMSDevice to test search
+tms_device.manufacturer_name = 'Siemens'
+tms_device.save()
+# Create another TMSSetting and associate with same TMSDeviceSetting
+# created above to test searching
+create_tmssetting(1, experiment)
+tms_setting = TMSSetting.objects.last()
+tmsds = create_tms_device_setting(1, tms_setting, tms_device, coil_model)
 
 # TODO: After populating models we call 'manage.py rebuild_index --noinput' to
 # TODO: rebuild haystack search index - to manually test searching.

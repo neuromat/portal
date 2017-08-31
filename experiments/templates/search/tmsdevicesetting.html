@@ -1,0 +1,16 @@
+{% load highlight %}
+{% load i18n %}
+<tr class="tmsdevicesetting-matches">
+    <td>
+        <h5 class="match">
+            <a href="
+{% url 'experiment-detail' result.object.tms_setting.experiment.id %}"><strong>{% trans "Experiment" %}: </strong>
+                {{ result.object.tms_setting.experiment.title }}
+                <strong>> {% trans "TMS Setting" %}: </strong>
+                {{ result.object.tms_setting.name }}
+                <strong>> {% trans "TMS Device Setting" %}: </strong>
+                {% highlight result.object.get_pulse_stimulus_type_display with query %}
+            </a><br><br>
+        </h5>
+    </td>
+</tr>

@@ -51,5 +51,3 @@ class LoginPageTest(FunctionalTest):
         # correctly redirected to home page
         response = self.client.get(logout_url)
         self.assertRedirects(response, reverse('home'))
-
-        self.fail('Finish this test!')

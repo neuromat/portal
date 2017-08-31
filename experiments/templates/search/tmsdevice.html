@@ -1,0 +1,29 @@
+{% load highlight %}
+{% load i18n %}
+{{ result.object.tms_device_settings.all }}  {# DEBUG #}
+{% for tms_device_setting in result.object.tms_device_settings.all %}
+    <tr class="tmsdevice-matches">
+        <td>
+            <h5 class="match">
+                <a href="{% url 'experiment-detail' tms_device_setting.tms_setting.experiment.id %}">
+                    <strong>{% trans "Experiment" %}: </strong>
+                    {{ tms_device_setting.tms_setting.experiment.title }}
+                    <strong>> {% trans "TMS Setting" %}: </strong>
+                    {{ tms_device_setting.tms_setting.name }}
+                    <strong>> {% trans "TMS Device" %}: </strong>
+                    {{ result.object.identification }}
+                </a><br><br>
+            </h5>
+            <strong>{% trans "identification" %}: </strong>
+            {% highlight result.object.identification with query %}&nbsp;
+            <strong>{% trans "manufacturer" %}: </strong>
+            {% highlight result.object.manufacturer_name with query %}&nbsp;
+            <strong>{% trans "equipment type" %}: </strong>
+            {% highlight result.object.equipment_type with query %}&nbsp;
+            <strong>{% trans "description" %}: </strong>
+            {% highlight result.object.description with query %}&nbsp;
+            <strong>{% trans "pulse type" %}: </strong>
+            {% highlight result.object.pulse_type with query %}&nbsp;
+        </td>
+    </tr>
+{% endfor %}
