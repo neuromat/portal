@@ -113,5 +113,5 @@ class TMSDeviceIndex(indexes.SearchIndex, indexes.Indexable):
             tms_setting__in=tms_settings
         )
         return self.get_model().objects.filter(
-            tms_device_settings=tms_device_settings
-        )
+            tms_device_settings__in=tms_device_settings
+        ).distinct()

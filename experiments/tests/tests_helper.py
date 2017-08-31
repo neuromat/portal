@@ -223,7 +223,7 @@ def create_step(qtty, group, type):
         )
 
 
-def create_tmssetting(qtty, experiment):
+def create_tms_setting(qtty, experiment):
     """
     :param qtty: number of tmssetting settings
     :param experiment: Experiment model instance
@@ -238,7 +238,7 @@ def create_tmssetting(qtty, experiment):
         )
 
 
-def create_tmsdevice(qtty):
+def create_tms_device(qtty):
     """
     :param qtty: number of tms device objects to create
     """
@@ -458,31 +458,41 @@ def global_setup_ft():
     # Requires running create_experiment_study_group before
     create_researchers()
 
+    ##
+    # To test searching TMS things
+    ##
     # Create TMSSetting from an experiment Approved, to test search
     experiment = Experiment.objects.filter(status=Experiment.APPROVED).first()
-    create_tmssetting(1, experiment)
+    create_tms_setting(1, experiment)  # 1º TMSSetting
     tms_setting = TMSSetting.objects.last()
     tms_setting.name = 'tmssettingname'
     tms_setting.save()
-
     # Create TMSDeviceSetting from a TMSSetting to test search
     # Required creating TMSSetting from experimenta Approved, first
-    create_tmsdevice(1)
+    create_tms_device(1)  # 1º TMSDevice
     tms_device = TMSDevice.objects.last()
-    create_coil_model(1)
+    tms_device.manufacturer_name = 'Siemens'
+    tms_device.save()
+    create_coil_model(1)  # 1º CoilModel
     coil_model = CoilModel.objects.last()
-    create_tms_device_setting(1, tms_setting, tms_device, coil_model)
+    create_tms_device_setting(1, tms_setting, tms_device, coil_model)  #
+    # 1º TMSDeviceSetting
     tms_device_setting = TMSDeviceSetting.objects.last()
     tms_device_setting.pulse_stimulus_type = 'single_pulse'
     tms_device_setting.save()
-
-    # Create TMSDevice to test search
+    # Create another TMSSetting and associate with same TMSDeviceSetting
+    # created above to test searching TMSDevice
+    create_tms_setting(1, experiment)  # 2º TMSSetting
+    tms_setting = TMSSetting.objects.last()
+    create_tms_device_setting(1, tms_setting, tms_device, coil_model)
+    # Create other TMSDevice associated with TMSDeviceSetting > TMSSetting >
+    # Experiment
+    create_tms_setting(1, experiment)  # 3º TMSSetting
+    tms_setting = TMSSetting.objects.last()
+    create_tms_device(1)  # 2º TMSDevice
+    tms_device = TMSDevice.objects.last()
     tms_device.manufacturer_name = 'Siemens'
     tms_device.save()
-    # Create another TMSSetting and associate with same TMSDeviceSetting
-    # created above to test searching
-    create_tmssetting(1, experiment)
-    tms_setting = TMSSetting.objects.last()
     create_tms_device_setting(1, tms_setting, tms_device, coil_model)
 
 

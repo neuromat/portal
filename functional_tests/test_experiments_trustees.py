@@ -441,8 +441,6 @@ class TrusteeTest(FunctionalTestTrustee):
             ethics_commitee_file.get_attribute('href')
         )
 
-        self.fail('Finish this test!')
-
     def test_change_status_from_under_analysis_to_approved_reindex_haystack(self):
 
         # The trustee Claudia changes an experiment under analysis to approved
