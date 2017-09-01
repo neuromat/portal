@@ -11,5 +11,5 @@ def rebuild_haystack_index():
 
 
 @app.task()
-def build_download_file():
-    call_command(views.download_view(), verbosity=0, interactive=False)
+def build_download_file(request, experiment_id):
+    views.download_view(request, experiment_id)
