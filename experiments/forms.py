@@ -79,7 +79,7 @@ class NepSearchForm(SearchForm):
                 if word == 'AND':
                     result = result.filter_and(content=words.__next__())
                 elif word == 'OR':
-                    # TODO: fail when changin order of the words. See
+                    # TODO: fail when changing order of the words. See
                     # TODO: functional test:
                     # TODO: test_search_with_OR_modifier_returns_correct_objects
                     result = result.filter_or(content=words.__next__())

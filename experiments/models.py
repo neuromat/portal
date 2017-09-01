@@ -462,7 +462,8 @@ class TMSDeviceSetting(models.Model):
         TMSDevice, related_name='tms_device_settings'
     )
     pulse_stimulus_type = models.CharField(null=True, blank=True, max_length=50, choices=PULSE_STIMULUS_TYPES)
-    coil_model = models.ForeignKey(CoilModel)
+    coil_model = models.ForeignKey(CoilModel,
+                                   related_name='tms_device_settings')
 
 
 class ContextTree(ExperimentSetting):
@@ -510,6 +511,9 @@ class Step(models.Model):
     interval_between_repetitions_value = models.IntegerField(null=True, blank=True)
     interval_between_repetitions_unit = models.CharField(null=True, blank=True, max_length=15)
     random_position = models.NullBooleanField(blank=True)
+
+    def __str__(self):
+        return self.type
 
 
 class EEG(Step):
