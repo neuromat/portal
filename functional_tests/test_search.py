@@ -456,3 +456,23 @@ class SearchTest(FunctionalTest):
             'tmsdevice-matches'
         ).text
         self.assertIn('Siemens', tmsdevicesetting_text)
+
+    def test_search_coilmodel_returns_correct_objects(self):
+        # Joselina searches for an experiment in which was used a Coil Model
+        # whose name is 'Magstim'
+        self.search_for('Magstim')
+        # As there is one TMSDevice object that has Siemens as manufacturer,
+        # but two TMSDeviceSetting objects that has that TMSDevice object as
+        # a Foreign Key, she sees just two rows in Search Results list
+        self.verify_n_objects_in_table_rows(3, 'coilmodel-matches')
+        self.verify_n_objects_in_table_rows(0, 'tmsdevice-matches')
+        self.verify_n_objects_in_table_rows(0, 'tmsdevicesetting-matches')
+        self.verify_n_objects_in_table_rows(0, 'tmssetting-matches')
+        self.verify_n_objects_in_table_rows(0, 'experiment-matches')
+        self.verify_n_objects_in_table_rows(0, 'study-matches')
+        self.verify_n_objects_in_table_rows(0, 'group-matches')
+        self.verify_n_objects_in_table_rows(0, 'experimentalprotocol-matches')
+        tmsdevicesetting_text = self.browser.find_element_by_class_name(
+            'coilmodel-matches'
+        ).text
+        self.assertIn('Magstim', tmsdevicesetting_text)
