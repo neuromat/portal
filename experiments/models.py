@@ -43,6 +43,7 @@ class Experiment(models.Model):
     data_acquisition_done = models.BooleanField(default=False)
     sent_date = models.DateField(auto_now=True)
     project_url = models.CharField(max_length=255, blank=True, null=True)
+    download_url = models.FileField(upload_to="uploads/%Y/%m/%d/", null=True, blank=True)
     ethics_committee_url = models.CharField(max_length=255, blank=True,
                                             null=True)
     ethics_committee_file = models.FileField(

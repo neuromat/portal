@@ -172,7 +172,7 @@ def change_status(request, experiment_id):
 
     if experiment.status == Experiment.APPROVED:
         rebuild_haystack_index.delay()
-        build_download_file(request, experiment.id).delay()
+        # build_download_file(request, experiment.id).delay()
 
     return HttpResponseRedirect('/')
 

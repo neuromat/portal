@@ -1,15 +1,19 @@
+import datetime
+
+from experiments.models import Experiment
 from django.conf import settings
 from django.contrib import messages
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse, HttpResponseRedirect
-from .models import Export
-from os import path
-from zipfile import ZipFile
-from shutil import rmtree
 
 from .export import create_directory, ExportExecution
 from .input_export import build_complete_export_structure
+from .models import Export
+
+from os import path
+from shutil import rmtree
+from zipfile import ZipFile
 
 JSON_FILENAME = "json_export.json"
 JSON_EXPERIMENT_FILENAME = "json_experiment_export.json"
@@ -138,6 +142,24 @@ def export_create(request, export_id, input_filename, experiment_id, template_na
 
             output_export_file = path.join("download", path.join(path.join(str(export_instance.id),
                                                                            str(export_filename))))
+
+            experiment = get_object_or_404(Experiment, pk=experiment_id)
+
+            # if not experiment.download_url:
+            #     now = datetime.datetime.now()
+            #     now_directory = '/' + str(now.year)
+            #     download_experiment_directory = settings.MEDIA_ROOT + '/' + 'uploads' + now_directory
+            #
+            #     now_directory = '/' + str(now.year) + '/' + str(now.month) + '/' + str(now.day) + '/'
+            #     download_experiment_directory = settings.MEDIA_ROOT + '/' + 'uploads' + now_directory
+            #     download_complete_filename = path.join(download_experiment_directory, export_filename)
+            #     experiment.download_url = download_experiment_directory
+            #
+            #     with open(export_complete_filename, 'rb') as f:
+            #         data = f.read()
+            #
+            #     with open(download_complete_filename, 'wb') as f:
+            #         f.write(data)
 
             update_export_instance(input_export_file, output_export_file, export_instance)
 
