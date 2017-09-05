@@ -1,5 +1,6 @@
 {% load highlight %}
 {% load i18n %}
+{# TODO: IMPORTANT! See if is really necessary to have this for loop #}
 {% for tms_device_setting in result.object.tms_device_settings.all %}
     <tr class="tmsdevice-matches">
         <td>
