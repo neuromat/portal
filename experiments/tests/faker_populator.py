@@ -13,10 +13,11 @@ from experiments.models import Gender, ClassificationOfDiseases, Keyword, \
 from experiments.models import Experiment, Study, Group, Researcher
 from experiments.tests.tests_helper import create_experiment_groups, \
     create_ethics_committee_info, create_step, create_tms_setting, \
-    create_tms_device, create_coil_model, create_tms_device_setting
+    create_tms_device, create_coil_model, create_tms_device_setting, \
+    objects_to_test_search
 from experiments.tests.tests_helper import create_classification_of_deseases
 from experiments.tests.tests_helper import create_experiment_protocol
-from experiments.tests.tests_helper import create_participants
+from experiments.tests.tests_helper import create_participant
 from experiments.tests.tests_helper import create_study_collaborator
 from experiments.tests.tests_helper import create_keyword
 from nep.local_settings import BASE_DIR
@@ -178,7 +179,7 @@ gender2 = Gender.objects.create(name='female')
 # Create groups' experimental protocols and participants
 for group in Group.objects.all():
     create_experiment_protocol(group)
-    create_participants(
+    create_participant(
         randint(3, 7), group,
         gender1 if randint(1, 2) == 1 else gender2
     )
@@ -214,6 +215,9 @@ tms_device.save()
 create_tms_setting(1, experiment)
 tms_setting = TMSSetting.objects.last()
 tmsds = create_tms_device_setting(1, tms_setting, tms_device, coil_model)
+
+# Create TMSData to test search
+objects_to_test_search()
 
 # TODO: After populating models we call 'manage.py rebuild_index --noinput' to
 # TODO: rebuild haystack search index - to manually test searching.

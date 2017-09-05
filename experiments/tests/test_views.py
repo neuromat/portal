@@ -1,4 +1,5 @@
 import haystack
+import sys
 from django.contrib.auth.models import User
 from django.core.management import call_command
 from django.test import TestCase, override_settings
@@ -178,15 +179,29 @@ class SearchTest(TestCase):
     def setUp(self):
         global_setup_ut()
         haystack.connections.reload('default')
+        self.haystack_index('rebuild_index')
+
+    def tearDown(self):
+        self.haystack_index('clear_index')
+
+    @staticmethod
+    def haystack_index(action):
+        # Redirect sys.stderr to avoid display
+        # "GET http://127.0.0.1:9200/haystack/_mapping"
+        # during tests.
+        # TODO: see:
+        # https://github.com/django-haystack/django-haystack/issues/1142
+        stderr_backup, sys.stderr = sys.stderr, \
+                                    open('/tmp/haystack_errors.txt', 'w+')
+        call_command(action, verbosity=0, interactive=False)
+        sys.stderr = stderr_backup
 
     def test_search_redirects_to_homepage_with_search_results(self):
-        call_command('rebuild_index', verbosity=0, interactive=False)
         response = self.client.get('/search/', {'q': 'plexus'})
         self.assertEqual(response.status_code, 200)
         # TODO: is it needed to test for redirected page?
 
     def test_search_returns_only_approved_experiments(self):
-        call_command('rebuild_index', verbosity=0, interactive=False)
         # response without filter
         response = self.client.get('/search/', {'q': 'Braquial+Plexus'})
         # TODO: complete this test!

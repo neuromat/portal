@@ -1,12 +1,25 @@
 import time
 
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
+from django.test import override_settings
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 
 from experiments.tests.tests_helper import global_setup_ft, apply_setup
 
+# To test haystack using a new index, instead of the settings.py index
+TEST_HAYSTACK_CONNECTIONS = {
+    'default': {
+        'ENGINE':
+            'haystack.backends.elasticsearch_backend.ElasticsearchSearchEngine',
+        'URL': 'http://127.0.0.1:9200/',
+        'INDEX_NAME': 'test_haystack',
+        'TIMEOUT': 60 * 10,
+    }
+}
 
+
+@override_settings(HAYSTACK_CONNECTIONS=TEST_HAYSTACK_CONNECTIONS)
 @apply_setup(global_setup_ft)
 class FunctionalTest(StaticLiveServerTestCase):
 

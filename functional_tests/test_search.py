@@ -1,4 +1,8 @@
+import sys
+
+import haystack
 from django.core.management import call_command
+from django.test import override_settings
 
 from experiments.models import Study, Experiment, Group, Step
 from functional_tests.base import FunctionalTest
@@ -10,11 +14,24 @@ class SearchTest(FunctionalTest):
 
     def setUp(self):
         super(SearchTest, self).setUp()
-        self.rebuild_index()
+        haystack.connections.reload('default')
+        self.haystack_index('rebuild_index')
+
+    def tearDown(self):
+        super(SearchTest, self).tearDown()
+        self.haystack_index('clear_index')
 
     @staticmethod
-    def rebuild_index():
-        call_command('rebuild_index', verbosity=0, interactive=False)
+    def haystack_index(action):
+        # Redirect sys.stderr to avoid display
+        # "GET http://127.0.0.1:9200/haystack/_mapping"
+        # during tests.
+        # TODO: see:
+        # https://github.com/django-haystack/django-haystack/issues/1142
+        stderr_backup, sys.stderr = sys.stderr, \
+                                    open('/tmp/haystack_errors.txt', 'w+')
+        call_command(action, verbosity=0, interactive=False)
+        sys.stderr = stderr_backup
 
     def verify_n_objects_in_table_rows(self, n, row_class):
         table = self.browser.find_element_by_id('search_table')
@@ -442,9 +459,9 @@ class SearchTest(FunctionalTest):
         # whose manufacturer name is 'Siemens'
         self.search_for('Siemens')
 
-        # As there is one TMSDevice object that has Siemens as manufacturer,
-        # but two TMSDeviceSetting objects that has that TMSDevice object as
-        # a Foreign Key, she sees just two rows in Search Results list
+        # As there is one TMSDevice object that has Magstim as manufacturer,
+        # but three TMSDeviceSetting objects that has that TMSDevice object as
+        # a Foreign Key, she sees three rows in Search Results list
         self.verify_n_objects_in_table_rows(3, 'tmsdevice-matches')
         self.verify_n_objects_in_table_rows(0, 'tmsdevicesetting-matches')
         self.verify_n_objects_in_table_rows(0, 'tmssetting-matches')
@@ -461,9 +478,9 @@ class SearchTest(FunctionalTest):
         # Joselina searches for an experiment in which was used a Coil Model
         # whose name is 'Magstim'
         self.search_for('Magstim')
-        # As there is one TMSDevice object that has Siemens as manufacturer,
-        # but two TMSDeviceSetting objects that has that TMSDevice object as
-        # a Foreign Key, she sees just two rows in Search Results list
+        # As there is one CoilModel object that has Magstim as manufacturer,
+        # but three TMSDeviceSetting objects that has that CoilModel object as
+        # a Foreign Key, she sees three rows in Search Results list
         self.verify_n_objects_in_table_rows(3, 'coilmodel-matches')
         self.verify_n_objects_in_table_rows(0, 'tmsdevice-matches')
         self.verify_n_objects_in_table_rows(0, 'tmsdevicesetting-matches')
@@ -476,3 +493,32 @@ class SearchTest(FunctionalTest):
             'coilmodel-matches'
         ).text
         self.assertIn('Magstim', tmsdevicesetting_text)
+
+    def test_search_tmsdata_returns_correct_objects(self):
+        # TODO: we are testing manually because search tests is giving
+        # TODO: non-deterministics results uncontrollably from now one
+        # TODO: irrespective of any testing jerry-rigs to make tests pass.
+        # Obs.: the tests commented bellow "passed" manually in localhost,
+        # by creating entries in faker_populator.
+
+        # Joselina searches for an experiment whose TMSData of a participant
+        # has collecting data from 'cerebral cortex'
+        self.search_for('cerebral cortex')
+        # As there is three TMSData object with 'cereberal cortex' as the
+        # brain_area_name field, one of them associated with a TMSSetting
+        # object, and other two associated with another TMSSetting object
+        # she sees two rows in Search Results list
+        self.verify_n_objects_in_table_rows(3, 'tmsdata-matches')
+        self.verify_n_objects_in_table_rows(0, 'coilmodel-matches')
+        self.verify_n_objects_in_table_rows(0, 'tmsdevice-matches')
+        self.verify_n_objects_in_table_rows(0, 'tmsdevicesetting-matches')
+        self.verify_n_objects_in_table_rows(0, 'tmssetting-matches')
+        self.verify_n_objects_in_table_rows(0, 'experiment-matches')
+        self.verify_n_objects_in_table_rows(0, 'study-matches')
+        self.verify_n_objects_in_table_rows(0, 'group-matches')
+        self.verify_n_objects_in_table_rows(0, 'experimentalprotocol-matches')
+        tmsdevicesetting_text = self.browser.find_element_by_class_name(
+            'tmsdata-matches'
+        ).text
+        self.assertIn('cerebral cortex', tmsdevicesetting_text)
+

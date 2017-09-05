@@ -8,7 +8,9 @@ from experiments.helpers import generate_image_file
 from experiments.models import Experiment, Study, Group, Researcher, \
     Collaborator, Participant, Gender, ExperimentalProtocol, \
     ClassificationOfDiseases, Keyword, Step, TMSSetting, TMSDevice, CoilModel, \
-    TMSDeviceSetting
+    TMSDeviceSetting, TMSData
+
+import random
 
 
 def create_experiment_groups(qtty, experiment):
@@ -92,7 +94,7 @@ def create_researchers():
                                     coordinator=False, study=study)
 
 
-def create_participants(qtty, group, gender):
+def create_participant(qtty, group, gender):
     """
     :param gender:
     :param qtty:
@@ -284,6 +286,54 @@ def create_tms_device_setting(qtty, tms_setting, tms_device, coil_model):
         )
 
 
+def create_tms_data(qtty, tmssetting, participant):
+    """
+    :param qtty: number of tms data objects to create
+    :param tmssetting: TMSSetting model instance
+    :param participant: Participant model instance
+    """
+    faker = Factory.create()
+
+    for i in range(qtty):
+        TMSData.objects.create(
+            participant=participant,
+            date=datetime.utcnow(),
+            tms_setting=tmssetting,
+            resting_motor_threshold=round(random.uniform(0, 10), 2),
+            test_pulse_intensity_of_simulation=round(random.uniform(0, 10), 2),
+            second_test_pulse_intensity=round(random.uniform(0, 10), 2),
+            interval_between_pulses=randint(0, 10),
+            interval_between_pulses_unit='s',
+            time_between_mep_trials=randint(0, 10),
+            description=faker.text(), hotspot_name=faker.word(),
+            localization_system_name=faker.word(),
+            localization_system_description=faker.text(),
+            brain_area_name=faker.word(),
+            brain_area_description=faker.text(),
+            brain_area_system_name=faker.word(),
+            brain_area_system_description=faker.text()
+        )
+
+
+def objects_to_test_search():
+    """
+    Requires having created at least one Participant and two TMSSetting objects
+    """
+    participant = Participant.objects.last()
+    create_tms_data(1, TMSSetting.objects.first(), participant)
+    tms_data = TMSData.objects.last()
+    tms_data.brain_area_name = 'cerebral cortex'
+    tms_data.save()
+    create_tms_data(1, TMSSetting.objects.last(), participant)
+    tms_data = TMSData.objects.last()
+    tms_data.brain_area_name = 'cerebral cortex'
+    tms_data.save()
+    create_tms_data(1, TMSSetting.objects.last(), participant)
+    tms_data = TMSData.objects.last()
+    tms_data.brain_area_name = 'cerebral cortex'
+    tms_data.save()
+
+
 def global_setup_ft():
     """
     This global setup creates basic object models that are used in 
@@ -445,7 +495,7 @@ def global_setup_ft():
     # groups before)
     for group in Group.objects.all():
         create_experiment_protocol(group)
-        create_participants(
+        create_participant(
             randint(3, 7), group,
             gender1 if randint(1, 2) == 1 else gender2
         )
@@ -505,6 +555,11 @@ def global_setup_ft():
     # coil_model.save()
     create_tms_device_setting(1, tms_setting, tms_device, coil_model)  # 3º
     # TMSDeviceSetting
+
+    # Create TMSData objects to test search
+    # TODO: the tests returns non-deterministic search results.
+    objects_to_test_search()
+
 
 
 def global_setup_ut():

@@ -246,13 +246,13 @@ class NepSearchView(SearchView):
         if not context['query']:
             for i in range(0, len(old_object_list)):
                 if old_object_list[i].model_name == 'experiment':
-                    print(old_object_list[i].object.id)  # DEBUG. See TODO
+                    # print(old_object_list[i].object.id)  # DEBUG. See TODO
                     # in tests_helper
                     groups = old_object_list[i].object.groups.all()
                     count = 0
                     for search_filter in search_filters:
                         for group in groups:
-                            print(group.steps.all())  # DEBUG. See TODO in
+                            # print(group.steps.all())  # DEBUG. See TODO in
                             # tests_helper
                             if group.steps.filter(
                                     type=search_filter

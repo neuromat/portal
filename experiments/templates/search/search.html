@@ -49,6 +49,9 @@
                 {% if result.model_name == 'coilmodel' %}
                     {% include 'search/coilmodel.html' %}
                 {% endif %}
+                {% if result.model_name == 'tmsdata' %}
+                    {% include 'search/tmsdata.html' %}
+                {% endif %}
             {% empty %}
                 <p>{% trans "No results found" %}.</p>
             {% endfor %}
