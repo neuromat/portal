@@ -1,0 +1,31 @@
+{% load highlight %}
+{% load i18n %}
+<tr class="tmsdata-matches">
+    <td>
+        <h5 class="match">
+            <a href="
+{% url 'experiment-detail' result.object.tms_setting.experiment.id %}"><strong
+            >{% trans "Experiment" %}: </strong>
+                {{ result.object.tms_setting.experiment.title }} <strong>>
+                    {% trans "TMS Setting" %}: </strong>
+                {{ result.object.tms_setting.name }}&nbsp;<strong>>
+                    {% trans "TMS Data" %}</strong></a><br><br>
+        </h5>
+        <strong>{% trans "Description" %}: </strong>
+        {% highlight result.object.description with query %}&nbsp;
+        <strong>{% trans "Hotspot Name" %}: </strong>
+        {% highlight result.object.hotspot_name with query %}&nbsp;
+        <strong>{% trans "Localization System Name" %}: </strong>
+        {% highlight result.object.localization_system_name with query %}&nbsp;
+        <strong>{% trans "Localization System Description" %}: </strong>
+        {% highlight result.object.localization_system_description with query %}&nbsp;
+        <strong>{% trans "Brain Area Name" %}: </strong>
+        {% highlight result.object.brain_area_name with query %}&nbsp;
+        <strong>{% trans "Brain Area Description" %}: </strong>
+        {% highlight result.object.brain_area_system_description with query %}&nbsp;
+        <strong>{% trans "Brain Area System Name" %}: </strong>
+        {% highlight result.object.brain_area_system_name with query %}&nbsp;
+        <strong>{% trans "Brain Area System Description" %}: </strong>
+        {% highlight result.object.brain_area_system_description with query %}&nbsp;
+    </td>
+</tr>
