@@ -8,7 +8,7 @@ from experiments.helpers import generate_image_file
 from experiments.models import Experiment, Study, Group, Researcher, \
     Collaborator, Participant, Gender, ExperimentalProtocol, \
     ClassificationOfDiseases, Keyword, Step, TMSSetting, TMSDevice, CoilModel, \
-    TMSDeviceSetting, TMSData
+    TMSDeviceSetting, TMSData, EEGSetting
 
 import random
 
@@ -315,7 +315,7 @@ def create_tms_data(qtty, tmssetting, participant):
         )
 
 
-def objects_to_test_search():
+def create_tmsdata_objects_to_test_search():
     """
     Requires having created at least one Participant and two TMSSetting objects
     """
@@ -332,6 +332,35 @@ def objects_to_test_search():
     tms_data = TMSData.objects.last()
     tms_data.brain_area_name = 'cerebral cortex'
     tms_data.save()
+
+
+def create_eeg_setting(qtty, experiment):
+    """
+    :param qtty: number of eeg setting objects to create
+    :param experiment: Experiment model instance
+    """
+    faker = Factory.create()
+
+    for i in range(qtty):
+        EEGSetting.objects.create(experiment=experiment, name=faker.word(),
+                                  description=faker.text())
+
+
+def create_eegsetting_objects_to_test_search():
+    experiment1 = Experiment.objects.filter(status=Experiment.APPROVED).first()
+    experiment2 = Experiment.objects.filter(status=Experiment.APPROVED).last()
+
+    create_eeg_setting(2, experiment1)
+    tmss1 = EEGSetting.objects.first()
+    tmss1.name = 'eegsettingname'
+    tmss1.save()
+    tmss2 = EEGSetting.objects.last()
+    tmss2.name = 'eegsettingname'
+    tmss2.save()
+    create_eeg_setting(1, experiment2)
+    tmss3 = EEGSetting.objects.last()
+    tmss3.name = 'eegsettingname'
+    tmss3.save()
 
 
 def global_setup_ft():
@@ -558,8 +587,10 @@ def global_setup_ft():
 
     # Create TMSData objects to test search
     # TODO: the tests returns non-deterministic search results.
-    objects_to_test_search()
+    create_tmsdata_objects_to_test_search()
 
+    # Create EEGSetting object to test search
+    create_eegsetting_objects_to_test_search()
 
 
 def global_setup_ut():
@@ -590,6 +621,16 @@ def global_setup_ut():
         title='Experiment 3', nes_id=2, owner=owner2,
         version=1, sent_date=datetime.utcnow(),
         status=Experiment.TO_BE_ANALYSED
+    )
+    experiment4 = Experiment.objects.create(
+        title='Experiment 4', nes_id=3, owner=owner1,
+        version=1, sent_date=datetime.utcnow(),
+        status=Experiment.APPROVED
+    )
+    experiment5 = Experiment.objects.create(
+        title='Experiment 5', nes_id=4, owner=owner2,
+        version=1, sent_date=datetime.utcnow(),
+        status=Experiment.APPROVED
     )
     create_ethics_committee_info(experiment3)
 
@@ -625,6 +666,9 @@ def global_setup_ut():
         name='Colaborador 2', team='Numec', coordinator=False,
         study=study1
     )
+
+    # To test search
+    create_eegsetting_objects_to_test_search()
 
 
 def apply_setup(setup_func):
