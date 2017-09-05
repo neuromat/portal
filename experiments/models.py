@@ -1,3 +1,5 @@
+from os import path
+
 from django.db import models
 from django.db.models import Max, Q
 from django.contrib.auth.models import User
@@ -43,7 +45,7 @@ class Experiment(models.Model):
     data_acquisition_done = models.BooleanField(default=False)
     sent_date = models.DateField(auto_now=True)
     project_url = models.CharField(max_length=255, blank=True, null=True)
-    download_url = models.FileField(upload_to="uploads/%Y/%m/%d/", null=True, blank=True)
+    download_url = models.FileField(upload_to=get_data_file_dir, null=True, blank=True)
     ethics_committee_url = models.CharField(max_length=255, blank=True,
                                             null=True)
     ethics_committee_file = models.FileField(
@@ -62,6 +64,14 @@ class Experiment(models.Model):
 
     class Meta:
         unique_together = ('nes_id', 'owner', 'version')
+
+
+def get_data_file_dir(instance, filename):
+    directory = "download"
+    if isinstance(instance, Experiment):
+        directory = path.join(directory, instance.id)
+
+    return path.join(directory, filename)
 
 
 class ClassificationOfDiseases(models.Model):

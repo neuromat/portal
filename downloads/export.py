@@ -72,7 +72,7 @@ class ExportExecution:
 
     def get_directory_base(self):
 
-        return self.directory_base  # MEDIA_ROOT/download/export_id
+        return self.directory_base  # MEDIA_ROOT/temp/export_id
 
     def __init__(self, export_id):
         # self.get_session_key()
@@ -82,7 +82,7 @@ class ExportExecution:
         # self.headers = []
         # self.fields = []
         self.directory_base = ''
-        self.base_directory_name = path.join(settings.MEDIA_ROOT, "download")
+        self.base_directory_name = path.join(settings.MEDIA_ROOT, "temp")
         # self.directory_base = self.base_directory_name
         self.set_directory_base(export_id)
         self.base_export_directory = ""

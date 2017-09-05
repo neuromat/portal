@@ -17,7 +17,8 @@ from zipfile import ZipFile
 
 JSON_FILENAME = "json_export.json"
 JSON_EXPERIMENT_FILENAME = "json_experiment_export.json"
-EXPORT_DIRECTORY = "download"
+EXPORT_DIRECTORY = "temp"
+DOWNLOAD_DIRECTORY = "download"
 EXPORT_FILENAME = "download.zip"
 EXPORT_EXPERIMENT_FILENAME = "download_experiment.zip"
 
@@ -48,14 +49,14 @@ def download_view(request, experiment_id):
 
         messages.success(request, "Export was finished correctly")
 
-        print("antes do fim: httpResponse")
-
-        zip_file = open(complete_filename, 'rb')
-        response = HttpResponse(zip_file, content_type='application/zip')
-        response['Content-Disposition'] = 'attachment; filename="export.zip"'
-        response['Content-Length'] = path.getsize(complete_filename)
-        response['Set-Cookie'] = 'fileDownload=true; path=/'
-        return response
+        # print("antes do fim: httpResponse")
+        #
+        # zip_file = open(complete_filename, 'rb')
+        # response = HttpResponse(zip_file, content_type='application/zip')
+        # response['Content-Disposition'] = 'attachment; filename="export.zip"'
+        # response['Content-Length'] = path.getsize(complete_filename)
+        # response['Set-Cookie'] = 'fileDownload=true; path=/'
+        # return response
     else:
         messages.error(request, "Export data was not generated.")
 
@@ -80,14 +81,14 @@ def export_create(request, export_id, input_filename, experiment_id, template_na
         export_instance = get_export_instance(export_id)
         export = ExportExecution(export_instance.id)
 
-        # set path of the directory base: ex. /Users/.../portal/media/download/
+        # set path of the directory base: ex. /Users/.../portal/media/temp/
         base_directory, path_to_create = path.split(export.get_directory_base())
-        # create directory base ex. /Users/.../portal/media/download/path_create
+        # create directory base ex. /Users/.../portal/media/temp/path_create
         error_msg, base_directory_name = create_directory(base_directory, path_to_create)
         if error_msg != "":
             messages.error(request, error_msg)
             return render(request, template_name)
-        # ex. /Users/.../portal/media/download/export_instance.id/json_export.json
+        # ex. /Users/.../portal/media/temp/export_instance.id/json_export.json
         input_export_file = path.join("export", path.join(path.join(str(export_instance.id), str(input_filename))))
 
         # language_code = request.LANGUAGE_CODE
@@ -131,6 +132,16 @@ def export_create(request, export_id, input_filename, experiment_id, template_na
             export_filename = export.get_input_data("export_filename")  # 'download.zip'
 
             export_complete_filename = path.join(base_directory_name, export_filename)
+            directory_download_base = path.join(settings.MEDIA_ROOT, "download")
+            download_experiment_directory = path.join(directory_download_base, experiment_id)
+
+            if not path.exists(download_experiment_directory):
+                error_msg, download_experiment_directory = create_directory(directory_download_base, experiment_id)
+                if error_msg != "":
+                    messages.error(request, error_msg)
+                    return render(request, template_name)
+
+            download_complete_filename = path.join(download_experiment_directory, export_filename)
 
             with ZipFile(export_complete_filename, 'w') as zip_file:
                 for filename, directory in export.files_to_zip_list:
@@ -138,10 +149,25 @@ def export_create(request, export_id, input_filename, experiment_id, template_na
 
                     zip_file.write(filename.encode('utf-8'), path.join(directory, fname))
 
+            # with ZipFile(download_complete_filename, 'w') as zip_file:
+            #     for filename, directory in export.files_to_zip_list:
+            #         fdir, fname = path.split(filename)
+            #
+            #         zip_file.write(filename.encode('utf-8'), path.join(directory, fname))
+
             zip_file.close()
 
             output_export_file = path.join("download", path.join(path.join(str(export_instance.id),
                                                                            str(export_filename))))
+
+            # output_download_file = path.join("download", path.join(path.join(str(experiment_id),
+            #                                                                  str(export_filename))))
+
+            with open(export_complete_filename, 'rb') as f:
+                data = f.read()
+
+            with open(download_complete_filename, 'wb') as f:
+                f.write(data)
 
             experiment = get_object_or_404(Experiment, pk=experiment_id)
 
