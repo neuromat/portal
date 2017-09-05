@@ -2,7 +2,6 @@ import sys
 
 import haystack
 from django.core.management import call_command
-from django.test import override_settings
 
 from experiments.models import Study, Experiment, Group, Step
 from functional_tests.base import FunctionalTest
@@ -522,3 +521,25 @@ class SearchTest(FunctionalTest):
         ).text
         self.assertIn('cerebral cortex', tmsdevicesetting_text)
 
+    def test_search_eegsetting_returns_correct_objects(self):
+        # Joselina wants to search for experiments whose EEGSetting name is
+        # 'eegsettingname'
+        self.search_for('eegsettingname')
+
+        # As there is three EEGSetting objects with that name,
+        # one associated to an experiment, and the other two associated with
+        # another experiment, she sees three rows in Search Results list
+        self.verify_n_objects_in_table_rows(3, 'eegsetting-matches')
+        self.verify_n_objects_in_table_rows(0, 'tmsdata-matches')
+        self.verify_n_objects_in_table_rows(0, 'coilmodel-matches')
+        self.verify_n_objects_in_table_rows(0, 'tmsdevice-matches')
+        self.verify_n_objects_in_table_rows(0, 'tmsdevicesetting-matches')
+        self.verify_n_objects_in_table_rows(0, 'tmssetting-matches')
+        self.verify_n_objects_in_table_rows(0, 'experiment-matches')
+        self.verify_n_objects_in_table_rows(0, 'study-matches')
+        self.verify_n_objects_in_table_rows(0, 'group-matches')
+        self.verify_n_objects_in_table_rows(0, 'experimentalprotocol-matches')
+        eegsetting_text = self.browser.find_element_by_class_name(
+            'eegsetting-matches'
+        ).text
+        self.assertIn('eegsettingname', eegsetting_text)

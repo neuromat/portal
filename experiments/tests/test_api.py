@@ -27,6 +27,8 @@ class ExperimentAPITest(APITestCase):
         experiment1 = Experiment.objects.get(nes_id=1, owner=owner1)
         experiment2 = Experiment.objects.get(nes_id=1, owner=owner2)
         experiment3 = Experiment.objects.get(nes_id=2, owner=owner2)
+        experiment4 = Experiment.objects.get(nes_id=3, owner=owner1)
+        experiment5 = Experiment.objects.get(nes_id=4, owner=owner2)
         response = self.client.get(self.list_url)
         self.assertEqual(
             json.loads(response.content.decode('utf8')),
@@ -77,7 +79,37 @@ class ExperimentAPITest(APITestCase):
                     'ethics_committee_url': experiment3.ethics_committee_url,
                     'ethics_committee_file': 'http://testserver' +
                                              experiment3.ethics_committee_file.url
-                }
+                },
+                {
+                    'id': experiment4.id,
+                    'title': experiment4.title,
+                    'description': experiment4.description,
+                    'data_acquisition_done':
+                        experiment4.data_acquisition_done,
+                    'nes_id': experiment4.nes_id,
+                    'owner': experiment4.owner.username,
+                    'status': experiment4.status,
+                    'protocol_components': [],
+                    'sent_date': experiment4.sent_date.strftime('%Y-%m-%d'),
+                    'project_url': experiment4.project_url,
+                    'ethics_committee_url': experiment4.ethics_committee_url,
+                    'ethics_committee_file': None
+                },
+                {
+                    'id': experiment5.id,
+                    'title': experiment5.title,
+                    'description': experiment5.description,
+                    'data_acquisition_done':
+                        experiment5.data_acquisition_done,
+                    'nes_id': experiment5.nes_id,
+                    'owner': experiment5.owner.username,
+                    'status': experiment5.status,
+                    'protocol_components': [],
+                    'sent_date': experiment5.sent_date.strftime('%Y-%m-%d'),
+                    'project_url': experiment5.project_url,
+                    'ethics_committee_url': experiment5.ethics_committee_url,
+                    'ethics_committee_file': None
+                },
             ]
         )
 

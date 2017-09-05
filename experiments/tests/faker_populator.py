@@ -14,7 +14,7 @@ from experiments.models import Experiment, Study, Group, Researcher
 from experiments.tests.tests_helper import create_experiment_groups, \
     create_ethics_committee_info, create_step, create_tms_setting, \
     create_tms_device, create_coil_model, create_tms_device_setting, \
-    objects_to_test_search
+    create_tmsdata_objects_to_test_search
 from experiments.tests.tests_helper import create_classification_of_deseases
 from experiments.tests.tests_helper import create_experiment_protocol
 from experiments.tests.tests_helper import create_participant
@@ -217,7 +217,7 @@ tms_setting = TMSSetting.objects.last()
 tmsds = create_tms_device_setting(1, tms_setting, tms_device, coil_model)
 
 # Create TMSData to test search
-objects_to_test_search()
+create_tmsdata_objects_to_test_search()
 
 # TODO: After populating models we call 'manage.py rebuild_index --noinput' to
 # TODO: rebuild haystack search index - to manually test searching.

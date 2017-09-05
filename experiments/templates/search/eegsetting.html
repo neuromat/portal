@@ -1,0 +1,15 @@
+{% load highlight %}
+{% load i18n %}
+<tr class="eegsetting-matches">
+    <td>
+        <h5 class="match">
+            <a href="{% url 'experiment-detail' result.object.experiment.id %}"><strong>{% trans "Experiment" %}: </strong>{{ result.object.experiment.title }}
+                <strong>> {% trans "EEG Setting" %}: </strong>
+                {{ result.object.name }}</a><br><br>
+        </h5>
+        <strong>{% trans "name" %}: </strong>
+        {% highlight result.object.name with query %}&nbsp;
+        <strong>{% trans "description" %}: </strong>
+        {% highlight result.object.description with query %}&nbsp;
+    </td>
+</tr>

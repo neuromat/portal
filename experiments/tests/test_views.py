@@ -228,3 +228,10 @@ class SearchTest(TestCase):
         self.assertEqual(results.count(), 1)
         self.assertEqual(results[0].model_name, 'experiment')
         self.assertEqual(results[0].object.title, 'Experiment 2')
+
+    # TODO: test other objects following this structure
+    def test_search_eegsetting_returns_correct_objects(self):
+        response = self.client.get('/search/', {'q': 'eegsettingname'})
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, '<tr', 3)  # because in search results
+        # templates it's '<tr class ...>'
