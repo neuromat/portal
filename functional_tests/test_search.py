@@ -495,31 +495,30 @@ class SearchTest(FunctionalTest):
         self.assertIn('Magstim', tmsdevicesetting_text)
 
     def test_search_tmsdata_returns_correct_objects(self):
-        pass
         # TODO: we are testing manually because search tests is giving
         # TODO: non-deterministics results uncontrollably from now one
-        # TODO: irrespective of any testing limitations to tests pass.
+        # TODO: irrespective of any testing jerry-rigs to make tests pass.
         # Obs.: the tests commented bellow "passed" manually in localhost,
         # by creating entries in faker_populator.
 
-        # # Joselina searches for an experiment whose TMSData of a participant
-        # # has collecting data from 'cerebral cortex'
-        # self.search_for('cerebral cortex')
-        # # As there is three TMSData object with 'cereberal cortex' as the
-        # # brain_area_name field, one of them associated with a TMSSetting
-        # # object, and other two associated with another TMSSetting object
-        # # she sees two rows in Search Results list
-        # self.verify_n_objects_in_table_rows(3, 'tmsdata-matches')
-        # self.verify_n_objects_in_table_rows(0, 'coilmodel-matches')
-        # self.verify_n_objects_in_table_rows(0, 'tmsdevice-matches')
-        # self.verify_n_objects_in_table_rows(0, 'tmsdevicesetting-matches')
-        # self.verify_n_objects_in_table_rows(0, 'tmssetting-matches')
-        # self.verify_n_objects_in_table_rows(0, 'experiment-matches')
-        # self.verify_n_objects_in_table_rows(0, 'study-matches')
-        # self.verify_n_objects_in_table_rows(0, 'group-matches')
-        # self.verify_n_objects_in_table_rows(0, 'experimentalprotocol-matches')
-        # tmsdevicesetting_text = self.browser.find_element_by_class_name(
-        #     'tmsdata-matches'
-        # ).text
-        # self.assertIn('cerebral cortex', tmsdevicesetting_text)
+        # Joselina searches for an experiment whose TMSData of a participant
+        # has collecting data from 'cerebral cortex'
+        self.search_for('cerebral cortex')
+        # As there is three TMSData object with 'cereberal cortex' as the
+        # brain_area_name field, one of them associated with a TMSSetting
+        # object, and other two associated with another TMSSetting object
+        # she sees two rows in Search Results list
+        self.verify_n_objects_in_table_rows(3, 'tmsdata-matches')
+        self.verify_n_objects_in_table_rows(0, 'coilmodel-matches')
+        self.verify_n_objects_in_table_rows(0, 'tmsdevice-matches')
+        self.verify_n_objects_in_table_rows(0, 'tmsdevicesetting-matches')
+        self.verify_n_objects_in_table_rows(0, 'tmssetting-matches')
+        self.verify_n_objects_in_table_rows(0, 'experiment-matches')
+        self.verify_n_objects_in_table_rows(0, 'study-matches')
+        self.verify_n_objects_in_table_rows(0, 'group-matches')
+        self.verify_n_objects_in_table_rows(0, 'experimentalprotocol-matches')
+        tmsdevicesetting_text = self.browser.find_element_by_class_name(
+            'tmsdata-matches'
+        ).text
+        self.assertIn('cerebral cortex', tmsdevicesetting_text)
 

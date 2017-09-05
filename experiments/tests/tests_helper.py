@@ -558,14 +558,8 @@ def global_setup_ft():
 
     # Create TMSData objects to test search
     # TODO: the tests returns non-deterministic search results.
-    # objects_to_test_search()
+    objects_to_test_search()
 
-    ##
-    # DEBUG
-    ##
-    # for group in Group.objects.all():
-    #     print(group.steps.all())
-    # print('\n')
 
 
 def global_setup_ut():
