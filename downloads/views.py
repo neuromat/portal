@@ -47,18 +47,18 @@ def download_view(request, experiment_id):
 
     if complete_filename:
 
-        messages.success(request, "Export was finished correctly")
+        messages.success(request, "Download was finished correctly")
 
         # print("antes do fim: httpResponse")
         #
-        # zip_file = open(complete_filename, 'rb')
-        # response = HttpResponse(zip_file, content_type='application/zip')
+        zip_file = open(complete_filename, 'rb')
+        response = HttpResponse(zip_file, content_type='application/zip')
         # response['Content-Disposition'] = 'attachment; filename="export.zip"'
         # response['Content-Length'] = path.getsize(complete_filename)
-        # response['Set-Cookie'] = 'fileDownload=true; path=/'
-        # return response
+        response['Set-Cookie'] = 'fileDownload=true; path=/'
+        return response
     else:
-        messages.error(request, "Export data was not generated.")
+        messages.error(request, "Download data was not generated.")
 
     return HttpResponseRedirect(template_name)
 
@@ -171,21 +171,9 @@ def export_create(request, export_id, input_filename, experiment_id, template_na
 
             experiment = get_object_or_404(Experiment, pk=experiment_id)
 
-            # if not experiment.download_url:
-            #     now = datetime.datetime.now()
-            #     now_directory = '/' + str(now.year)
-            #     download_experiment_directory = settings.MEDIA_ROOT + '/' + 'uploads' + now_directory
-            #
-            #     now_directory = '/' + str(now.year) + '/' + str(now.month) + '/' + str(now.day) + '/'
-            #     download_experiment_directory = settings.MEDIA_ROOT + '/' + 'uploads' + now_directory
-            #     download_complete_filename = path.join(download_experiment_directory, export_filename)
-            #     experiment.download_url = download_experiment_directory
-            #
-            #     with open(export_complete_filename, 'rb') as f:
-            #         data = f.read()
-            #
-            #     with open(download_complete_filename, 'wb') as f:
-            #         f.write(data)
+            experiment.download_url = "download/" + experiment_id + "/" + export_filename
+            experiment.save(update_fields=["download_url"])
+
 
             update_export_instance(input_export_file, output_export_file, export_instance)
 
@@ -198,7 +186,7 @@ def export_create(request, export_id, input_filename, experiment_id, template_na
         # messages.success(request, "Export was finished correctly")
         print("finalizado corretamente 2")
 
-        return export_complete_filename
+        return download_complete_filename
 
     except OSError as e:
         print(e)

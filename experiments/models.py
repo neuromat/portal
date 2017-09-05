@@ -21,6 +21,14 @@ class CurrentExperimentManager(models.Manager):
             .filter(q_statement)
 
 
+def get_data_file_dir(instance, filename):
+    directory = "download"
+    if isinstance(instance, Experiment):
+        directory = path.join(directory, instance.id)
+
+    return path.join(directory, filename)
+
+
 # models
 class Experiment(models.Model):
     RECEIVING = 'receiving'
@@ -64,14 +72,6 @@ class Experiment(models.Model):
 
     class Meta:
         unique_together = ('nes_id', 'owner', 'version')
-
-
-def get_data_file_dir(instance, filename):
-    directory = "download"
-    if isinstance(instance, Experiment):
-        directory = path.join(directory, instance.id)
-
-    return path.join(directory, filename)
 
 
 class ClassificationOfDiseases(models.Model):
