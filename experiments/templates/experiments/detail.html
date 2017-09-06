@@ -189,6 +189,33 @@
 
                                         </p></h5>
                                     </blockquote>
+
+                                {% endif %}
+                                {% if emg_setting.emg_ad_converter_setting %}
+                                    <blockquote>
+                                        <h5><p>
+
+                                            <strong>{% trans "A/D converter setting: " %}{{ emg_setting.emg_ad_converter_setting.ad_converter.identification }}</strong><br/>
+                                            {{ emg_setting.emg_ad_converter_setting.ad_converter.description }}<br/>
+                                            {% if emg_setting.emg_ad_converter_setting.ad_converter.serial_number %}
+                                                {% trans "serial number: " %}{{ emg_setting.emg_ad_converter_setting.ad_converter.serial_number }}<br/>
+                                            {% endif %}
+                                            {% if emg_setting.emg_ad_converter_setting.ad_converter.signal_to_noise_rate %}
+                                                {% trans "signal to noise rate: " %}{{ emg_setting.emg_ad_converter_setting.ad_converter.signal_to_noise_rate }}<br/>
+                                            {% endif %}
+                                            {% if emg_setting.emg_ad_converter_setting.ad_converter.resolution %}
+                                                {% trans "resolution: " %}{{ emg_setting.emg_ad_converter_setting.ad_converter.resolution }}<br/>
+                                            {% endif %}
+                                            {% if emg_setting.emg_ad_converter_setting.ad_converter.sampling_rate %}
+                                                {% trans "sampling rate: " %}{{ emg_setting.emg_ad_converter_setting.ad_converter.sampling_rate }}<br/>
+                                            {% endif %}
+                                            {% if emg_setting.emg_ad_converter_setting.sampling_rate %}
+                                                {% trans "sampling rate setting: " %}{{ emg_setting.emg_ad_converter_setting.sampling_rate }}<br/>
+                                            {% endif %}
+
+                                        </p></h5>
+                                    </blockquote>
+
                                 {% endif %}
                             </div>
                         </div>
