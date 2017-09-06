@@ -1,0 +1,6 @@
+{{ object.name }}
+{{ object.description }}
+{{ object.coil_shape_name }}
+{{ object.material_name }}
+{{ object.material_description }}
+{{ object.coil_design }}

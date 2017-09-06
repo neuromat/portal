@@ -1,9 +1,13 @@
+import haystack
+import sys
 from django.contrib.auth.models import User
 from django.core.management import call_command
-from django.test import TestCase
+from django.test import TestCase, override_settings
+from haystack.query import SearchQuerySet
 
 from experiments import views
 from experiments.models import Experiment
+from experiments.tasks import rebuild_haystack_index
 from experiments.tests.tests_helper import apply_setup, global_setup_ut
 
 
@@ -156,12 +160,41 @@ class HomePageTest(TestCase):
         self.assertEqual(None, experiment.trustee)
 
 
+# To test haystack using a new index, instead of the settings.py index
+TEST_HAYSTACK_CONNECTIONS = {
+    'default': {
+        'ENGINE':
+            'haystack.backends.elasticsearch_backend.ElasticsearchSearchEngine',
+        'URL': 'http://127.0.0.1:9200/',
+        'INDEX_NAME': 'test_haystack',
+        'TIMEOUT': 60 * 10,
+    }
+}
+
+
+@override_settings(HAYSTACK_CONNECTIONS=TEST_HAYSTACK_CONNECTIONS)
 @apply_setup(global_setup_ut)
 class SearchTest(TestCase):
 
     def setUp(self):
         global_setup_ut()
-        call_command('rebuild_index', verbosity=0, interactive=False)
+        haystack.connections.reload('default')
+        self.haystack_index('rebuild_index')
+
+    def tearDown(self):
+        self.haystack_index('clear_index')
+
+    @staticmethod
+    def haystack_index(action):
+        # Redirect sys.stderr to avoid display
+        # "GET http://127.0.0.1:9200/haystack/_mapping"
+        # during tests.
+        # TODO: see:
+        # https://github.com/django-haystack/django-haystack/issues/1142
+        stderr_backup, sys.stderr = sys.stderr, \
+                                    open('/tmp/haystack_errors.txt', 'w+')
+        call_command(action, verbosity=0, interactive=False)
+        sys.stderr = stderr_backup
 
     def test_search_redirects_to_homepage_with_search_results(self):
         response = self.client.get('/search/', {'q': 'plexus'})
@@ -172,3 +205,33 @@ class SearchTest(TestCase):
         # response without filter
         response = self.client.get('/search/', {'q': 'Braquial+Plexus'})
         # TODO: complete this test!
+
+    def test_change_status_from_UNDER_ANALYSIS_to_APPROVED_reindex_haystack(
+            self):
+        # TODO: testing calling celery task directly. Didn't work posting
+        # TODO: approved experiment. Test with POST!
+        experiment = Experiment.objects.filter(
+            status=Experiment.UNDER_ANALYSIS
+        ).first()
+        experiment.status = Experiment.APPROVED
+        experiment.save()
+
+        # We are calling method directly without delay method. Test is not
+        # recognizing the result, although celery log reports success.
+        rebuild_haystack_index()
+
+        # Tests helper creates an experiment UNDER_ANALYSIS with 'Experiment
+        # 2' as experiment title
+        results = SearchQuerySet().filter(content='Experiment 2')
+        # results = SearchQuerySet().all()  # DEBUG
+        # TODO: by now we have 4 models been indexed
+        self.assertEqual(results.count(), 1)
+        self.assertEqual(results[0].model_name, 'experiment')
+        self.assertEqual(results[0].object.title, 'Experiment 2')
+
+    # TODO: test other objects following this structure
+    def test_search_eegsetting_returns_correct_objects(self):
+        response = self.client.get('/search/', {'q': 'eegsettingname'})
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, '<tr', 3)  # because in search results
+        # templates it's '<tr class ...>'

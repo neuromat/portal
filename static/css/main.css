@@ -200,6 +200,7 @@ a:hover.nep-btn {
 */
 
 .table-title {
+  clear: right;
   text-align: center;
 }
 

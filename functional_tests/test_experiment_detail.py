@@ -200,5 +200,3 @@ class ExperimentDetailTest(FunctionalTest):
                             .experimental_protocol.image),
             protocol_image_path
         )
-
-        self.fail('Finish this test!')

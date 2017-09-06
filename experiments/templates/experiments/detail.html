@@ -92,8 +92,7 @@
                             {{ eeg_setting.description }}
                             <div class="pull-right">
                                 <a role="button" data-toggle="collapse" data-parent="#accordion"
-                                   href="#collapse_eeg_setting_{{ eeg_setting.id }}"
-                                   aria-expanded="true" aria-controls="collapse_eeg_setting_{{ eeg_setting.id }}" class="nep-btn">
+                                   href="#collapse_eeg_setting_{{ eeg_setting.id }}" aria-expanded="true" class="nep-btn">
                                     {% trans "Details" %}</a>
                             </div>
                             <div id="collapse_eeg_setting_{{ eeg_setting.id }}"
@@ -154,6 +153,43 @@
                                    href="#collapse_emg_setting_{{ emg_setting.id }}"
                                    aria-expanded="true" aria-controls="collapse_emg_setting_{{ emg_setting.id }}" class="nep-btn">
                                     {% trans "Details" %}</a>
+                            </div>
+                            <div id="collapse_emg_setting_{{ emg_setting.id }}"
+                                 class="panel-collapse collapse out" role="tabpanel" aria-labelledby="heading_emg_setting_{{ emg_setting.id }}">
+                                {% if emg_setting.emg_digital_filter_setting %}
+                                    <blockquote>
+                                        <h5><p>
+
+                                            <strong>{% trans "Digital filter setting: " %}</strong><br/>
+                                            {% trans "filter type name: " %}{{ emg_setting.emg_digital_filter_setting.filter_type_name }}<br/>
+                                            {% if emg_setting.emg_digital_filter_setting.filter_type_description %}
+                                                {% trans "filter type description: " %}{{ emg_setting.emg_digital_filter_setting.filter_type_description }}<br/>
+                                            {% endif %}
+                                            {% if emg_setting.emg_digital_filter_setting.low_pass %}
+                                                {% trans "low pass: " %}{{ emg_setting.emg_digital_filter_setting.low_pass }}<br/>
+                                            {% endif %}
+                                            {% if emg_setting.emg_digital_filter_setting.high_pass %}
+                                                {% trans "high pass: " %}{{ emg_setting.emg_digital_filter_setting.high_pass }}<br/>
+                                            {% endif %}
+                                            {% if emg_setting.emg_digital_filter_setting.low_band_pass %}
+                                                {% trans "low_band_pass: " %}{{ emg_setting.emg_digital_filter_setting.low_band_pass }}<br/>
+                                            {% endif %}
+                                            {% if emg_setting.emg_digital_filter_setting.high_band_pass %}
+                                                {% trans "high_band_pass: " %}{{ emg_setting.emg_digital_filter_setting.high_band_pass }}<br/>
+                                            {% endif %}
+                                            {% if emg_setting.emg_digital_filter_setting.low_notch %}
+                                                {% trans "low_notch: " %}{{ emg_setting.emg_digital_filter_setting.low_notch }}<br/>
+                                            {% endif %}
+                                            {% if emg_setting.emg_digital_filter_setting.high_notch %}
+                                                {% trans "high_notch: " %}{{ emg_setting.emg_digital_filter_setting.high_notch }}<br/>
+                                            {% endif %}
+                                            {% if emg_setting.emg_digital_filter_setting.order %}
+                                                {% trans "order: " %}{{ emg_setting.emg_digital_filter_setting.order }}<br/>
+                                            {% endif %}
+
+                                        </p></h5>
+                                    </blockquote>
+                                {% endif %}
                             </div>
                         </div>
                     {% endfor %}

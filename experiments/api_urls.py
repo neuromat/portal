@@ -145,6 +145,90 @@ api_experiment_emg_setting_list =\
         'post': 'create'
     })
 
+# EMG Digital Filter Setting
+api_experiment_emg_digital_filter_setting =\
+    api.EMGDigitalFilterSettingViewSet.as_view({
+        'get': 'list',
+        'post': 'create'
+    })
+
+# AD Converter
+api_experiment_ad_converter =\
+    api.ADConverterViewSet.as_view({
+        'get': 'list',
+        'post': 'create'
+    })
+
+# EMG AD Converter Setting
+api_experiment_emg_ad_converter_setting =\
+    api.EMGADConverterSettingViewSet.as_view({
+        'get': 'list',
+        'post': 'create'
+    })
+
+# EMG Electrode Setting
+api_experiment_emg_electrode_setting =\
+    api.EMGElectrodeSettingViewSet.as_view({
+        'get': 'list',
+        'post': 'create'
+    })
+
+# EMG Preamplifier Setting
+api_experiment_emg_preamplifier_setting =\
+    api.EMGPreamplifierSettingViewSet.as_view({
+        'get': 'list',
+        'post': 'create'
+    })
+
+# EMG Amplifier Setting
+api_experiment_emg_amplifier_setting =\
+    api.EMGAmplifierSettingViewSet.as_view({
+        'get': 'list',
+        'post': 'create'
+    })
+
+# EMG Preamplifier Filter Setting
+api_experiment_emg_preamplifier_filter_setting =\
+    api.EMGPreamplifierFilterSettingViewSet.as_view({
+        'get': 'list',
+        'post': 'create'
+    })
+
+# EMG Amplifier Filter Setting
+api_experiment_emg_analog_filter_setting =\
+    api.EMGAnalogFilterSettingViewSet.as_view({
+        'get': 'list',
+        'post': 'create'
+    })
+
+# EMG Electrode Placement Setting
+api_experiment_emg_electrode_placement_setting =\
+    api.EMGElectrodePlacementSettingViewSet.as_view({
+        'get': 'list',
+        'post': 'create'
+    })
+
+# EMG Electrode Placement
+api_experiment_emg_surface_placement =\
+    api.EMGSurfacePlacementViewSet.as_view({
+        'get': 'list',
+        'post': 'create'
+    })
+
+# EMG Electrode Placement
+api_experiment_emg_intramuscular_placement =\
+    api.EMGIntramuscularPlacementViewSet.as_view({
+        'get': 'list',
+        'post': 'create'
+    })
+
+# EMG Electrode Placement
+api_experiment_emg_needle_placement =\
+    api.EMGNeedlePlacementViewSet.as_view({
+        'get': 'list',
+        'post': 'create'
+    })
+
 # TMS setting
 api_experiment_tms_setting_list =\
     api.TMSSettingViewSet.as_view({
@@ -396,6 +480,32 @@ urlpatterns = [
     # EMG setting
     url(r'^experiments/(?P<experiment_nes_id>[0-9]+)/emg_setting/$',
         api_experiment_emg_setting_list, name='api_experiment_emg_setting-list'),
+    url(r'^emg_setting/(?P<pk>[0-9]+)/emg_digital_filter_setting/$',
+        api_experiment_emg_digital_filter_setting, name='api_experiment_emg_digital_filter_setting'),
+    url(r'^experiments/(?P<experiment_nes_id>[0-9]+)/ad_converter/$',
+        api_experiment_ad_converter, name='api_experiment_ad_converter'),
+    url(r'^emg_setting/(?P<pk>[0-9]+)/emg_ad_converter_setting/$',
+        api_experiment_emg_ad_converter_setting, name='api_experiment_emg_ad_converter_setting'),
+    url(r'^emg_setting/(?P<pk>[0-9]+)/emg_electrode_setting/$',
+        api_experiment_emg_electrode_setting, name='api_experiment_emg_electrode_setting_setting'),
+    url(r'^emg_electrode_setting/(?P<pk>[0-9]+)/emg_preamplifier_setting/$',
+        api_experiment_emg_preamplifier_setting, name='api_experiment_emg_preamplifier_setting'),
+    url(r'^emg_electrode_setting/(?P<pk>[0-9]+)/emg_amplifier_setting/$',
+        api_experiment_emg_amplifier_setting, name='api_experiment_emg_amplifier_setting'),
+    url(r'^emg_electrode_setting/(?P<pk>[0-9]+)/emg_preamplifier_filter_setting/$',
+        api_experiment_emg_preamplifier_filter_setting, name='api_experiment_emg_preamplifier_filter_setting'),
+    url(r'^emg_electrode_setting/(?P<pk>[0-9]+)/emg_analog_filter_setting/$',
+        api_experiment_emg_analog_filter_setting, name='api_experiment_emg_analog_filter_setting'),
+
+    url(r'^emg_electrode_setting/(?P<pk>[0-9]+)/emg_electrode_placement_setting/$',
+        api_experiment_emg_electrode_placement_setting, name='api_experiment_emg_electrode_placement_setting'),
+    url(r'^experiments/(?P<experiment_nes_id>[0-9]+)/emg_surface_placement/$',
+        api_experiment_emg_surface_placement, name='api_experiment_emg_surface_placement'),
+    url(r'^experiments/(?P<experiment_nes_id>[0-9]+)/emg_intramuscular_placement/$',
+        api_experiment_emg_intramuscular_placement, name='api_experiment_emg_intramuscular_placement'),
+    url(r'^experiments/(?P<experiment_nes_id>[0-9]+)/emg_needle_placement/$',
+        api_experiment_emg_needle_placement, name='api_experiment_emg_needle_placement'),
+
     # TMS setting
     url(r'^experiments/(?P<experiment_nes_id>[0-9]+)/tms_setting/$',
         api_experiment_tms_setting_list, name='api_experiment_tms_setting-list'),
@@ -405,6 +515,7 @@ urlpatterns = [
         api_experiment_coil_model, name='api_experiment_coil_model'),
     url(r'^tms_setting/(?P<pk>[0-9]+)/tms_device_setting/$',
         api_experiment_tms_device_setting, name='api_experiment_tms_device_setting'),
+
     # Context tree
     url(r'^experiments/(?P<experiment_nes_id>[0-9]+)/context_tree/$',
         api_experiment_context_tree_list, name='api_experiment_context_tree-list'),

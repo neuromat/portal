@@ -495,7 +495,7 @@ class ExportExecution:
                     export_participant_code_directory = path.join(export_participant_directory, participant_code)
                     if participant_code not in self.per_group_data[group_id]['data_per_participant']:
                         self.per_group_data[group_id]['data_per_participant'][participant_code] = {}
-                    if 'generic_data' not in self.per_group_data[group_id]['data_per_participant'][participant_code]:
+                    if 'goalkeeper_data' not in self.per_group_data[group_id]['data_per_participant'][participant_code]:
                         self.per_group_data[group_id]['data_per_participant'][participant_code]['goalkeeper_data'] = []
                     self.per_group_data[group_id]['data_per_participant'][participant_code]['goalkeeper_data'].append({
                         'step_identification': goalkeeper_data.step.identification,

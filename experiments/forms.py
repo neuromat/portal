@@ -7,7 +7,7 @@ from haystack.forms import SearchForm
 
 class NepSearchForm(SearchForm):
     q = forms.CharField(
-        required=True, label='',
+        required=False, label='',
         widget=forms.TextInput(
             attrs={'type': 'search',
                    'placeholder': _('Type key terms/words to be searched'),
@@ -60,6 +60,9 @@ class NepSearchForm(SearchForm):
 
         return sqs
 
+    def no_query_found(self):
+        return self.searchqueryset.all()
+
     def _parse_query(self, query):
         """
         Parse query treating modifiers 'AND', 'OR', 'NOT' to make what they're
@@ -76,7 +79,7 @@ class NepSearchForm(SearchForm):
                 if word == 'AND':
                     result = result.filter_and(content=words.__next__())
                 elif word == 'OR':
-                    # TODO: fail when changin order of the words. See
+                    # TODO: fail when changing order of the words. See
                     # TODO: functional test:
                     # TODO: test_search_with_OR_modifier_returns_correct_objects
                     result = result.filter_or(content=words.__next__())

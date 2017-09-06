@@ -1,0 +1,2 @@
+{{ object.pulse_stimulus_type }}
+{{ object.tms_setting }}

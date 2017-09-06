@@ -32,7 +32,8 @@ INSTALLED_APPS = [
     'haystack',
     'experiments.apps.ExperimentsConfig',
     'downloads',
-    'bootstrapform'
+    'bootstrapform',
+    'django_celery_results',
 ]
 
 MIDDLEWARE = [
@@ -60,6 +61,7 @@ HAYSTACK_CONNECTIONS = {
         'INDEX_NAME': 'haystack',
     }
 }
+HAYSTACK_DEFAULT_OPERATOR = 'OR'
 
 TEMPLATES = [
     {
@@ -129,6 +131,9 @@ STATIC_URL = '/static/'
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
+
+# Celery
+CELERY_RESULT_BACKEND = 'django-db'
 
 # Import local settings
 try:

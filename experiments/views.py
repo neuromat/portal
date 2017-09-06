@@ -8,6 +8,7 @@ from django.utils.translation import activate, LANGUAGE_SESSION_KEY, ugettext as
 
 from experiments.forms import NepSearchForm
 from experiments.models import Experiment, RejectJustification
+from experiments.tasks import rebuild_haystack_index, build_download_file
 
 
 def home_page(request):
@@ -163,8 +164,15 @@ def change_status(request, experiment_id):
                 _('The experiment data ') + experiment.title + _(' was made available to be analysed by other trustee.')
             )
 
+    # TODO: wrong order. Save first, before send message to user that the
+    # TODO: status was changed. Does not make sense tell user that the
+    # TODO: status was changed, before save the change.
     experiment.status = status
     experiment.save()
+
+    if experiment.status == Experiment.APPROVED:
+        rebuild_haystack_index.delay()
+        # build_download_file(request, experiment.id).delay()
 
     return HttpResponseRedirect('/')
 
@@ -233,25 +241,48 @@ class NepSearchView(SearchView):
         """
         old_object_list = context['page_obj'].object_list
         indexes_to_remove = []
-        for i in range(0, len(old_object_list)):
-            if old_object_list[i].model_name == 'experiment':
-                groups = old_object_list[i].object.groups.all()
-            elif old_object_list[i].model_name == 'study':
-                groups = old_object_list[i].object.experiment.groups.all()
-            elif old_object_list[i].model_name == 'experimentalprotocol':
-                groups = [old_object_list[i].object.group]
-            elif old_object_list[i].model_name == 'group':
-                groups = [old_object_list[i].object]
-            else:
-                # TODO: generates exception: object not indexed
-                pass
-            count = 0
-            for group in groups:
-                for search_filter in search_filters:
-                    if group.steps.filter(type=search_filter).count() > 0:
-                        count = count + 1
-            if count < len(search_filters):
-                indexes_to_remove.append(i)
+        # If context['query'] is empty the search is only by filter,
+        # so we search for matches only in experiments
+        if not context['query']:
+            for i in range(0, len(old_object_list)):
+                if old_object_list[i].model_name == 'experiment':
+                    # print(old_object_list[i].object.id)  # DEBUG. See TODO
+                    # in tests_helper
+                    groups = old_object_list[i].object.groups.all()
+                    count = 0
+                    for search_filter in search_filters:
+                        for group in groups:
+                            # print(group.steps.all())  # DEBUG. See TODO in
+                            # tests_helper
+                            if group.steps.filter(
+                                    type=search_filter
+                            ).count() > 0:
+                                count = count + 1
+                                break
+                    if count < len(search_filters):
+                        indexes_to_remove.append(i)
+                else:
+                    indexes_to_remove.append(i)
+        else:
+            for i in range(0, len(old_object_list)):
+                if old_object_list[i].model_name == 'experiment':
+                    groups = old_object_list[i].object.groups.all()
+                elif old_object_list[i].model_name == 'study':
+                    groups = old_object_list[i].object.experiment.groups.all()
+                elif old_object_list[i].model_name == 'experimentalprotocol':
+                    groups = [old_object_list[i].object.group]
+                elif old_object_list[i].model_name == 'group':
+                    groups = [old_object_list[i].object]
+                else:
+                    # TODO: generates exception: object not indexed
+                    pass
+                count = 0
+                for group in groups:  # TODO
+                    for search_filter in search_filters:
+                        if group.steps.filter(type=search_filter).count() > 0:
+                            count = count + 1
+                if count < len(search_filters):
+                    indexes_to_remove.append(i)
 
         context['page_obj'].object_list = \
             [v for i, v in enumerate(old_object_list)

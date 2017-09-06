@@ -1,3 +1,6 @@
+import sys
+
+import haystack
 from django.core.management import call_command
 
 from experiments.models import Study, Experiment, Group, Step
@@ -10,11 +13,24 @@ class SearchTest(FunctionalTest):
 
     def setUp(self):
         super(SearchTest, self).setUp()
-        self.rebuild_index()
+        haystack.connections.reload('default')
+        self.haystack_index('rebuild_index')
+
+    def tearDown(self):
+        super(SearchTest, self).tearDown()
+        self.haystack_index('clear_index')
 
     @staticmethod
-    def rebuild_index():
-        call_command('rebuild_index', verbosity=0, interactive=False)
+    def haystack_index(action):
+        # Redirect sys.stderr to avoid display
+        # "GET http://127.0.0.1:9200/haystack/_mapping"
+        # during tests.
+        # TODO: see:
+        # https://github.com/django-haystack/django-haystack/issues/1142
+        stderr_backup, sys.stderr = sys.stderr, \
+                                    open('/tmp/haystack_errors.txt', 'w+')
+        call_command(action, verbosity=0, interactive=False)
+        sys.stderr = stderr_backup
 
     def verify_n_objects_in_table_rows(self, n, row_class):
         table = self.browser.find_element_by_id('search_table')
@@ -28,7 +44,7 @@ class SearchTest(FunctionalTest):
         self.browser.find_element_by_id('submit_terms').click()
         time.sleep(1)
 
-    def test_two_words_searched_return_correct_objects(self):
+    def test_search_two_words_returns_correct_objects(self):
 
         # Joselina, a neuroscience researcher at Numec is delighted with the
         # NED Portal. She decides to search for experiments that contains
@@ -45,7 +61,7 @@ class SearchTest(FunctionalTest):
         # one list for each of them.
         # One experiment has 'Brachial Plexus' in title, other has 'Brachial
         # plexus' in description
-        search_header_title = self.browser.find_element_by_tag_name('h3').text
+        search_header_title = self.browser.find_element_by_tag_name('h2').text
         self.assertEqual(search_header_title, 'Search Results')
 
         table = self.browser.find_element_by_id('search_table')
@@ -310,4 +326,220 @@ class SearchTest(FunctionalTest):
         tooltip_data_toggle = search_box.get_attribute('data-toggle')
         self.assertEqual('tooltip', tooltip_data_toggle)
 
-        self.fail('Finish this test!')
+    def test_search_only_with_two_filters_returns_correct_results(self):
+        # Joselina wishes to search only experiments that has EMG and EEG
+        # steps, regardless of search terms.
+        self.browser.find_element_by_id('filter_box').click()
+        self.browser.find_element_by_xpath(
+            "//select/option[@value='" + Step.EEG + "']"
+        ).click()
+        self.browser.find_element_by_xpath(
+            "//select/option[@value='" + Step.EMG + "']"
+        ).click()
+        self.browser.find_element_by_id('submit_terms').click()
+        time.sleep(2)
+
+        # As we have only one experiment with EMG and EEG steps, Joselina gets
+        # only one row tha corresponds to that the experiment
+        ##
+        # If user searches only with filters selected (without a query in
+        # search box, we display in search results, only experiment rows)
+        ##
+        self.verify_n_objects_in_table_rows(1, 'experiment-matches')
+        self.verify_n_objects_in_table_rows(0, 'study-matches')
+        self.verify_n_objects_in_table_rows(0, 'group-matches')
+        self.verify_n_objects_in_table_rows(0, 'experimentalprotocol-matches')
+        experiment_text = self.browser.find_element_by_class_name(
+            'experiment-matches'
+        ).text
+        self.assertIn('Experiment changed to test filter only',
+                      experiment_text)
+
+    def test_search_only_with_one_filter_returns_correct_results_1(self):
+        # Joselina wishes to search only experiments that has EEG
+        # stpes, regardless of search terms.
+        self.browser.find_element_by_id('filter_box').click()
+        self.browser.find_element_by_xpath(
+            "//select/option[@value='" + Step.EEG + "']"
+        ).click()
+        self.browser.find_element_by_id('submit_terms').click()
+        time.sleep(2)
+
+        # As we have only one experiment with EEG step, Joselina
+        # gets only one row that corresponds to that the experiment
+        self.verify_n_objects_in_table_rows(1, 'experiment-matches')
+        self.verify_n_objects_in_table_rows(0, 'study-matches')
+        self.verify_n_objects_in_table_rows(0, 'group-matches')
+        self.verify_n_objects_in_table_rows(0, 'experimentalprotocol-matches')
+        experiment_text = self.browser.find_element_by_class_name(
+            'experiment-matches'
+        ).text
+        self.assertIn('Experiment changed to test filter only',
+                      experiment_text)
+
+    def test_search_only_with_one_filter_returns_correct_results_2(self):
+        # Joselina wishes to search only experiments that has EMG
+        # steps, regardless of search terms.
+        self.browser.find_element_by_id('filter_box').click()
+        self.browser.find_element_by_xpath(
+            "//select/option[@value='" + Step.EMG + "']"
+        ).click()
+        self.browser.find_element_by_id('submit_terms').click()
+        time.sleep(2)
+
+        # As we have two experiments with EMG steps, Joselina
+        # gets two rows that corresponds to that the experiments
+        self.verify_n_objects_in_table_rows(2, 'experiment-matches')
+        self.verify_n_objects_in_table_rows(0, 'study-matches')
+        self.verify_n_objects_in_table_rows(0, 'group-matches')
+        self.verify_n_objects_in_table_rows(0, 'experimentalprotocol-matches')
+        table = self.browser.find_element_by_id('search_table')
+        experiment_rows =  \
+            table.find_elements_by_class_name('experiment-matches')
+        count = 0
+        for experiment in experiment_rows:
+            if 'Brachial Plexus (with EMG Setting)' in experiment.text:
+                count = count + 1
+            if 'Experiment changed to test filter only' in experiment.text:
+                count = count + 1
+        self.assertEqual(2, count)
+
+    def test_search_display_backhome_button(self):
+        # When Joselina makes searches, a button to back homepage is
+        # displayed on the right side, above the list of search results
+        self.search_for('brachial plexus')
+        link_home = self.browser.find_element_by_id('link_home')
+        self.assertEqual('Back Home', link_home.text)
+        link_home.click()
+        time.sleep(1)
+
+        # Joselina is back homepage
+        table_title = self.browser.find_element_by_id(
+            'id_table_title').find_element_by_tag_name('h2').text
+        self.assertEqual('List of Experiments', table_title)
+
+    def test_search_tmssetting_returns_correct_objects(self):
+        # Joselina searches for a TMS Setting whose name is 'tmssettingname'
+        self.search_for('tmssettingname')
+
+        # As there is one TMSSetting object with that name, she sees just
+        # one row in Search Results list
+        self.verify_n_objects_in_table_rows(1, 'tmssetting-matches')
+        self.verify_n_objects_in_table_rows(0, 'experiment-matches')
+        self.verify_n_objects_in_table_rows(0, 'study-matches')
+        self.verify_n_objects_in_table_rows(0, 'group-matches')
+        self.verify_n_objects_in_table_rows(0, 'experimentalprotocol-matches')
+        tmssetting_text = self.browser.find_element_by_class_name(
+            'tmssetting-matches'
+        ).text
+        self.assertIn('tmssettingname', tmssetting_text)
+
+    def test_search_tmsdevicesetting_returns_correct_objects(self):
+        # Joselina searches for a TMS Device Setting whose name is
+        # 'tmsdevicesettingname'
+        # TODO: test for choice representation!
+        self.search_for('single_pulse')
+
+        # As there is one TMSDeviceSetting object with that name, she sees just
+        # one row in Search Results list
+        self.verify_n_objects_in_table_rows(1, 'tmsdevicesetting-matches')
+        self.verify_n_objects_in_table_rows(0, 'tmssetting-matches')
+        self.verify_n_objects_in_table_rows(0, 'experiment-matches')
+        self.verify_n_objects_in_table_rows(0, 'study-matches')
+        self.verify_n_objects_in_table_rows(0, 'group-matches')
+        self.verify_n_objects_in_table_rows(0, 'experimentalprotocol-matches')
+        tmsdevicesetting_text = self.browser.find_element_by_class_name(
+            'tmsdevicesetting-matches'
+        ).text
+        self.assertIn('Single pulse', tmsdevicesetting_text)
+
+    def test_search_tmsdevice_returns_correct_objects(self):
+        # Joselina searches for an experiment in which was used a TMS Device
+        # whose manufacturer name is 'Siemens'
+        self.search_for('Siemens')
+
+        # As there is one TMSDevice object that has Magstim as manufacturer,
+        # but three TMSDeviceSetting objects that has that TMSDevice object as
+        # a Foreign Key, she sees three rows in Search Results list
+        self.verify_n_objects_in_table_rows(3, 'tmsdevice-matches')
+        self.verify_n_objects_in_table_rows(0, 'tmsdevicesetting-matches')
+        self.verify_n_objects_in_table_rows(0, 'tmssetting-matches')
+        self.verify_n_objects_in_table_rows(0, 'experiment-matches')
+        self.verify_n_objects_in_table_rows(0, 'study-matches')
+        self.verify_n_objects_in_table_rows(0, 'group-matches')
+        self.verify_n_objects_in_table_rows(0, 'experimentalprotocol-matches')
+        tmsdevicesetting_text = self.browser.find_element_by_class_name(
+            'tmsdevice-matches'
+        ).text
+        self.assertIn('Siemens', tmsdevicesetting_text)
+
+    def test_search_coilmodel_returns_correct_objects(self):
+        # Joselina searches for an experiment in which was used a Coil Model
+        # whose name is 'Magstim'
+        self.search_for('Magstim')
+        # As there is one CoilModel object that has Magstim as manufacturer,
+        # but three TMSDeviceSetting objects that has that CoilModel object as
+        # a Foreign Key, she sees three rows in Search Results list
+        self.verify_n_objects_in_table_rows(3, 'coilmodel-matches')
+        self.verify_n_objects_in_table_rows(0, 'tmsdevice-matches')
+        self.verify_n_objects_in_table_rows(0, 'tmsdevicesetting-matches')
+        self.verify_n_objects_in_table_rows(0, 'tmssetting-matches')
+        self.verify_n_objects_in_table_rows(0, 'experiment-matches')
+        self.verify_n_objects_in_table_rows(0, 'study-matches')
+        self.verify_n_objects_in_table_rows(0, 'group-matches')
+        self.verify_n_objects_in_table_rows(0, 'experimentalprotocol-matches')
+        tmsdevicesetting_text = self.browser.find_element_by_class_name(
+            'coilmodel-matches'
+        ).text
+        self.assertIn('Magstim', tmsdevicesetting_text)
+
+    def test_search_tmsdata_returns_correct_objects(self):
+        # TODO: we are testing manually because search tests is giving
+        # TODO: non-deterministics results uncontrollably from now one
+        # TODO: irrespective of any testing jerry-rigs to make tests pass.
+        # Obs.: the tests commented bellow "passed" manually in localhost,
+        # by creating entries in faker_populator.
+
+        # Joselina searches for an experiment whose TMSData of a participant
+        # has collecting data from 'cerebral cortex'
+        self.search_for('cerebral cortex')
+        # As there is three TMSData object with 'cereberal cortex' as the
+        # brain_area_name field, one of them associated with a TMSSetting
+        # object, and other two associated with another TMSSetting object
+        # she sees two rows in Search Results list
+        self.verify_n_objects_in_table_rows(3, 'tmsdata-matches')
+        self.verify_n_objects_in_table_rows(0, 'coilmodel-matches')
+        self.verify_n_objects_in_table_rows(0, 'tmsdevice-matches')
+        self.verify_n_objects_in_table_rows(0, 'tmsdevicesetting-matches')
+        self.verify_n_objects_in_table_rows(0, 'tmssetting-matches')
+        self.verify_n_objects_in_table_rows(0, 'experiment-matches')
+        self.verify_n_objects_in_table_rows(0, 'study-matches')
+        self.verify_n_objects_in_table_rows(0, 'group-matches')
+        self.verify_n_objects_in_table_rows(0, 'experimentalprotocol-matches')
+        tmsdevicesetting_text = self.browser.find_element_by_class_name(
+            'tmsdata-matches'
+        ).text
+        self.assertIn('cerebral cortex', tmsdevicesetting_text)
+
+    def test_search_eegsetting_returns_correct_objects(self):
+        # Joselina wants to search for experiments whose EEGSetting name is
+        # 'eegsettingname'
+        self.search_for('eegsettingname')
+
+        # As there is three EEGSetting objects with that name,
+        # one associated to an experiment, and the other two associated with
+        # another experiment, she sees three rows in Search Results list
+        self.verify_n_objects_in_table_rows(3, 'eegsetting-matches')
+        self.verify_n_objects_in_table_rows(0, 'tmsdata-matches')
+        self.verify_n_objects_in_table_rows(0, 'coilmodel-matches')
+        self.verify_n_objects_in_table_rows(0, 'tmsdevice-matches')
+        self.verify_n_objects_in_table_rows(0, 'tmsdevicesetting-matches')
+        self.verify_n_objects_in_table_rows(0, 'tmssetting-matches')
+        self.verify_n_objects_in_table_rows(0, 'experiment-matches')
+        self.verify_n_objects_in_table_rows(0, 'study-matches')
+        self.verify_n_objects_in_table_rows(0, 'group-matches')
+        self.verify_n_objects_in_table_rows(0, 'experimentalprotocol-matches')
+        eegsetting_text = self.browser.find_element_by_class_name(
+            'eegsetting-matches'
+        ).text
+        self.assertIn('eegsettingname', eegsetting_text)

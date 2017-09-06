@@ -17,52 +17,71 @@
             {% include 'experiments/messages.html' %}
         {% endif %}
 
-        <div class="table-title">
-            <h3>{% trans "Search Results" %}</h3>
+        <div id="link_home" class="detail-back-search">
+            <a href="/" class="nep-btn">Back Home</a>
         </div>
-        {% if query %}
-            <table id="search_table" class="table table-hover">
-                <tbody>
-                {% for result in page_obj.object_list %}
-                    {% if result.model_name == 'experiment' %}
-                        {% include 'search/experiments.html' %}
-                    {% endif %}
-                    {% if result.model_name == 'study' %}
-                        {% include 'search/studies.html' %}
-                    {% endif %}
-                    {% if result.model_name == 'group' %}
-                        {% include 'search/groups.html' %}
-                    {% endif %}
-                    {% if result.model_name == 'experimentalprotocol' %}
-                        {% include 'search/experimental_protocol.html' %}
-                    {% endif %}
-                {% empty %}
-                    <p>{% trans "No results found" %}.</p>
-                {% endfor %}
-                </tbody>
-            </table>
+        <h2 class="table-title">{% trans "Search Results" %}</h2>
+        {#        {% if query %}#} {# TODO: see if it's necessary #}
+        <table id="search_table" class="table table-hover">
+            <tbody>
+            {% for result in page_obj.object_list %}
+                {% if result.model_name == 'experiment' %}
+                    {% include 'search/experiments.html' %}
+                {% endif %}
+                {% if result.model_name == 'study' %}
+                    {% include 'search/studies.html' %}
+                {% endif %}
+                {% if result.model_name == 'group' %}
+                    {% include 'search/groups.html' %}
+                {% endif %}
+                {% if result.model_name == 'experimentalprotocol' %}
+                    {% include 'search/experimental_protocol.html' %}
+                {% endif %}
+                {% if result.model_name == 'tmssetting' %}
+                    {% include 'search/tmssetting.html' %}
+                {% endif %}
+                {% if result.model_name == 'tmsdevicesetting' %}
+                    {% include 'search/tmsdevicesetting.html' %}
+                {% endif %}
+                {% if result.model_name == 'tmsdevice' %}
+                    {% include 'search/tmsdevice.html' %}
+                {% endif %}
+                {% if result.model_name == 'coilmodel' %}
+                    {% include 'search/coilmodel.html' %}
+                {% endif %}
+                {% if result.model_name == 'tmsdata' %}
+                    {% include 'search/tmsdata.html' %}
+                {% endif %}
+                {% if result.model_name == 'eegsetting' %}
+                    {% include 'search/eegsetting.html' %}
+                {% endif %}
+            {% empty %}
+                <p>{% trans "No results found" %}.</p>
+            {% endfor %}
+            </tbody>
+        </table>
 
-            {% if page.has_previous or page.has_next %}
-                <div>
-                    {% if page.has_previous %}<a href="?q={{ query }}&amp;page={{ page.previous_page_number }}">
-                    {% endif %}&laquo; {% trans "Previous" %}{% if page.has_previous %}</a>{% endif %}
-                    |
-                    {% if page.has_next %}<a href="?q={{ query }}&amp;page={{ page.next_page_number }}">{% endif %}
-                    {% trans "Next" %}
-                    &raquo;{% if page.has_next %}</a>{% endif %}
-                </div>
-            {% endif %}
-        {% else %}
-            <p>{% trans "Sorry, no matches found for the terms used. Please try again." %}</p>
-            {% trans "Search Suggestion:" %}
-            <ol>
-                <li>{% trans "Check your spelling." %}</li>
-                <li>{% trans "Try more general word." %}</li>
-                <li>{% trans "Try different words that mean the same thing." %}</li>
-                <li>{% trans "Post a request for your search and we'll help you find it." %}</li>
-            </ol>
-
+        {% if page.has_previous or page.has_next %}
+            <div>
+                {% if page.has_previous %}<a href="?q={{ query }}&amp;page={{ page.previous_page_number }}">
+                {% endif %}&laquo; {% trans "Previous" %}{% if page.has_previous %}</a>{% endif %}
+                |
+                {% if page.has_next %}<a href="?q={{ query }}&amp;page={{ page.next_page_number }}">{% endif %}
+                {% trans "Next" %}
+                &raquo;{% if page.has_next %}</a>{% endif %}
+            </div>
         {% endif %}
+        {#        {% else %}#}
+        {#            <p>{% trans "Sorry, no matches found for the terms used. Please try again." %}</p>#}
+        {#            {% trans "Search Suggestion:" %}#}
+        {#            <ol>#}
+        {#                <li>{% trans "Check your spelling." %}</li>#}
+        {#                <li>{% trans "Try more general word." %}</li>#}
+        {#                <li>{% trans "Try different words that mean the same thing." %}</li>#}
+        {#                <li>{% trans "Post a request for your search and we'll help you find it." %}</li>#}
+        {#            </ol>#}
+        {##}
+        {#        {% endif %}#}
 
 
     </section>

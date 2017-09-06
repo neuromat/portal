@@ -3,6 +3,7 @@ from django.db.models import Max, Q
 from django.contrib.auth.models import User
 
 
+# custom managers
 class CurrentExperimentManager(models.Manager):
     def get_queryset(self):
         experiment_max_version_set = \
@@ -18,6 +19,7 @@ class CurrentExperimentManager(models.Manager):
             .filter(q_statement)
 
 
+# models
 class Experiment(models.Model):
     RECEIVING = 'receiving'
     TO_BE_ANALYSED = 'to_be_analysed'
@@ -41,6 +43,7 @@ class Experiment(models.Model):
     data_acquisition_done = models.BooleanField(default=False)
     sent_date = models.DateField(auto_now=True)
     project_url = models.CharField(max_length=255, blank=True, null=True)
+    download_url = models.FileField(upload_to="uploads/%Y/%m/%d/", null=True, blank=True)
     ethics_committee_url = models.CharField(max_length=255, blank=True,
                                             null=True)
     ethics_committee_file = models.FileField(
@@ -293,7 +296,7 @@ class IntramuscularElectrode(ElectrodeModel):
         ("multi", "Multi"),
     )
     strand = models.CharField(max_length=20, choices=STRAND_TYPES)
-    insulation_material_name = models.CharField(max_length=150)
+    insulation_material_name = models.CharField(max_length=150, null=True, blank=True)
     insulation_material_description = models.TextField(null=True, blank=True)
     length_of_exposed_tip = models.FloatField(null=True, blank=True)
 
@@ -304,13 +307,124 @@ class NeedleElectrode(ElectrodeModel):
         ("cm", "centimeter(s)"),
     )
     size = models.FloatField(null=True, blank=True)
-    size_unit = models.CharField(max_length=10, choices=SIZE_UNIT)
+    size_unit = models.CharField(max_length=10, choices=SIZE_UNIT, null=True, blank=True)
     number_of_conductive_contact_points_at_the_tip = models.IntegerField(null=True, blank=True)
     size_of_conductive_contact_points_at_the_tip = models.FloatField(null=True, blank=True)
 
 
 class EMGSetting(ExperimentSetting):
     acquisition_software_version = models.CharField(max_length=150)
+
+
+class EMGDigitalFilterSetting(models.Model):
+    emg_setting = models.OneToOneField(EMGSetting, primary_key=True, related_name='emg_digital_filter_setting')
+    filter_type_name = models.CharField(max_length=150)
+    filter_type_description = models.TextField(null=True, blank=True)
+    low_pass = models.FloatField(null=True, blank=True)
+    high_pass = models.FloatField(null=True, blank=True)
+    low_band_pass = models.FloatField(null=True, blank=True)
+    high_band_pass = models.FloatField(null=True, blank=True)
+    low_notch = models.FloatField(null=True, blank=True)
+    high_notch = models.FloatField(null=True, blank=True)
+    order = models.IntegerField(null=True, blank=True)
+
+
+class ADConverter(Equipment):
+    signal_to_noise_rate = models.FloatField(null=True, blank=True)
+    sampling_rate = models.FloatField(null=True, blank=True)
+    resolution = models.FloatField(null=True, blank=True)
+
+
+class EMGADConverterSetting(models.Model):
+    emg_setting = models.OneToOneField(EMGSetting, primary_key=True, related_name='emg_ad_converter_setting')
+    ad_converter = models.ForeignKey(ADConverter)
+    sampling_rate = models.FloatField(null=True, blank=True)
+
+
+class EMGElectrodeSetting(models.Model):
+    emg_setting = models.ForeignKey(EMGSetting, related_name='emg_electrode_settings')
+    electrode_model = models.ForeignKey(ElectrodeModel)
+
+
+class EMGPreamplifierSetting(models.Model):
+    emg_electrode_setting = models.OneToOneField(EMGElectrodeSetting,
+                                                 primary_key=True, related_name='emg_preamplifier_setting')
+    amplifier = models.ForeignKey(Amplifier)
+    gain = models.FloatField(null=True, blank=True)
+
+
+class EMGPreamplifierFilterSetting(models.Model):
+    emg_preamplifier_setting = models.OneToOneField(EMGPreamplifierSetting,
+                                                    primary_key=True,
+                                                    related_name='emg_preamplifier_filter_setting')
+    low_pass = models.FloatField(null=True, blank=True)
+    high_pass = models.FloatField(null=True, blank=True)
+    low_band_pass = models.FloatField(null=True, blank=True)
+    low_notch = models.FloatField(null=True, blank=True)
+    high_band_pass = models.FloatField(null=True, blank=True)
+    high_notch = models.FloatField(null=True, blank=True)
+    order = models.IntegerField(null=True, blank=True)
+
+
+class EMGAmplifierSetting(models.Model):
+    emg_electrode_setting = models.OneToOneField(EMGElectrodeSetting,
+                                                 primary_key=True, related_name='emg_amplifier_setting')
+    amplifier = models.ForeignKey(Amplifier)
+    gain = models.FloatField(null=True, blank=True)
+
+
+class EMGAnalogFilterSetting(models.Model):
+    emg_amplifier_setting = models.OneToOneField(EMGAmplifierSetting,
+                                                 primary_key=True, related_name='emg_analog_filter_setting')
+    low_pass = models.FloatField(null=True, blank=True)
+    high_pass = models.FloatField(null=True, blank=True)
+    low_band_pass = models.FloatField(null=True, blank=True)
+    low_notch = models.FloatField(null=True, blank=True)
+    high_band_pass = models.FloatField(null=True, blank=True)
+    high_notch = models.FloatField(null=True, blank=True)
+    order = models.IntegerField(null=True, blank=True)
+
+
+class EMGElectrodePlacement(models.Model):
+    PLACEMENT_TYPES = (
+        ("surface", "Surface"),
+        ("intramuscular", "Intramuscular"),
+        ("needle", "Needle"),
+    )
+    standardization_system_name = models.CharField(max_length=150)
+    standardization_system_description = models.TextField(null=True, blank=True)
+    muscle_anatomy_origin = models.TextField(null=True, blank=True)
+    muscle_anatomy_insertion = models.TextField(null=True, blank=True)
+    muscle_anatomy_function = models.TextField(null=True, blank=True)
+    photo = models.FileField(upload_to='uploads/%Y/%m/%d/', null=True, blank=True)
+    location = models.TextField(null=True, blank=True)
+    placement_type = models.CharField(max_length=50, choices=PLACEMENT_TYPES)
+
+
+class EMGSurfacePlacement(EMGElectrodePlacement):
+    start_posture = models.TextField(null=True, blank=True)
+    orientation = models.TextField(null=True, blank=True)
+    fixation_on_the_skin = models.TextField(null=True, blank=True)
+    reference_electrode = models.TextField(null=True, blank=True)
+    clinical_test = models.TextField(null=True, blank=True)
+
+
+class EMGIntramuscularPlacement(EMGElectrodePlacement):
+    method_of_insertion = models.TextField(null=True, blank=True)
+    depth_of_insertion = models.TextField(null=True, blank=True)
+
+
+class EMGNeedlePlacement(EMGElectrodePlacement):
+    depth_of_insertion = models.TextField(null=True, blank=True)
+
+
+class EMGElectrodePlacementSetting(models.Model):
+    emg_electrode_setting = models.OneToOneField(EMGElectrodeSetting,
+                                                 primary_key=True, related_name='emg_electrode_placement_setting')
+    emg_electrode_placement = models.ForeignKey(EMGElectrodePlacement)
+    muscle_side = models.CharField(max_length=150, null=True, blank=True)
+    muscle_name = models.CharField(max_length=150, null=True, blank=True)
+    remarks = models.TextField(null=True, blank=True)
 
 
 class TMSSetting(ExperimentSetting):
@@ -345,9 +459,12 @@ class TMSDeviceSetting(models.Model):
         ("repetitive_pulse", "Repetitive pulse")
     )
     tms_setting = models.OneToOneField(TMSSetting, primary_key=True, related_name='tms_device_setting')
-    tms_device = models.ForeignKey(TMSDevice)
+    tms_device = models.ForeignKey(
+        TMSDevice, related_name='tms_device_settings'
+    )
     pulse_stimulus_type = models.CharField(null=True, blank=True, max_length=50, choices=PULSE_STIMULUS_TYPES)
-    coil_model = models.ForeignKey(CoilModel)
+    coil_model = models.ForeignKey(CoilModel,
+                                   related_name='tms_device_settings')
 
 
 class ContextTree(ExperimentSetting):
@@ -395,6 +512,9 @@ class Step(models.Model):
     interval_between_repetitions_value = models.IntegerField(null=True, blank=True)
     interval_between_repetitions_unit = models.CharField(null=True, blank=True, max_length=15)
     random_position = models.NullBooleanField(blank=True)
+
+    def __str__(self):
+        return self.type
 
 
 class EEG(Step):
