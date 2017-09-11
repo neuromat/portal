@@ -843,6 +843,7 @@ class ExperimentViewSet(viewsets.ModelViewSet):
         )
 
 
+
 class StudyViewSet(viewsets.ModelViewSet):
     serializer_class = StudySerializer
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
