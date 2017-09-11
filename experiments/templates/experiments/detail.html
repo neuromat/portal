@@ -154,6 +154,70 @@
                                    aria-expanded="true" aria-controls="collapse_emg_setting_{{ emg_setting.id }}" class="nep-btn">
                                     {% trans "Details" %}</a>
                             </div>
+                            <div id="collapse_emg_setting_{{ emg_setting.id }}"
+                                 class="panel-collapse collapse out" role="tabpanel" aria-labelledby="heading_emg_setting_{{ emg_setting.id }}">
+                                {% if emg_setting.emg_digital_filter_setting %}
+                                    <blockquote>
+                                        <h5><p>
+
+                                            <strong>{% trans "Digital filter setting: " %}</strong><br/>
+                                            {% trans "filter type name: " %}{{ emg_setting.emg_digital_filter_setting.filter_type_name }}<br/>
+                                            {% if emg_setting.emg_digital_filter_setting.filter_type_description %}
+                                                {% trans "filter type description: " %}{{ emg_setting.emg_digital_filter_setting.filter_type_description }}<br/>
+                                            {% endif %}
+                                            {% if emg_setting.emg_digital_filter_setting.low_pass %}
+                                                {% trans "low pass: " %}{{ emg_setting.emg_digital_filter_setting.low_pass }}<br/>
+                                            {% endif %}
+                                            {% if emg_setting.emg_digital_filter_setting.high_pass %}
+                                                {% trans "high pass: " %}{{ emg_setting.emg_digital_filter_setting.high_pass }}<br/>
+                                            {% endif %}
+                                            {% if emg_setting.emg_digital_filter_setting.low_band_pass %}
+                                                {% trans "low_band_pass: " %}{{ emg_setting.emg_digital_filter_setting.low_band_pass }}<br/>
+                                            {% endif %}
+                                            {% if emg_setting.emg_digital_filter_setting.high_band_pass %}
+                                                {% trans "high_band_pass: " %}{{ emg_setting.emg_digital_filter_setting.high_band_pass }}<br/>
+                                            {% endif %}
+                                            {% if emg_setting.emg_digital_filter_setting.low_notch %}
+                                                {% trans "low_notch: " %}{{ emg_setting.emg_digital_filter_setting.low_notch }}<br/>
+                                            {% endif %}
+                                            {% if emg_setting.emg_digital_filter_setting.high_notch %}
+                                                {% trans "high_notch: " %}{{ emg_setting.emg_digital_filter_setting.high_notch }}<br/>
+                                            {% endif %}
+                                            {% if emg_setting.emg_digital_filter_setting.order %}
+                                                {% trans "order: " %}{{ emg_setting.emg_digital_filter_setting.order }}<br/>
+                                            {% endif %}
+
+                                        </p></h5>
+                                    </blockquote>
+
+                                {% endif %}
+                                {% if emg_setting.emg_ad_converter_setting %}
+                                    <blockquote>
+                                        <h5><p>
+
+                                            <strong>{% trans "A/D converter setting: " %}{{ emg_setting.emg_ad_converter_setting.ad_converter.identification }}</strong><br/>
+                                            {{ emg_setting.emg_ad_converter_setting.ad_converter.description }}<br/>
+                                            {% if emg_setting.emg_ad_converter_setting.ad_converter.serial_number %}
+                                                {% trans "serial number: " %}{{ emg_setting.emg_ad_converter_setting.ad_converter.serial_number }}<br/>
+                                            {% endif %}
+                                            {% if emg_setting.emg_ad_converter_setting.ad_converter.signal_to_noise_rate %}
+                                                {% trans "signal to noise rate: " %}{{ emg_setting.emg_ad_converter_setting.ad_converter.signal_to_noise_rate }}<br/>
+                                            {% endif %}
+                                            {% if emg_setting.emg_ad_converter_setting.ad_converter.resolution %}
+                                                {% trans "resolution: " %}{{ emg_setting.emg_ad_converter_setting.ad_converter.resolution }}<br/>
+                                            {% endif %}
+                                            {% if emg_setting.emg_ad_converter_setting.ad_converter.sampling_rate %}
+                                                {% trans "sampling rate: " %}{{ emg_setting.emg_ad_converter_setting.ad_converter.sampling_rate }}<br/>
+                                            {% endif %}
+                                            {% if emg_setting.emg_ad_converter_setting.sampling_rate %}
+                                                {% trans "sampling rate setting: " %}{{ emg_setting.emg_ad_converter_setting.sampling_rate }}<br/>
+                                            {% endif %}
+
+                                        </p></h5>
+                                    </blockquote>
+
+                                {% endif %}
+                            </div>
                         </div>
                     {% endfor %}
                 {% endif %}

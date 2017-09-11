@@ -1,5 +1,6 @@
 import time
 
+import os
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 from django.test import override_settings
 from selenium import webdriver
@@ -30,6 +31,10 @@ class FunctionalTest(StaticLiveServerTestCase):
         profile.set_preference('intl.accept_languages', 'en')
         self.browser = webdriver.Firefox(profile)
 
+        staging_server = os.environ.get('STAGING_SERVER')
+        if staging_server:
+            self.live_server_url = 'http://' + staging_server
+
         # A neuroscience researcher discovered a new site that
         # provides a data base with neuroscience experiments.
         # She goes to checkout its home page
@@ -48,6 +53,10 @@ class FunctionalTestTrustee(StaticLiveServerTestCase):
         profile = webdriver.FirefoxProfile()
         profile.set_preference('intl.accept_languages', 'en')
         self.browser = webdriver.Firefox(profile)
+
+        staging_server = os.environ.get('STAGING_SERVER')
+        if staging_server:
+            self.live_server_url = 'http://' + staging_server
 
         # Trustee Claudia visit the home page and click in "Log In"
         self.browser.get(self.live_server_url)
