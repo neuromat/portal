@@ -7,7 +7,10 @@ from faker import Factory
 from experiments.helpers import generate_image_file
 from experiments.models import Experiment, Study, Group, Researcher, \
     Collaborator, Participant, Gender, ExperimentalProtocol, \
-    ClassificationOfDiseases, Keyword
+    ClassificationOfDiseases, Keyword, Step, TMSSetting, TMSDevice, CoilModel, \
+    TMSDeviceSetting, TMSData, EEGSetting
+
+import random
 
 
 def create_experiment_groups(qtty, experiment):
@@ -25,8 +28,20 @@ def create_experiment_groups(qtty, experiment):
         )
 
 
-# TODO: separate study creation from experiment creation
-def create_experiment_and_study(qtty, owner, status):
+def create_study(experiment):
+    """
+    :param experiment: Experiment to be associated with Study
+    """
+    fake = Factory.create()
+
+    Study.objects.create(
+        title=fake.text(max_nb_chars=15),
+        description=fake.text(max_nb_chars=200),
+        start_date=datetime.utcnow(), experiment=experiment
+    )
+
+
+def create_experiment(qtty, owner, status):
     """
     :param qtty: Number of experiments
     :param owner: Owner of experiment - User instance model
@@ -42,13 +57,10 @@ def create_experiment_and_study(qtty, owner, status):
             # genetates constraint violaton (nes_id, owner_id)
             owner=owner, version=1,
             sent_date=datetime.utcnow(),
-            status=status
+            status=status,
+            data_acquisition_done=choice([True, False])
         )
-        Study.objects.create(
-            title=fake.text(max_nb_chars=15),
-            description=fake.text(max_nb_chars=200),
-            start_date=datetime.utcnow(), experiment=experiment
-        )
+        create_study(experiment)
         create_experiment_groups(randint(2, 3), experiment)
 
 
@@ -82,7 +94,7 @@ def create_researchers():
                                     coordinator=False, study=study)
 
 
-def create_participants(qtty, group, gender):
+def create_participant(qtty, group, gender):
     """
     :param gender:
     :param qtty:
@@ -163,6 +175,8 @@ def create_keyword(qtty):
             if not Keyword.objects.filter(name=keyword):
                 break
         Keyword.objects.create(name=keyword)
+    # To test search
+    Keyword.objects.create(name='brachial plexus')
 
 
 def associate_experiments_to_trustees():
@@ -184,6 +198,171 @@ def associate_experiments_to_trustees():
     exp2.save()
 
 
+def create_ethics_committee_info(experiment):
+    fake = Factory.create()
+
+    experiment.project_url = fake.uri()
+    experiment.ethics_committee_url = fake.uri()
+    # TODO: generate PDF
+    file = generate_image_file(500, 800, fake.word() + '.jpg')
+    experiment.ethics_committee_file.save(file.name, file)
+    experiment.save()
+
+
+def create_step(qtty, group, type):
+    """
+    :param qtty: number of emg settings
+    :param group: Experiment model instance
+    :param type: step type: eeg, emg, tms etc.
+    """
+    fake = Factory.create()
+
+    for i in range(qtty):
+        Step.objects.create(
+            group=group,
+            identification=fake.word(), numeration=fake.ssn(),
+            type=type, order=randint(1, 20)
+        )
+
+
+def create_tms_setting(qtty, experiment):
+    """
+    :param qtty: number of tmssetting settings
+    :param experiment: Experiment model instance
+    """
+    fake = Factory.create()
+
+    for i in range(qtty):
+        TMSSetting.objects.create(
+            experiment=experiment,
+            name=fake.word(),
+            description=fake.text()
+        )
+
+
+def create_tms_device(qtty):
+    """
+    :param qtty: number of tms device objects to create
+    """
+    fake = Factory.create()
+
+    for i in range(qtty):
+        TMSDevice.objects.create(
+            manufacturer_name=fake.word(),
+            equipment_type=fake.word(),
+            identification=fake.word(),
+            description=fake.text(),
+            serial_number=fake.ssn(),
+            pulse_type=choice(['monophase', 'biphase'])
+        )
+
+
+def create_coil_model(qtty):
+    """
+    :param qtty: number of coil model objects to create
+    """
+    fake = Factory.create()
+    for i in range(qtty):
+        CoilModel.objects.create(
+            name=fake.word(), coil_shape_name=fake.word(),
+            coil_design=choice(['air_core_coil', 'biphase']),
+            description=fake.text(), material_name=fake.word(),
+            material_description=fake.text(),
+        )
+
+
+def create_tms_device_setting(qtty, tms_setting, tms_device, coil_model):
+    """
+    :param qtty: number of tms device setting objects to create
+    :param tms_setting: TMSSetting model instance
+    :param tms_device: TMSDevice model instance
+    :param coil_model: CoilModel model instance
+    """
+    for i in range(qtty):
+        TMSDeviceSetting.objects.create(
+            tms_setting=tms_setting, tms_device=tms_device, coil_model=coil_model,
+            pulse_stimulus_type=choice(['single_pulse', 'paired_pulse',
+                                        'repetitive_pulse'])
+        )
+
+
+def create_tms_data(qtty, tmssetting, participant):
+    """
+    :param qtty: number of tms data objects to create
+    :param tmssetting: TMSSetting model instance
+    :param participant: Participant model instance
+    """
+    faker = Factory.create()
+
+    for i in range(qtty):
+        TMSData.objects.create(
+            participant=participant,
+            date=datetime.utcnow(),
+            tms_setting=tmssetting,
+            resting_motor_threshold=round(random.uniform(0, 10), 2),
+            test_pulse_intensity_of_simulation=round(random.uniform(0, 10), 2),
+            second_test_pulse_intensity=round(random.uniform(0, 10), 2),
+            interval_between_pulses=randint(0, 10),
+            interval_between_pulses_unit='s',
+            time_between_mep_trials=randint(0, 10),
+            description=faker.text(), hotspot_name=faker.word(),
+            localization_system_name=faker.word(),
+            localization_system_description=faker.text(),
+            brain_area_name=faker.word(),
+            brain_area_description=faker.text(),
+            brain_area_system_name=faker.word(),
+            brain_area_system_description=faker.text()
+        )
+
+
+def create_tmsdata_objects_to_test_search():
+    """
+    Requires having created at least one Participant and two TMSSetting objects
+    """
+    participant = Participant.objects.last()
+    create_tms_data(1, TMSSetting.objects.first(), participant)
+    tms_data = TMSData.objects.last()
+    tms_data.brain_area_name = 'cerebral cortex'
+    tms_data.save()
+    create_tms_data(1, TMSSetting.objects.last(), participant)
+    tms_data = TMSData.objects.last()
+    tms_data.brain_area_name = 'cerebral cortex'
+    tms_data.save()
+    create_tms_data(1, TMSSetting.objects.last(), participant)
+    tms_data = TMSData.objects.last()
+    tms_data.brain_area_name = 'cerebral cortex'
+    tms_data.save()
+
+
+def create_eeg_setting(qtty, experiment):
+    """
+    :param qtty: number of eeg setting objects to create
+    :param experiment: Experiment model instance
+    """
+    faker = Factory.create()
+
+    for i in range(qtty):
+        EEGSetting.objects.create(experiment=experiment, name=faker.word(),
+                                  description=faker.text())
+
+
+def create_eegsetting_objects_to_test_search():
+    experiment1 = Experiment.objects.filter(status=Experiment.APPROVED).first()
+    experiment2 = Experiment.objects.filter(status=Experiment.APPROVED).last()
+
+    create_eeg_setting(2, experiment1)
+    tmss1 = EEGSetting.objects.first()
+    tmss1.name = 'eegsettingname'
+    tmss1.save()
+    tmss2 = EEGSetting.objects.last()
+    tmss2.name = 'eegsettingname'
+    tmss2.save()
+    create_eeg_setting(1, experiment2)
+    tmss3 = EEGSetting.objects.last()
+    tmss3.name = 'eegsettingname'
+    tmss3.save()
+
+
 def global_setup_ft():
     """
     This global setup creates basic object models that are used in 
@@ -200,23 +379,130 @@ def global_setup_ft():
 
     # Create 5 experiments for 2 owners, randomly, and studies (groups are
     # created inside create_experiment_and_study)
-    create_experiment_and_study(2, choice([owner1, owner2]),
-                                Experiment.TO_BE_ANALYSED)
-    # TODO: when creating experiment UNDER_ANALYSIS, associate with a trustee
-    create_experiment_and_study(2, choice([owner1, owner2]),
-                                Experiment.UNDER_ANALYSIS)
-    create_experiment_and_study(1, choice([owner1, owner2]),
-                                Experiment.APPROVED)
-    create_experiment_and_study(1, choice([owner1, owner2]),
-                                Experiment.NOT_APPROVED)
+    create_experiment(2, choice([owner1, owner2]),
+                      Experiment.TO_BE_ANALYSED)
+    # To test search
+    experiment = Experiment.objects.last()
+    experiment.title = 'Brachial Plexus'
+    experiment.save()
 
-    # Associate trustee to studies under analysis (requires create
+    create_experiment(2, choice([owner1, owner2]),
+                      Experiment.UNDER_ANALYSIS)
+    # To test search
+    experiment = Experiment.objects.last()
+    experiment.title = 'Brachial Plexus'
+    experiment.save()
+
+    create_experiment(4, choice([owner1, owner2]),
+                      Experiment.APPROVED)
+    # Put some non-random strings in one approved experiment to test search
+    experiment = Experiment.objects.last()
+    experiment.title = 'Brachial Plexus'
+    experiment.description = 'Ein Beschreibung.'
+    experiment.save()
+    # Create version 2 of the experiment to test search - necessary to change
+    # some field other than title, to include a non-random text, because we
+    # are highlitghing the terms searched, and this put span's elements in
+    # html with search results, causing dificulty to search 'Brachial
+    # Plexus' in experiment title in test_search.py.
+    # Related to: test_search_returns_only_last_version_experiment test.
+    experiment.pk = None
+    experiment.version = 2
+    experiment.save()
+
+    # To test search: we've created one experiment approved with 'Brachial
+    # Plexus' in its title. We now create another experiment approved also
+    # with 'Brachial Plexus' in title, and with EMG settings, to test
+    # searching with filter.
+    create_experiment(1, choice([owner1, owner2]),
+                      Experiment.APPROVED)
+    experiment = Experiment.objects.last()
+    experiment.title = 'Brachial Plexus (with EMG Setting)'
+    experiment.description = 'Ein Beschreibung. Brachial plexus repair by ' \
+                             'peripheral nerve ' \
+                             'grafts directly into the spinal cord in rats ' \
+                             'Behavioral and anatomical evidence of ' \
+                             'functional recovery. The EEG text.'
+    experiment.save()
+    create_step(1, experiment.groups.first(), Step.EMG)
+
+    # We change first experiment study approved to contain 'brachial' in
+    # study description, so it have to be found by search test
+    study = Study.objects.filter(
+        experiment__status=Experiment.APPROVED
+    ).first()
+    study.description = 'The brachial artery is the major blood vessel of ' \
+                        'the (upper) arm. It\'s correlated with plexus. ' \
+                        'This study should have an experiment with EEG.'
+    # We put a keyword with the string 'brachial plexus' in the study to
+    # also be found by search test
+    study.keywords.add('brachial plexus')
+    study.save()
+
+    # To test search
+    group = Group.objects.filter(
+        experiment__status=Experiment.APPROVED
+    ).first()
+    group.description = 'Plexus brachial is written in wrong order. Correct ' \
+                        'is Brachial plexus.'
+    group.save()
+    create_step(1, group, Step.EEG)
+    create_step(1, group, Step.EMG)
+    # To test search
+    group.experiment.title = 'Experiment changed to test filter only'
+    group.experiment.save()
+
+    # TODO: test for matches Classification of Diseases
+    ic = ClassificationOfDiseases.objects.create(
+        code='BP', description='brachial Plexus',
+        abbreviated_description='brachial Plexus',
+        parent=None
+    )
+    group.inclusion_criteria.add(ic)
+    group.save()
+
+    # To test search
+    group = Group.objects.filter(
+        experiment__status=Experiment.APPROVED
+    ).last()
+    group.description = 'Brachial plexus is a set of nerves.'
+    group.save()
+    create_step(1, group, Step.EMG)
+
+    # To test search
+    create_experiment_groups(
+        1, Experiment.objects.filter(status=Experiment.APPROVED).first()
+    )
+    group = Group.objects.last()
+    group.title = 'Brachial only'
+    group.save()
+
+    # We create one experiment approved with ethics committee information
+    create_ethics_committee_info(Experiment.objects.last())
+    create_experiment(1, choice([owner1, owner2]),
+                      Experiment.NOT_APPROVED)
+
+    # Associate trustee to experiments under analysis (requires create
     # experiments before)
     associate_experiments_to_trustees()
+
+    # To test search
+    experiment = Experiment.objects.get(
+        trustee=models.User.objects.get(username='claudia')
+    )
+    experiment.title = 'Experiment analysed by Claudia'
+    experiment.save()
 
     # Create study collaborators (requires creating studies before)
     for study in Study.objects.all():
         create_study_collaborator(randint(2, 3), study)
+    # To test search
+    study = Study.objects.filter(
+        experiment__status=Experiment.APPROVED
+    ).last()
+    collaborator = Collaborator.objects.filter(study=study).first()
+    collaborator.name = 'Pero Vaz'
+    collaborator.save()
 
     # Create some keywords to associate with studies
     create_keyword(10)
@@ -238,7 +524,7 @@ def global_setup_ft():
     # groups before)
     for group in Group.objects.all():
         create_experiment_protocol(group)
-        create_participants(
+        create_participant(
             randint(3, 7), group,
             gender1 if randint(1, 2) == 1 else gender2
         )
@@ -250,6 +536,61 @@ def global_setup_ft():
     # create_experiment_and_study method
     # Requires running create_experiment_study_group before
     create_researchers()
+
+    ##
+    # To test searching TMS things
+    ##
+    # Create TMSSetting from an experiment Approved, to test search
+    experiment = Experiment.objects.filter(status=Experiment.APPROVED).first()
+    create_tms_setting(1, experiment)  # 1º TMSSetting
+    tms_setting = TMSSetting.objects.last()
+    tms_setting.name = 'tmssettingname'
+    tms_setting.save()
+    # Create TMSDeviceSetting from a TMSSetting to test search
+    # Required creating TMSSetting from experimenta Approved, first
+    create_tms_device(1)  # 1º TMSDevice
+    tms_device = TMSDevice.objects.last()
+    tms_device.manufacturer_name = 'Siemens'
+    tms_device.save()
+    create_coil_model(1)  # 1º CoilModel
+    coil_model = CoilModel.objects.last()
+    coil_model.name = 'Magstim'
+    coil_model.save()
+    create_tms_device_setting(1, tms_setting, tms_device, coil_model)  #
+    # 1º TMSDeviceSetting
+    tms_device_setting = TMSDeviceSetting.objects.last()
+    tms_device_setting.pulse_stimulus_type = 'single_pulse'
+    tms_device_setting.save()
+    # Create another TMSSetting and associate with same TMSDeviceSetting
+    # created above to test searching TMSDevice and CoilModel
+    create_tms_setting(1, experiment)  # 2º TMSSetting
+    tms_setting = TMSSetting.objects.last()
+    create_tms_device_setting(1, tms_setting, tms_device, coil_model)  # 2º
+    # TMSDeviceSetting
+    # Create others TMSDevice and CoilModel associated with TMSDeviceSetting >
+    # TMSSetting > Experiment
+    create_tms_setting(1, experiment)  # 3º TMSSetting
+    tms_setting = TMSSetting.objects.last()
+    # TODO: IMPORTANT! when creating a new TMSDevice and a new CoilModel to
+    # TODO: associate with new TMSDeviceSetting, the tests with filters in
+    # TODO: test_search fails. See
+    # create_tms_device(1)  # 2º TMSDevice
+    # tms_device = TMSDevice.objects.last()
+    # tms_device.manufacturer_name = 'Siemens'
+    # tms_device.save()
+    # create_coil_model(1)  # 2º CoilModel
+    # coil_model = CoilModel.objects.last()
+    # coil_model.name = 'Magstim'
+    # coil_model.save()
+    create_tms_device_setting(1, tms_setting, tms_device, coil_model)  # 3º
+    # TMSDeviceSetting
+
+    # Create TMSData objects to test search
+    # TODO: the tests returns non-deterministic search results.
+    create_tmsdata_objects_to_test_search()
+
+    # Create EEGSetting object to test search
+    create_eegsetting_objects_to_test_search()
 
 
 def global_setup_ut():
@@ -281,6 +622,17 @@ def global_setup_ut():
         version=1, sent_date=datetime.utcnow(),
         status=Experiment.TO_BE_ANALYSED
     )
+    experiment4 = Experiment.objects.create(
+        title='Experiment 4', nes_id=3, owner=owner1,
+        version=1, sent_date=datetime.utcnow(),
+        status=Experiment.APPROVED
+    )
+    experiment5 = Experiment.objects.create(
+        title='Experiment 5', nes_id=4, owner=owner2,
+        version=1, sent_date=datetime.utcnow(),
+        status=Experiment.APPROVED
+    )
+    create_ethics_committee_info(experiment3)
 
     study1 = Study.objects.create(start_date=datetime.utcnow(),
                                   experiment=experiment1)
@@ -314,6 +666,9 @@ def global_setup_ut():
         name='Colaborador 2', team='Numec', coordinator=False,
         study=study1
     )
+
+    # To test search
+    create_eegsetting_objects_to_test_search()
 
 
 def apply_setup(setup_func):

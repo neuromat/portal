@@ -9,7 +9,6 @@ from functional_tests.base import FunctionalTest
 class LoginPageTest(FunctionalTest):
 
     def test_can_view_login_page_and_login_in_the_system(self):
-        self.browser.get(self.live_server_url)
 
         # The visitor is in home page and see that is a "Log In" link in up
         # right corner of the page. She clicks in that link.
@@ -52,5 +51,3 @@ class LoginPageTest(FunctionalTest):
         # correctly redirected to home page
         response = self.client.get(logout_url)
         self.assertRedirects(response, reverse('home'))
-
-        self.fail('Finish this test!')

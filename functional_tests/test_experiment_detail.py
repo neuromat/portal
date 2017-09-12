@@ -8,16 +8,24 @@ from functional_tests.base import FunctionalTest
 
 class ExperimentDetailTest(FunctionalTest):
 
+    # TODO: break by tabs
     def test_can_view_detail_page(self):
-        experiment = Experiment.objects.filter(status=Experiment.APPROVED).first()
-        self.browser.get(self.live_server_url)
+        experiment = Experiment.objects.filter(
+            status=Experiment.APPROVED
+        ).last()
 
         # The new visitor is in home page and see the list of experiments.
-        # She clicks in first "View" link and is redirected to experiment
+        # She clicks in second "View" link and is redirected to experiment
         # detail page
-        self.browser.find_element_by_link_text('View').click()  # TODO:
-        # really gets first element?
+        # TODO: frequently fails to catch second link
+        link = self.browser.find_element_by_xpath(
+            "//a[@href='/experiments/" + str(experiment.id) + "/']"
+        )
+        link.click()
+        # list_links = self.browser.find_elements_by_link_text('View')
+        # list_links[0].click()
         time.sleep(1)
+
 
         # She sees a new page with a header title: Open Database
         # for Experiments in Neuroscience.
@@ -32,25 +40,44 @@ class ExperimentDetailTest(FunctionalTest):
             'id_detail_title').text
         self.assertEqual(experiment.title, experiment_title)
         link_home = self.browser.find_element_by_id('id_link_home').text
-        self.assertIn('Back Search', link_home)
+        self.assertIn('Back Home', link_home)
         experiment_description = self.browser.find_element_by_id(
             'id_detail_description').text
         self.assertEqual(experiment.description, experiment_description)
 
-        # Right bellow she sees the study that the experiment belongs to
-        # at left, and if data acquisition was finished, at right
-        study_text = self.browser.find_element_by_id('id_detail_study').text
-        self.assertIn('Related study: ' + experiment.study.title, study_text)
+        # Bellow experiment description there is a link to the project site
+        # (because experiment has that data posted via api)
+        ethics_commitee_project_info = \
+            self.browser.find_element_by_link_text('Project Info')
+        self.assertEqual(
+            experiment.project_url,
+            ethics_commitee_project_info.get_attribute('href')
+        )
+
+        # At the right side there is a warning telling that the data
+        # acquisition is not finished yet
         data_acquisition_text = self.browser.find_element_by_id(
             'id_detail_acquisition').text
-        self.assertIn('Data acquisition not finished yet',
-                      data_acquisition_text)
+        if experiment.data_acquisition_done:
+            self.assertIn('Data acquisition was completed',
+                          data_acquisition_text)
+        else:
+            self.assertIn('Data acquisition was not completed',
+                          data_acquisition_text)
 
-        # In right side bellow the data acquisition alert, she sees a link
+        # Right bellow she sees the study that the experiment belongs to
+        # at left
+        study_text = self.browser.find_element_by_id('id_detail_study').text
+        self.assertIn('From study: ' + experiment.study.title, study_text)
+
+        # In right side bellow the data acquisition alert, she sees a button
         # to download of data
-        link_download = self.browser.find_element_by_id(
-            'id_link_download').text
-        self.assertIn('Download data', link_download)
+        button_download = self.browser.find_element_by_id(
+            'button_download')
+        self.assertEqual(
+            'Download experiment data',
+            button_download.text
+        )
 
         # She clicks in Related study link and see a modal with Study data
         self.browser.find_element_by_link_text(experiment.study.title).click()
@@ -72,7 +99,7 @@ class ExperimentDetailTest(FunctionalTest):
         self.assertIn('Start date:', study_start_date)
         # Obs.: code line right below is only to conform to study_start_date
         # format in browser
-        self.assertIn(experiment.study.start_date.strftime("%B %d, %Y")
+        self.assertIn(experiment.study.start_date.strftime("%b. %d, %Y")
                       .lstrip("0").replace(" 0", " "), study_start_date)
         study_end_date = self.browser.find_element_by_id(
             'study_enddate').text
@@ -173,5 +200,3 @@ class ExperimentDetailTest(FunctionalTest):
                             .experimental_protocol.image),
             protocol_image_path
         )
-
-        self.fail('Finish this test!')

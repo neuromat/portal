@@ -1,0 +1,5 @@
+{{ object.title }}
+{{ object.description }}
+{{ object.experiment }}
+{{ object.researcher }}
+{{ object.collaborators.all }}

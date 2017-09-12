@@ -1,0 +1,9 @@
+{{ object.description }}
+{{ object.hotspot_name }}
+{{ object.localization_system_name }}
+{{ object.localization_system_description }}
+{{ object.brain_area_name }}
+{{ object.brain_area_description }}
+{{ object.brain_area_system_name }}
+{{ object.brain_area_system_description }}
+{{ object.tms_setting }}

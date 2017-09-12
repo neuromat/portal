@@ -2,6 +2,7 @@ import re
 import time
 
 from django.core import mail
+from django.core.management import call_command
 from selenium.webdriver.common.keys import Keys
 
 from experiments.models import Experiment
@@ -9,6 +10,20 @@ from functional_tests.base import FunctionalTestTrustee
 
 
 class TrusteeTest(FunctionalTestTrustee):
+
+    # TODO: repeated from test_search.SearchTest
+    def search_for(self, string):
+        search_box = self.browser.find_element_by_id('id_q')
+        search_box.clear()
+        search_box.send_keys(string)
+        self.browser.find_element_by_id('submit_terms').click()
+        time.sleep(1)
+
+    # TODO: repeated from test_search.SearchTest
+    def verify_n_objects_in_table_rows(self, n, row_class):
+        table = self.browser.find_element_by_id('search_table')
+        count = len(table.find_elements_by_class_name(row_class))
+        self.assertEqual(n, count)
 
     def test_trustee_can_view_initial_page(self):
         experiment = Experiment.objects.first()
@@ -75,7 +90,7 @@ class TrusteeTest(FunctionalTestTrustee):
         time.sleep(1)
         self.browser.find_element_by_link_text(
             'Under analysis').find_element_by_xpath(
-            "//a[@data-experiment_trustee='claudia'] "
+            "//a[@data-experiment_trustee='claudia']"
         ).click()
         time.sleep(1)
         status_choices_form = self.browser.find_element_by_id(
@@ -107,7 +122,8 @@ class TrusteeTest(FunctionalTestTrustee):
     def test_trustee_can_see_experiments_to_be_analysed_sign(self):
         experiments_to_be_analysed = Experiment.objects.filter(status=Experiment.TO_BE_ANALYSED)
         new_experiments = self.browser.find_element_by_id('new_experiments')
-        # TODO: we are using a bad technique - badger is greater or equal zero or -1
+        # TODO: we are using a bad technique - badger is greater or equal
+        # TODO: zero or -1
         badger = new_experiments.get_attribute('class').find('badger')
         if experiments_to_be_analysed:
             self.assertLess(-1, badger)
@@ -145,22 +161,27 @@ class TrusteeTest(FunctionalTestTrustee):
                       self.browser.find_element_by_tag_name('body').text)
         # The work is done. She is satisfied and decides to log out from system
         self.browser.find_element_by_link_text('Log Out').click()
-        time.sleep(3)
+        time.sleep(1)
         # The email was sent to the researcher. The guy checks her email and
         # finds a message
         email = mail.outbox[0]
         self.assertIn(experiment.study.researcher.email, email.to)
         self.assertEqual(email.subject,
-                         'Your experiment was approved in NEDP portal')
+                         'Your experiment was approved')
         # Inside it, there's a message with congratulations and a link to
         # the Portal
-        self.assertIn('Congratulations, your experiment ' + experiment.title
-                      + ' was approved by the Portal committee. Now it is '
-                        'public available under Creative Commons '
-                        'Share Alike license.\nYou can view your experiment '
-                        'data in ' +
-                        self.live_server_url, email.body)
-        url_search = re.search(r'http://.+$', email.body)
+        self.assertIn('We are pleased to inform you that your experiment ' +
+                      experiment.title +
+                      ' was approved by Neuromat Open Database Evaluation '
+                      'Committee. All data of the submitted experiment '
+                      'will be available freely to the public '
+                      'consultation and shared under Creative Commons Share '
+                      'Alike license.\n You can access your experiment '
+                      'data by clicking on the link below\n' +
+                      self.live_server_url + '\n', email.body)
+        self.assertIn('With best regards,\n The NeuroMat Open Database '
+                      'Evaluation Committee.', email.body)
+        url_search = re.search(r'http://localhost:\d+', email.body)
         if not url_search:
             self.fail('Could not find url in email body:\n' + email.body)
         url = url_search.group(0)
@@ -362,8 +383,8 @@ class TrusteeTest(FunctionalTestTrustee):
         ).text
         # Experiment.STATUS[1][1] == 'To be analysed'
         self.assertEqual(td_tag_status, Experiment.STATUS_OPTIONS[1][1])
-        self.assertIn('You have liberate the experiment ' + experiment.title
-                      + ' to be analysed by other trustee.',
+        self.assertIn('The experiment data ' + experiment.title
+                      + ' was made available to be analysed by other trustee.',
                       self.browser.find_element_by_tag_name('body').text)
 
     def test_can_change_status_from_under_analysis_to_other_only_if_trustee_is_the_owner(self):
@@ -386,4 +407,85 @@ class TrusteeTest(FunctionalTestTrustee):
                       'trustee roque.',
                       modal_body)
 
-        self.fail('Finish this test!')
+    def test_can_view_ethics_committee_info(self):
+        # Last experiment approved has ethics committee info (tests helper)
+        experiment = Experiment.objects.filter(
+            status=Experiment.APPROVED
+        ).last()
+
+        # The trustee click in the experiment of the list that has ethics
+        # commitee info data
+        self.browser.find_element_by_link_text('View').find_element_by_xpath(
+            "//a[@href='/experiments/" + str(experiment.id) + "/']"
+        ).click()
+        time.sleep(1)
+
+        # Bellow experiment description there's a link to ethics committee
+        # approval site, and a link to download the ethics committee file
+        # (because this experiment has that data posted via api)
+        ethics_commitee_url = self.browser.find_element_by_link_text(
+            'Approval of the ethics committee'
+        )
+        self.assertEqual(
+            experiment.ethics_committee_url,
+            ethics_commitee_url.get_attribute('href')
+        )
+        ethics_commitee_file = self.browser.find_element_by_link_text(
+            'Approval of the ethics committee file'
+        )
+        # Obs.: self.assertIn because
+        # experiment.ethics_committee_info.file.url gives relative url
+        # here in test, but prepends url in template system
+        self.assertIn(
+            experiment.ethics_committee_file.url,
+            ethics_commitee_file.get_attribute('href')
+        )
+
+    def test_change_status_from_under_analysis_to_approved_reindex_haystack(self):
+
+        # The trustee Claudia changes an experiment under analysis to approved
+        experiment_links = self.browser.find_elements_by_link_text(
+                'Under analysis')
+        for experiment_link in experiment_links:
+            if experiment_link.get_attribute('data-experiment_trustee') == \
+                    'claudia':
+                experiment_link.click()
+        time.sleep(1)
+        status_choices_form = self.browser.find_element_by_id(
+            'id_status_choices')
+        status_choices_form.find_element_by_xpath(
+            '//input[@type="radio" and  @value=' + '"' +
+            Experiment.APPROVED + '"]').click()
+        submit_button = self.browser.find_element_by_id('submit')
+        submit_button.send_keys(Keys.ENTER)
+        time.sleep(1)
+
+        # Claudia is redirected to home page. She logs out the system
+        self.browser.find_element_by_link_text('Log Out').click()
+        # TODO: we're running rebuild_index manually, because the celery
+        # TODO: task is TODO: not beeing recognized by tests. See:
+        # TODO: https://stackoverflow.com/questions/4055860/unit-testing-with
+        # TODO: -django-celery
+        # TODO: http://bwreilly.github.io/blog/2013/07/21/testing-search
+        # TODO: -haystack-in-django/
+        # TODO: https://buxty.com/b/2012/12/testing-django-haystack-whoosh/
+        call_command('rebuild_index', verbosity=0, interactive=False)
+
+        # Coincidentally a researcher arrives to the site, just a few moments
+        # after Claudia logged out from Portal, and searches for
+        # the experiment that Claudia has just changed from under analysis
+        # to approved.
+        self.search_for('\"Experiment analysed by Claudia\"')
+
+        # When a trustee changes experiment status from under analysis to
+        # approved the system makes search reindexing, so the researcher will
+        # see one line that corresponds to the experiment with 'Experiment
+        # 2' in experiment title and nothing more.
+        self.verify_n_objects_in_table_rows(1, 'experiment-matches')
+        self.verify_n_objects_in_table_rows(0, 'study-matches')
+        self.verify_n_objects_in_table_rows(0, 'experimentalprotocol-matches')
+        self.verify_n_objects_in_table_rows(0, 'group-matches')
+        experiment_text = self.browser.find_element_by_class_name(
+            'experiment-matches'
+        ).text
+        self.assertIn('Experiment analysed by Claudia', experiment_text)
