@@ -33,15 +33,6 @@ def create_export_instance():
 def download_view(request, experiment_id):
     template_name = "experiments/detail.html"
 
-    # export_instance = create_export_instance()
-    # input_export_file = path.join(EXPORT_DIRECTORY, path.join(path.join(str(export_instance.id), str(JSON_FILENAME))))
-    # input_filename = path.join(settings.MEDIA_ROOT, input_export_file)
-    #
-    # create_directory(settings.MEDIA_ROOT, path.split(input_export_file)[0])
-    #
-    # build_complete_export_structure(experiment_id, input_filename)
-
-    # complete_filename = export_create(request, export_instance.id, input_filename, experiment_id, template_name="experiments/detail.html")
     complete_filename = download_create(request, experiment_id, template_name)
 
     if complete_filename:
@@ -178,8 +169,7 @@ def download_create(request, experiment_id, template_name):
             print("finalizado corretamente")
 
         # delete temporary directory: from base_directory and below
-        # base_export_directory = export.get_export_directory()
-        base_export_directory = path.join(settings.MEDIA_ROOT, str(export_instance.id))
+        base_export_directory = path.join(settings.MEDIA_ROOT, path.join("temp", str(export_instance.id)))
         rmtree(base_export_directory, ignore_errors=True)
 
         print("finalizado corretamente 2")
