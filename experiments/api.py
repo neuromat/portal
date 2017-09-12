@@ -842,7 +842,7 @@ class ExperimentViewSet(viewsets.ModelViewSet):
         serializer.save(
             owner=owner, version=exp_version.get_last_version(), nes_id=nes_id
         )
-        download_filename = download_create(request='GET', experiment_id=nes_id, template_name="")
+        # download_filename = download_create(request='GET', experiment_id=nes_id, template_name="")
 
 
 class StudyViewSet(viewsets.ModelViewSet):
