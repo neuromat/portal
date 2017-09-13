@@ -17,7 +17,7 @@ from experiments.models import Experiment, Study, User, ProtocolComponent, \
     EMGPreamplifierSetting, EMGAmplifierSetting, EMGPreamplifierFilterSetting, EMGAnalogFilterSetting, \
     EMGElectrodePlacementSetting, \
     EMGSurfacePlacement, EMGIntramuscularPlacement, EMGNeedlePlacement
-from downloads.views import download_create
+from experiments.tasks import build_download_file
 
 
 ###################
@@ -839,10 +839,12 @@ class ExperimentViewSet(viewsets.ModelViewSet):
         nes_id = self.kwargs['experiment_nes_id']
         owner = self.request.user
         exp_version = appclasses.ExperimentVersion(nes_id, owner)
+        version = exp_version.get_last_version()
         serializer.save(
             owner=owner, version=exp_version.get_last_version(), nes_id=nes_id
         )
-        # download_filename = download_create(request='GET', experiment_id=nes_id, template_name="")
+        experiment = Experiment.objects.filter(nes_id=nes_id, version=version).values('id')[0]
+        build_download_file(int(experiment['id']), template_name="")
 
 
 class StudyViewSet(viewsets.ModelViewSet):

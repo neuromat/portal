@@ -106,7 +106,6 @@ def change_status(request, experiment_id):
                         'reasons providing by the Neuromat Open Database Evaluation Committee:') + justification + \
                       _('.\nWith best regards,\n The Neuromat Open Database Evaluation Committee')
 
-
             send_mail(subject, message, from_email,
                       [experiment.study.researcher.email])
             messages.success(
@@ -172,7 +171,7 @@ def change_status(request, experiment_id):
 
     if experiment.status == Experiment.APPROVED:
         rebuild_haystack_index.delay()
-        # build_download_file(request, experiment.id).delay()
+        # build_download_file(experiment.id).delay()
 
     return HttpResponseRedirect('/')
 

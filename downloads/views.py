@@ -33,7 +33,11 @@ def create_export_instance():
 def download_view(request, experiment_id):
     template_name = "experiments/detail.html"
 
-    complete_filename = download_create(request, experiment_id, template_name)
+    complete_filename, error_msg = download_create(experiment_id, template_name)
+
+    if error_msg != "":
+        messages.error(request, error_msg)
+        return render(request, template_name)
 
     if complete_filename:
 
@@ -43,8 +47,8 @@ def download_view(request, experiment_id):
         #
         zip_file = open(complete_filename, 'rb')
         response = HttpResponse(zip_file, content_type='application/zip')
-        # response['Content-Disposition'] = 'attachment; filename="export.zip"'
-        # response['Content-Length'] = path.getsize(complete_filename)
+        response['Content-Disposition'] = 'attachment; filename="export.zip"'
+        response['Content-Length'] = path.getsize(complete_filename)
         response['Set-Cookie'] = 'fileDownload=true; path=/'
         return response
     else:
@@ -65,7 +69,7 @@ def update_export_instance(input_file, output_export, export_instance):
     export_instance.save()
 
 
-def download_create(request, experiment_id, template_name):
+def download_create(experiment_id, template_name):
     try:
         export_instance = create_export_instance()
         input_export_file = path.join(EXPORT_DIRECTORY,
@@ -84,9 +88,9 @@ def download_create(request, experiment_id, template_name):
         base_directory, path_to_create = path.split(export.get_directory_base())
         # create directory base ex. /Users/.../portal/media/temp/path_create
         error_msg, base_directory_name = create_directory(base_directory, path_to_create)
-        if error_msg != "":
-            messages.error(request, error_msg)
-            return render(request, template_name)
+        # if error_msg != "":
+        #     messages.error(request, error_msg)
+        #     return render(request, template_name)
         # ex. /Users/.../portal/media/temp/export_instance.id/json_export.json
         input_export_file = path.join("export", path.join(path.join(str(export_instance.id), str(input_filename))))
 
@@ -95,35 +99,36 @@ def download_create(request, experiment_id, template_name):
         input_data = export.read_configuration_data(input_filename)
 
         if not export.is_input_data_consistent() or not input_data:
-            messages.error(request, "Inconsistent data read from json file")
-            return render(request, template_name)
+            error_msg = "Inconsistent data read from json file"
+            # messages.error(request, "Inconsistent data read from json file")
+            # return render(request, template_name)
 
         # create directory base for export: /EXPERIMENT_DOWNLOAD
         error_msg = export.create_export_directory()
 
-        if error_msg != "":
-            messages.error(request, error_msg)
-            return render(request, template_name)
+        # if error_msg != "":
+        #     messages.error(request, error_msg)
+        #     return render(request, template_name)
 
         # load information of the data collection per participant in a dictionnary
         error_msg = export.include_data_from_group(experiment_id)
-        if error_msg != "":
-            messages.error(request, error_msg)
-            return render(request, template_name)
+        # if error_msg != "":
+        #     messages.error(request, error_msg)
+        #     return render(request, template_name)
 
         # Create arquivos para exportação
         # create files protocolo experimental and diagnosis/participant csv file for each group
         error_msg = export.process_experiment_data(experiment_id)
 
-        if error_msg != "":
-            messages.error(request, error_msg)
-            return render(request, template_name)
+        # if error_msg != "":
+        #     messages.error(request, error_msg)
+        #     return render(request, template_name)
         # process the data per participant
         error_msg = export.download_data_per_participant()
 
-        if error_msg != "":
-            messages.error(request, error_msg)
-            return render(request, template_name)
+        # if error_msg != "":
+        #     messages.error(request, error_msg)
+        #     return render(request, template_name)
 
         # create zip file and include files
         export_complete_filename = ""
@@ -132,13 +137,14 @@ def download_create(request, experiment_id, template_name):
 
             export_complete_filename = path.join(base_directory_name, export_filename)
             directory_download_base = path.join(settings.MEDIA_ROOT, "download")
-            download_experiment_directory = path.join(directory_download_base, experiment_id)
+
+            download_experiment_directory = path.join(directory_download_base, str(experiment_id))
 
             if not path.exists(download_experiment_directory):
-                error_msg, download_experiment_directory = create_directory(directory_download_base, experiment_id)
-                if error_msg != "":
-                    messages.error(request, error_msg)
-                    return render(request, template_name)
+                error_msg, download_experiment_directory = create_directory(directory_download_base, str(experiment_id))
+                # if error_msg != "":
+                #     messages.error(request, error_msg)
+                #     return render(request, template_name)
 
             download_complete_filename = path.join(download_experiment_directory, export_filename)
 
@@ -150,8 +156,7 @@ def download_create(request, experiment_id, template_name):
 
             zip_file.close()
 
-            output_download_file = path.join("download", path.join(path.join(str(experiment_id),
-                                                                             str(export_filename))))
+            output_download_file = path.join("download", path.join(path.join(str(experiment_id), str(export_filename))))
 
             with open(export_complete_filename, 'rb') as f:
                 data = f.read()
@@ -159,9 +164,9 @@ def download_create(request, experiment_id, template_name):
             with open(download_complete_filename, 'wb') as f:
                 f.write(data)
 
+            # experimento ultima versão
             experiment = get_object_or_404(Experiment, pk=experiment_id)
-
-            experiment.download_url = "download/" + experiment_id + "/" + export_filename
+            experiment.download_url = "download/" + str(experiment_id) + "/" + export_filename
             experiment.save(update_fields=["download_url"])
 
             update_export_instance(input_export_file, output_download_file, export_instance)
@@ -174,10 +179,13 @@ def download_create(request, experiment_id, template_name):
 
         print("finalizado corretamente 2")
 
-        return download_complete_filename
+        if template_name != "":
+            return download_complete_filename, error_msg
 
     except OSError as e:
         print(e)
         error_msg = e
-        messages.error(request, error_msg)
-        return render(request, template_name)
+        # messages.error(request, error_msg)
+        # return render(request, template_name)
+        if template_name != "":
+            return error_msg
