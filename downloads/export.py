@@ -5,7 +5,8 @@ from django.conf import settings
 from django.shortcuts import get_object_or_404
 
 from experiments.models import Experiment, Group, Participant, EEGData, EMGData, EEGSetting, EMGSetting, TMSData, \
-    TMSSetting, AdditionalData, ContextTree, GenericDataCollectionData, GoalkeeperGameData, Stimulus, Step
+    TMSSetting, AdditionalData, ContextTree, GenericDataCollectionData, GoalkeeperGameData, Step, \
+    QuestionnaireResponse, Questionnaire
 
 DEFAULT_LANGUAGE = "pt-BR"
 
@@ -148,7 +149,7 @@ class ExportExecution:
         # process of experiment description
 
         study = experiment.study
-        experiment_resume_header = ['Study', 'Study description', 'Start date', 'End date', 'Experiment',
+        experiment_resume_header = ['Study', 'Study description', 'Start date', 'End date', 'Experiment Title',
                                     'Experiment description']
 
         experiment_resume = [study.title, study.description, str(study.start_date), str(study.end_date),
@@ -385,6 +386,34 @@ class ExportExecution:
             participant_directory = path.join(self.per_group_data[group_id]['group']['directory'], "Participants")
             export_participant_directory = path.join(self.per_group_data[group_id]['group']['export_directory'],
                                                      "Participants")
+
+            # questionnaire data
+            step_list = Step.objects.filter(group=group, type='questionnaire')
+            for step_questionnaire in step_list:
+                questionnaire_list = QuestionnaireResponse.objects.filter(step_id=step_questionnaire.id)
+                directory_step_name = "Step_" + str(step_questionnaire.numeration) + "_" + \
+                                      step_questionnaire.type.upper()
+                for questionnaire in questionnaire_list:
+                    participant_code = questionnaire.participant.code
+                    participant_code_directory = path.join(participant_directory, participant_code)
+                    export_participant_code_directory = path.join(export_participant_directory, participant_code)
+
+                    if participant_code['code'] not in self.per_group_data[group_id]['data_per_participant']:
+                        self.per_group_data[group_id]['data_per_participant'][participant_code] = {}
+                    if 'questionnaire_data' not in self.per_group_data[group_id]['data_per_participant'][
+                        participant_code]:
+                        self.per_group_data[group_id]['data_per_participant'][participant_code]['questionnaire_data']\
+                            = []
+
+                    self.per_group_data[group_id]['data_per_participant'][participant_code][
+                        'questionnaire_data'].append({
+                            'step_identification': step_questionnaire.identification,
+                            'questionnaire_response_list': questionnaire.limesurvey_response,
+                            'directory_step_name': directory_step_name,
+                            'directory_step': path.join(participant_code_directory, directory_step_name),
+                            'export_directory_step': path.join(export_participant_code_directory, directory_step_name),
+                        })
+
             # participant with data collection
             eeg_participant_list = EEGData.objects.filter(participant__in=participant_group_list)
             for eeg_participant in eeg_participant_list:
