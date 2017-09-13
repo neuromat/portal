@@ -43,8 +43,8 @@ def download_view(request, experiment_id):
         #
         zip_file = open(complete_filename, 'rb')
         response = HttpResponse(zip_file, content_type='application/zip')
-        # response['Content-Disposition'] = 'attachment; filename="export.zip"'
-        # response['Content-Length'] = path.getsize(complete_filename)
+        response['Content-Disposition'] = 'attachment; filename="download.zip"'
+        response['Content-Length'] = path.getsize(complete_filename)
         response['Set-Cookie'] = 'fileDownload=true; path=/'
         return response
     else:
