@@ -391,6 +391,7 @@ class ExportExecution:
             step_list = Step.objects.filter(group=group, type='questionnaire')
             for step_questionnaire in step_list:
                 questionnaire_list = QuestionnaireResponse.objects.filter(step_id=step_questionnaire.id)
+                survey = get_object_or_404(Questionnaire, pk=step_questionnaire.id)
                 directory_step_name = "Step_" + str(step_questionnaire.numeration) + "_" + \
                                       step_questionnaire.type.upper()
                 for questionnaire in questionnaire_list:
@@ -398,7 +399,7 @@ class ExportExecution:
                     participant_code_directory = path.join(participant_directory, participant_code)
                     export_participant_code_directory = path.join(export_participant_directory, participant_code)
 
-                    if participant_code['code'] not in self.per_group_data[group_id]['data_per_participant']:
+                    if participant_code not in self.per_group_data[group_id]['data_per_participant']:
                         self.per_group_data[group_id]['data_per_participant'][participant_code] = {}
                     if 'questionnaire_data' not in self.per_group_data[group_id]['data_per_participant'][
                         participant_code]:
@@ -408,7 +409,9 @@ class ExportExecution:
                     self.per_group_data[group_id]['data_per_participant'][participant_code][
                         'questionnaire_data'].append({
                             'step_identification': step_questionnaire.identification,
-                            'questionnaire_response_list': questionnaire.limesurvey_response,
+                            'questionnaire_response_list': json.loads(questionnaire.limesurvey_response),
+                            'questionnaire_metadata': survey.survey_metadata,
+                            'questionnaire_name': survey.survey_name,
                             'directory_step_name': directory_step_name,
                             'directory_step': path.join(participant_code_directory, directory_step_name),
                             'export_directory_step': path.join(export_participant_code_directory, directory_step_name),
@@ -544,21 +547,69 @@ class ExportExecution:
         for group_id in self.per_group_data:
             if 'data_per_participant' in self.per_group_data[group_id]:
                 group_directory = self.per_group_data[group_id]['group']['directory']
+                questionnaire_metadata_directory = path.join(group_directory, "Questionnaire_metadata")
 
                 # ex. Users/.../EXPERIMENT_DOWNLOAD/Group_group.title/Participants
                 error_msg, group_participants_directory = create_directory(group_directory, "Participants")
                 if error_msg != "":
                     return error_msg
-                # ex. EXPERIMENT_DOWNLOAD/Group_group.title/Participants
+                # ex. EXPERIMENT_DOWNLOAD/Group_group.title/
                 export_directory_group = self.per_group_data[group_id]['group']['export_directory']
+                # ex. EXPERIMENT_DOWNLOAD/Group_group.title/Participants
                 export_directory_group_participants = path.join(export_directory_group, "Participants")
                 for participant_code in self.per_group_data[group_id]['data_per_participant']:
                     # ex. Users/.../EXPERIMENT_DOWNLOAD/Group_group.title/Participants/PXXXXX
                     error_msg, participant_directory = create_directory(group_participants_directory, participant_code)
                     if error_msg != "":
                         return error_msg
-                    # ex. EXPERIMENT_DOWNLOAD/Group_group.title/Participants/PXXXX
-                    export_directory_participant = path.join(export_directory_group_participants, participant_code)
+                    # data from questionnaire
+                    if 'questionnaire_data' in self.per_group_data[group_id]['data_per_participant'][participant_code]:
+                        questionnaire_list = self.per_group_data[group_id]['data_per_participant'][participant_code][
+                            'questionnaire_data']
+                        for questionnaire_data in questionnaire_list:
+                            questionnaire_directory = questionnaire_data['directory_step']
+                            # ex. Users/.../EXPERIMENT_DOWNLOAD/Group_group.title/Participants/PXXXX
+                            # /Step_XX_Questionnaire
+                            if not path.exists(questionnaire_directory):
+                                error_msg, questionnaire_directory = create_directory(participant_directory,
+                                                                                      questionnaire_data[
+                                                                                          'directory_step_name'])
+                                if error_msg != "":
+                                    return error_msg
+
+                            # ex. EXPERIMENT_DOWNLOAD/Group_group.title/Participants/PXXXX/Step_XX_Questionnaire
+                            export_questionnaire_directory = questionnaire_data['export_directory_step']
+                            filename_questionnaire = "%s.csv" % questionnaire_data['questionnaire_name']
+                            complete_filename_questionnaire = path.join(questionnaire_directory, filename_questionnaire)
+
+                            questionnaire_response = questionnaire_data['questionnaire_response_list']
+
+                            questionnaire_description_fields = []
+                            questionnaire_description_fields.insert(0, questionnaire_response['questions'])
+                            questionnaire_description_fields.insert(1, questionnaire_response['answers'])
+
+                            save_to_csv(complete_filename_questionnaire, questionnaire_description_fields)
+
+                            self.files_to_zip_list.append([complete_filename_questionnaire,
+                                                           export_questionnaire_directory])
+
+                            # if questionnaire_data['questionnaire_metadata']:
+                            #     if not path.exists(questionnaire_metadata_directory):
+                            #         error_msg, questionnaire_metadata_directory = create_directory(
+                            #             group_directory, "Questionnaire_metadata")
+                            #         if error_msg != "":
+                            #             return error_msg
+                            #     filename_questionnaire_metadata = "%s_%s.csv" % ("Responses", questionnaire_data[
+                            #         'questionnaire_name'])
+                            #     complete_filename_questionnaire_metadata = path.join(
+                            #         questionnaire_metadata_directory, filename_questionnaire_metadata)
+                            #
+                            #     save_to_csv(complete_filename_questionnaire_metadata, questionnaire_data[
+                            #         'questionnaire_metadata'])
+                            #
+                            #     self.files_to_zip_list.append([complete_filename_questionnaire_metadata,
+                            #                                   export_directory_group])
+
                     if 'eeg_data' in self.per_group_data[group_id]['data_per_participant'][participant_code]:
                         eeg_data_list = self.per_group_data[group_id]['data_per_participant'][participant_code][
                             'eeg_data']
