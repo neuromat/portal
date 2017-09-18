@@ -5,7 +5,7 @@
 */
 
 h1, h3, h4, h5, p {
-  margin-bottom: 22px;
+  margin-bottom: 15px;
 }
 
 p.alert{
@@ -290,8 +290,27 @@ h5.match {
   border-radius: 3px;
 }
 
+.nep-footer h4 {
+  text-transform: uppercase;
+  margin-bottom: 15px;
+}
+
+.nep-footer a {
+  color: #ffffff;
+}
+
+.nep-footer a:hover, .nep-footer a:active {
+    color: #ffffff;
+    text-decoration: underline;
+}
+
 .footer-license {
   float: right;
+}
+
+.footer-license p {
+  font-size: 13px;
+  margin: 15px 10px;
 }
 
 /*
@@ -343,8 +362,10 @@ h5.match {
 /* overrides bootstrap class */
 
 .list-group-item {
-  background: #80868a;
+  background: transparent;
   border: none;
+  padding: 5px 0px;
+  text-transform: uppercase;
 }
 
 #protocol_image_full .modal-dialog {
