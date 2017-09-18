@@ -1,3 +1,4 @@
+import csv
 import json
 from os import path, makedirs
 from csv import writer
@@ -6,7 +7,7 @@ from django.shortcuts import get_object_or_404
 
 from experiments.models import Experiment, Group, Participant, EEGData, EMGData, EEGSetting, EMGSetting, TMSData, \
     TMSSetting, AdditionalData, ContextTree, GenericDataCollectionData, GoalkeeperGameData, Step, \
-    QuestionnaireResponse, Questionnaire
+    QuestionnaireResponse, Questionnaire, EEG, EMG, TMS, GoalkeeperGame, Stimulus, GenericDataCollection
 
 DEFAULT_LANGUAGE = "pt-BR"
 
@@ -227,6 +228,116 @@ class ExportExecution:
                     with open(complete_protocol_image_filename, 'wb') as f:
                         f.write(data)
 
+            # Experimental protocol - default setting
+            eeg_setting_list = Step.objects.filter(group=group, type='eeg')
+            if eeg_setting_list:
+                for eeg_step in eeg_setting_list:
+                    eeg_default_setting_description = get_eeg_setting_description(default_eeg.eeg_setting.id)
+                    if eeg_default_setting_description:
+                        eeg_setting_filename = "%s.json" % "eeg_default_setting"
+                        complete_filename_eeg_setting = path.join(directory_experimental_protocol, eeg_setting_filename)
+                        default_eeg = get_object_or_404(EEG, pk=eeg_step.id)
+
+                        self.files_to_zip_list.append([complete_filename_eeg_setting,
+                                                       export_directory_experimental_protocol])
+
+                        with open(complete_filename_eeg_setting.encode('utf-8'), 'w', newline='',
+                                  encoding='UTF-8') as outfile:
+                            json.dump(eeg_default_setting_description, outfile, indent=4)
+
+            emg_setting_list = Step.objects.filter(group=group, type='emg')
+            if emg_setting_list:
+                for emg_step in emg_setting_list:
+                    emg_default_setting_description = get_emg_setting_description(default_emg.emg_setting.id)
+                    if emg_default_setting_description:
+                        emg_setting_filename = "%s.json" % "emg_default_setting"
+                        complete_filename_emg_setting = path.join(directory_experimental_protocol, emg_setting_filename)
+                        default_emg = get_object_or_404(EMG, pk=emg_step.id)
+
+                        self.files_to_zip_list.append([complete_filename_emg_setting,
+                                                       export_directory_experimental_protocol])
+
+                        with open(complete_filename_emg_setting.encode('utf-8'), 'w', newline='',
+                                  encoding='UTF-8') as outfile:
+                            json.dump(emg_default_setting_description, outfile, indent=4)
+
+            tms_setting_list = Step.objects.filter(group=group, type='tms')
+            if tms_setting_list:
+                for tms_step in tms_setting_list:
+                    tms_default_setting_description = get_tms_setting_description(default_tms.tms_setting.id)
+                    if tms_default_setting_description:
+                        tms_setting_filename = "%s.json" % "tms_default_setting"
+                        complete_filename_tms_setting = path.join(directory_experimental_protocol, tms_setting_filename)
+                        default_tms = get_object_or_404(TMS, pk=tms_step.id)
+
+                        self.files_to_zip_list.append([complete_filename_tms_setting,
+                                                       export_directory_experimental_protocol])
+
+                        with open(complete_filename_tms_setting.encode('utf-8'), 'w', newline='',
+                                  encoding='UTF-8') as outfile:
+                            json.dump(tms_default_setting_description, outfile, indent=4)
+
+            goalkeeper_game_list = Step.objects.filter(group=group, type='goalkeeper_game')
+            if goalkeeper_game_list:
+                for goalkeeper_game_step in goalkeeper_game_list:
+                    context_tree_default_description = get_context_tree_description(
+                        default_goalkeeper_game.context_tree.id)
+                    if context_tree_default_description:
+                        goalkeeper_game_setting_filename = "%s.json" % "goalkeeper_game_default_setting"
+                        complete_filename_goalkeeper_game_setting = path.join(directory_experimental_protocol,
+                                                                              goalkeeper_game_setting_filename)
+                        default_goalkeeper_game = get_object_or_404(GoalkeeperGame, pk=goalkeeper_game_step.id)
+
+                        self.files_to_zip_list.append([complete_filename_goalkeeper_game_setting,
+                                                       export_directory_experimental_protocol])
+
+                        with open(complete_filename_goalkeeper_game_setting.encode('utf-8'), 'w', newline='',
+                                  encoding='UTF-8') as outfile:
+                            json.dump(context_tree_default_description, outfile, indent=4)
+
+                        # if context_tree have a file
+                        saved_context_tree_filename = default_goalkeeper_game.context_tree.setting_file.name
+                        read_filename_context_tree = path.join(settings.MEDIA_ROOT, saved_context_tree_filename)
+                        context_tree_filename = saved_context_tree_filename.split('/')[-1]
+                        complete_context_tree_filename = path.join(directory_experimental_protocol,
+                                                                   context_tree_filename)
+
+                        with open(read_filename_context_tree, "rb") as f:
+                            data = f.read()
+                        with open(complete_context_tree_filename, "wb") as f:
+                            f.write(data)
+
+                        self.files_to_zip_list.append([complete_context_tree_filename,
+                                                       export_directory_experimental_protocol])
+
+            stimulus_list = Step.objects.filter(group=group, type='stimulus')
+            if stimulus_list:
+                for stimulus_step in stimulus_list:
+                    stimulus = get_object_or_404(Stimulus, pk=stimulus_step.id)
+                    if stimulus.media_file:
+                        stimulus_step_name = stimulus_step.type.upper() + "_" + stimulus_step.numeration
+                        path_stimulus_directory = path.join(directory_experimental_protocol, stimulus_step_name)
+                        if not path.exists(path_stimulus_directory):
+                            error_msg, directory_stimulus_data = create_directory(directory_experimental_protocol,
+                                                                                  stimulus_step_name)
+                            if error_msg != "":
+                                return error_msg
+
+                        export_directory_stimulus_data = path.join(export_directory_experimental_protocol,
+                                                                   stimulus_step_name)
+
+                        stimulus_setting_filename = stimulus.media_file.name.split('/')[-1]
+                        complete_stimulus_filename = path.join(directory_experimental_protocol,
+                                                               stimulus_setting_filename)
+                        read_stimulus_filename = path.join(settings.MEDIA_ROOT, stimulus.media_file.name)
+
+                        with open(read_stimulus_filename, "rb") as f:
+                            data = f.read()
+                        with open(complete_stimulus_filename, "wb") as f:
+                            f.write(data)
+
+                        self.files_to_zip_list.append([complete_stimulus_filename, export_directory_stimulus_data])
+
             # Export data per Participant
             header_personal_data = ["Participant_code", "Age", "Gender"]
             personal_data_list = []
@@ -244,72 +355,7 @@ class ExportExecution:
                 save_to_csv(complete_participant_filename, personal_data_list)
                 self.files_to_zip_list.append([complete_participant_filename, export_directory_group])
 
-                # save eeg, emg, tms, context tree setting data
 
-                # save eeg, emg, tms, context tree setting default in Experimental Protocol directory
-        #         if 'eeg_default_setting_id' in self.per_group_data[group_id]:
-        #             eeg_default_setting_description = get_eeg_setting_description(self.per_group_data[group_id][
-        #                                                                               'eeg_default_setting_id'])
-        #             eeg_setting_description = "%s.json" % "eeg_default_setting"
-        #             complete_filename_eeg_setting = path.join(directory_experimental_protocol, eeg_setting_description)
-        #             self.files_to_zip_list.append([complete_filename_eeg_setting,
-        #                                            export_directory_experimental_protocol])
-        #
-        #             with open(complete_filename_eeg_setting.encode('utf-8'), 'w', newline='',
-        #                       encoding='UTF-8') as outfile:
-        #                 json.dump(eeg_default_setting_description, outfile, indent=4)
-        #
-        #         if 'emg_default_setting_id' in self.per_group_data[group_id]:
-        #             emg_default_setting_description = get_emg_setting_description(self.per_group_data[group_id][
-        #                                                                               'emg_default_setting_id'])
-        #             emg_setting_description = "%s.json" % "emg_default_setting"
-        #             complete_filename_emg_setting = path.join(directory_experimental_protocol,
-        #                                                       emg_setting_description)
-        #             self.files_to_zip_list.append([complete_filename_emg_setting,
-        #                                            export_directory_experimental_protocol])
-        #
-        #             with open(complete_filename_emg_setting.encode('utf-8'), 'w', newline='',
-        #                       encoding='UTF-8') as outfile:
-        #                 json.dump(emg_default_setting_description, outfile, indent=4)
-        #
-        #         if 'tms_default_setting_id' in self.per_group_data[group_id]:
-        #             tms_default_setting_description = get_tms_setting_description(self.per_group_data[group_id][
-        #                                                                               'tms_default_setting_id'])
-        #             tms_setting_description = "%s.json" % "tms_default_setting"
-        #             complete_filename_tms_setting = path.join(directory_experimental_protocol,
-        #                                                       tms_setting_description)
-        #             self.files_to_zip_list.append([complete_filename_tms_setting,
-        #                                            export_directory_experimental_protocol])
-        #
-        #             with open(complete_filename_tms_setting.encode('utf-8'), 'w', newline='',
-        #                       encoding='UTF-8') as outfile:
-        #                 json.dump(tms_default_setting_description, outfile, indent=4)
-        #
-        #         if 'context_tree_default_id' in self.per_group_data[group_id]:
-        #             context_tree_default_description = get_context_tree_description(self.per_group_data[group_id][
-        #                                                                                 'context_tree_default_id'])
-        #             context_tree_description = "%s.json" % "context_tree_default"
-        #             complete_filename_context_tree = path.join(directory_experimental_protocol,
-        #                                                        context_tree_description)
-        #             self.files_to_zip_list.append([complete_filename_context_tree,
-        #                                            export_directory_experimental_protocol])
-        #
-        #             with open(complete_filename_context_tree.encode('utf-8'), 'w', newline='',
-        #                       encoding='UTF-8') as outfile:
-        #                 json.dump(context_tree_default_description, outfile, indent=4)
-        #
-        #             context_tree = get_object_or_404(ContextTree, pk=self.per_group_data[group_id][
-        #                 'context_tree_default_id'])
-        #             context_tree_filename = path.join(settings.BASE_DIR, "media") + "/" + context_tree.setting_file.name
-        #             complete_context_tree_filename = path.join(directory_experimental_protocol,
-        #                                                        context_tree.setting_file.name.split('/')[-1])
-        #             with open(context_tree_filename, "rb") as f:
-        #                 data = f.read()
-        #             with open(complete_context_tree_filename, "wb") as f:
-        #                 f.write(data)
-        #
-        #             self.files_to_zip_list.append([complete_context_tree_filename,
-        #                                            export_directory_experimental_protocol])
         #
         #         # process participant/diagnosis per Participant of each group
         #         participant_group_list = []
@@ -392,6 +438,7 @@ class ExportExecution:
             for step_questionnaire in step_list:
                 questionnaire_list = QuestionnaireResponse.objects.filter(step_id=step_questionnaire.id)
                 survey = get_object_or_404(Questionnaire, pk=step_questionnaire.id)
+                questionnaire_code = survey.id
                 directory_step_name = "Step_" + str(step_questionnaire.numeration) + "_" + \
                                       step_questionnaire.type.upper()
                 for questionnaire in questionnaire_list:
@@ -410,12 +457,21 @@ class ExportExecution:
                         'questionnaire_data'].append({
                             'step_identification': step_questionnaire.identification,
                             'questionnaire_response_list': json.loads(questionnaire.limesurvey_response),
-                            'questionnaire_metadata': survey.survey_metadata,
                             'questionnaire_name': survey.survey_name,
                             'directory_step_name': directory_step_name,
                             'directory_step': path.join(participant_code_directory, directory_step_name),
                             'export_directory_step': path.join(export_participant_code_directory, directory_step_name),
                         })
+
+                    if 'questionnaire_metadata' not in self.per_group_data[group_id]:
+                        self.per_group_data[group_id]['questionnaire_metadata'] = {}
+                    if questionnaire_code not in self.per_group_data[group_id]['questionnaire_metadata']:
+
+                        self.per_group_data[group_id]['questionnaire_metadata'][questionnaire_code] = \
+                            {
+                                'questionnaire_name': survey.survey_name,
+                                'questionnaire_metadata': survey.survey_metadata
+                            }
 
             # participant with data collection
             eeg_participant_list = EEGData.objects.filter(participant__in=participant_group_list)
@@ -593,23 +649,6 @@ class ExportExecution:
                             self.files_to_zip_list.append([complete_filename_questionnaire,
                                                            export_questionnaire_directory])
 
-                            # if questionnaire_data['questionnaire_metadata']:
-                            #     if not path.exists(questionnaire_metadata_directory):
-                            #         error_msg, questionnaire_metadata_directory = create_directory(
-                            #             group_directory, "Questionnaire_metadata")
-                            #         if error_msg != "":
-                            #             return error_msg
-                            #     filename_questionnaire_metadata = "%s_%s.csv" % ("Responses", questionnaire_data[
-                            #         'questionnaire_name'])
-                            #     complete_filename_questionnaire_metadata = path.join(
-                            #         questionnaire_metadata_directory, filename_questionnaire_metadata)
-                            #
-                            #     save_to_csv(complete_filename_questionnaire_metadata, questionnaire_data[
-                            #         'questionnaire_metadata'])
-                            #
-                            #     self.files_to_zip_list.append([complete_filename_questionnaire_metadata,
-                            #                                   export_directory_group])
-
                     if 'eeg_data' in self.per_group_data[group_id]['data_per_participant'][participant_code]:
                         eeg_data_list = self.per_group_data[group_id]['data_per_participant'][participant_code][
                             'eeg_data']
@@ -775,58 +814,91 @@ class ExportExecution:
 
                             self.files_to_zip_list.append([complete_additional_data_filename,
                                                            export_additional_data_directory])
+            # if exist completed questionnaires
+            if 'questionnaire_metadata' in self.per_group_data[group_id]:
+                questionnaire_code_list = self.per_group_data[group_id]['questionnaire_metadata']
+                for questionnaire_code in questionnaire_code_list:
+                    questionnaire_metadata_directory = path.join(group_directory, "Questionnaire_metadata")
+
+                    # create 'questionnaire_metadata' directory
+                    if not path.exists(questionnaire_metadata_directory):
+                        error_msg, questionnaire_metadata_directory = create_directory(
+                            group_directory, "Questionnaire_metadata")
+                        if error_msg != "":
+                            return error_msg
+                    # questionnaire metadata directory export
+                    export_questionnaire_metadata_directory = path.join(export_directory_group,
+                                                                        "Questionnaire_metadata")
+                    questionnaire_metadata_list = self.per_group_data[group_id]['questionnaire_metadata'][
+                        questionnaire_code]['questionnaire_metadata']
+                    questionnaire_name = self.per_group_data[group_id]['questionnaire_metadata'][
+                        questionnaire_code]['questionnaire_name']
+
+                    filename_questionnaire_metadata = "%s_%s.csv" % ("Responses", questionnaire_name)
+                    complete_filename_questionnaire_metadata = path.join(
+                        questionnaire_metadata_directory, filename_questionnaire_metadata)
+
+                    with open(complete_filename_questionnaire_metadata, 'w') as f:
+                        f.write(questionnaire_metadata_list)
+
+                    self.files_to_zip_list.append([complete_filename_questionnaire_metadata,
+                                                   export_questionnaire_metadata_directory])
 
         return error_msg
 
 
 def get_eeg_setting_description(eeg_setting_id):
     eeg_setting = get_object_or_404(EEGSetting, pk=eeg_setting_id)
-    description = {
-        'name': eeg_setting.name,
-        'description': eeg_setting.description,
-    }
-        # description['eeg_amplifier_setting'] = []
-        # eeg_amplifier_setting = eeg_setting.eeg_amplifier_setting
-        # description['eeg_amplifier_setting'].append({
-        #     'identification': eeg_amplifier_setting.eeg_amplifier.identification,
-        #     'description': eeg_amplifier_setting.eeg_amplifier.description,
-        #     'gain': eeg_amplifier_setting.gain,
-        #     'sampling_rate': eeg_amplifier_setting.sampling_rate,
-        #     'number_of_channels_used': eeg_amplifier_setting.number_of_channels_used
-        # })
-        #
-        # description['eeg_filter_setting'] = []
-        # eeg_filter_setting = eeg_setting.eeg_filter_setting
-        # description['eeg_filter_setting'].append({
-        #     'filter_type': eeg_filter_setting.eeg_filter_type.name,
-        #     'description': eeg_filter_setting.eeg_filter_type.description,
-        #     'high_pass': eeg_filter_setting.high_pass,
-        #     'low_pass': eeg_filter_setting.low_pass,
-        #     'order': eeg_filter_setting.order,
-        #     'high_band_pass': eeg_filter_setting.high_band_pass,
-        #     'low_band_pass': eeg_filter_setting.low_band_pass,
-        #     'high_notch': eeg_filter_setting.high_notch,
-        #     'low_notch': eeg_filter_setting.low_notch
-        # })
-        #
-        # description['eeg_solution_setting'] = []
-        # eeg_solution_setting = eeg_setting.eeg_solution_setting
-        # description['eeg_solution_setting'].append({
-        #     'manufacturer': eeg_solution_setting.eeg_solution.manufacturer.name,
-        #     'identification': eeg_solution_setting.eeg_solution.name,
-        #     'components': eeg_solution_setting.eeg_solution.components
-        # })
-        #
-        # description['eeg_electrode_layout_setting'] = []
-        # eeg_electrode_layout_setting = eeg_setting.eeg_electrode_layout_setting.eeg_electrode_net_system
-        # description['eeg_electrode_layout_setting'].append({
-        #     'manufacturer': eeg_electrode_layout_setting.eeg_electrode_net.manufacturer.name,
-        #     'identification': eeg_electrode_layout_setting.eeg_electrode_net.identification,
-        #     'description': eeg_electrode_layout_setting.eeg_electrode_net.description,
-        #     'eeg_electrode_localization_system': eeg_electrode_layout_setting.eeg_electrode_localization_system.name,
-        #     'eeg_electrode_model_default': eeg_electrode_layout_setting.eeg_electrode_localization_system.name,
-        #     'cap_size': ''
-        # })
+    description = {}
+
+    if hasattr(eeg_setting, 'eeg_amplifier_setting'):
+        description['eeg_amplifier_setting'] = []
+        eeg_amplifier_setting = eeg_setting.eeg_amplifier_setting
+        description['eeg_amplifier_setting'].append({
+            'identification': eeg_amplifier_setting.eeg_amplifier.identification,
+            'description': eeg_amplifier_setting.eeg_amplifier.description,
+            'gain': eeg_amplifier_setting.gain,
+            'sampling_rate': eeg_amplifier_setting.sampling_rate,
+            'number_of_channels_used': eeg_amplifier_setting.number_of_channels_used
+        })
+
+    if hasattr(eeg_setting, 'eeg_filter_setting'):
+        description['eeg_filter_setting'] = []
+        eeg_filter_setting = eeg_setting.eeg_filter_setting
+        description['eeg_filter_setting'].append({
+            'filter_type': eeg_filter_setting.eeg_filter_type_name,
+            'description': eeg_filter_setting.eeg_filter_type_description,
+            'high_pass': eeg_filter_setting.high_pass,
+            'low_pass': eeg_filter_setting.low_pass,
+            'order': eeg_filter_setting.order,
+            'high_band_pass': eeg_filter_setting.high_band_pass,
+            'low_band_pass': eeg_filter_setting.low_band_pass,
+            'high_notch': eeg_filter_setting.high_notch,
+            'low_notch': eeg_filter_setting.low_notch
+        })
+
+    if hasattr(eeg_setting, 'eeg_solution'):
+        description['eeg_solution_setting'] = []
+        eeg_solution_setting = eeg_setting.eeg_solution
+        description['eeg_solution_setting'].append({
+            'manufacturer': eeg_solution_setting.manufacturer_name,
+            'identification': eeg_solution_setting.name,
+            'components': eeg_solution_setting.components
+        })
+
+    # if hasattr(eeg_setting, 'eeg_electrode_layout_setting'):
+    #     eeg_electrode_layout_setting = eeg_setting.eeg_electrode_layout_setting
+    #     if hasattr(eeg_electrode_layout_setting, 'eeg_electrode_net_system'):
+    #         description['eeg_electrode_layout_setting'] = []
+    #         eeg_electrode_layout_setting = eeg_setting.eeg_electrode_layout_setting.eeg_electrode_net_system
+    #         description['eeg_electrode_layout_setting'].append({
+    #             'manufacturer': eeg_electrode_layout_setting.eeg_electrode_net.manufacturer.name,
+    #             'identification': eeg_electrode_layout_setting.eeg_electrode_net.identification,
+    #             'description': eeg_electrode_layout_setting.eeg_electrode_net.description,
+    #             'eeg_electrode_localization_system': eeg_electrode_layout_setting.eeg_electrode_localization_system.name,
+    #             'eeg_electrode_model_default': eeg_electrode_layout_setting.eeg_electrode_localization_system.name,
+    #             'cap_size': ''
+    #         })
 
     return description
 
@@ -834,77 +906,61 @@ def get_eeg_setting_description(eeg_setting_id):
 def get_emg_setting_description(emg_setting_id):
     emg_setting = get_object_or_404(EMGSetting, pk=emg_setting_id)
 
-    emg_description = {
-        'setting_description': {},
-        'ad_converter_setting': {},
-        'digital_filter_setting': {}
-    }
+    description = {}
+    if hasattr(emg_setting, 'emg_ad_converter_setting'):
+        description['emg_ad_converter_setting'] = []
+        description['emg_ad_converter_setting'].append({
+            'sampling_rate': emg_setting.emg_ad_converter_setting.sampling_rate,
+        })
 
-    emg_description['setting_description'] = {
-        'name': emg_setting.name,
-        'description': emg_setting.description,
-        'acquisition_software_version': emg_setting.acquisition_software_version
-    }
+    if hasattr(emg_setting, 'emg_digital_filter_setting'):
+        description['emg_digital_filter_setting'] = []
+        emg_digital_filter_setting = emg_setting.emg_digital_filter_setting
+        description['emg_digital_filter_setting'].append({
+            'high_pass': emg_digital_filter_setting.high_pass,
+            'low_pass': emg_digital_filter_setting.low_pass,
+            'order': emg_digital_filter_setting.order,
+            'high_band_pass': emg_digital_filter_setting.high_band_pass,
+            'low_band_pass': emg_digital_filter_setting.low_band_pass,
+            'high_notch': emg_digital_filter_setting.high_notch,
+            'low_notch': emg_digital_filter_setting.low_notch
+        })
 
-    # emg_description['ad_converter_setting'] = {
-    #     'sampling_rate': emg_setting.emg_ad_converter_setting.sampling_rate,
-    # }
-
-    # emg_digital_filter_setting = emg_setting.emg_digital_filter_setting
-    # emg_description['digital_filter_setting'] = {
-    #     'high_pass': emg_digital_filter_setting.high_pass,
-    #     'low_pass': emg_digital_filter_setting.low_pass,
-    #     'order': emg_digital_filter_setting.order,
-    #     'high_band_pass': emg_digital_filter_setting.high_band_pass,
-    #     'low_band_pass': emg_digital_filter_setting.low_band_pass,
-    #     'high_notch': emg_digital_filter_setting.high_notch,
-    #     'low_notch': emg_digital_filter_setting.low_notch
-    # }
-
-    return emg_description
+    return description
 
 
 def get_tms_data_description(tms_data_id):
     tms_data = get_object_or_404(TMSData, pk=tms_data_id)
 
-    tms_description = {
-        'setting_description': {},
-        'stimulation_description': {},
-        'hotspot_position': {},
-    }
+    if tms_data:
+        tms_description = {
+            'setting_description': {},
+            'stimulation_description': {},
+            'hotspot_position': {},
+        }
 
-    tms_description['stimulation_description'] = {
-        'tms_stimulation_description': tms_data.description,
-        # 'pulse_stimulus': tms_data.tms_setting.tms_device_setting.pulse_stimulus_type,
-        'resting_motor threshold-RMT(%)': tms_data.resting_motor_threshold,
-        'test_pulse_intensity_of_simulation(% over the %RMT)': tms_data.test_pulse_intensity_of_simulation,
-        'interval_between_pulses': tms_data.interval_between_pulses,
-        'interval_between_pulses_unit': tms_data.interval_between_pulses_unit,
-        'repetitive_pulse_frequency': tms_data.repetitive_pulse_frequency,
-        'coil_orientation': tms_data.coil_orientation,
-        'coil_orientation_angle': tms_data.coil_orientation_angle,
-        'second_test_pulse_intensity (% over the %RMT)': tms_data.second_test_pulse_intensity,
-        'time_between_mep_trials': tms_data.time_between_mep_trials,
-        'time_between_mep_trials_unit': tms_data.time_between_mep_trials_unit,
-    }
-    # localization_system_selected = get_object_or_404(TMSLocalizationSystem,
-    #                                                  pk=tms_data.hotspot.tms_localization_system_id)
-    tms_description['hotspot_position'] = {
-        'tms_localization_system_name': tms_data.localization_system_name,
-        'tms_localization_system_description': tms_data.localization_system_description,
-        'brain_area': tms_data.brain_area_name,
-        'brain_area_system_name': tms_data.brain_area_system_name,
-        'brain_area_system_description': tms_data.brain_area_system_description
-    }
+        tms_description['stimulation_description'] = {
+            'tms_stimulation_description': tms_data.description,
+            # 'pulse_stimulus': tms_data.tms_setting.tms_device_setting.pulse_stimulus_type,
+            'resting_motor threshold-RMT(%)': tms_data.resting_motor_threshold,
+            'test_pulse_intensity_of_simulation(% over the %RMT)': tms_data.test_pulse_intensity_of_simulation,
+            'interval_between_pulses': tms_data.interval_between_pulses,
+            'interval_between_pulses_unit': tms_data.interval_between_pulses_unit,
+            'repetitive_pulse_frequency': tms_data.repetitive_pulse_frequency,
+            'coil_orientation': tms_data.coil_orientation,
+            'coil_orientation_angle': tms_data.coil_orientation_angle,
+            'second_test_pulse_intensity (% over the %RMT)': tms_data.second_test_pulse_intensity,
+            'time_between_mep_trials': tms_data.time_between_mep_trials,
+            'time_between_mep_trials_unit': tms_data.time_between_mep_trials_unit,
+        }
 
-    # tms_setting = get_object_or_404(TMSSetting, pk=tms_data.tms_setting_id)
-    #
-    # tms_description['setting_description'] = {
-    #     'name': tms_setting.name,
-    #     'description': tms_setting.description,
-    #     'pulse_stimulus_type': tms_setting.tms_device_setting.pulse_stimulus_type,
-    # }
-    #
+        tms_description['hotspot_position'] = {
+            'tms_localization_system_name': tms_data.localization_system_name,
+            'tms_localization_system_description': tms_data.localization_system_description,
+            'brain_area': tms_data.brain_area_name,
+            'brain_area_description': tms_data.brain_area_description,
+        }
+
     return tms_description
 
 
@@ -914,12 +970,6 @@ def get_tms_setting_description(tms_setting_id):
     tms_setting_description = {
         'name': tms_setting.name,
         'description': tms_setting.description,
-        # 'tms_device': tms_setting.tms_device_setting.coil_model.name,
-        # 'tms_device': tms_setting.tms_device_setting.tms_device.manufacturer.name,
-        # 'tms_device_description': tms_setting.tms_device_setting.tms_device.description,
-        # 'coil_model_description': tms_setting.tms_device_setting.coil_model.description,
-        # 'coil_model_design': tms_setting.tms_device_setting.coil_model.coil_design,
-        # 'pulse_stimulus_type': tms_setting.tms_device_setting.pulse_stimulus_type,
     }
 
     return tms_setting_description
