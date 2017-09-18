@@ -97,7 +97,9 @@ a:hover.nep-btn {
  */
 
 .nep-top {
-  height: 60px;
+    height: 65px;
+    margin-top: 10px;
+    padding-left: 0;
 }
 
 .top-neuromat {
@@ -106,6 +108,7 @@ a:hover.nep-btn {
   top: 30%; /* TODO: make relative, try does not use magic number */
   float: left;
   margin-right: 10px;
+  font-size: 40px;
 }
 
 .top-small {
@@ -113,8 +116,7 @@ a:hover.nep-btn {
   display: inline-block;
   width: 13%; /* TODO: make relative, try does not use magic number */
   margin-top: 5px;
-  margin-left: 10px;
-  border-left: 2px solid #000;
+  border-left: 1px solid #2b2d2d;
   padding-left: 10px;
 }
 
@@ -124,6 +126,18 @@ a:hover.nep-btn {
   top: 30%;
 }
 
+.top-login-language a {
+  color: #2b2b2b;
+  padding: 4px 20px;
+  border-radius: 3px;
+}
+
+.top-login-language a:hover,.top-login-language a:focus {
+  color: #ffffff;
+  background-color: #60c8a3;
+  border-radius: 3px;
+    padding: 4px 20px;
+}
 
 /* override bootstrat navbar-nav class */
 .navbar-nav > li > a.top-language {
@@ -135,6 +149,17 @@ a:hover.nep-btn {
   padding: 3px;
 }
 
+/* override bootstrat dropdrown*/
+.nav>li>a:focus, .nav>li>a:hover {
+    text-decoration: none;
+    background-color: transparent;
+    border-radius: 3px;
+    color: #40c899;
+}
+
+.nav .open>a, .nav .open>a:focus, .nav .open>a:hover {
+    background-color: transparent;
+}
 
 /*
   ========================================
