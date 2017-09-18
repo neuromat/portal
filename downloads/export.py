@@ -232,11 +232,11 @@ class ExportExecution:
             eeg_setting_list = Step.objects.filter(group=group, type='eeg')
             if eeg_setting_list:
                 for eeg_step in eeg_setting_list:
+                    default_eeg = get_object_or_404(EEG, pk=eeg_step.id)
                     eeg_default_setting_description = get_eeg_setting_description(default_eeg.eeg_setting.id)
                     if eeg_default_setting_description:
                         eeg_setting_filename = "%s.json" % "eeg_default_setting"
                         complete_filename_eeg_setting = path.join(directory_experimental_protocol, eeg_setting_filename)
-                        default_eeg = get_object_or_404(EEG, pk=eeg_step.id)
 
                         self.files_to_zip_list.append([complete_filename_eeg_setting,
                                                        export_directory_experimental_protocol])
@@ -248,11 +248,11 @@ class ExportExecution:
             emg_setting_list = Step.objects.filter(group=group, type='emg')
             if emg_setting_list:
                 for emg_step in emg_setting_list:
+                    default_emg = get_object_or_404(EMG, pk=emg_step.id)
                     emg_default_setting_description = get_emg_setting_description(default_emg.emg_setting.id)
                     if emg_default_setting_description:
                         emg_setting_filename = "%s.json" % "emg_default_setting"
                         complete_filename_emg_setting = path.join(directory_experimental_protocol, emg_setting_filename)
-                        default_emg = get_object_or_404(EMG, pk=emg_step.id)
 
                         self.files_to_zip_list.append([complete_filename_emg_setting,
                                                        export_directory_experimental_protocol])
@@ -264,11 +264,11 @@ class ExportExecution:
             tms_setting_list = Step.objects.filter(group=group, type='tms')
             if tms_setting_list:
                 for tms_step in tms_setting_list:
+                    default_tms = get_object_or_404(TMS, pk=tms_step.id)
                     tms_default_setting_description = get_tms_setting_description(default_tms.tms_setting.id)
                     if tms_default_setting_description:
                         tms_setting_filename = "%s.json" % "tms_default_setting"
                         complete_filename_tms_setting = path.join(directory_experimental_protocol, tms_setting_filename)
-                        default_tms = get_object_or_404(TMS, pk=tms_step.id)
 
                         self.files_to_zip_list.append([complete_filename_tms_setting,
                                                        export_directory_experimental_protocol])
@@ -280,13 +280,13 @@ class ExportExecution:
             goalkeeper_game_list = Step.objects.filter(group=group, type='goalkeeper_game')
             if goalkeeper_game_list:
                 for goalkeeper_game_step in goalkeeper_game_list:
+                    default_goalkeeper_game = get_object_or_404(GoalkeeperGame, pk=goalkeeper_game_step.id)
                     context_tree_default_description = get_context_tree_description(
                         default_goalkeeper_game.context_tree.id)
                     if context_tree_default_description:
                         goalkeeper_game_setting_filename = "%s.json" % "goalkeeper_game_default_setting"
                         complete_filename_goalkeeper_game_setting = path.join(directory_experimental_protocol,
                                                                               goalkeeper_game_setting_filename)
-                        default_goalkeeper_game = get_object_or_404(GoalkeeperGame, pk=goalkeeper_game_step.id)
 
                         self.files_to_zip_list.append([complete_filename_goalkeeper_game_setting,
                                                        export_directory_experimental_protocol])
