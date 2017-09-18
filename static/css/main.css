@@ -111,6 +111,14 @@ a:hover.nep-btn {
   font-size: 40px;
 }
 
+.top-neuromat a {
+    color: #333;
+}
+
+.top-neuromat a:hover,.top-neuromat a:focus  {
+    text-decoration: none;
+}
+
 .top-small {
   font-size: smaller;
   display: inline-block;
