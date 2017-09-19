@@ -486,7 +486,7 @@ class Step(models.Model):
     BLOCK = 'block'
     INSTRUCTION = 'instruction'
     PAUSE = 'pause'
-    QUESTIONAIRE = 'questionnaire'
+    QUESTIONNAIRE = 'questionnaire'
     STIMULUS = 'stimulus'
     TASK = 'task'
     TASK_EXPERIMENT = 'task_experiment'
@@ -499,7 +499,7 @@ class Step(models.Model):
         (BLOCK, "Set of steps"),
         (INSTRUCTION, "Instruction"),
         (PAUSE, "Pause"),
-        (QUESTIONAIRE, "Questionnaire"),
+        (QUESTIONNAIRE, "Questionnaire"),
         (STIMULUS, "Stimulus"),
         (TASK, "Task for participant"),
         (TASK_EXPERIMENT, "Task for experimenter"),
