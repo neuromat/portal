@@ -340,6 +340,10 @@ h5.match {
   width: 100%;
 }
 
+.input-disabled {
+  pointer-events: none;
+}
+
 /*
   ========================================
   Messages
