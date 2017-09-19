@@ -7,7 +7,7 @@ from django.shortcuts import get_object_or_404
 
 from experiments.models import Experiment, Group, Participant, EEGData, EMGData, EEGSetting, EMGSetting, TMSData, \
     TMSSetting, AdditionalData, ContextTree, GenericDataCollectionData, GoalkeeperGameData, Step, \
-    QuestionnaireResponse, Questionnaire, EEG, EMG, TMS, GoalkeeperGame, Stimulus, GenericDataCollection
+    QuestionnaireResponse, Questionnaire, EEG, EMG, TMS, GoalkeeperGame, Stimulus
 
 DEFAULT_LANGUAGE = "pt-BR"
 
@@ -48,7 +48,7 @@ def create_directory(basedir, path_to_create):
     complete_path = ""
 
     if not path.exists(basedir.encode('utf-8')):
-        return ("Base path does not exist"), complete_path
+        return "Base path does not exist", complete_path
 
     complete_path = path.join(basedir, path_to_create)
 
@@ -232,14 +232,23 @@ class ExportExecution:
             eeg_setting_list = Step.objects.filter(group=group, type='eeg')
             if eeg_setting_list:
                 for eeg_step in eeg_setting_list:
+                    # create directory of eeg step
+                    eeg_step_name = "STEP_" + eeg_step.numeration + "_" + eeg_step.type.upper()
+                    path_eeg_directory = path.join(directory_experimental_protocol, eeg_step_name)
+                    if not path.exists(path_eeg_directory):
+                        error_msg, directory_eeg_step = create_directory(directory_experimental_protocol, eeg_step_name)
+                        if error_msg != "":
+                            return error_msg
+
+                    export_directory_eeg_step = path.join(export_directory_experimental_protocol, eeg_step_name)
+
                     default_eeg = get_object_or_404(EEG, pk=eeg_step.id)
                     eeg_default_setting_description = get_eeg_setting_description(default_eeg.eeg_setting.id)
                     if eeg_default_setting_description:
                         eeg_setting_filename = "%s.json" % "eeg_default_setting"
-                        complete_filename_eeg_setting = path.join(directory_experimental_protocol, eeg_setting_filename)
+                        complete_filename_eeg_setting = path.join(directory_eeg_step, eeg_setting_filename)
 
-                        self.files_to_zip_list.append([complete_filename_eeg_setting,
-                                                       export_directory_experimental_protocol])
+                        self.files_to_zip_list.append([complete_filename_eeg_setting, export_directory_eeg_step])
 
                         with open(complete_filename_eeg_setting.encode('utf-8'), 'w', newline='',
                                   encoding='UTF-8') as outfile:
@@ -248,14 +257,23 @@ class ExportExecution:
             emg_setting_list = Step.objects.filter(group=group, type='emg')
             if emg_setting_list:
                 for emg_step in emg_setting_list:
+                    # create directory of emg step
+                    emg_step_name = "STEP_" + emg_step.numeration + "_" + emg_step.type.upper()
+                    path_emg_directory = path.join(directory_experimental_protocol, emg_step_name)
+                    if not path.exists(path_emg_directory):
+                        error_msg, directory_emg_step = create_directory(directory_experimental_protocol, emg_step_name)
+                        if error_msg != "":
+                            return error_msg
+
+                    export_directory_emg_step = path.join(export_directory_experimental_protocol, emg_step_name)
+
                     default_emg = get_object_or_404(EMG, pk=emg_step.id)
                     emg_default_setting_description = get_emg_setting_description(default_emg.emg_setting.id)
                     if emg_default_setting_description:
                         emg_setting_filename = "%s.json" % "emg_default_setting"
-                        complete_filename_emg_setting = path.join(directory_experimental_protocol, emg_setting_filename)
+                        complete_filename_emg_setting = path.join(directory_emg_step, emg_setting_filename)
 
-                        self.files_to_zip_list.append([complete_filename_emg_setting,
-                                                       export_directory_experimental_protocol])
+                        self.files_to_zip_list.append([complete_filename_emg_setting, export_directory_emg_step])
 
                         with open(complete_filename_emg_setting.encode('utf-8'), 'w', newline='',
                                   encoding='UTF-8') as outfile:
@@ -264,14 +282,23 @@ class ExportExecution:
             tms_setting_list = Step.objects.filter(group=group, type='tms')
             if tms_setting_list:
                 for tms_step in tms_setting_list:
+                    # create directory of tms step
+                    tms_step_name = "STEP_" + tms_step.numeration + "_" + tms_step.type.upper()
+                    path_tms_directory = path.join(directory_experimental_protocol, tms_step_name)
+                    if not path.exists(path_tms_directory):
+                        error_msg, directory_tms_step = create_directory(directory_experimental_protocol, tms_step_name)
+                        if error_msg != "":
+                            return error_msg
+
+                    export_directory_tms_step = path.join(export_directory_experimental_protocol, tms_step_name)
+
                     default_tms = get_object_or_404(TMS, pk=tms_step.id)
                     tms_default_setting_description = get_tms_setting_description(default_tms.tms_setting.id)
                     if tms_default_setting_description:
                         tms_setting_filename = "%s.json" % "tms_default_setting"
-                        complete_filename_tms_setting = path.join(directory_experimental_protocol, tms_setting_filename)
+                        complete_filename_tms_setting = path.join(directory_tms_step, tms_setting_filename)
 
-                        self.files_to_zip_list.append([complete_filename_tms_setting,
-                                                       export_directory_experimental_protocol])
+                        self.files_to_zip_list.append([complete_filename_tms_setting, export_directory_tms_step])
 
                         with open(complete_filename_tms_setting.encode('utf-8'), 'w', newline='',
                                   encoding='UTF-8') as outfile:
@@ -284,12 +311,27 @@ class ExportExecution:
                     context_tree_default_description = get_context_tree_description(
                         default_goalkeeper_game.context_tree.id)
                     if context_tree_default_description:
+                        # create directory of goalkeeper_game step
+                        goalkeeper_game_step_name = "STEP_" + goalkeeper_game_step.numeration + "_" + \
+                                                    goalkeeper_game_step.type.upper()
+
+                        path_goalkeeper_game_directory = path.join(directory_experimental_protocol,
+                                                                   goalkeeper_game_step_name)
+                        if not path.exists(path_goalkeeper_game_directory):
+                            error_msg, directory_goalkeeper_game_step = create_directory(directory_experimental_protocol,
+                                                                                         goalkeeper_game_step_name)
+                            if error_msg != "":
+                                return error_msg
+
+                        export_directory_goalkeeper_game_step = path.join(export_directory_experimental_protocol,
+                                                                          goalkeeper_game_step_name)
+
                         goalkeeper_game_setting_filename = "%s.json" % "goalkeeper_game_default_setting"
-                        complete_filename_goalkeeper_game_setting = path.join(directory_experimental_protocol,
+                        complete_filename_goalkeeper_game_setting = path.join(directory_goalkeeper_game_step,
                                                                               goalkeeper_game_setting_filename)
 
                         self.files_to_zip_list.append([complete_filename_goalkeeper_game_setting,
-                                                       export_directory_experimental_protocol])
+                                                       export_directory_goalkeeper_game_step])
 
                         with open(complete_filename_goalkeeper_game_setting.encode('utf-8'), 'w', newline='',
                                   encoding='UTF-8') as outfile:
@@ -299,7 +341,7 @@ class ExportExecution:
                         saved_context_tree_filename = default_goalkeeper_game.context_tree.setting_file.name
                         read_filename_context_tree = path.join(settings.MEDIA_ROOT, saved_context_tree_filename)
                         context_tree_filename = saved_context_tree_filename.split('/')[-1]
-                        complete_context_tree_filename = path.join(directory_experimental_protocol,
+                        complete_context_tree_filename = path.join(directory_goalkeeper_game_step,
                                                                    context_tree_filename)
 
                         with open(read_filename_context_tree, "rb") as f:
@@ -308,14 +350,14 @@ class ExportExecution:
                             f.write(data)
 
                         self.files_to_zip_list.append([complete_context_tree_filename,
-                                                       export_directory_experimental_protocol])
+                                                       export_directory_goalkeeper_game_step])
 
             stimulus_list = Step.objects.filter(group=group, type='stimulus')
             if stimulus_list:
                 for stimulus_step in stimulus_list:
                     stimulus = get_object_or_404(Stimulus, pk=stimulus_step.id)
                     if stimulus.media_file:
-                        stimulus_step_name = stimulus_step.type.upper() + "_" + stimulus_step.numeration
+                        stimulus_step_name = "STEP_" + stimulus_step.numeration + "_" + stimulus_step.type.upper()
                         path_stimulus_directory = path.join(directory_experimental_protocol, stimulus_step_name)
                         if not path.exists(path_stimulus_directory):
                             error_msg, directory_stimulus_data = create_directory(directory_experimental_protocol,
@@ -429,9 +471,9 @@ class ExportExecution:
             self.per_group_data[group_id]['participant_list'] = []
             for participant in participant_group_list:
                 self.per_group_data[group_id]['participant_list'].append(participant)
-            participant_directory = path.join(self.per_group_data[group_id]['group']['directory'], "Participants")
+            participant_directory = path.join(self.per_group_data[group_id]['group']['directory'], "Participants_data")
             export_participant_directory = path.join(self.per_group_data[group_id]['group']['export_directory'],
-                                                     "Participants")
+                                                     "Participants_data")
 
             # questionnaire data
             step_list = Step.objects.filter(group=group, type='questionnaire')
@@ -439,7 +481,7 @@ class ExportExecution:
                 questionnaire_list = QuestionnaireResponse.objects.filter(step_id=step_questionnaire.id)
                 survey = get_object_or_404(Questionnaire, pk=step_questionnaire.id)
                 questionnaire_code = survey.id
-                directory_step_name = "Step_" + str(step_questionnaire.numeration) + "_" + \
+                directory_step_name = "STEP_" + str(step_questionnaire.numeration) + "_" + \
                                       step_questionnaire.type.upper()
                 for questionnaire in questionnaire_list:
                     participant_code = questionnaire.participant.code
@@ -458,6 +500,7 @@ class ExportExecution:
                             'step_identification': step_questionnaire.identification,
                             'questionnaire_response_list': json.loads(questionnaire.limesurvey_response),
                             'questionnaire_name': survey.survey_name,
+                            'questionnaire_code': questionnaire_code,
                             'directory_step_name': directory_step_name,
                             'directory_step': path.join(participant_code_directory, directory_step_name),
                             'export_directory_step': path.join(export_participant_code_directory, directory_step_name),
@@ -477,10 +520,12 @@ class ExportExecution:
             eeg_participant_list = EEGData.objects.filter(participant__in=participant_group_list)
             for eeg_participant in eeg_participant_list:
                 participant_code = eeg_participant.participant.code
-                directory_step_name = "Step_" + str(eeg_participant.step.numeration) + "_" + \
+                directory_step_name = "STEP_" + str(eeg_participant.step.numeration) + "_" + \
                                       eeg_participant.step.type.upper()
-                participant_code_directory = path.join(participant_directory, participant_code)
-                export_participant_code_directory = path.join(export_participant_directory, participant_code)
+                participant_code_directory_name = "Participant_" + participant_code
+                participant_code_directory = path.join(participant_directory, participant_code_directory_name)
+                export_participant_code_directory = path.join(export_participant_directory,
+                                                              participant_code_directory_name)
                 if participant_code not in self.per_group_data[group_id]['data_per_participant']:
                     self.per_group_data[group_id]['data_per_participant'][participant_code] = {}
                 if 'eeg_data' not in self.per_group_data[group_id]['data_per_participant'][participant_code]:
@@ -497,10 +542,12 @@ class ExportExecution:
             emg_participant_list = EMGData.objects.filter(participant__in=participant_group_list)
             for emg_participant in emg_participant_list:
                 participant_code = emg_participant.participant.code
-                directory_step_name = "Step_" + str(emg_participant.step.numeration) + "_" + \
+                participant_code_directory_name = "Participant_" + participant_code
+                directory_step_name = "STEP_" + str(emg_participant.step.numeration) + "_" + \
                                       emg_participant.step.type.upper()
-                participant_code_directory = path.join(participant_directory, participant_code)
-                export_participant_code_directory = path.join(export_participant_directory, participant_code)
+                participant_code_directory = path.join(participant_directory, participant_code_directory_name)
+                export_participant_code_directory = path.join(export_participant_directory,
+                                                              participant_code_directory_name)
                 if participant_code not in self.per_group_data[group_id]['data_per_participant']:
                     self.per_group_data[group_id]['data_per_participant'][participant_code] = {}
                 if 'emg_data' not in self.per_group_data[group_id]['data_per_participant'][participant_code]:
@@ -517,10 +564,12 @@ class ExportExecution:
             tms_participant_list = TMSData.objects.filter(participant__in=participant_group_list)
             for tms_participant in tms_participant_list:
                 participant_code = tms_participant.participant.code
-                directory_step_name = "Step_" + str(tms_participant.step.numeration) + "_" + \
+                participant_code_directory_name = "Participant_" + participant_code
+                directory_step_name = "STEP_" + str(tms_participant.step.numeration) + "_" + \
                                       tms_participant.step.type.upper()
-                participant_code_directory = path.join(participant_directory, participant_code)
-                export_participant_code_directory = path.join(export_participant_directory, participant_code)
+                participant_code_directory = path.join(participant_directory, participant_code_directory_name)
+                export_participant_code_directory = path.join(export_participant_directory,
+                                                              participant_code_directory_name)
                 if participant_code not in self.per_group_data[group_id]['data_per_participant']:
                     self.per_group_data[group_id]['data_per_participant'][participant_code] = {}
                 if 'tms_data' not in self.per_group_data[group_id]['data_per_participant'][participant_code]:
@@ -537,10 +586,12 @@ class ExportExecution:
             additional_data_list = AdditionalData.objects.filter(participant__in=participant_group_list)
             for additional_data in additional_data_list:
                 participant_code = additional_data.participant.code
-                directory_step_name = "Step_" + str(additional_data.step.numeration) + "_" + \
+                participant_code_directory_name = "Participant_" + participant_code
+                directory_step_name = "STEP_" + str(additional_data.step.numeration) + "_" + \
                                       additional_data.step.type.upper()
-                participant_code_directory = path.join(participant_directory, participant_code)
-                export_participant_code_directory = path.join(export_participant_directory, participant_code)
+                participant_code_directory = path.join(participant_directory, participant_code_directory_name)
+                export_participant_code_directory = path.join(export_participant_directory,
+                                                              participant_code_directory_name)
                 if participant_code not in self.per_group_data[group_id]['data_per_participant']:
                     self.per_group_data[group_id]['data_per_participant'][participant_code] = {}
                 if 'additional_data' not in self.per_group_data[group_id]['data_per_participant'][participant_code]:
@@ -557,10 +608,12 @@ class ExportExecution:
             generic_data_list = GenericDataCollectionData.objects.filter(participant__in=participant_group_list)
             for generic_data in generic_data_list:
                 participant_code = generic_data.participant.code
-                directory_step_name = "Step_" + str(generic_data.step.numeration) + "_" + \
+                participant_code_directory_name = "Participant_" + participant_code
+                directory_step_name = "STEP_" + str(generic_data.step.numeration) + "_" + \
                                       generic_data.step.type.upper()
-                participant_code_directory = path.join(participant_directory, participant_code)
-                export_participant_code_directory = path.join(export_participant_directory, participant_code)
+                participant_code_directory = path.join(participant_directory, participant_code_directory_name)
+                export_participant_code_directory = path.join(export_participant_directory,
+                                                              participant_code_directory_name)
                 if participant_code not in self.per_group_data[group_id]['data_per_participant']:
                     self.per_group_data[group_id]['data_per_participant'][participant_code] = {}
                 if 'generic_data' not in self.per_group_data[group_id]['data_per_participant'][participant_code]:
@@ -576,8 +629,8 @@ class ExportExecution:
 
                 goalkeeper_data_list = GoalkeeperGameData.objects.filter(participant__in=participant_group_list)
                 for goalkeeper_data in goalkeeper_data_list:
-                    participant_code = goalkeeper_data.participant.code
-                    directory_step_name = "Step_" + str(goalkeeper_data.step.numeration) + "_" + \
+                    participant_code = "Participant_" + goalkeeper_data.participant.code
+                    directory_step_name = "STEP_" + str(goalkeeper_data.step.numeration) + "_" + \
                                           goalkeeper_data.step.type.upper()
                     participant_code_directory = path.join(participant_directory, participant_code)
                     export_participant_code_directory = path.join(export_participant_directory, participant_code)
@@ -603,19 +656,20 @@ class ExportExecution:
         for group_id in self.per_group_data:
             if 'data_per_participant' in self.per_group_data[group_id]:
                 group_directory = self.per_group_data[group_id]['group']['directory']
-                questionnaire_metadata_directory = path.join(group_directory, "Questionnaire_metadata")
 
                 # ex. Users/.../EXPERIMENT_DOWNLOAD/Group_group.title/Participants
-                error_msg, group_participants_directory = create_directory(group_directory, "Participants")
+                error_msg, group_participants_directory = create_directory(group_directory, "Participants_data")
                 if error_msg != "":
                     return error_msg
                 # ex. EXPERIMENT_DOWNLOAD/Group_group.title/
                 export_directory_group = self.per_group_data[group_id]['group']['export_directory']
                 # ex. EXPERIMENT_DOWNLOAD/Group_group.title/Participants
-                export_directory_group_participants = path.join(export_directory_group, "Participants")
+                # export_directory_group_participants = path.join(export_directory_group, "Participants_data")
                 for participant_code in self.per_group_data[group_id]['data_per_participant']:
+                    participant_code_directory_name = "Participant_" + participant_code
                     # ex. Users/.../EXPERIMENT_DOWNLOAD/Group_group.title/Participants/PXXXXX
-                    error_msg, participant_directory = create_directory(group_participants_directory, participant_code)
+                    error_msg, participant_directory = create_directory(group_participants_directory,
+                                                                        participant_code_directory_name)
                     if error_msg != "":
                         return error_msg
                     # data from questionnaire
@@ -635,7 +689,8 @@ class ExportExecution:
 
                             # ex. EXPERIMENT_DOWNLOAD/Group_group.title/Participants/PXXXX/Step_XX_Questionnaire
                             export_questionnaire_directory = questionnaire_data['export_directory_step']
-                            filename_questionnaire = "%s.csv" % questionnaire_data['questionnaire_name']
+                            filename_questionnaire = "%s_%s.csv" % ("Responses",
+                                                                    questionnaire_data['questionnaire_code'])
                             complete_filename_questionnaire = path.join(questionnaire_directory, filename_questionnaire)
 
                             questionnaire_response = questionnaire_data['questionnaire_response_list']
@@ -679,20 +734,21 @@ class ExportExecution:
 
                             self.files_to_zip_list.append([complete_eeg_data_filename, export_eeg_directory])
 
-                            # download eeg_setting_description
+                            # create eeg_setting_description
                             eeg_setting_description = get_eeg_setting_description(eeg_data.eeg_setting_id)
-                            eeg_setting_filename = "%s_%s.json" % (eeg_data_filename.split(".")[0],
-                                                                   "setting_description")
+                            if eeg_setting_description:
+                                eeg_setting_filename = "%s_%s.json" % (eeg_data_filename.split(".")[0],
+                                                                       "setting_description")
 
-                            # ex. Users/.../EXPERIMENT_DOWNLOAD/Group_group.title/Participants/PXXXX/Step_XX_EEG/
-                            # eeg_rawfilename_setting_description.json#
-                            complete_setting_filename = path.join(eeg_directory, eeg_setting_filename)
+                                # ex. Users/.../EXPERIMENT_DOWNLOAD/Group_group.title/Participants/PXXXX/Step_XX_EEG/
+                                # eeg_rawfilename_setting_description.json#
+                                complete_setting_filename = path.join(eeg_directory, eeg_setting_filename)
 
-                            self.files_to_zip_list.append([complete_setting_filename, export_eeg_directory])
+                                self.files_to_zip_list.append([complete_setting_filename, export_eeg_directory])
 
-                            with open(complete_setting_filename.encode('utf-8'), 'w', newline='',
-                                      encoding='UTF-8') as outfile:
-                                json.dump(eeg_setting_description, outfile, indent=4)
+                                with open(complete_setting_filename.encode('utf-8'), 'w', newline='',
+                                          encoding='UTF-8') as outfile:
+                                    json.dump(eeg_setting_description, outfile, indent=4)
 
                     if 'emg_data' in self.per_group_data[group_id]['data_per_participant'][participant_code]:
                         emg_data_list = self.per_group_data[group_id]['data_per_participant'][participant_code][
@@ -726,18 +782,19 @@ class ExportExecution:
 
                             # download emg_setting_description
                             emg_setting_description = get_emg_setting_description(emg_data.emg_setting_id)
-                            emg_setting_filename = "%s_%s.json" % (emg_data_filename.split(".")[0],
-                                                                   "setting_description")
+                            if emg_setting_description:
+                                emg_setting_filename = "%s_%s.json" % (emg_data_filename.split(".")[0],
+                                                                       "setting_description")
 
-                            # ex. Users/.../EXPERIMENT_DOWNLOAD/Group_group.title/Participants/PXXXX/Step_XX_EMG/
-                            # emg_rawfilename_setting_description.json#
-                            complete_setting_filename = path.join(emg_directory, emg_setting_filename)
+                                # ex. Users/.../EXPERIMENT_DOWNLOAD/Group_group.title/Participants/PXXXX/Step_XX_EMG/
+                                # emg_rawfilename_setting_description.json#
+                                complete_setting_filename = path.join(emg_directory, emg_setting_filename)
 
-                            self.files_to_zip_list.append([complete_setting_filename, export_emg_directory])
+                                self.files_to_zip_list.append([complete_setting_filename, export_emg_directory])
 
-                            with open(complete_setting_filename.encode('utf-8'), 'w', newline='',
-                                      encoding='UTF-8') as outfile:
-                                json.dump(emg_setting_description, outfile, indent=4)
+                                with open(complete_setting_filename.encode('utf-8'), 'w', newline='',
+                                          encoding='UTF-8') as outfile:
+                                    json.dump(emg_setting_description, outfile, indent=4)
 
                     if 'tms_data' in self.per_group_data[group_id]['data_per_participant'][participant_code]:
                         tms_data_list = self.per_group_data[group_id]['data_per_participant'][participant_code][
@@ -754,16 +811,17 @@ class ExportExecution:
                             export_tms_directory = tms_data['export_directory_step']
 
                             tms_data_description = get_tms_data_description(tms_data['data_id'])
-                            tms_data_filename = "%s.json" % "tms_data_description"
-                            # ex. Users/.../EXPERIMENT_DOWNLOAD/Group_group.title/Participants/PXXXX/Step_XX_TMS
-                            # /tms_data_description.json
-                            complete_data_filename = path.join(tms_directory, tms_data_filename)
+                            if tms_data_description:
+                                tms_data_filename = "%s.json" % "tms_data_description"
+                                # ex. Users/.../EXPERIMENT_DOWNLOAD/Group_group.title/Participants/PXXXX/Step_XX_TMS
+                                # /tms_data_description.json
+                                complete_data_filename = path.join(tms_directory, tms_data_filename)
 
-                            self.files_to_zip_list.append([complete_data_filename, export_tms_directory])
+                                self.files_to_zip_list.append([complete_data_filename, export_tms_directory])
 
-                            with open(complete_data_filename.encode('utf-8'), 'w', newline='', encoding='UTF-8') as \
-                                    outfile:
-                                json.dump(tms_data_description, outfile, indent=4)
+                                with open(complete_data_filename.encode('utf-8'), 'w', newline='', encoding='UTF-8') as \
+                                        outfile:
+                                    json.dump(tms_data_description, outfile, indent=4)
 
                             # TMS hotspot position image file
                             tms_data = get_object_or_404(TMSData, pk=tms_data['data_id'])
@@ -783,6 +841,7 @@ class ExportExecution:
                                         f.write(data)
 
                                     self.files_to_zip_list.append([complete_hotspot_filename, export_tms_directory])
+
                     if 'additional_data' in self.per_group_data[group_id]['data_per_participant'][participant_code]:
                         additional_data_list = self.per_group_data[group_id]['data_per_participant'][
                             participant_code]['additional_data']
@@ -814,10 +873,11 @@ class ExportExecution:
 
                             self.files_to_zip_list.append([complete_additional_data_filename,
                                                            export_additional_data_directory])
+
             # if exist completed questionnaires
             if 'questionnaire_metadata' in self.per_group_data[group_id]:
                 questionnaire_code_list = self.per_group_data[group_id]['questionnaire_metadata']
-                for questionnaire_code in questionnaire_code_list:
+                if questionnaire_code_list:
                     questionnaire_metadata_directory = path.join(group_directory, "Questionnaire_metadata")
 
                     # create 'questionnaire_metadata' directory
@@ -829,20 +889,31 @@ class ExportExecution:
                     # questionnaire metadata directory export
                     export_questionnaire_metadata_directory = path.join(export_directory_group,
                                                                         "Questionnaire_metadata")
-                    questionnaire_metadata_list = self.per_group_data[group_id]['questionnaire_metadata'][
-                        questionnaire_code]['questionnaire_metadata']
-                    questionnaire_name = self.per_group_data[group_id]['questionnaire_metadata'][
-                        questionnaire_code]['questionnaire_name']
+                    for questionnaire_code in questionnaire_code_list:
+                        questionnaire_name = self.per_group_data[group_id]['questionnaire_metadata'][
+                            questionnaire_code]['questionnaire_name']
+                        questionnaire_metadata_code_name = "%s_%s" % (questionnaire_code, questionnaire_name)
+                        # create directory by each questionnaire_metadata
+                        error_msg, questionnaire_metadata_directory_name = create_directory(
+                            questionnaire_metadata_directory, questionnaire_metadata_code_name)
+                        if error_msg != "":
+                            return error_msg
 
-                    filename_questionnaire_metadata = "%s_%s.csv" % ("Responses", questionnaire_name)
-                    complete_filename_questionnaire_metadata = path.join(
-                        questionnaire_metadata_directory, filename_questionnaire_metadata)
+                        export_questionnaire_metadata_directory_name = path.join(
+                            export_questionnaire_metadata_directory, questionnaire_metadata_code_name)
 
-                    with open(complete_filename_questionnaire_metadata, 'w') as f:
-                        f.write(questionnaire_metadata_list)
+                        questionnaire_metadata_fields = self.per_group_data[group_id]['questionnaire_metadata'][
+                            questionnaire_code]['questionnaire_metadata']
 
-                    self.files_to_zip_list.append([complete_filename_questionnaire_metadata,
-                                                   export_questionnaire_metadata_directory])
+                        filename_questionnaire_metadata = "%s_%s.csv" % ("Fields", questionnaire_code)
+                        complete_filename_questionnaire_metadata = path.join(
+                            questionnaire_metadata_directory_name, filename_questionnaire_metadata)
+
+                        with open(complete_filename_questionnaire_metadata, 'w') as f:
+                            f.write(questionnaire_metadata_fields)
+
+                        self.files_to_zip_list.append([complete_filename_questionnaire_metadata,
+                                                       export_questionnaire_metadata_directory_name])
 
         return error_msg
 
@@ -850,6 +921,12 @@ class ExportExecution:
 def get_eeg_setting_description(eeg_setting_id):
     eeg_setting = get_object_or_404(EEGSetting, pk=eeg_setting_id)
     description = {}
+
+    description['eeg_setting'] = []
+    description['eeg_setting'].append({
+        'name': eeg_setting.name,
+        'description': eeg_setting.description if eeg_setting.description else '',
+    })
 
     if hasattr(eeg_setting, 'eeg_amplifier_setting'):
         description['eeg_amplifier_setting'] = []
@@ -907,80 +984,269 @@ def get_emg_setting_description(emg_setting_id):
     emg_setting = get_object_or_404(EMGSetting, pk=emg_setting_id)
 
     description = {}
+    description['emg_setting'] = []
+    description['emg_setting'].append({
+        'name': emg_setting.name,
+        'description': emg_setting.description if emg_setting.description else '',
+        'acquisition_software': emg_setting.acquisition_software_version if emg_setting.acquisition_software_version
+        else '',
+    })
+
     if hasattr(emg_setting, 'emg_ad_converter_setting'):
         description['emg_ad_converter_setting'] = []
         description['emg_ad_converter_setting'].append({
-            'sampling_rate': emg_setting.emg_ad_converter_setting.sampling_rate,
+            'sampling_rate_setted': emg_setting.emg_ad_converter_setting.sampling_rate if
+            emg_setting.emg_ad_converter_setting.sampling_rate else '',
         })
+
+        if hasattr(emg_setting.emg_ad_converter_setting, 'ad_converter'):
+            description['emg_ad_converter_setting'].append({
+                'ad_converter': emg_setting.emg_ad_converter_setting.ad_converter.identification,
+                'sample_rate (equipment)': emg_setting.emg_ad_converter_setting.ad_converter.sampling_rate,
+                'signal_to_noise (equipment)': emg_setting.emg_ad_converter_setting.ad_converter.signal_to_noise_rate,
+                'resolution (equipment)': emg_setting.emg_ad_converter_setting.ad_converter.resolution,
+            })
 
     if hasattr(emg_setting, 'emg_digital_filter_setting'):
         description['emg_digital_filter_setting'] = []
         emg_digital_filter_setting = emg_setting.emg_digital_filter_setting
         description['emg_digital_filter_setting'].append({
-            'high_pass': emg_digital_filter_setting.high_pass,
-            'low_pass': emg_digital_filter_setting.low_pass,
-            'order': emg_digital_filter_setting.order,
-            'high_band_pass': emg_digital_filter_setting.high_band_pass,
-            'low_band_pass': emg_digital_filter_setting.low_band_pass,
-            'high_notch': emg_digital_filter_setting.high_notch,
-            'low_notch': emg_digital_filter_setting.low_notch
+            'filter type name': emg_digital_filter_setting.filter_type_name,
+            'description': emg_digital_filter_setting.filter_type_description if
+            emg_digital_filter_setting.filter_type_description else '',
+            'high_pass': emg_digital_filter_setting.high_pass if emg_digital_filter_setting.high_pass else '',
+            'low_pass': emg_digital_filter_setting.low_pass if emg_digital_filter_setting.low_pass else '',
+            'high_band_pass': emg_digital_filter_setting.high_band_pass if emg_digital_filter_setting.high_band_pass
+            else '',
+            'low_band_pass': emg_digital_filter_setting.low_band_pass if emg_digital_filter_setting.low_band_pass
+            else '',
+            'high_notch': emg_digital_filter_setting.high_notch if emg_digital_filter_setting.high_notch else '',
+            'low_notch': emg_digital_filter_setting.low_notch if emg_digital_filter_setting.low_notch else '',
+            'order': emg_digital_filter_setting.order if emg_digital_filter_setting.order else '',
         })
+
+    # if hasattr(emg_setting, 'emg_electrode_settings'):
+    #     description['emg_electrode_settings'] = []
+    #     description['emg_electrode_settings'].append({
+    #         'name': emg_setting.emg_electrode_settings.name,
+    #         'electrode_model': [],
+    #         'emg_amplifier_setting': [],
+    #         'emg_preamplifier_setting': [],
+    #         'emg_electrode_placement_setting': [],
+    #     })
+    #     if hasattr(emg_setting.emg_electrode_settings.model):
+    #         if hasattr(emg_setting.emg_electrode_settings.model.electrode_model):
+    #             electrode_model = emg_setting.emg_electrode_settings.model.electrode_model
+    #             if electrode_model.impedance and electrode_model.impedance_unit:
+    #                 impedance_description = electrode_model.impedance + " (" + electrode_model.impedance_unit + ")"
+    #             if electrode_model.inter_electrode_distance and electrode_model.inter_electrode_distance_unit:
+    #                 electrode_distance_description = electrode_model.inter_electrode_distance + " (" + \
+    #                                                  electrode_model.inter_electrode_distance_unit + ")"
+    #             description['emg_electrode_settings']['electrode_model'].append({
+    #                 'model_name': electrode_model.name,
+    #                 'electrode type': electrode_model.electrode_type,
+    #                 'description': electrode_model.description if electrode_model.description else '',
+    #                 'material': electrode_model.material if electrode_model.material else '',
+    #                 'usability': electrode_model.usability if electrode_model.usability else '',
+    #                 'impedance': impedance_description,
+    #                 'distance inter electrode': electrode_distance_description,
+    #                 'electrode_configuration_name': electrode_model.electrode_configuration_name if
+    #                 electrode_model.electrode_configuration_name else '',
+    #             })
+    #
+    #     if hasattr(emg_setting.emg_electrode_settings, 'emg_amplifier_setting'):
+    #         preamplifier = emg_setting.emg_electrode_settings.emg_amplifier_setting.amplifier
+    #         if preamplifier.impedance and preamplifier.impedance_unit:
+    #             amplifier_impedance_description = preamplifier.impedance + " (" + preamplifier.impedance_unit + ")"
+    #         description['emg_electrode_settings']['emg_amplifier_setting'].append({
+    #             'amplifier_name': preamplifier.identification,
+    #             'manufacturer_name': preamplifier.manufacturer_name,
+    #             'description': preamplifier.description if preamplifier.description else '',
+    #             'serial_number': preamplifier.serial_number if preamplifier.serial_number else '',
+    #             'gain': preamplifier.gain if preamplifier.gain else '',
+    #             'number of channels': preamplifier.number_of_channels if preamplifier.number_of_channels else '',
+    #             'impedance': amplifier_impedance_description,
+    #             'detection type': preamplifier.amplifier_detection_type_name if preamplifier.amplifier_detection_type_name
+    #             else '',
+    #             'tethering system': preamplifier.tethering_system_name if preamplifier.tethering_system_name else '',
+    #             'emg_analog_filter_setting': [],
+    #         })
+    #
+    #         if hasattr(emg_setting.emg_electrode_settings.emg_amplifier_setting, 'emg_analog_filter_setting'):
+    #             emg_preamplifier_filter_setting = emg_setting.emg_electrode_settings.emg_amplifier_setting
+    #             description['emg_electrode_settings']['emg_amplifier_setting']['emg_analog_filter_setting'].append({
+    #                 'low_pass': emg_preamplifier_filter_setting.low_pass if emg_preamplifier_filter_setting.low_pass else '',
+    #                 'high_pass': emg_preamplifier_filter_setting.high_pass if emg_preamplifier_filter_setting.high_pass else '',
+    #                 'low_band_pass': emg_preamplifier_filter_setting.low_band_pass if
+    #                 emg_preamplifier_filter_setting.low_band_pass else '',
+    #                 'high_band_pass': emg_preamplifier_filter_setting.high_band_pass if
+    #                 emg_preamplifier_filter_setting.high_band_pass else '',
+    #                 'low_notch': emg_preamplifier_filter_setting.low_notch if emg_preamplifier_filter_setting.low_notch else '',
+    #                 'high_notch': emg_preamplifier_filter_setting.high_notch if emg_preamplifier_filter_setting.high_notch else '',
+    #                 'order': emg_preamplifier_filter_setting.order if emg_preamplifier_filter_setting.order else '',
+    #             })
+    #     if hasattr(emg_setting.emg_electrode_settings, 'emg_preamplifier_setting'):
+    #         preamplifier = emg_setting.emg_electrode_settings.emg_preamplifier_setting.amplifier
+    #         if preamplifier.impedance and preamplifier.impedance_unit:
+    #             amplifier_impedance_description = preamplifier.impedance + " (" + preamplifier.impedance_unit + ")"
+    #         description['emg_electrode_settings']['emg_preamplifier_setting'].append({
+    #             'amplifier_name': preamplifier.identification,
+    #             'manufacturer_name': preamplifier.manufacturer_name,
+    #             'description': preamplifier.description if preamplifier.description else '',
+    #             'serial_number': preamplifier.serial_number if preamplifier.serial_number else '',
+    #             'gain': preamplifier.gain if preamplifier.gain else '',
+    #             'number of channels': preamplifier.number_of_channels if preamplifier.number_of_channels else '',
+    #             'impedance': amplifier_impedance_description,
+    #             'detection type': preamplifier.amplifier_detection_type_name if preamplifier.amplifier_detection_type_name
+    #             else '',
+    #             'tethering system': preamplifier.tethering_system_name if preamplifier.tethering_system_name else '',
+    #             'emg_preamplifier_filter_setting': [],
+    #         })
+    #
+    #         if hasattr(emg_setting.emg_electrode_settings.emg_preamplifier_setting.emg_preamplifier_filter_setting):
+    #             emg_preamplifier_filter_setting = \
+    #                 emg_setting.emg_electrode_settings.emg_preamplifier_setting.emg_preamplifier_filter_setting
+    #             description['emg_electrode_settings']['emg_preamplifier_setting'][
+    #                 'emg_preamplifier_filter_setting'].append({
+    #                     'low_pass': emg_preamplifier_filter_setting.low_pass if
+    #                     emg_preamplifier_filter_setting.low_pass else '',
+    #                     'high_pass': emg_preamplifier_filter_setting.high_pass if
+    #                     emg_preamplifier_filter_setting.high_pass else '',
+    #                     'low_band_pass': emg_preamplifier_filter_setting.low_band_pass if
+    #                     emg_preamplifier_filter_setting.low_band_pass else '',
+    #                     'high_band_pass': emg_preamplifier_filter_setting.high_band_pass if
+    #                     emg_preamplifier_filter_setting.high_band_pass else '',
+    #                     'low_notch': emg_preamplifier_filter_setting.low_notch if
+    #                     emg_preamplifier_filter_setting.low_notch else '',
+    #                     'high_notch': emg_preamplifier_filter_setting.high_notch if
+    #                     emg_preamplifier_filter_setting.high_notch else '',
+    #                     'order': emg_preamplifier_filter_setting.order if emg_preamplifier_filter_setting.order else '',
+    #             })
+    #
+    #     if hasattr(emg_setting.emg_electrode_settings, 'emg_electrode_placement_setting'):
+    #         emg_electrode_placement_setting = emg_setting.emg_electrode_settings.emg_electrode_placement_setting
+    #         description['emg_electrode_settings']['emg_electrode_placement_setting'].append({
+    #             'muscle name': emg_electrode_placement_setting.muscle_name if
+    #             emg_electrode_placement_setting.muscle_name else '',
+    #             'muscle side': emg_electrode_placement_setting.muscle_side if
+    #             emg_electrode_placement_setting.muscle_side else '',
+    #             'remarks': emg_electrode_placement_setting.remarks if emg_electrode_placement_setting.remarks else '',
+    #             'electrode_placement': []
+    #         })
+    #         if hasattr(emg_electrode_placement_setting, 'electrode_placement'):
+    #             electrode_placement = emg_electrode_placement_setting.electrode_placement
+    #             description['emg_electrode_settings']['emg_electrode_placement_setting']['electrode_placement'].append({
+    #                 'standardization system': electrode_placement.standardization_system_name if
+    #                 electrode_placement.standardization_system_name else '',
+    #                 'standardization system description': electrode_placement.standardization_system_description if
+    #                 electrode_placement.standardization_system_description else '',
+    #                 'muscle_anatomy_origin': electrode_placement.muscle_anatomy_origin if
+    #                 electrode_placement.muscle_anatomy_origin else '',
+    #                 'muscle_anatomy_insertion': electrode_placement.muscle_anatomy_insertion if
+    #                 electrode_placement.muscle_anatomy_insertion else '',
+    #                 'muscle_anatomy_function': electrode_placement.muscle_anatomy_function if
+    #                 electrode_placement.muscle_anatomy_function else '',
+    #                 'location': electrode_placement.location if electrode_placement.location else '',
+    #                 'placement type': electrode_placement.placement_type if electrode_placement.placement_type else '',
+    #                 'placement_type_description': []
+    #             })
+    #
+    #             if hasattr(electrode_placement, 'emg_intramuscular_placement'):
+    #                 intramuscular_placement = electrode_placement.emg_intramuscular_placement
+    #                 description['emg_electrode_settings']['emg_electrode_placement_setting']['electrode_placement'][
+    #                     'placement_type_description'].append({
+    #                         'method_of_insertion': intramuscular_placement.method_of_insertion if
+    #                         intramuscular_placement.method_of_insertion else '',
+    #                         'depth_of_insertion': intramuscular_placement.depth_of_insertion if
+    #                         intramuscular_placement.depth_of_insertion else '',
+    #                     })
+    #
+    #             if hasattr(electrode_placement, 'emg_needle_placement'):
+    #                 needle_placement = electrode_placement.emg_needle_placement
+    #                 description['emg_electrode_settings']['emg_electrode_placement_setting']['electrode_placement'][
+    #                     'placement_type_description'].append({
+    #                         'depth_of_insertion': needle_placement.depth_of_insertion if
+    #                         needle_placement.depth_of_insertion else '',
+    #                     })
+    #
+    #             if hasattr(electrode_placement, 'emg_surface_placement'):
+    #                 surface_placement = electrode_placement.emg_surface_placement
+    #                 description['emg_electrode_settings']['emg_electrode_placement_setting']['electrode_placement'][
+    #                     'placement_type_description'].append({
+    #                         'start_posture': surface_placement.start_posture if
+    #                         surface_placement.start_posture else '',
+    #                         'orientation': surface_placement.orientation if
+    #                         surface_placement.orientation else '',
+    #                         'fixation_on_the_skin': surface_placement.fixation_on_the_skin if
+    #                         surface_placement.fixation_on_the_skin else '',
+    #                         'reference_electrode': surface_placement.reference_electrode if
+    #                         surface_placement.reference_electrode else '',
+    #                         'clinical_test': surface_placement.clinical_test if
+    #                         surface_placement.clinical_test else '',
+    #                     })
 
     return description
 
 
 def get_tms_data_description(tms_data_id):
+    tms_description = {}
     tms_data = get_object_or_404(TMSData, pk=tms_data_id)
 
-    if tms_data:
-        tms_description = {
-            'setting_description': {},
-            'stimulation_description': {},
-            'hotspot_position': {},
-        }
+    pulse_stimulus_type = ''
+    if hasattr(tms_data.tms_setting, 'tms_device_setting'):
+        pulse_stimulus_type = tms_data.tms_setting.tms_device_setting.pulse_stimulus_type
 
-        tms_description['stimulation_description'] = {
-            'tms_stimulation_description': tms_data.description,
-            # 'pulse_stimulus': tms_data.tms_setting.tms_device_setting.pulse_stimulus_type,
-            'resting_motor threshold-RMT(%)': tms_data.resting_motor_threshold,
-            'test_pulse_intensity_of_simulation(% over the %RMT)': tms_data.test_pulse_intensity_of_simulation,
-            'interval_between_pulses': tms_data.interval_between_pulses,
-            'interval_between_pulses_unit': tms_data.interval_between_pulses_unit,
-            'repetitive_pulse_frequency': tms_data.repetitive_pulse_frequency,
-            'coil_orientation': tms_data.coil_orientation,
-            'coil_orientation_angle': tms_data.coil_orientation_angle,
-            'second_test_pulse_intensity (% over the %RMT)': tms_data.second_test_pulse_intensity,
-            'time_between_mep_trials': tms_data.time_between_mep_trials,
-            'time_between_mep_trials_unit': tms_data.time_between_mep_trials_unit,
-        }
+    tms_description['stimulation_description'] = {
+        'tms_stimulation_description': tms_data.description,
+        'pulse_stimulus': pulse_stimulus_type if pulse_stimulus_type else '',
+        'resting_motor threshold-RMT(%)': tms_data.resting_motor_threshold if tms_data.resting_motor_threshold else '',
+        'test_pulse_intensity_of_simulation(% over the %RMT)':
+            tms_data.test_pulse_intensity_of_simulation if tms_data.test_pulse_intensity_of_simulation else '',
+        'interval_between_pulses': tms_data.interval_between_pulses if tms_data.interval_between_pulses else '',
+        'interval_between_pulses_unit': tms_data.interval_between_pulses_unit if
+        tms_data.interval_between_pulses_unit else '',
+        'repetitive_pulse_frequency': tms_data.repetitive_pulse_frequency if tms_data.repetitive_pulse_frequency else '',
+        'coil_orientation': tms_data.coil_orientation if tms_data.coil_orientation else '',
+        'coil_orientation_angle': tms_data.coil_orientation_angle if tms_data.coil_orientation_angle else '',
+        'second_test_pulse_intensity (% over the %RMT)': tms_data.second_test_pulse_intensity if
+        tms_data.second_test_pulse_intensity else '',
+        'time_between_mep_trials': tms_data.time_between_mep_trials if tms_data.time_between_mep_trials else '',
+        'time_between_mep_trials_unit': tms_data.time_between_mep_trials_unit if
+        tms_data.time_between_mep_trials_unit else '',
+    }
 
-        tms_description['hotspot_position'] = {
-            'tms_localization_system_name': tms_data.localization_system_name,
-            'tms_localization_system_description': tms_data.localization_system_description,
-            'brain_area': tms_data.brain_area_name,
-            'brain_area_description': tms_data.brain_area_description,
-        }
+    tms_description['hotspot_position'] = {
+        'tms_localization_system_name': tms_data.localization_system_name,
+        'tms_localization_system_description': tms_data.localization_system_description if
+        tms_data.localization_system_description else '',
+        'brain_area': tms_data.brain_area_name,
+        'brain_area_description': tms_data.brain_area_description if tms_data.brain_area_description else '',
+    }
 
     return tms_description
 
 
 def get_tms_setting_description(tms_setting_id):
+    tms_setting_description = {}
     tms_setting = get_object_or_404(TMSSetting, pk=tms_setting_id)
 
-    tms_setting_description = {
-        'name': tms_setting.name,
-        'description': tms_setting.description,
-    }
+    if tms_setting:
+        tms_setting_description = {
+            'name': tms_setting.name if tms_setting.name else '',
+            'description': tms_setting.description if tms_setting.description else '',
+        }
 
     return tms_setting_description
 
 
 def get_context_tree_description(context_tree_id):
+    context_tree_description = {}
     context_tree = get_object_or_404(ContextTree, pk=context_tree_id)
-    context_tree_description = {
-        'name': context_tree.name,
-        'description': context_tree.description,
-        'setting_text': context_tree.setting_text,
-    }
+    if context_tree:
+        context_tree_description = {
+            'name': context_tree.name if context_tree.name else '',
+            'description': context_tree.description if context_tree.description else '',
+            'setting_text': context_tree.setting_text if context_tree.setting_text else '',
+        }
 
     return context_tree_description
