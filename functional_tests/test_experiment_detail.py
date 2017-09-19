@@ -2,7 +2,7 @@ import time
 
 from selenium.webdriver.common.keys import Keys
 
-from experiments.models import Experiment
+from experiments.models import Experiment, Questionnaire
 from functional_tests.base import FunctionalTest
 
 
@@ -25,7 +25,6 @@ class ExperimentDetailTest(FunctionalTest):
         # list_links = self.browser.find_elements_by_link_text('View')
         # list_links[0].click()
         time.sleep(1)
-
 
         # She sees a new page with a header title: Open Database
         # for Experiments in Neuroscience.
@@ -55,7 +54,7 @@ class ExperimentDetailTest(FunctionalTest):
         )
 
         # At the right side there is a warning telling that the data
-        # acquisition is not finished yet
+        # acquisition was finished or not
         data_acquisition_text = self.browser.find_element_by_id(
             'id_detail_acquisition').text
         if experiment.data_acquisition_done:
@@ -200,3 +199,62 @@ class ExperimentDetailTest(FunctionalTest):
                             .experimental_protocol.image),
             protocol_image_path
         )
+
+    def test_can_view_questionaire_tab(self):
+        experiment = Experiment.objects.filter(
+            status=Experiment.APPROVED
+        ).last()
+
+        # The new visitor is in home page and sees the list of experiments.
+        # She clicks in second "View" link and is redirected to experiment
+        # detail page
+        # TODO: frequently fails to catch second link
+        self.browser.find_element_by_xpath(
+            "//a[@href='/experiments/" + str(experiment.id) + "/']"
+        ).click()
+        time.sleep(1)
+
+        # There's a tab written Questionnaires
+        questionnaires_tab = self.browser.find_element_by_link_text(
+            'Questionnaires')
+        self.assertEqual('Questionnaires', questionnaires_tab.text)
+
+    def test_can_view_questionnaire_content(self):
+        ##
+        # We've created Questionnaire data in tests helper from a Sample
+        # of NES
+        ##
+        experiment = Experiment.objects.filter(
+            status=Experiment.APPROVED
+        ).last()
+        questionnaire = Questionnaire.objects.first()
+
+        # The new visitor is in home page and sees the list of experiments.
+        # She clicks in second "View" link and is redirected to experiment
+        # detail page
+        # TODO: frequently fails to catch second link
+        self.browser.find_element_by_xpath(
+            "//a[@href='/experiments/" + str(experiment.id) + "/']"
+        ).click()
+        time.sleep(1)
+
+        # When the new visitor clicks in the Questionnaires tab, she sees
+        # the questionnaires questions and answers.
+        # The questionnaires tab has a questionnaire's title
+        title_text = self.browser.find_element_by_id(
+            'questionnaire_title').text
+        self.assertEqual(questionnaire.survey_name, title_text)
+        # The questionnaires tab has the sequence of questions and answers
+        ##
+        # We check if some entries in our questionnaire example appear in
+        # questionnaire content
+        ##
+        content_text = self.browser.find_element_by_id(
+            'questionnaire_content').text
+        self.assertIn('História da fratura', content_text)
+        self.assertIn('Fratura da costela', content_text)
+        self.assertIn('Já fez alguma cirurgia ortopédica?', content_text)
+        self.assertIn('Fez alguma cirurgia de nervo?', content_text)
+        self.assertIn('História prévia de dor?', content_text)
+        self.assertIn('Fratura vertebral cervical', content_text)
+        self.assertIn('Fratura vertebral torácica', content_text)

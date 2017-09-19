@@ -1,13 +1,19 @@
+import csv
+
+import math
+import pandas
 from django.contrib import messages
 from django.contrib.auth.views import LoginView
 from django.core.mail import send_mail
 from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import render
 from haystack.generic_views import SearchView
-from django.utils.translation import activate, LANGUAGE_SESSION_KEY, ugettext as _
+from django.utils.translation import activate, LANGUAGE_SESSION_KEY, \
+    ugettext as _
 
 from experiments.forms import NepSearchForm
-from experiments.models import Experiment, RejectJustification
+from experiments.models import Experiment, RejectJustification, Questionnaire, \
+    Step
 from experiments.tasks import rebuild_haystack_index, build_download_file
 
 
@@ -45,6 +51,51 @@ def home_page(request):
                    'search_form': NepSearchForm()})
 
 
+def _get_nested_rec(key, grp):
+    rec = {}
+    rec['question_code'] = key[0]
+    rec['question_limesurvey_type'] = key[1]
+    rec['question_description'] = key[2]
+
+    for field in ['subquestion_description', 'option_description']:
+        if isinstance(grp[field].unique()[0], float) and \
+                math.isnan(grp[field].unique()[0]):
+            rec[field] = None
+        else:
+            rec[field] = list(grp[field].unique())
+
+    return rec
+
+
+def _get_questionnaire(metadata):
+    # Put the questionnaire data into a temporary csv file
+    file = open('/tmp/questionnaire.csv', 'w')
+    file.write(metadata)
+    file.close()
+
+    # Remove the columns that won't be used and save in another temporary file
+    with open('/tmp/questionnaire.csv', 'r') as source:
+        rdr = csv.reader(source, skipinitialspace=True)
+        with open('/tmp/questionnaire_cleaned.csv', 'w') as result:
+            wtr = csv.writer(result)
+            for r in rdr:
+                wtr.writerow((r[2], r[3], r[4], r[6], r[8]))
+
+    q_cleaned = pandas.read_csv('/tmp/questionnaire_cleaned.csv')
+
+    records = []
+
+    for key, grp in q_cleaned.groupby(['question_code',
+                                       'question_limesurvey_type',
+                                       'question_description']):
+        rec = _get_nested_rec(key, grp)
+        records.append(rec)
+
+    records = dict(data=records)
+
+    return records
+
+
 def experiment_detail(request, experiment_id):
     to_be_analysed_count = None  # will be None if home contains the list of
     # normal user
@@ -69,12 +120,25 @@ def experiment_detail(request, experiment_id):
                 age_grouping[int(participant.age)] = 0
             age_grouping[int(participant.age)] += 1
 
+    # Get questionnaires for all groups
+    questionnaire = {}
+    for group in experiment.groups.all():
+        if group.steps.filter(type=Step.QUESTIONNAIRE).count() > 0:
+            questionnaire[group.title] = {}
+            for step in group.steps.filter(type=Step.QUESTIONNAIRE):
+                q = Questionnaire.objects.get(step_ptr=step)
+                questionnaire[group.title][q.id] = {}
+                questionnaire[group.title][q.id]['survey_name'] = q.survey_name
+                questionnaire[group.title][q.id]['survey_metadata'] = \
+                    _get_questionnaire(q.survey_metadata)
+
     return render(
         request, 'experiments/detail.html', {
             'experiment': experiment,
             'gender_grouping': gender_grouping,
             'age_grouping': age_grouping,
-            'to_be_analysed_count': to_be_analysed_count
+            'to_be_analysed_count': to_be_analysed_count,
+            'questionnaire': questionnaire
         }
     )
 
@@ -94,18 +158,21 @@ def change_status(request, experiment_id):
     if status == Experiment.NOT_APPROVED:
         if not justification:
             messages.warning(
-                request, _('Please provide a reason justifying the change of the status of the experiment ') +
+                request, _(
+                    'Please provide a reason justifying the change of the status of the experiment ') +
                          experiment.title + _('to "Not approved". '))
 
             return HttpResponseRedirect('/')
         else:
             # if has justification send email to researcher
             subject = _('Your experiment was rejected')
-            message = _('We regret to inform you that your experiment, ') + experiment.title + \
-                      _(', has not been acceptted to be published in the NeuroMat Open Database. Please check the '
-                        'reasons providing by the Neuromat Open Database Evaluation Committee:') + justification + \
-                      _('.\nWith best regards,\n The Neuromat Open Database Evaluation Committee')
-
+            message = _(
+                'We regret to inform you that your experiment, ') + experiment.title + \
+                      _(
+                          ', has not been acceptted to be published in the NeuroMat Open Database. Please check the '
+                          'reasons providing by the Neuromat Open Database Evaluation Committee:') + justification + \
+                      _(
+                          '.\nWith best regards,\n The Neuromat Open Database Evaluation Committee')
 
             send_mail(subject, message, from_email,
                       [experiment.study.researcher.email])
@@ -122,12 +189,15 @@ def change_status(request, experiment_id):
     # to experiment study researcher
     if status == Experiment.APPROVED:
         subject = _('Your experiment was approved')
-        message = _('We are pleased to inform you that your experiment ') + experiment.title + \
-                  _(' was approved by Neuromat Open Database Evaluation Committee. All data of the submitted experiment'
-                    ' will be available freely to the public consultation and shared under Creative Commons Share '
-                    'Alike license.\n You can access your experiment data by clicking on the link below\n') + 'http://' + \
+        message = _(
+            'We are pleased to inform you that your experiment ') + experiment.title + \
+                  _(
+                      ' was approved by Neuromat Open Database Evaluation Committee. All data of the submitted experiment'
+                      ' will be available freely to the public consultation and shared under Creative Commons Share '
+                      'Alike license.\n You can access your experiment data by clicking on the link below\n') + 'http://' + \
                   request.get_host() + \
-                  _('\nWith best regards,\n The NeuroMat Open Database Evaluation Committee.')
+                  _(
+                      '\nWith best regards,\n The NeuroMat Open Database Evaluation Committee.')
 
         send_mail(subject, message, from_email,
                   [experiment.study.researcher.email])
@@ -138,10 +208,12 @@ def change_status(request, experiment_id):
         )
     if status == Experiment.UNDER_ANALYSIS:
         subject = _('Your experiment is now under analysis')
-        message = _('Thank you for submitting your experiment ') + experiment.title + \
-                  _('. The NeuroMat Open Database Evaluation Committee will be analyze your data and will try to '
-                    'respond as soon as possible.\n With best regards,\n The NeuroMat Open Database Evaluation '
-                    'Committee')
+        message = _(
+            'Thank you for submitting your experiment ') + experiment.title + \
+                  _(
+                      '. The NeuroMat Open Database Evaluation Committee will be analyze your data and will try to '
+                      'respond as soon as possible.\n With best regards,\n The NeuroMat Open Database Evaluation '
+                      'Committee')
         send_mail(subject, message, from_email,
                   [experiment.study.researcher.email])
         messages.success(
@@ -161,7 +233,8 @@ def change_status(request, experiment_id):
             experiment.trustee = None
             messages.warning(
                 request,
-                _('The experiment data ') + experiment.title + _(' was made available to be analysed by other trustee.')
+                _('The experiment data ') + experiment.title + _(
+                    ' was made available to be analysed by other trustee.')
             )
 
     # TODO: wrong order. Save first, before send message to user that the
@@ -186,7 +259,6 @@ def ajax_to_be_analysed(request):
 
 
 def language_change(request, language_code):
-
     activate(language_code)
     request.session[LANGUAGE_SESSION_KEY] = language_code
 
@@ -293,4 +365,3 @@ class NepSearchView(SearchView):
 class NepLoginView(LoginView):
     search_form = NepSearchForm()
     extra_context = {'search_form': search_form}
-

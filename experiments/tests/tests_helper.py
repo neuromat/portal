@@ -8,9 +8,11 @@ from experiments.helpers import generate_image_file
 from experiments.models import Experiment, Study, Group, Researcher, \
     Collaborator, Participant, Gender, ExperimentalProtocol, \
     ClassificationOfDiseases, Keyword, Step, TMSSetting, TMSDevice, CoilModel, \
-    TMSDeviceSetting, TMSData, EEGSetting
+    TMSDeviceSetting, TMSData, EEGSetting, Questionnaire
 
 import random
+
+from nep import settings
 
 
 def create_experiment_groups(qtty, experiment):
@@ -363,6 +365,27 @@ def create_eegsetting_objects_to_test_search():
     tmss3.save()
 
 
+def create_questionnaire(source, group):
+    """
+    Get the data from source file containing quesuestionnaire csv data,
+    and populates Questionnaire object
+    :param group: the
+    :param source: the file to read from
+    """
+    file = open(source, 'r')
+    file.readline()  # skip first line with column titles
+    questionnaire_title = file.readline().split(',')[1]  # gets the
+    # questionnaire title in second line second column
+    file.close()  # close file to gets all data
+    file = open(source, 'r')
+    metadata = file.readlines()
+
+    Questionnaire.objects.create(
+        group=group, survey_name=questionnaire_title, survey_metadata=metadata,
+        order=randint(1, 10)
+    )
+
+
 def global_setup_ft():
     """
     This global setup creates basic object models that are used in 
@@ -586,11 +609,23 @@ def global_setup_ft():
     # TMSDeviceSetting
 
     # Create TMSData objects to test search
-    # TODO: the tests returns non-deterministic search results.
+    # TODO: the tests returns (sic) non-deterministic search results.
     create_tmsdata_objects_to_test_search()
 
     # Create EEGSetting object to test search
     create_eegsetting_objects_to_test_search()
+
+    ##
+    # Create Questionnaire object
+    # (requires the file 'questionnaire.csv' being generated in
+    # 'experiments/tests' subdirectory)
+    ##
+    experiment = Experiment.objects.filter(
+        status=Experiment.APPROVED
+    ).last()
+    group = experiment.groups.first()
+    create_questionnaire(settings.BASE_DIR +
+                         '/experiments/tests/questionnaire.csv', group)
 
 
 def global_setup_ut():

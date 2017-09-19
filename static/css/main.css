@@ -21,6 +21,10 @@ pre.textual-protocol {
   font-family: "Liberation Sans", serif;
 }
 
+label.questionnaire-options {
+  font-weight: normal;
+}
+
 /*
   ========================================
   Links
@@ -334,6 +338,10 @@ h5.match {
 
 .text-box-justification {
   width: 100%;
+}
+
+.input-disabled {
+  pointer-events: none;
 }
 
 /*
