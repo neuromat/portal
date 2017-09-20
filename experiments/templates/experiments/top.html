@@ -1,8 +1,10 @@
 {% load i18n %}
-<section class="container nep-top">
-    <div class="top-neuromat">{% trans "Neuromat" %}</div>
-    <div class="top-small">{% trans "Research, Innovation and Dissemination Center for Neuromathematics" %}</div>
-    <div id="login-language" class="top-login-language">
+<section class="nep-top container">
+    <div class="top-alignment-left col-xs-12 col-sm-6 col-md-5">
+        <a class="top-neuromat"  href="/">{% trans "NeuroMat" %}</a>
+        <p class="top-small">{% trans "Research, Innovation and Dissemination Center for Neuromathematics" %}</p>
+    </div>
+    <div id="login-language" class="top-alignment-right col-xs-12 col-sm-12 col-md-5 top-login-language">
         {% if user.is_authenticated %}
             {% if user.first_name %}
                 {% trans "Welcome" %}, {{ user.first_name }}
@@ -11,16 +13,15 @@
             {% endif %}
             {% if to_be_analysed_count %}
                 <i id="new_experiments" class="fa fa-bell fa-2x icon-grey
-                badger"></i>&nbsp;&nbsp;
+                badger"></i>
             {% else %}
                 <i id="new_experiments" class="fa fa-bell fa-2x
-                icon-grey"></i>&nbsp;&nbsp;
+                icon-grey"></i>
             {% endif %}
             <a href="{% url 'logout' %}">{% trans "Log Out" %}</a>
         {% else %}
             <a href="{% url 'login' %}">{% trans "Log In" %}</a>
         {% endif %}
-        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
         <ol class="nav navbar-nav navbar-right">
             <li>
                 {% get_current_language as LANGUAGE_CODE %}
