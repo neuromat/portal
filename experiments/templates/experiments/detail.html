@@ -15,6 +15,7 @@
                 {% trans "Statistics" %}</a></li>
             <li role="presentation"><a href="#groups_tab" role="tab" data-toggle="tab">{% trans "Groups" %}</a></li>
             <li role="presentation"><a href="#settings_tab" role="tab" data-toggle="tab">{% trans "Settings" %}</a></li>
+            <li role="presentation"><a href="#questionnaires_tab" role="tab" data-toggle="tab">{% trans "Questionnaires" %}</a></li>
         </ul>
 
         <!-- Tab panes -->
@@ -69,10 +70,7 @@
                                    aria-controls="collapse{{ group.id }}" class="nep-btn">{% trans "Details" %}</a>
                             </div>
                             <br>
-                            <div id="collapse{{ group.id }}"
-                                 class="panel-collapse
-                            collapse out" role="tabpanel"
-                                 aria-labelledby="heading{{ group.id }}">
+                            <div id="collapse{{ group.id }}" class="panel-collapse collapse out" role="tabpanel" aria-labelledby="heading{{ group.id }}">
                                 <div class="panel-body">
                                     <strong>{% trans "Textual description" %}</strong>
                                     <pre class="textual-protocol">{{ group.experimental_protocol.textual_description }}</pre>
@@ -132,7 +130,7 @@
                                             {% endif %}
                                             {% if eeg_setting.eeg_amplifier_setting.number_of_channels_used %}
                                                 {% trans "number of used channels: " %}{{ eeg_setting.eeg_amplifier_setting.number_of_channels_used }}<br/>
-                                           {% endif %}
+                                            {% endif %}
 
                                         </p></h5>
                                     </blockquote>
@@ -304,6 +302,62 @@
                         </div>
                     {% endfor %}
                 {% endif %}
+            </div>
+            <!-- Questionnaires tab -->
+            <div role="tabpanel" class="tab-pane" id="questionnaires_tab">
+                {% for group_key, group_values in questionnaire.items %}
+                    <h3>Questionnaires for group {{ group_key }}</h3>
+                    {% for q_key, q_values in group_values.items %}
+                        <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+                            <div class="panel panel-default">
+                                <div class="panel-heading" role="tab"
+                                     id="heading{{ q_key }}">
+                                    <h4 class="panel-title">
+                                        <a href="#collapse{{ q_key }}"
+                                           role="button"
+                                           data-toggle="collapse"
+                                           data-parent="#accordion"
+                                           aria-expanded="true"
+                                           aria-controls="collapse{{ q_key }}">
+                                            Questionnaire {{ q_values.survey_name }}
+                                        </a>
+                                    </h4>
+                                </div>
+                                <div class="panel-collapse collapse in"
+                                     id="collapse{{ q_key }}"
+                                     role="tabpanel"
+                                     aria-labelledby="heading{{ q_key }}">
+                                    <section id="questionnaire_title">
+                                        {% for data in q_values.survey_metadata.data %}
+                                            <ul>
+                                                <li>{{ data.question_description }}</li>
+                                                {% if data.question_limesurvey_type == 'F' %}
+                                                    {% include 'experiments/questionnaire/f_type.html' %}
+                                                {% elif data.question_limesurvey_type == 'L' %}
+                                                    {% include 'experiments/questionnaire/l_type.html' %}
+                                                {% elif data.question_limesurvey_type == 'M' or data.question_limesurvey_type == 'B' or data.question_limesurvey_type == 'P' %}
+                                                    {% include 'experiments/questionnaire/m_type.html' %}
+                                                {% elif data.question_limesurvey_type == 'D' %}
+                                                    <p>
+                                                        <em>{% trans "The user enters a date in a date field" %}.</em>
+                                                    </p>
+                                                {% elif data.question_limesurvey_type == '|' %}
+                                                    <p>
+                                                        <em>{% trans "The user uploads file(s)" %}.</em>
+                                                    </p>
+                                                {% else %}
+                                                    <p>
+                                                        <em>{% trans "The user enters a free text" %}</em>
+                                                    </p>
+                                                {% endif %}
+                                            </ul>
+                                        {% endfor %}
+                                    </section>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                {% endfor %}
             </div>
         </div>
         {# Full protocol experiment image modal #}

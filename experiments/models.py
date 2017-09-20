@@ -1,3 +1,5 @@
+from os import path
+
 from django.db import models
 from django.db.models import Max, Q
 from django.contrib.auth.models import User
@@ -17,6 +19,14 @@ class CurrentExperimentManager(models.Manager):
 
         return super(CurrentExperimentManager, self).get_queryset()\
             .filter(q_statement)
+
+
+def get_data_file_dir(instance, filename):
+    directory = "download"
+    if isinstance(instance, Experiment):
+        directory = path.join(directory, instance.id)
+
+    return path.join(directory, filename)
 
 
 # models
@@ -43,7 +53,7 @@ class Experiment(models.Model):
     data_acquisition_done = models.BooleanField(default=False)
     sent_date = models.DateField(auto_now=True)
     project_url = models.CharField(max_length=255, blank=True, null=True)
-    download_url = models.FileField(upload_to="uploads/%Y/%m/%d/", null=True, blank=True)
+    download_url = models.FileField(upload_to=get_data_file_dir, null=True, blank=True)
     ethics_committee_url = models.CharField(max_length=255, blank=True,
                                             null=True)
     ethics_committee_file = models.FileField(
@@ -476,7 +486,7 @@ class Step(models.Model):
     BLOCK = 'block'
     INSTRUCTION = 'instruction'
     PAUSE = 'pause'
-    QUESTIONAIRE = 'questionnaire'
+    QUESTIONNAIRE = 'questionnaire'
     STIMULUS = 'stimulus'
     TASK = 'task'
     TASK_EXPERIMENT = 'task_experiment'
@@ -489,7 +499,7 @@ class Step(models.Model):
         (BLOCK, "Set of steps"),
         (INSTRUCTION, "Instruction"),
         (PAUSE, "Pause"),
-        (QUESTIONAIRE, "Questionnaire"),
+        (QUESTIONNAIRE, "Questionnaire"),
         (STIMULUS, "Stimulus"),
         (TASK, "Task for participant"),
         (TASK_EXPERIMENT, "Task for experimenter"),

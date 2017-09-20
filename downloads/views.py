@@ -1,10 +1,8 @@
-import datetime
 
 from experiments.models import Experiment
 from django.conf import settings
 from django.contrib import messages
 from django.shortcuts import render, get_object_or_404
-from django.core.urlresolvers import reverse
 from django.http import HttpResponse, HttpResponseRedirect
 
 from .export import create_directory, ExportExecution
@@ -17,7 +15,8 @@ from zipfile import ZipFile
 
 JSON_FILENAME = "json_export.json"
 JSON_EXPERIMENT_FILENAME = "json_experiment_export.json"
-EXPORT_DIRECTORY = "download"
+EXPORT_DIRECTORY = "temp"
+DOWNLOAD_DIRECTORY = "download"
 EXPORT_FILENAME = "download.zip"
 EXPORT_EXPERIMENT_FILENAME = "download_experiment.zip"
 
@@ -34,30 +33,22 @@ def create_export_instance():
 def download_view(request, experiment_id):
     template_name = "experiments/detail.html"
 
-    export_instance = create_export_instance()
-    input_export_file = path.join(EXPORT_DIRECTORY, path.join(path.join(str(export_instance.id), str(JSON_FILENAME))))
-    input_filename = path.join(settings.MEDIA_ROOT, input_export_file)
-
-    create_directory(settings.MEDIA_ROOT, path.split(input_export_file)[0])
-
-    build_complete_export_structure(experiment_id, input_filename)
-
-    complete_filename = export_create(request, export_instance.id, input_filename, experiment_id)
+    complete_filename = download_create(request, experiment_id, template_name)
 
     if complete_filename:
 
-        messages.success(request, "Export was finished correctly")
+        messages.success(request, "Download was finished correctly")
 
-        print("antes do fim: httpResponse")
-
+        # print("antes do fim: httpResponse")
+        #
         zip_file = open(complete_filename, 'rb')
         response = HttpResponse(zip_file, content_type='application/zip')
-        response['Content-Disposition'] = 'attachment; filename="export.zip"'
-        response['Content-Length'] = path.getsize(complete_filename)
+        # response['Content-Disposition'] = 'attachment; filename="export.zip"'
+        # response['Content-Length'] = path.getsize(complete_filename)
         response['Set-Cookie'] = 'fileDownload=true; path=/'
         return response
     else:
-        messages.error(request, "Export data was not generated.")
+        messages.error(request, "Download data was not generated.")
 
     return HttpResponseRedirect(template_name)
 
@@ -74,20 +65,29 @@ def update_export_instance(input_file, output_export, export_instance):
     export_instance.save()
 
 
-def export_create(request, export_id, input_filename, experiment_id, template_name="experiments/detail.html"):
+def download_create(request, experiment_id, template_name):
     try:
+        export_instance = create_export_instance()
+        input_export_file = path.join(EXPORT_DIRECTORY,
+                                      path.join(path.join(str(export_instance.id), str(JSON_FILENAME))))
+        input_filename = path.join(settings.MEDIA_ROOT, input_export_file)
 
-        export_instance = get_export_instance(export_id)
+        create_directory(settings.MEDIA_ROOT, path.split(input_export_file)[0])
+
+        build_complete_export_structure(experiment_id, input_filename)
+
+        # export_instance = get_export_instance(export_id)
+
         export = ExportExecution(export_instance.id)
 
-        # set path of the directory base: ex. /Users/.../portal/media/download/
+        # set path of the directory base: ex. /Users/.../portal/media/temp/
         base_directory, path_to_create = path.split(export.get_directory_base())
-        # create directory base ex. /Users/.../portal/media/download/path_create
+        # create directory base ex. /Users/.../portal/media/temp/path_create
         error_msg, base_directory_name = create_directory(base_directory, path_to_create)
         if error_msg != "":
             messages.error(request, error_msg)
             return render(request, template_name)
-        # ex. /Users/.../portal/media/download/export_instance.id/json_export.json
+        # ex. /Users/.../portal/media/temp/export_instance.id/json_export.json
         input_export_file = path.join("export", path.join(path.join(str(export_instance.id), str(input_filename))))
 
         # language_code = request.LANGUAGE_CODE
@@ -131,6 +131,16 @@ def export_create(request, export_id, input_filename, experiment_id, template_na
             export_filename = export.get_input_data("export_filename")  # 'download.zip'
 
             export_complete_filename = path.join(base_directory_name, export_filename)
+            directory_download_base = path.join(settings.MEDIA_ROOT, "download")
+            download_experiment_directory = path.join(directory_download_base, experiment_id)
+
+            if not path.exists(download_experiment_directory):
+                error_msg, download_experiment_directory = create_directory(directory_download_base, experiment_id)
+                if error_msg != "":
+                    messages.error(request, error_msg)
+                    return render(request, template_name)
+
+            download_complete_filename = path.join(download_experiment_directory, export_filename)
 
             with ZipFile(export_complete_filename, 'w') as zip_file:
                 for filename, directory in export.files_to_zip_list:
@@ -140,39 +150,31 @@ def export_create(request, export_id, input_filename, experiment_id, template_na
 
             zip_file.close()
 
-            output_export_file = path.join("download", path.join(path.join(str(export_instance.id),
-                                                                           str(export_filename))))
+            output_download_file = path.join("download", path.join(path.join(str(experiment_id),
+                                                                             str(export_filename))))
+
+            with open(export_complete_filename, 'rb') as f:
+                data = f.read()
+
+            with open(download_complete_filename, 'wb') as f:
+                f.write(data)
 
             experiment = get_object_or_404(Experiment, pk=experiment_id)
 
-            # if not experiment.download_url:
-            #     now = datetime.datetime.now()
-            #     now_directory = '/' + str(now.year)
-            #     download_experiment_directory = settings.MEDIA_ROOT + '/' + 'uploads' + now_directory
-            #
-            #     now_directory = '/' + str(now.year) + '/' + str(now.month) + '/' + str(now.day) + '/'
-            #     download_experiment_directory = settings.MEDIA_ROOT + '/' + 'uploads' + now_directory
-            #     download_complete_filename = path.join(download_experiment_directory, export_filename)
-            #     experiment.download_url = download_experiment_directory
-            #
-            #     with open(export_complete_filename, 'rb') as f:
-            #         data = f.read()
-            #
-            #     with open(download_complete_filename, 'wb') as f:
-            #         f.write(data)
+            experiment.download_url = "download/" + experiment_id + "/" + export_filename
+            experiment.save(update_fields=["download_url"])
 
-            update_export_instance(input_export_file, output_export_file, export_instance)
+            update_export_instance(input_export_file, output_download_file, export_instance)
 
             print("finalizado corretamente")
 
         # delete temporary directory: from base_directory and below
-        base_export_directory = export.get_export_directory()
-        rmtree(base_export_directory)
+        base_export_directory = path.join(settings.MEDIA_ROOT, path.join("temp", str(export_instance.id)))
+        rmtree(base_export_directory, ignore_errors=True)
 
-        # messages.success(request, "Export was finished correctly")
         print("finalizado corretamente 2")
 
-        return export_complete_filename
+        return download_complete_filename
 
     except OSError as e:
         print(e)

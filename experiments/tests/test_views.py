@@ -172,6 +172,9 @@ TEST_HAYSTACK_CONNECTIONS = {
 }
 
 
+class ExperimentDetailTest(TestCase):
+    pass
+
 @override_settings(HAYSTACK_CONNECTIONS=TEST_HAYSTACK_CONNECTIONS)
 @apply_setup(global_setup_ut)
 class SearchTest(TestCase):
