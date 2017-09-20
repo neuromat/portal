@@ -308,6 +308,7 @@ class ExportExecution:
             if goalkeeper_game_list:
                 for goalkeeper_game_step in goalkeeper_game_list:
                     default_goalkeeper_game = get_object_or_404(GoalkeeperGame, pk=goalkeeper_game_step.id)
+
                     context_tree_default_description = get_context_tree_description(
                         default_goalkeeper_game.context_tree.id)
                     if context_tree_default_description:
@@ -338,19 +339,24 @@ class ExportExecution:
                             json.dump(context_tree_default_description, outfile, indent=4)
 
                         # if context_tree have a file
-                        saved_context_tree_filename = default_goalkeeper_game.context_tree.setting_file.name
-                        read_filename_context_tree = path.join(settings.MEDIA_ROOT, saved_context_tree_filename)
-                        context_tree_filename = saved_context_tree_filename.split('/')[-1]
-                        complete_context_tree_filename = path.join(directory_goalkeeper_game_step,
-                                                                   context_tree_filename)
+                        setting_file = default_goalkeeper_game.context_tree.setting_file if \
+                            default_goalkeeper_game.context_tree.setting_file else ''
+                        if setting_file:
+                            context_tree_file = setting_file.file if setting_file.file else ''
+                            if context_tree_file:
+                                saved_context_tree_filename = context_tree_file.name
+                                read_filename_context_tree = path.join(settings.MEDIA_ROOT, saved_context_tree_filename)
+                                context_tree_filename = saved_context_tree_filename.split('/')[-1]
+                                complete_context_tree_filename = path.join(directory_goalkeeper_game_step,
+                                                                           context_tree_filename)
 
-                        with open(read_filename_context_tree, "rb") as f:
-                            data = f.read()
-                        with open(complete_context_tree_filename, "wb") as f:
-                            f.write(data)
+                                with open(read_filename_context_tree, "rb") as f:
+                                    data = f.read()
+                                with open(complete_context_tree_filename, "wb") as f:
+                                    f.write(data)
 
-                        self.files_to_zip_list.append([complete_context_tree_filename,
-                                                       export_directory_goalkeeper_game_step])
+                                self.files_to_zip_list.append([complete_context_tree_filename,
+                                                               export_directory_goalkeeper_game_step])
 
             stimulus_list = Step.objects.filter(group=group, type='stimulus')
             if stimulus_list:
@@ -485,8 +491,10 @@ class ExportExecution:
                                       step_questionnaire.type.upper()
                 for questionnaire in questionnaire_list:
                     participant_code = questionnaire.participant.code
-                    participant_code_directory = path.join(participant_directory, participant_code)
-                    export_participant_code_directory = path.join(export_participant_directory, participant_code)
+                    participant_code_directory_name = "Participant_" + questionnaire.participant.code
+                    participant_code_directory = path.join(participant_directory, participant_code_directory_name)
+                    export_participant_code_directory = path.join(export_participant_directory,
+                                                                  participant_code_directory_name)
 
                     if participant_code not in self.per_group_data[group_id]['data_per_participant']:
                         self.per_group_data[group_id]['data_per_participant'][participant_code] = {}
