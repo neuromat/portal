@@ -97,9 +97,16 @@ a:hover.nep-btn {
  */
 
 .nep-top {
-    height: 65px;
     margin-top: 10px;
     padding-left: 0;
+}
+
+.top-alignment-left{
+    padding: 0;
+}
+
+.top-alignment-right{
+    padding: 0;
 }
 
 .top-neuromat {
@@ -109,20 +116,18 @@ a:hover.nep-btn {
   float: left;
   margin-right: 10px;
   font-size: 40px;
+  color: #333;
 }
 
-.top-neuromat a {
-    color: #333;
-}
-
-.top-neuromat a:hover,.top-neuromat a:focus  {
+.top-neuromat:hover,.top-neuromat:focus  {
     text-decoration: none;
+    color: #000;
 }
 
 .top-small {
   font-size: smaller;
   display: inline-block;
-  width: 13%; /* TODO: make relative, try does not use magic number */
+  width: 40%; /* TODO: make relative, try does not use magic number */
   margin-top: 5px;
   border-left: 1px solid #2b2d2d;
   padding-left: 10px;
@@ -132,19 +137,21 @@ a:hover.nep-btn {
   float: right;
   position: relative;
   top: 30%;
+  text-align: right;
 }
 
 .top-login-language a {
   color: #2b2b2b;
   padding: 4px 20px;
   border-radius: 3px;
+  margin-right: 3px;
 }
 
 .top-login-language a:hover,.top-login-language a:focus {
   color: #ffffff;
   background-color: #60c8a3;
   border-radius: 3px;
-    padding: 4px 20px;
+  padding: 4px 20px;
 }
 
 /* override bootstrat navbar-nav class */
@@ -157,7 +164,7 @@ a:hover.nep-btn {
   padding: 3px;
 }
 
-/* override bootstrat dropdrown*/
+/* override bootstrat dropdown*/
 .nav>li>a:focus, .nav>li>a:hover {
     text-decoration: none;
     background-color: transparent;
@@ -167,6 +174,11 @@ a:hover.nep-btn {
 
 .nav .open>a, .nav .open>a:focus, .nav .open>a:hover {
     background-color: transparent;
+}
+
+.dropdown-menu {
+        background-color: rgba(255,255,255,.8);
+        border: 1px solid rgba(226, 222, 218, 0.5);
 }
 
 /*
@@ -410,4 +422,48 @@ h5.match {
 /* used when highlight haystack tag is used in template */
 .highlighted {
   background: yellow;
+}
+
+/*
+ ========================================
+  Adaptations on mobile devices
+  ========================================
+ */
+
+/* smartphone landscape */
+@media (max-width: 480px) {
+    .top-neuromat {
+      font-size: 29px;
+      margin-top: 8px;
+    }
+    .top-alignment-left {
+      padding: 0 5px;
+    }
+    .top-small {
+      width: 50%;
+    }
+    .top-alignment-right {
+      padding: 5px 0 10px 0;
+    }
+    .top-login-language {
+      text-align: center;
+    }
+}
+/* smartphone landscape or tablet portrait */
+@media (min-width: 481px) and (max-width: 767px) {
+    .top-small {
+      width: 30%;
+    }
+    .top-alignment-right {
+      padding: 0 0 10px 0;
+    }
+    .top-login-language {
+      text-align: center;
+    }
+}
+/* desktop */
+@media (min-width: 768px) and (max-width: 1024px) {
+    .top-alignment-right {
+      padding: 0 0 10px 0;
+    }
 }
