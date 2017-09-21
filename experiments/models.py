@@ -71,7 +71,7 @@ class Experiment(models.Model):
     # TODO: detect the change. This implies that the experiments are being
     # TODO: saved in tests, with slug='', what we don't want. The tests should
     # TODO: regret when saving experiments with slug=''.
-    slug = models.SlugField(max_length=100, default='')
+    slug = models.SlugField(max_length=100, unique=True)
 
     # Managers
     objects = models.Manager()
