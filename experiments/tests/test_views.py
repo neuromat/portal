@@ -22,8 +22,8 @@ class HomePageTest(TestCase):
         self.assertTemplateUsed(response, 'experiments/home.html')
 
     def test_access_experiment_detail_after_GET_experiment(self):
-        experiment_id = str(Experiment.objects.first().id)
-        response = self.client.get('/experiments/' + experiment_id + '/')
+        experiment_slug = str(Experiment.objects.first().slug)
+        response = self.client.get('/experiments/' + experiment_slug + '/')
         self.assertEqual(response.status_code, 200)
 
     def test_uses_detail_template(self):

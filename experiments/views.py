@@ -96,7 +96,7 @@ def _get_questionnaire(metadata):
     return records
 
 
-def experiment_detail(request, experiment_id):
+def experiment_detail(request, slug):
     to_be_analysed_count = None  # will be None if home contains the list of
     # normal user
     if request.user.is_authenticated and \
@@ -105,7 +105,7 @@ def experiment_detail(request, experiment_id):
         to_be_analysed_count = all_experiments.filter(
             status=Experiment.TO_BE_ANALYSED).count()
 
-    experiment = Experiment.objects.get(pk=experiment_id)
+    experiment = Experiment.objects.get(slug=slug)
 
     gender_grouping = {}
     age_grouping = {}

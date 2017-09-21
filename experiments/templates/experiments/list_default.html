@@ -16,7 +16,7 @@
             <td>{{ experiment.description }}</td>
             <td>{{ experiment.total_participants }} {% trans "in" %} {{ experiment.groups.count }} {% trans "groups" %} </td>
             <td>{{ experiment.version }}</td>
-            <td><a href="{% url 'experiment-detail' experiment.id %}"
+            <td><a href="{% url 'experiment-detail' experiment.slug %}"
                    class="nep-btn">{% trans "View" %}</a></td>
         </tr>
     {% endfor %}

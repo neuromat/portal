@@ -17,9 +17,9 @@ class ExperimentDetailTest(FunctionalTest):
         # The new visitor is in home page and see the list of experiments.
         # She clicks in second "View" link and is redirected to experiment
         # detail page
-        # TODO: frequently fails to catch second link
+        # TODO: frequently fails to catch second link (see if it's solved)
         link = self.browser.find_element_by_xpath(
-            "//a[@href='/experiments/" + str(experiment.id) + "/']"
+            "//a[@href='/experiments/" + experiment.slug + "/']"
         )
         link.click()
         # list_links = self.browser.find_elements_by_link_text('View')
@@ -210,7 +210,7 @@ class ExperimentDetailTest(FunctionalTest):
         # detail page
         # TODO: frequently fails to catch second link
         self.browser.find_element_by_xpath(
-            "//a[@href='/experiments/" + str(experiment.id) + "/']"
+            "//a[@href='/experiments/" + experiment.slug + "/']"
         ).click()
         time.sleep(1)
 
@@ -234,7 +234,7 @@ class ExperimentDetailTest(FunctionalTest):
         # detail page
         # TODO: frequently fails to catch second link
         self.browser.find_element_by_xpath(
-            "//a[@href='/experiments/" + str(experiment.id) + "/']"
+            "//a[@href='/experiments/" + experiment.slug + "/']"
         ).click()
         time.sleep(1)
 

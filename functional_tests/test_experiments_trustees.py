@@ -416,7 +416,7 @@ class TrusteeTest(FunctionalTestTrustee):
         # The trustee click in the experiment of the list that has ethics
         # commitee info data
         self.browser.find_element_by_link_text('View').find_element_by_xpath(
-            "//a[@href='/experiments/" + str(experiment.id) + "/']"
+            "//a[@href='/experiments/" + experiment.slug + "/']"
         ).click()
         time.sleep(1)
 
