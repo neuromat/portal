@@ -647,32 +647,27 @@ def global_setup_ut():
         title='Experiment 1', nes_id=1, owner=owner1,
         version=1, sent_date=datetime.utcnow(),
         status=Experiment.TO_BE_ANALYSED,
-        slug='slug1'
     )
     experiment2 = Experiment.objects.create(
         title='Experiment 2', nes_id=1, owner=owner2,
         version=1, sent_date=datetime.utcnow(),
         status=Experiment.UNDER_ANALYSIS,
         trustee=models.User.objects.get(username='claudia'),
-        slug='slug2'
     )
     experiment3 = Experiment.objects.create(
         title='Experiment 3', nes_id=2, owner=owner2,
         version=1, sent_date=datetime.utcnow(),
         status=Experiment.TO_BE_ANALYSED,
-        slug='slug3'
     )
     experiment4 = Experiment.objects.create(
         title='Experiment 4', nes_id=3, owner=owner1,
         version=1, sent_date=datetime.utcnow(),
         status=Experiment.APPROVED,
-        slug='slug4'
     )
     experiment5 = Experiment.objects.create(
         title='Experiment 5', nes_id=4, owner=owner2,
         version=1, sent_date=datetime.utcnow(),
         status=Experiment.APPROVED,
-        slug='slug5'
     )
     create_ethics_committee_info(experiment3)
 

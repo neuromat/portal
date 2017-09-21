@@ -3,6 +3,7 @@ from os import path
 from django.db import models
 from django.db.models import Max, Q
 from django.contrib.auth.models import User
+from django.template.defaultfilters import slugify
 
 
 # custom managers
@@ -73,12 +74,27 @@ class Experiment(models.Model):
     # TODO: regret when saving experiments with slug=''.
     slug = models.SlugField(max_length=100, unique=True)
 
-    # Managers
     objects = models.Manager()
     lastversion_objects = CurrentExperimentManager()
 
     class Meta:
         unique_together = ('nes_id', 'owner', 'version')
+
+    # save slug field if it's first time save
+    def save(self, *args, **kwargs):
+        if not self.id:
+            count = Experiment.objects.filter(
+                slug__startswith=slugify(self.title)
+            ).count()
+
+            # if there're slugs that starts with same name adds 1 to
+            # count to save as unique slug
+            if count > 0:
+                self.slug = slugify(self.title + '-' + str(count + 1))
+            else:
+                self.slug = slugify(self.title)
+
+        super(Experiment, self).save()
 
 
 class ClassificationOfDiseases(models.Model):
