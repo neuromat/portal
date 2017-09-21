@@ -1,16 +1,15 @@
 from random import randint
 
+from django.template.defaultfilters import slugify
 from django.test import TestCase
 from django.core.exceptions import ValidationError
 from django.contrib.auth.models import User
 from datetime import datetime
-
 from faker import Factory
 
 from experiments.models import Experiment, Study, Group, Researcher, \
     Collaborator, RejectJustification
-from experiments.tests.tests_helper import global_setup_ut, apply_setup, \
-    create_experiment
+from experiments.tests.tests_helper import global_setup_ut, apply_setup
 
 
 @apply_setup(global_setup_ut)
@@ -134,10 +133,10 @@ class ExperimentModelTest(TestCase):
     def test_cannot_create_experiment_with_same_slug(self):
         fake = Factory.create()
 
-        # create_experiment(
-        #     1, User.objects.get(username='lab1'), Experiment.TO_BE_ANALYSED
-        # )
-        Experiment.objects.create(
+        # slugs are automatically created in Experiment model when it's the
+        # first saving; so we have to save two instances, and after modify
+        # slug field to be the same, and only then try to save.
+        e1 = Experiment.objects.create(
             title=fake.text(max_nb_chars=15),
             description=fake.text(max_nb_chars=200),
             nes_id=randint(1, 10000),
@@ -145,9 +144,10 @@ class ExperimentModelTest(TestCase):
             version=1, sent_date=datetime.utcnow(),
             status=Experiment.TO_BE_ANALYSED,
             data_acquisition_done=True,
-            slug='same-slug'
         )
-        e2 = Experiment(
+        e1.slug = 'same-slug'
+        e1.save()
+        e2 = Experiment.objects.create(
             title=fake.text(max_nb_chars=15),
             description=fake.text(max_nb_chars=200),
             nes_id=randint(1, 10000),
@@ -156,14 +156,62 @@ class ExperimentModelTest(TestCase):
             sent_date=datetime.utcnow(),
             status=Experiment.TO_BE_ANALYSED,
             data_acquisition_done=True,
-            slug='same-slug'
         )
+        e2.slug = 'same-slug'
 
         with self.assertRaises(ValidationError):
             e2.full_clean()
 
-    # def test_creating_experiment_creates_predefined_slug(self):
+    def test_slug_is_a_slugyfication_of_title_field(self):
+        for experiment in Experiment.objects.all():
+            count = Experiment.objects.filter(
+                slug__startswith=slugify(experiment.title)
+            ).count()
+            # if there're slugs that starts with same name, adds 1 to
+            # count to save as unique slug
+            if count > 1:
+                slug = slugify(experiment.title + '-' + str(count))
+            else:
+                slug = slugify(experiment.title)
+            self.assertEqual(slug, experiment.slug)
 
+    def test_creating_experiment_creates_predefined_slug(self):
+        fake = Factory.create()
+
+        e1 = Experiment.objects.create(
+            title='This is a slug',
+            description=fake.text(max_nb_chars=200),
+            nes_id=randint(1, 1000000),
+            owner=User.objects.get(username='lab1'),
+            version=1, sent_date=datetime.utcnow(),
+            status=Experiment.TO_BE_ANALYSED,
+            data_acquisition_done=True,
+        )
+        self.assertEqual(slugify(e1.title), e1.slug)
+
+        # create another experiment with same title
+        e2 = Experiment.objects.create(
+            title='This is a slug',
+            description=fake.text(max_nb_chars=200),
+            nes_id=randint(1, 1000000),
+            owner=User.objects.get(username='lab1'),
+            version=1, sent_date=datetime.utcnow(),
+            status=Experiment.TO_BE_ANALYSED,
+            data_acquisition_done=True,
+        )
+        self.assertEqual(slugify(e1.title + '-' + str(2)), e2.slug)
+
+        # create one more with same title
+        e3 = Experiment.objects.create(
+            title='This is a slug',
+            description=fake.text(max_nb_chars=200),
+            nes_id=randint(1, 1000000),
+            owner=User.objects.get(username='lab2'),
+            version=1, sent_date=datetime.utcnow(),
+            status=Experiment.TO_BE_ANALYSED,
+            data_acquisition_done=True,
+        )
+        self.assertEqual(slugify(e1.title + '-' + str(3)), e3.slug)
 
 
 @apply_setup(global_setup_ut)
