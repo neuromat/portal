@@ -431,7 +431,7 @@ def global_setup_ft():
     # html with search results, causing dificulty to search 'Brachial
     # Plexus' in experiment title in test_search.py.
     # Related to: test_search_returns_only_last_version_experiment test.
-    # experiment.pk = None
+    # experiment.pk = None # ???
     experiment.version = 2
     experiment.save()
 
