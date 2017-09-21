@@ -56,11 +56,13 @@ def create_experiment(qtty, owner, status):
             title=fake.text(max_nb_chars=15),
             description=fake.text(max_nb_chars=200),
             nes_id=randint(1, 10000),  # TODO: guarantee that this won't
-            # genetates constraint violaton (nes_id, owner_id)
+            # TODO: genetates constraint violaton (nes_id, owner_id)
             owner=owner, version=1,
             sent_date=datetime.utcnow(),
             status=status,
-            data_acquisition_done=choice([True, False])
+            data_acquisition_done=choice([True, False]),
+            slug='slug' + str(randint(1, 1000000))  # TODO: guarantee that
+            # TODO: is unique
         )
         create_study(experiment)
         create_experiment_groups(randint(2, 3), experiment)
@@ -429,7 +431,7 @@ def global_setup_ft():
     # html with search results, causing dificulty to search 'Brachial
     # Plexus' in experiment title in test_search.py.
     # Related to: test_search_returns_only_last_version_experiment test.
-    experiment.pk = None
+    # experiment.pk = None
     experiment.version = 2
     experiment.save()
 
@@ -644,28 +646,33 @@ def global_setup_ut():
     experiment1 = Experiment.objects.create(
         title='Experiment 1', nes_id=1, owner=owner1,
         version=1, sent_date=datetime.utcnow(),
-        status=Experiment.TO_BE_ANALYSED
+        status=Experiment.TO_BE_ANALYSED,
+        slug='slug1'
     )
     experiment2 = Experiment.objects.create(
         title='Experiment 2', nes_id=1, owner=owner2,
         version=1, sent_date=datetime.utcnow(),
         status=Experiment.UNDER_ANALYSIS,
-        trustee=models.User.objects.get(username='claudia')
+        trustee=models.User.objects.get(username='claudia'),
+        slug='slug2'
     )
     experiment3 = Experiment.objects.create(
         title='Experiment 3', nes_id=2, owner=owner2,
         version=1, sent_date=datetime.utcnow(),
-        status=Experiment.TO_BE_ANALYSED
+        status=Experiment.TO_BE_ANALYSED,
+        slug='slug3'
     )
     experiment4 = Experiment.objects.create(
         title='Experiment 4', nes_id=3, owner=owner1,
         version=1, sent_date=datetime.utcnow(),
-        status=Experiment.APPROVED
+        status=Experiment.APPROVED,
+        slug='slug4'
     )
     experiment5 = Experiment.objects.create(
         title='Experiment 5', nes_id=4, owner=owner2,
         version=1, sent_date=datetime.utcnow(),
-        status=Experiment.APPROVED
+        status=Experiment.APPROVED,
+        slug='slug5'
     )
     create_ethics_committee_info(experiment3)
 
