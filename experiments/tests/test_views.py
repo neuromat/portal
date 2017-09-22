@@ -1,5 +1,6 @@
 import haystack
 import sys
+
 from django.contrib.auth.models import User
 from django.core.management import call_command
 from django.test import TestCase, override_settings
@@ -167,7 +168,7 @@ class ExperimentDetailTest(TestCase):
 
     def setUp(self):
         global_setup_ut()
-        
+
     def test_access_experiment_detail_after_GET_experiment(self):
         slug = str(Experiment.objects.first().slug)
         response = self.client.get('/experiments/' + slug + '/')
@@ -192,47 +193,56 @@ class ExperimentDetailTest(TestCase):
                       'been created the questionnaires in tests helper?')
         for group in groups_with_qs:
             self.assertContains(
-                'Questionnaires for group ' + group.name,
-                response
+                response,
+                'Questionnaires for group ' + group.title
             )
-            for step in group.steps:
+            for step in group.steps.filter(type=Step.QUESTIONNAIRE):
                 questionnaire = Questionnaire.objects.get(step_ptr=step)
-                self.assertIn(
-                    'Questionnaire ' + questionnaire.survey_name,
-                    response
+                self.assertContains(
+                    response,
+                    'Questionnaire ' + questionnaire.survey_name
                 )
 
+        # print(response.content)  # DEBUG
+
         # Sample asserts for first questionnaire
-        self.assertIn('História da fratura', response)
-        self.assertIn('Fratura da costela', response)
-        self.assertIn('História prévia de dor?', response)
-        self.assertIn('T1', response)
-        self.assertIn('data da lesão:', response)
-        self.assertIn('User fill in a date.', response)
-        self.assertIn('<em>User answers</em> yes <em>or</em> not.',
-                      response)
-        # Sample asserts for second questionnaire
+        self.assertIn('História de fratura', response.content.decode())
         self.assertIn('Já fez alguma cirurgia ortopédica?',
-                      response)
-        self.assertIn('Fez alguma cirurgia de nervo?', response)
+                      response.content.decode())
+        self.assertIn('Fez alguma cirurgia de nervo?',
+                      response.content.decode())
         self.assertIn('Identifique o evento que levou ao trauma do seu plexo '
                       'braquial. É possível marcar mais do que um evento.',
-                      response)
-        self.assertIn('Lesão por queimadura', response)
-        self.assertIn('Faz uso de dispositivo auxiliar?',
-                      response)
-        self.assertIn('História da doença atual:', response)
-        self.assertIn('User fills in a text field.', response)
+                      response.content.decode())
+        self.assertIn('Teve alguma fratura associada à lesão?',
+                      response.content.decode())
+        self.assertIn('The user enters a date in a date field',
+                      response.content.decode())
+
+        # Sample asserts for second questionnaire
+        self.assertIn('Qual o lado da lesão?', response.content.decode())
+        self.assertIn('Instituição do Estudo', response.content.decode())
+        self.assertIn('The user enters a free text',
+                      response.content.decode())
+        self.assertIn('Tipo(s) de lesão(ões):', response.content.decode())
+        self.assertIn('Trombose', response.content.decode())
+        self.assertIn('Anexar exames.', response.content.decode())
+        self.assertIn('The user uploads file(s)',
+                      response.content.decode())
+        self.assertIn('<em>The user answers</em> yes <em>or</em> not',
+                      response.content.decode())
+
         # Sample asserts for third questionnaire
-        self.assertIn('C5-T1', response)
-        self.assertIn('Qual a localização da lesão ao exame clínico?',
-                      response)
-        self.assertIn('Anestesia', response)
-        self.assertIn('T3', response)
-        self.assertIn('Sensibilidade Superficial Tátil:',
-                      response)
-        self.assertIn('Número do participante:', response)
-        self.assertIn('User fills in with a number.', response)
+        self.assertIn('Refere dor após a lesão?', response.content.decode())
+        self.assertIn('EVA da dor principal:', response.content.decode())
+        self.assertIn('Qual região apresenta alteração do trofismo?',
+                      response.content.decode())
+        self.assertIn('Atrofia', response.content.decode())
+        self.assertIn('Qual(is) artéria(s) e/ou vaso(s) foram acometidos?',
+                      response.content.decode())
+        self.assertIn('Artéria axilar', response.content.decode())
+        self.assertIn('Quando foi submetido(a) à cirurgia(s) de plexo '
+                      'braquial (mm/aaaa)?', response.content.decode())
 
 
 @override_settings(HAYSTACK_CONNECTIONS=TEST_HAYSTACK_CONNECTIONS)

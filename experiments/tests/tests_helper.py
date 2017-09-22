@@ -8,14 +8,14 @@ from experiments.helpers import generate_image_file
 from experiments.models import Experiment, Study, Group, Researcher, \
     Collaborator, Participant, Gender, ExperimentalProtocol, \
     ClassificationOfDiseases, Keyword, Step, TMSSetting, TMSDevice, CoilModel, \
-    TMSDeviceSetting, TMSData, EEGSetting
+    TMSDeviceSetting, TMSData, EEGSetting, Questionnaire
 
 import random
 
 from nep import settings
 
 
-def create_experiment_groups(qtty, experiment):
+def create_groups(qtty, experiment):
     """
     :param qtty: Number of groups
     :param experiment: Experiment model instance
@@ -65,7 +65,7 @@ def create_experiment(qtty, owner, status):
             # TODO: is unique
         )
         create_study(experiment)
-        create_experiment_groups(randint(2, 3), experiment)
+        create_groups(randint(2, 3), experiment)
 
 
 def create_trustee_users():
@@ -474,7 +474,7 @@ def global_setup_ft():
     create_step(1, group, Step.EMG)
 
     # To test search
-    create_experiment_groups(
+    create_groups(
         1, Experiment.objects.filter(status=Experiment.APPROVED).first()
     )
     group = Group.objects.last()
@@ -597,6 +597,31 @@ def global_setup_ft():
     create_eegsetting_objects_to_test_search()
 
 
+def create_questionnaire(source, group):
+    """
+    Get the data from source file containing questionnaire csv data,
+    and populates Questionnaire object
+    :param source: file to read from
+    :param group: Group model instance
+    """
+    file = open(source, 'r')
+    # skip first line with column titles
+    file.readline()
+    # gets the questionnaire title in second line second column
+    questionnaire_title = file.readline().split(',')[1]
+    file.close()
+    # open again to get all data
+    with open(source, 'r') as fp:
+        metadata = fp.read()
+    Questionnaire.objects.create(
+        group=group, order=randint(1, 10),
+        identification='questionnaire',
+        type=Step.QUESTIONNAIRE,
+        survey_name=questionnaire_title,
+        survey_metadata=metadata
+    )
+
+
 def global_setup_ut():
     """
     This global setup creates basic object models that are used in 
@@ -673,6 +698,26 @@ def global_setup_ut():
 
     # To test search
     create_eegsetting_objects_to_test_search()
+
+    # Create Questionnaire objects
+    # (requires the files 'questionnaire1.csv', 'questionnaire2.csv' and
+    # 'questionnaire3.csv' being generated in 'experiments/tests' subdirectory)
+    experiment = Experiment.objects.filter(
+        status=Experiment.APPROVED
+    ).last()
+    create_groups(2, experiment4)  # experiment4 is approved. See above.
+    create_groups(1, experiment5)  # experiment5 is approved. See above.
+    group_first = experiment.groups.first()
+    create_questionnaire(settings.BASE_DIR +
+                         '/experiments/tests/questionnaire1.csv', group_first
+                         )
+    create_questionnaire(settings.BASE_DIR +
+                         '/experiments/tests/questionnaire2.csv', group_first
+                         )
+    group_last = experiment.groups.last()
+    create_questionnaire(settings.BASE_DIR +
+                         '/experiments/tests/questionnaire3.csv', group_last
+                         )
 
 
 def apply_setup(setup_func):
