@@ -6,7 +6,7 @@ from django.test import TestCase, override_settings
 from haystack.query import SearchQuerySet
 
 from experiments import views
-from experiments.models import Experiment
+from experiments.models import Experiment, Step, Questionnaire
 from experiments.tasks import rebuild_haystack_index
 from experiments.tests.tests_helper import apply_setup, global_setup_ut
 
@@ -20,16 +20,6 @@ class HomePageTest(TestCase):
     def test_uses_home_template(self):
         response = self.client.get('/')
         self.assertTemplateUsed(response, 'experiments/home.html')
-
-    def test_access_experiment_detail_after_GET_experiment(self):
-        experiment_slug = str(Experiment.objects.first().slug)
-        response = self.client.get('/experiments/' + experiment_slug + '/')
-        self.assertEqual(response.status_code, 200)
-
-    def test_uses_detail_template(self):
-        experiment_slug = str(Experiment.objects.first().slug)
-        response = self.client.get('/experiments/' + experiment_slug + '/')
-        self.assertTemplateUsed(response, 'experiments/detail.html')
 
     def test_trustee_can_change_experiment_status_with_a_POST_request(self):
         trustee_user = User.objects.get(username='claudia')
@@ -172,9 +162,77 @@ TEST_HAYSTACK_CONNECTIONS = {
 }
 
 
-# TODO!
+# TODO: test other stuf
 class ExperimentDetailTest(TestCase):
-    pass
+
+    def setUp(self):
+        global_setup_ut()
+        
+    def test_access_experiment_detail_after_GET_experiment(self):
+        slug = str(Experiment.objects.first().slug)
+        response = self.client.get('/experiments/' + slug + '/')
+        self.assertEqual(response.status_code, 200)
+
+    def test_uses_detail_template(self):
+        slug = str(Experiment.objects.first().slug)
+        response = self.client.get('/experiments/' + slug + '/')
+        self.assertTemplateUsed(response, 'experiments/detail.html')
+
+    def test_access_experiment_detail_returns_questionnaire_data(self):
+        experiment = Experiment.objects.last()
+        slug = str(experiment.slug)
+        response = self.client.get('/experiments/' + slug + '/')
+
+        # We've made last experiment approved contain questionnaire data in
+        # tests helper
+        q_steps = Step.objects.filter(type=Step.QUESTIONNAIRE)
+        groups_with_qs = experiment.groups.filter(steps__in=q_steps)
+        if groups_with_qs.count() == 0:
+            self.fail('There are no groups with questionnaires. Have you '
+                      'been created the questionnaires in tests helper?')
+        for group in groups_with_qs:
+            self.assertContains(
+                'Questionnaires for group ' + group.name,
+                response
+            )
+            for step in group.steps:
+                questionnaire = Questionnaire.objects.get(step_ptr=step)
+                self.assertIn(
+                    'Questionnaire ' + questionnaire.survey_name,
+                    response
+                )
+
+        # Sample asserts for first questionnaire
+        self.assertIn('História da fratura', response)
+        self.assertIn('Fratura da costela', response)
+        self.assertIn('História prévia de dor?', response)
+        self.assertIn('T1', response)
+        self.assertIn('data da lesão:', response)
+        self.assertIn('User fill in a date.', response)
+        self.assertIn('<em>User answers</em> yes <em>or</em> not.',
+                      response)
+        # Sample asserts for second questionnaire
+        self.assertIn('Já fez alguma cirurgia ortopédica?',
+                      response)
+        self.assertIn('Fez alguma cirurgia de nervo?', response)
+        self.assertIn('Identifique o evento que levou ao trauma do seu plexo '
+                      'braquial. É possível marcar mais do que um evento.',
+                      response)
+        self.assertIn('Lesão por queimadura', response)
+        self.assertIn('Faz uso de dispositivo auxiliar?',
+                      response)
+        self.assertIn('História da doença atual:', response)
+        self.assertIn('User fills in a text field.', response)
+        # Sample asserts for third questionnaire
+        self.assertIn('C5-T1', response)
+        self.assertIn('Qual a localização da lesão ao exame clínico?',
+                      response)
+        self.assertIn('Anestesia', response)
+        self.assertIn('T3', response)
+        self.assertIn('Sensibilidade Superficial Tátil:',
+                      response)
+        self.assertIn('Número do participante:', response)
+        self.assertIn('User fills in with a number.', response)
 
 
 @override_settings(HAYSTACK_CONNECTIONS=TEST_HAYSTACK_CONNECTIONS)

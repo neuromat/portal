@@ -2,7 +2,7 @@ import time
 
 from selenium.webdriver.common.keys import Keys
 
-from experiments.models import Experiment
+from experiments.models import Experiment, Questionnaire, Step
 from functional_tests.base import FunctionalTest
 
 
@@ -199,3 +199,140 @@ class ExperimentDetailTest(FunctionalTest):
                             .experimental_protocol.image),
             protocol_image_path
         )
+
+    def test_can_view_questionaire_tab(self):
+        experiment = Experiment.objects.filter(
+            status=Experiment.APPROVED
+        ).last()
+
+        # The new visitor is in home page and sees the list of experiments.
+        # She clicks in second "View" link and is redirected to experiment
+        # detail page
+        # TODO: frequently fails to catch second link
+        self.browser.find_element_by_xpath(
+            "//a[@href='/experiments/" + str(experiment.slug) + "/']"
+        ).click()
+        time.sleep(1)
+
+        # There's a tab written Questionnaires
+        questionnaires_tab = self.browser.find_element_by_link_text(
+            'Questionnaires')
+        self.assertEqual('Questionnaires', questionnaires_tab.text)
+
+    # def test_display_message_if_there_is_no_questionnaires(self):
+    #     ##
+    #     # We pick an experiment without questionnaires. The first approved
+    #     # experiment hasn't questionnaires steps in any experiment protocol
+    #     # of
+    #     # no one group. See tests helper
+    #     ##
+    #     experiment = Experiment.objects.filter(
+    #         status=Experiment.APPROVED
+    #     ).first()
+
+    def test_can_view_group_questionnaires_and_questionnaires_titles(self):
+        ##
+        # We've created Questionnaire data in tests helper from a Sample
+        # of NES
+        ##
+        experiment = Experiment.objects.filter(
+            status=Experiment.APPROVED
+        ).last()
+
+        # The new visitor is in home page and sees the list of experiments.
+        # She clicks in second "View" link and is redirected to experiment
+        # detail page
+        # TODO: frequently fails to catch second link
+        self.browser.find_element_by_xpath(
+            "//a[@href='/experiments/" + experiment.slug + "/']"
+        ).click()
+        time.sleep(1)
+
+        # When the new visitor clicks in the Questionnaires tab, she sees
+        # the groups questionnaires and the questionnaires' titles as
+        # headers of the questionnaires contents
+        self.browser.find_element_by_link_text('Questionnaires').click()
+        q_steps = Step.objects.filter(type=Step.QUESTIONNAIRE)
+        questionnaires_content = self.browser.find_element_by_id(
+            'questionnaires_tab').text
+        groups_with_qs = experiment.groups.filter(steps__in=q_steps)
+        if groups_with_qs.count() == 0:
+            self.fail('There are no groups with questionnaires. Have you '
+                      'been created the questionnaires in tests helper?')
+        for group in groups_with_qs:
+            self.assertIn(
+                'Questionnaires for group ' + group.name,
+                questionnaires_content
+            )
+            for step in group.steps:
+                questionnaire = Questionnaire.objects.get(step_ptr=step)
+                self.assertIn(
+                    'Questionnaire ' + questionnaire.survey_name,
+                    questionnaires_content
+                )
+
+    def test_can_view_questionnaires_content(self):
+        ##
+        # We've three questionnaires in an experiment, two are from one
+        # group and one are from another group. We test questions and
+        # answers from this three questionnaires. See tests helper.
+        ##
+        experiment = Experiment.objects.filter(
+            status=Experiment.APPROVED
+        ).last()
+
+        # The new visitor is in home page and sees the list of experiments.
+        # She clicks in second "View" link and is redirected to experiment
+        # detail page.
+        # TODO: frequently fails to catch second link
+        self.browser.find_element_by_xpath(
+            "//a[@href='/experiments/" + experiment.slug + "/']"
+        ).click()
+        time.sleep(1)
+
+        # When the new visitor clicks in the Questionnaires tab, then click
+        # in 'Expand' button of the Questionnaires sections she sees
+        # the questionnaires' content as a series of questions and answers
+        self.browser.find_element_by_link_text('Questionnaires').click()
+        # TODO: click on the 'Expand' buttons just for simulate user
+        # TODO: interaction, as the questionnaires' content is in html page
+        questionnaires_content = self.browser.find_element_by_id(
+            'questionnaires_tab').text
+
+        ##
+        # Sample asserts for first questionnaire
+        ##
+        self.assertIn('História da fratura', questionnaires_content)
+        self.assertIn('Fratura da costela', questionnaires_content)
+        self.assertIn('História prévia de dor?', questionnaires_content)
+        self.assertIn('T1', questionnaires_content)
+        self.assertIn('data da lesão:', questionnaires_content)
+        self.assertIn('User fill in a date.', questionnaires_content)
+        self.assertIn('<em>User answers</em> yes <em>or</em> not.',
+                      questionnaires_content)
+        ##
+        # Sample asserts for second questionnaire
+        ##
+        self.assertIn('Já fez alguma cirurgia ortopédica?',
+                      questionnaires_content)
+        self.assertIn('Fez alguma cirurgia de nervo?', questionnaires_content)
+        self.assertIn('Identifique o evento que levou ao trauma do seu plexo '
+                      'braquial. É possível marcar mais do que um evento.',
+                      questionnaires_content)
+        self.assertIn('Lesão por queimadura', questionnaires_content)
+        self.assertIn('Faz uso de dispositivo auxiliar?',
+                      questionnaires_content)
+        self.assertIn('História da doença atual:', questionnaires_content)
+        self.assertIn('User fills in a text field.', questionnaires_content)
+        ##
+        # Sample asserts for third questionnaire
+        ##
+        self.assertIn('C5-T1', questionnaires_content)
+        self.assertIn('Qual a localização da lesão ao exame clínico?',
+                      questionnaires_content)
+        self.assertIn('Anestesia', questionnaires_content)
+        self.assertIn('T3', questionnaires_content)
+        self.assertIn('Sensibilidade Superficial Tátil:',
+                      questionnaires_content)
+        self.assertIn('Número do participante:', questionnaires_content)
+        self.assertIn('User fills in with a number.', questionnaires_content)

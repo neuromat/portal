@@ -15,6 +15,7 @@
                 {% trans "Statistics" %}</a></li>
             <li role="presentation"><a href="#groups_tab" role="tab" data-toggle="tab">{% trans "Groups" %}</a></li>
             <li role="presentation"><a href="#settings_tab" role="tab" data-toggle="tab">{% trans "Settings" %}</a></li>
+            <li role="presentation"><a href="#questionnaires_tab" role="tab" data-toggle="tab"> {% trans "Questionnaires" %}</a></li>
         </ul>
 
         <!-- Tab panes -->
@@ -301,6 +302,10 @@
                         </div>
                     {% endfor %}
                 {% endif %}
+            </div>
+            <!-- Questionnaires tab -->
+            <div role="tabpanel" class="tab-pane" id="questionnaires_tab">
+
             </div>
         </div>
         {# Full protocol experiment image modal #}
