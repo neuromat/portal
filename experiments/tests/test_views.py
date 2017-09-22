@@ -27,8 +27,8 @@ class HomePageTest(TestCase):
         self.assertEqual(response.status_code, 200)
 
     def test_uses_detail_template(self):
-        experiment_id = str(Experiment.objects.first().id)
-        response = self.client.get('/experiments/' + experiment_id + '/')
+        experiment_slug = str(Experiment.objects.first().slug)
+        response = self.client.get('/experiments/' + experiment_slug + '/')
         self.assertTemplateUsed(response, 'experiments/detail.html')
 
     def test_trustee_can_change_experiment_status_with_a_POST_request(self):
