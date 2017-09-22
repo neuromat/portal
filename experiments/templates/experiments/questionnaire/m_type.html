@@ -1,8 +1,0 @@
-{% load i18n %}
-{% if data.subquestion_description %}
-        {% for sd in data.subquestion_description %}
-            <input type="checkbox" class="input-disabled" disabled> {{ sd }}<br>
-        {% endfor %}
-{% else %}
-    <p>{% trans "No data found" %}.</p>
-{% endif %}
