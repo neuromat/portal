@@ -180,9 +180,9 @@ class ExperimentDetailTest(TestCase):
         self.assertTemplateUsed(response, 'experiments/detail.html')
 
     def test_access_experiment_detail_returns_questionnaire_data(self):
+        # Last experiment has questionnaires. See tests helper
         experiment = Experiment.objects.last()
-        slug = str(experiment.slug)
-        response = self.client.get('/experiments/' + slug + '/')
+        response = self.client.get('/experiments/' + experiment.slug + '/')
 
         # We've made last experiment approved contain questionnaire data in
         # tests helper
@@ -241,6 +241,13 @@ class ExperimentDetailTest(TestCase):
         self.assertIn('Artéria axilar', response.content.decode())
         self.assertIn('Quando foi submetido(a) à cirurgia(s) de plexo '
                       'braquial (mm/aaaa)?', response.content.decode())
+
+    def test_access_experiment_detail_without_questionnaires_returns_null_questionnaires(self):
+        # First experiment has not questionnaires. See tests helper
+        experiment = Experiment.objects.first()
+        response = self.client.get('/experiments/' + experiment.slug + '/')
+
+        self.assertFalse(response.context['questionnaires'])
 
 
 @override_settings(HAYSTACK_CONNECTIONS=TEST_HAYSTACK_CONNECTIONS)

@@ -69,7 +69,7 @@ def _get_nested_rec(key, group):
 
 def _get_questionnaire(metadata):
     # Put the questionnaire data into a temporary csv file
-    # TODO: see what is a temporary dir in RWindows
+    # TODO: see what is a temporary dir in Rwindows
     file = open('/tmp/questionnaire.csv', 'w')
     file.write(metadata)
     file.close()
@@ -121,16 +121,15 @@ def experiment_detail(request, slug):
             age_grouping[int(participant.age)] += 1
 
     # Get questionnaires for all groups
-    questionnaire = {}
+    questionnaires = {}
     for group in experiment.groups.all():
         if group.steps.filter(type=Step.QUESTIONNAIRE).count() > 0:
-            questionnaire[group.title] = {}
+            questionnaires[group.title] = {}
             for step in group.steps.filter(type=Step.QUESTIONNAIRE):
                 q = Questionnaire.objects.get(step_ptr=step)
-                # print(q.survey_metadata)  # DEBUG
-                questionnaire[group.title][q.id] = {}
-                questionnaire[group.title][q.id]['survey_name'] = q.survey_name
-                questionnaire[group.title][q.id]['survey_metadata'] = \
+                questionnaires[group.title][q.id] = {}
+                questionnaires[group.title][q.id]['survey_name'] = q.survey_name
+                questionnaires[group.title][q.id]['survey_metadata'] = \
                     _get_questionnaire(q.survey_metadata)
 
     return render(
@@ -139,7 +138,7 @@ def experiment_detail(request, slug):
             'gender_grouping': gender_grouping,
             'age_grouping': age_grouping,
             'to_be_analysed_count': to_be_analysed_count,
-            'questionnaire': questionnaire
+            'questionnaires': questionnaires
         }
     )
 

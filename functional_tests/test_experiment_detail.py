@@ -1,5 +1,6 @@
 import time
 
+from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.common.keys import Keys
 
 from experiments.models import Experiment, Questionnaire, Step
@@ -219,16 +220,28 @@ class ExperimentDetailTest(FunctionalTest):
             'Questionnaires')
         self.assertEqual('Questionnaires', questionnaires_tab.text)
 
-    # def test_display_message_if_there_is_no_questionnaires(self):
-    #     ##
-    #     # We pick an experiment without questionnaires. The first approved
-    #     # experiment hasn't questionnaires steps in any experiment protocol
-    #     # of
-    #     # no one group. See tests helper
-    #     ##
-    #     experiment = Experiment.objects.filter(
-    #         status=Experiment.APPROVED
-    #     ).first()
+    def test_does_not_display_questionnaire_tab_if_there_are_not_questionnaires(self):
+        ##
+        # We pick an experiment without questionnaires. The first approved
+        # experiment hasn't questionnaires steps in any experiment protocol
+        # of no one group. See tests helper
+        ##
+        experiment = Experiment.objects.filter(
+            status=Experiment.APPROVED
+        ).first()
+
+        # The new visitor is in home page and sees the list of experiments.
+        # She clicks in second "View" link and is redirected to experiment
+        # detail page
+        self.browser.find_element_by_xpath(
+            "//a[@href='/experiments/" + experiment.slug + "/']"
+        ).click()
+        time.sleep(1)
+
+        # As there are no questionnaires for this experiment, she can't see
+        # the Questionnaires tab and Questionnaires content
+        with self.assertRaises(NoSuchElementException):
+            self.browser.find_element_by_link_text('Questionnaires')
 
     def test_can_view_group_questionnaires_and_questionnaires_titles(self):
         ##
@@ -242,7 +255,6 @@ class ExperimentDetailTest(FunctionalTest):
         # The new visitor is in home page and sees the list of experiments.
         # She clicks in second "View" link and is redirected to experiment
         # detail page
-        # TODO: frequently fails to catch second link
         self.browser.find_element_by_xpath(
             "//a[@href='/experiments/" + experiment.slug + "/']"
         ).click()
@@ -284,7 +296,6 @@ class ExperimentDetailTest(FunctionalTest):
         # The new visitor is in home page and sees the list of experiments.
         # She clicks in second "View" link and is redirected to experiment
         # detail page.
-        # TODO: frequently fails to catch second link
         self.browser.find_element_by_xpath(
             "//a[@href='/experiments/" + experiment.slug + "/']"
         ).click()

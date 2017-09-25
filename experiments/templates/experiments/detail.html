@@ -15,7 +15,9 @@
                 {% trans "Statistics" %}</a></li>
             <li role="presentation"><a href="#groups_tab" role="tab" data-toggle="tab">{% trans "Groups" %}</a></li>
             <li role="presentation"><a href="#settings_tab" role="tab" data-toggle="tab">{% trans "Settings" %}</a></li>
-            <li role="presentation"><a href="#questionnaires_tab" role="tab" data-toggle="tab"> {% trans "Questionnaires" %}</a></li>
+            {% if questionnaires %}
+                <li role="presentation"><a href="#questionnaires_tab" role="tab" data-toggle="tab"> {% trans "Questionnaires" %}</a></li>
+            {% endif %}
         </ul>
 
         <!-- Tab panes -->
@@ -81,6 +83,7 @@
                 </div>
             </div>
 
+            <!-- Settings tab -->
             <div role="tabpanel" class="tab-pane" id="settings_tab">
                 {% if experiment.eegsetting_set.all %}
                     <strong>{% trans "EEG Settings" %}</strong>
@@ -305,7 +308,7 @@
             </div>
             <!-- Questionnaires tab -->
             <div role="tabpanel" class="tab-pane" id="questionnaires_tab">
-                {% for group_key, group_values in questionnaire.items %}
+                {% for group_key, group_values in questionnaires.items %}
                     <h3>Questionnaires for group {{ group_key }}</h3>
                     {% for q_key, q_values in group_values.items %}
                         <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
@@ -332,11 +335,11 @@
                                             <ul>
                                                 <li>{{ data.question_description }}</li>
                                                 {% if data.question_limesurvey_type == 'F' %}
-                                                    {% include 'experiments/questionnaire/f_type.html' %}
+                                                    {% include 'experiments/questionnaires/f_type.html' %}
                                                 {% elif data.question_limesurvey_type == 'L' %}
-                                                    {% include 'experiments/questionnaire/l_type.html' %}
+                                                    {% include 'experiments/questionnaires/l_type.html' %}
                                                 {% elif data.question_limesurvey_type == 'M' or data.question_limesurvey_type == 'B' or data.question_limesurvey_type == 'P' %}
-                                                    {% include 'experiments/questionnaire/m_type.html' %}
+                                                    {% include 'experiments/questionnaires/m_type.html' %}
                                                 {% elif data.question_limesurvey_type == 'D' %}
                                                     <p>
                                                         <em>{% trans "The user enters a date in a date field" %}.</em>
@@ -364,6 +367,7 @@
                 {% endfor %}
             </div>
         </div>
+
         {# Full protocol experiment image modal #}
         <div id="protocol_image_full" class="modal fade" tabindex="-1"
              role="dialog">
