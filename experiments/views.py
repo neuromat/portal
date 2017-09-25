@@ -52,7 +52,7 @@ def home_page(request):
 
 
 def _get_nested_rec(key, group):
-    rec = {}
+    rec = dict()
     rec['question_code'] = key[0]
     rec['question_limesurvey_type'] = key[1]
     rec['question_description'] = key[2]

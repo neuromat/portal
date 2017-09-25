@@ -203,8 +203,6 @@ class ExperimentDetailTest(TestCase):
                     'Questionnaire ' + questionnaire.survey_name
                 )
 
-        # print(response.content)  # DEBUG
-
         # Sample asserts for first questionnaire
         self.assertIn('História de fratura', response.content.decode())
         self.assertIn('Já fez alguma cirurgia ortopédica?',

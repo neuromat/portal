@@ -233,7 +233,7 @@ class ExperimentDetailTest(FunctionalTest):
     def test_can_view_group_questionnaires_and_questionnaires_titles(self):
         ##
         # We've created Questionnaire data in tests helper from a Sample
-        # of NES
+        # of a questionnaire from NES, in csv format
         ##
         experiment = Experiment.objects.filter(
             status=Experiment.APPROVED
@@ -261,10 +261,10 @@ class ExperimentDetailTest(FunctionalTest):
                       'been created the questionnaires in tests helper?')
         for group in groups_with_qs:
             self.assertIn(
-                'Questionnaires for group ' + group.name,
+                'Questionnaires for group ' + group.title,
                 questionnaires_content
             )
-            for step in group.steps:
+            for step in group.steps.filter(type=Step.QUESTIONNAIRE):
                 questionnaire = Questionnaire.objects.get(step_ptr=step)
                 self.assertIn(
                     'Questionnaire ' + questionnaire.survey_name,
@@ -273,7 +273,7 @@ class ExperimentDetailTest(FunctionalTest):
 
     def test_can_view_questionnaires_content(self):
         ##
-        # We've three questionnaires in an experiment, two are from one
+        # We've created three questionnaires in an experiment, two are from one
         # group and one are from another group. We test questions and
         # answers from this three questionnaires. See tests helper.
         ##
@@ -302,37 +302,44 @@ class ExperimentDetailTest(FunctionalTest):
         ##
         # Sample asserts for first questionnaire
         ##
-        self.assertIn('História da fratura', questionnaires_content)
-        self.assertIn('Fratura da costela', questionnaires_content)
-        self.assertIn('História prévia de dor?', questionnaires_content)
-        self.assertIn('T1', questionnaires_content)
-        self.assertIn('data da lesão:', questionnaires_content)
-        self.assertIn('User fill in a date.', questionnaires_content)
-        self.assertIn('<em>User answers</em> yes <em>or</em> not.',
-                      questionnaires_content)
-        ##
-        # Sample asserts for second questionnaire
-        ##
+        self.assertIn('História de fratura', questionnaires_content)
         self.assertIn('Já fez alguma cirurgia ortopédica?',
                       questionnaires_content)
-        self.assertIn('Fez alguma cirurgia de nervo?', questionnaires_content)
+        self.assertIn('Fez alguma cirurgia de nervo?',
+                      questionnaires_content)
         self.assertIn('Identifique o evento que levou ao trauma do seu plexo '
                       'braquial. É possível marcar mais do que um evento.',
                       questionnaires_content)
-        self.assertIn('Lesão por queimadura', questionnaires_content)
-        self.assertIn('Faz uso de dispositivo auxiliar?',
+        self.assertIn('Teve alguma fratura associada à lesão?',
                       questionnaires_content)
-        self.assertIn('História da doença atual:', questionnaires_content)
-        self.assertIn('User fills in a text field.', questionnaires_content)
+        self.assertIn('The user enters a date in a date field',
+                      questionnaires_content)
+
+        ##
+        #  Sample asserts for second questionnaire
+        ##
+        self.assertIn('Qual o lado da lesão?', questionnaires_content)
+        self.assertIn('Instituição do Estudo', questionnaires_content)
+        self.assertIn('The user enters a free text',
+                      questionnaires_content)
+        self.assertIn('Tipo(s) de lesão(ões):', questionnaires_content)
+        self.assertIn('Trombose', questionnaires_content)
+        self.assertIn('Anexar exames.', questionnaires_content)
+        self.assertIn('The user uploads file(s)',
+                      questionnaires_content)
+        self.assertIn('The user answers yes or not',
+                      questionnaires_content)
+
         ##
         # Sample asserts for third questionnaire
         ##
-        self.assertIn('C5-T1', questionnaires_content)
-        self.assertIn('Qual a localização da lesão ao exame clínico?',
+        self.assertIn('Refere dor após a lesão?', questionnaires_content)
+        self.assertIn('EVA da dor principal:', questionnaires_content)
+        self.assertIn('Qual região apresenta alteração do trofismo?',
                       questionnaires_content)
-        self.assertIn('Anestesia', questionnaires_content)
-        self.assertIn('T3', questionnaires_content)
-        self.assertIn('Sensibilidade Superficial Tátil:',
+        self.assertIn('Atrofia', questionnaires_content)
+        self.assertIn('Qual(is) artéria(s) e/ou vaso(s) foram acometidos?',
                       questionnaires_content)
-        self.assertIn('Número do participante:', questionnaires_content)
-        self.assertIn('User fills in with a number.', questionnaires_content)
+        self.assertIn('Artéria axilar', questionnaires_content)
+        self.assertIn('Quando foi submetido(a) à cirurgia(s) de plexo '
+                      'braquial (mm/aaaa)?', questionnaires_content)

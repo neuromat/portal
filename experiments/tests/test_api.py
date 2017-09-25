@@ -588,53 +588,56 @@ class GroupAPITest(APITestCase):
 
     def setUp(self):
         global_setup_ut()
-        owner1 = User.objects.get(username='lab1')
-        owner2 = User.objects.get(username='lab2')
-        experiment1 = Experiment.objects.get(nes_id=1, owner=owner1)
-        experiment2 = Experiment.objects.get(nes_id=1, owner=owner2)
-        # TODO: refactor! Include in global setup
-        Group.objects.create(
-            title='A title', description='A description',
-            experiment=experiment1
-        )
-        Group.objects.create(
-            title='Other title', description='Other description',
-            experiment=experiment1
-        )
-        Group.objects.create(
-            title='A title', description='A description',
-            experiment=experiment2
-        )
 
     def test_get_returns_all_groups_short_url(self):
-        group1 = Group.objects.get(id=1)
-        group2 = Group.objects.get(id=2)
-        group3 = Group.objects.get(id=3)
+        # We've created 5 groups in global_setup_ut()
+        groups = []
+        for group in Group.objects.all():
+            groups.append(group)
         list_url = reverse('api_groups-list')
         response = self.client.get(list_url)
         self.assertEqual(
             json.loads(response.content.decode('utf8')),
             [
                 {
-                    'id': group1.id,
-                    'title': group1.title,
-                    'description': group1.description,
-                    'experiment': group1.experiment.title,
-                    'inclusion_criteria': list(group1.inclusion_criteria.all())
+                    'id': groups[0].id,
+                    'title': groups[0].title,
+                    'description': groups[0].description,
+                    'experiment': groups[0].experiment.title,
+                    'inclusion_criteria':
+                        list(groups[0].inclusion_criteria.all())
                 },
                 {
-                    'id': group2.id,
-                    'title': group2.title,
-                    'description': group2.description,
-                    'experiment': group2.experiment.title,
-                    'inclusion_criteria': list(group2.inclusion_criteria.all())
+                    'id': groups[1].id,
+                    'title': groups[1].title,
+                    'description': groups[1].description,
+                    'experiment': groups[1].experiment.title,
+                    'inclusion_criteria':
+                        list(groups[1].inclusion_criteria.all())
                 },
                 {
-                    'id': group3.id,
-                    'title': group3.title,
-                    'description': group3.description,
-                    'experiment': group3.experiment.title,
-                    'inclusion_criteria': list(group3.inclusion_criteria.all())
+                    'id': groups[2].id,
+                    'title': groups[2].title,
+                    'description': groups[2].description,
+                    'experiment': groups[2].experiment.title,
+                    'inclusion_criteria':
+                        list(groups[2].inclusion_criteria.all())
+                },
+                {
+                    'id': groups[3].id,
+                    'title': groups[3].title,
+                    'description': groups[3].description,
+                    'experiment': groups[3].experiment.title,
+                    'inclusion_criteria':
+                        list(groups[3].inclusion_criteria.all())
+                },
+                {
+                    'id': groups[4].id,
+                    'title': groups[4].title,
+                    'description': groups[4].description,
+                    'experiment': groups[4].experiment.title,
+                    'inclusion_criteria':
+                        list(groups[4].inclusion_criteria.all())
                 }
             ]
         )
@@ -642,9 +645,10 @@ class GroupAPITest(APITestCase):
     def test_get_returns_all_groups_long_url(self):
         owner1 = User.objects.get(username='lab1')
         experiment = Experiment.objects.get(nes_id=1, owner=owner1)
-        group1 = Group.objects.first()
-        group2 = Group.objects.get(id=2)
-        group3 = Group.objects.get(id=3)
+        # We've created 5 groups in global_setup_ut()
+        groups = []
+        for group in Group.objects.all():
+            groups.append(group)
         list_url = reverse('api_experiment_groups-list',
                            kwargs={'experiment_nes_id': experiment.nes_id})
         response = self.client.get(list_url)
@@ -652,25 +656,44 @@ class GroupAPITest(APITestCase):
             json.loads(response.content.decode('utf8')),
             [
                 {
-                    'id': group1.id,
-                    'title': group1.title,
-                    'description': group1.description,
-                    'experiment': group1.experiment.title,
-                    'inclusion_criteria': list(group1.inclusion_criteria.all())
+                    'id': groups[0].id,
+                    'title': groups[0].title,
+                    'description': groups[0].description,
+                    'experiment': groups[0].experiment.title,
+                    'inclusion_criteria':
+                        list(groups[0].inclusion_criteria.all())
                 },
                 {
-                    'id': group2.id,
-                    'title': group2.title,
-                    'description': group2.description,
-                    'experiment': group2.experiment.title,
-                    'inclusion_criteria': list(group2.inclusion_criteria.all())
+                    'id': groups[1].id,
+                    'title': groups[1].title,
+                    'description': groups[1].description,
+                    'experiment': groups[1].experiment.title,
+                    'inclusion_criteria':
+                        list(groups[1].inclusion_criteria.all())
                 },
                 {
-                    'id': group3.id,
-                    'title': group3.title,
-                    'description': group3.description,
-                    'experiment': group3.experiment.title,
-                    'inclusion_criteria': list(group3.inclusion_criteria.all())
+                    'id': groups[2].id,
+                    'title': groups[2].title,
+                    'description': groups[2].description,
+                    'experiment': groups[2].experiment.title,
+                    'inclusion_criteria':
+                        list(groups[2].inclusion_criteria.all())
+                },
+                {
+                    'id': groups[3].id,
+                    'title': groups[3].title,
+                    'description': groups[3].description,
+                    'experiment': groups[3].experiment.title,
+                    'inclusion_criteria':
+                        list(groups[3].inclusion_criteria.all())
+                },
+                {
+                    'id': groups[4].id,
+                    'title': groups[4].title,
+                    'description': groups[4].description,
+                    'experiment': groups[4].experiment.title,
+                    'inclusion_criteria':
+                        list(groups[4].inclusion_criteria.all())
                 }
             ]
         )
@@ -720,7 +743,7 @@ class GroupAPITest(APITestCase):
         )
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.client.logout()
-        new_group = Group.objects.first()
+        new_group = Group.objects.last()
         self.assertEqual(new_group.title, 'A title')
 
     def test_POSTing_new_group_associates_with_last_experiment_version(self):
