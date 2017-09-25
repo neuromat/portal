@@ -5,7 +5,9 @@
             <li>{{ sd }}</li>
             {% if data.option_description %}
                     {% for od in data.option_description %}
-                        <input type="radio" value="{{ od }}"><label class="questionnaire-options" for="{{ od }}">&nbsp;&nbsp;{{ od }}</label><br>
+                        <input type="radio" value="{{ od }}"
+                               class="input-disabled" disabled><label
+                            class="questionnaire-options" for="{{ od }}">&nbsp;&nbsp;{{ od }}</label><br>
                     {% endfor %}
             {% else %}
                 <p>{% trans "No data found" %}.</p>
