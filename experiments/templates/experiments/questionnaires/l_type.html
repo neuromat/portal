@@ -1,7 +1,8 @@
 {% load i18n %}
 {% if data.option_description %}
     {% for od in data.option_description %}
-        <input type="radio" name="{{ od }}"><label class="questionnaire-options" for="{{ od }}">&nbsp;
+        <input type="radio" name="{{ od }}" class="input-disabled" disabled><label
+            class="questionnaire-options" for="{{ od }}">&nbsp;
         &nbsp;{{ od }}</label><br>
     {% endfor %}
 {% else %}
