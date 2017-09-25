@@ -11,7 +11,8 @@ from django.utils.translation import ugettext as _
 
 from experiments.models import Experiment, Group, Participant, EEGData, EMGData, EEGSetting, EMGSetting, TMSData, \
     TMSSetting, AdditionalData, ContextTree, GenericDataCollectionData, GoalkeeperGameData, Step, \
-    QuestionnaireResponse, Questionnaire, EEG, EMG, TMS, GoalkeeperGame, Stimulus, EMGElectrodeSetting
+    QuestionnaireResponse, Questionnaire, EEG, EMG, TMS, GoalkeeperGame, Stimulus, EMGElectrodeSetting, \
+    EEGElectrodePosition
 
 DEFAULT_LANGUAGE = "pt-BR"
 
@@ -978,118 +979,239 @@ class ExportExecution:
 
 def get_eeg_setting_description(eeg_setting_id):
     eeg_setting = get_object_or_404(EEGSetting, pk=eeg_setting_id)
-    description = {}
 
-    description['eeg_setting'] = []
-    description['eeg_setting'].append({
-        'name': eeg_setting.name,
-        'description': eeg_setting.description if eeg_setting.description else '',
-    })
+    eeg_setting_attributes = vars(eeg_setting)
+
+    eeg_setting_attributes = handling_values(eeg_setting_attributes)
+
+    description = {
+        'name': eeg_setting_attributes['name'],
+        'description': eeg_setting_attributes['description'],
+    }
 
     if hasattr(eeg_setting, 'eeg_amplifier_setting'):
-        description['eeg_amplifier_setting'] = []
-        eeg_amplifier_setting = eeg_setting.eeg_amplifier_setting
-        description['eeg_amplifier_setting'].append({
-            'identification': eeg_amplifier_setting.eeg_amplifier.identification,
-            'description': eeg_amplifier_setting.eeg_amplifier.description,
-            'gain': eeg_amplifier_setting.gain,
-            'sampling_rate': eeg_amplifier_setting.sampling_rate,
-            'number_of_channels_used': eeg_amplifier_setting.number_of_channels_used
-        })
+        eeg_amplifier_setting_attributes = vars(eeg_setting.eeg_amplifier_setting)
+        eeg_amplifier_setting_attributes = handling_values(eeg_amplifier_setting_attributes)
+        eeg_amplifier_attributes = vars(eeg_setting.eeg_amplifier_setting.eeg_amplifier)
+        eeg_amplifier_attributes = handling_values(eeg_amplifier_attributes)
+        impedance_description = ''
+        if eeg_amplifier_attributes['input_impedance'] and eeg_amplifier_attributes['input_impedance_unit']:
+            impedance_description = eeg_amplifier_attributes['input_impedance'] + " (" + eeg_amplifier_attributes[
+                'input_impedance_unit'] + ")"
+        description['eeg_amplifier_setting'] = {
+            'identification': eeg_amplifier_attributes['identification'],
+            'manufacturer_name': eeg_amplifier_attributes['manufacturer_name'],
+            'serial_number': eeg_amplifier_attributes['serial_number'],
+            'description': eeg_amplifier_attributes['description'],
+            'gain_setted': eeg_amplifier_setting_attributes['gain'],
+            'sampling_rate_setted': eeg_amplifier_setting_attributes['sampling_rate'],
+            'number_of_channels_used': eeg_amplifier_setting_attributes['number_of_channels_used'],
+            'gain (equipment)': eeg_amplifier_attributes['identification'],
+            'number_of_channels (equipment)': eeg_amplifier_attributes['identification'],
+            'common_mode_rejection_ratio': eeg_amplifier_attributes['identification'],
+            'input_impedance': impedance_description,
+            'amplifier_detection_type_name': eeg_amplifier_attributes['amplifier_detection_type_name'],
+            'tethering_system_name': eeg_amplifier_attributes['tethering_system_name'],
+        }
 
     if hasattr(eeg_setting, 'eeg_filter_setting'):
-        description['eeg_filter_setting'] = []
-        eeg_filter_setting = eeg_setting.eeg_filter_setting
-        description['eeg_filter_setting'].append({
-            'filter_type': eeg_filter_setting.eeg_filter_type_name,
-            'description': eeg_filter_setting.eeg_filter_type_description,
-            'high_pass': eeg_filter_setting.high_pass,
-            'low_pass': eeg_filter_setting.low_pass,
-            'order': eeg_filter_setting.order,
-            'high_band_pass': eeg_filter_setting.high_band_pass,
-            'low_band_pass': eeg_filter_setting.low_band_pass,
-            'high_notch': eeg_filter_setting.high_notch,
-            'low_notch': eeg_filter_setting.low_notch
-        })
+        eeg_filter_setting_attributes = vars(eeg_setting.eeg_filter_setting)
+        eeg_filter_setting_attributes = handling_values(eeg_filter_setting_attributes)
+        description['eeg_filter_setting'] = {
+            'filter_type': eeg_filter_setting_attributes['eeg_filter_type_name'],
+            'description': eeg_filter_setting_attributes['eeg_filter_type_description'],
+            'high_pass': eeg_filter_setting_attributes['high_pass'],
+            'low_pass': eeg_filter_setting_attributes['low_pass'],
+            'order': eeg_filter_setting_attributes['order'],
+            'high_band_pass': eeg_filter_setting_attributes['high_band_pass'],
+            'low_band_pass': eeg_filter_setting_attributes['low_band_pass'],
+            'high_notch': eeg_filter_setting_attributes['high_notch'],
+            'low_notch': eeg_filter_setting_attributes['low_notch']
+        }
 
     if hasattr(eeg_setting, 'eeg_solution'):
-        description['eeg_solution_setting'] = []
-        eeg_solution_setting = eeg_setting.eeg_solution
-        description['eeg_solution_setting'].append({
-            'manufacturer': eeg_solution_setting.manufacturer_name,
-            'identification': eeg_solution_setting.name,
-            'components': eeg_solution_setting.components
-        })
+        eeg_solution_attributes = vars(eeg_setting.eeg_solution)
+        eeg_solution_attributes = handling_values(eeg_solution_attributes)
+        description['eeg_solution_setting'] = {
+            'manufacturer': eeg_solution_attributes['manufacturer_name'],
+            'identification': eeg_solution_attributes['name'],
+            'components': eeg_solution_attributes['components']
+        }
 
-    # if hasattr(eeg_setting, 'eeg_electrode_layout_setting'):
-    #     eeg_electrode_layout_setting = eeg_setting.eeg_electrode_layout_setting
-    #     if hasattr(eeg_electrode_layout_setting, 'eeg_electrode_net_system'):
-    #         description['eeg_electrode_layout_setting'] = []
-    #         eeg_electrode_layout_setting = eeg_setting.eeg_electrode_layout_setting.eeg_electrode_net_system
-    #         description['eeg_electrode_layout_setting'].append({
-    #             'manufacturer': eeg_electrode_layout_setting.eeg_electrode_net.manufacturer.name,
-    #             'identification': eeg_electrode_layout_setting.eeg_electrode_net.identification,
-    #             'description': eeg_electrode_layout_setting.eeg_electrode_net.description,
-    #             'eeg_electrode_localization_system': eeg_electrode_layout_setting.eeg_electrode_localization_system.name,
-    #             'eeg_electrode_model_default': eeg_electrode_layout_setting.eeg_electrode_localization_system.name,
-    #             'cap_size': ''
-    #         })
+    if hasattr(eeg_setting, 'eeg_electrode_net'):
+        eeg_electrode_net_attributes = vars(eeg_setting.eeg_electrode_net)
+        eeg_electrode_net_attributes = handling_values(eeg_electrode_net_attributes)
+        description['eeg_electrode_net'] = {
+            'manufacturer_name': eeg_electrode_net_attributes['manufacturer_name'],
+            'equipment_type': eeg_electrode_net_attributes['equipment_type'],
+            'identification': eeg_electrode_net_attributes['identification'],
+            'description': eeg_electrode_net_attributes['description'],
+            'serial_number': eeg_electrode_net_attributes['serial_number'],
+        }
+
+    if hasattr(eeg_setting, 'eeg_electrode_localization_system'):
+        eeg_electrode_localization_system_attributes = vars(eeg_setting.eeg_electrode_localization_system)
+        eeg_electrode_localization_system_attributes = handling_values(eeg_electrode_localization_system_attributes)
+        description['eeg_electrode_localization_system'] = {
+            'name': eeg_electrode_localization_system_attributes['name'],
+            'description': eeg_electrode_localization_system_attributes['description'],
+            'image_filename': eeg_electrode_localization_system_attributes['map_image_file'].split('/')[-1],
+            'electrode_position_list': [],
+        }
+
+        eeg_electrode_position_list = EEGElectrodePosition.objects.filter(
+            eeg_electrode_localization_system=eeg_setting.eeg_electrode_localization_system)
+        for eeg_electrode_position in eeg_electrode_position_list:
+            eeg_electrode_position_attributes = vars(eeg_electrode_position)
+            eeg_electrode_position_attributes = handling_values(eeg_electrode_position_attributes)
+            description['eeg_electrode_localization_system']['electrode_position_list'].append({
+                'name': eeg_electrode_position_attributes['name'],
+                'coordinate_x': eeg_electrode_position_attributes['coordinate_x'],
+                'coordinate_y': eeg_electrode_position_attributes['coordinate_y'],
+                'channel_index': eeg_electrode_position_attributes['channel_index'],
+                'electrode_model': {}
+            })
+
+            if hasattr(eeg_electrode_position, 'electrode_model'):
+                electrode_model_attributes = vars(eeg_electrode_position.electrode_model)
+                electrode_model_attributes = handling_values(electrode_model_attributes)
+                impedance_description = ''
+                electrode_distance_description = ''
+                if electrode_model_attributes['impedance'] and electrode_model_attributes['impedance_unit']:
+                    impedance_description = electrode_model_attributes['impedance'] + " (" + electrode_model_attributes[
+                        'impedance_unit'] + ")"
+                if electrode_model_attributes['inter_electrode_distance'] and \
+                        electrode_model_attributes['inter_electrode_distance_unit']:
+                    electrode_distance_description = electrode_model_attributes['inter_electrode_distance'] + " (" + \
+                                                     electrode_model_attributes['inter_electrode_distance_unit'] + ")"
+                description['eeg_electrode_localization_system']['electrode_position_list'][-1]['electrode_model'][
+                    'model_name'] = electrode_model_attributes['name']
+                description['eeg_electrode_localization_system']['electrode_position_list'][-1]['electrode_model'][
+                    'electrode type'] = electrode_model_attributes['electrode_type']
+                description['eeg_electrode_localization_system']['electrode_position_list'][-1]['electrode_model'][
+                    'description'] = electrode_model_attributes['description']
+                description['eeg_electrode_localization_system']['electrode_position_list'][-1]['electrode_model'][
+                    'material'] = electrode_model_attributes['material']
+                description['eeg_electrode_localization_system']['electrode_position_list'][-1]['electrode_model'][
+                    'usability'] = electrode_model_attributes['usability']
+                description['eeg_electrode_localization_system']['electrode_position_list'][-1]['electrode_model'][
+                    'impedance'] = impedance_description
+                description['eeg_electrode_localization_system']['electrode_position_list'][-1]['electrode_model'][
+                    'distance_inter_electrode'] = electrode_distance_description
+                description['eeg_electrode_localization_system']['electrode_position_list'][-1]['electrode_model'][
+                    'electrode_configuration_name'] = electrode_model_attributes['electrode_configuration_name']
+
+                if hasattr(eeg_electrode_position.electrode_model, 'surfaceelectrode'):
+                    surface_electrode_attributes = vars(eeg_electrode_position.electrode_model.surfaceelectrode)
+                    surface_electrode_attributes = handling_values(surface_electrode_attributes)
+                    electrode_shape_measure_description = ''
+                    if surface_electrode_attributes['electrode_shape_measure_value'] and surface_electrode_attributes[
+                        'electrode_shape_measure_unit']:
+                        electrode_shape_measure_description = surface_electrode_attributes['electrode_shape_measure']\
+                                                              + " (" + surface_electrode_attributes[
+                            'electrode_shape_measure_unit'] + ")"
+
+                    description['eeg_electrode_localization_system']['electrode_position_list'][-1]['electrode_model'][
+                        'surface_electrode'] = {}
+                    description['eeg_electrode_localization_system']['electrode_position_list'][-1]['electrode_model'][
+                        'surface_electrode']['conduction_type'] = surface_electrode_attributes['conduction_type']
+                    description['eeg_electrode_localization_system']['electrode_position_list'][-1]['electrode_model'][
+                        'surface_electrode']['electrode_mode'] = surface_electrode_attributes['electrode_mode']
+                    description['eeg_electrode_localization_system']['electrode_position_list'][-1]['electrode_model'][
+                        'surface_electrode']['electrode_shape_measure'] = electrode_shape_measure_description
+                    description['eeg_electrode_localization_system']['electrode_position_list'][-1]['electrode_model'][
+                        'surface_electrode']['electrode_shape_name'] = surface_electrode_attributes[
+                        'electrode_shape_name']
+
+                if hasattr(eeg_electrode_position.electrode_model, 'intramuscular_electrode'):
+                    intramuscular_electrode_attributes = vars(
+                        eeg_electrode_position.electrode_model.intramuscular_electrode)
+                    intramuscular_electrode_attributes = handling_values(intramuscular_electrode_attributes)
+                    description['eeg_electrode_localization_system']['electrode_position_list'][-1][
+                        'electrode_model']['intramuscular_electrode'] = {}
+                    description['eeg_electrode_localization_system']['electrode_position_list'][-1][
+                        'electrode_model']['intramuscular_electrode']['strand'] = intramuscular_electrode_attributes[
+                        'strand']
+                    description['eeg_electrode_localization_system']['electrode_position_list'][-1][
+                        'electrode_model']['intramuscular_electrode']['insulation_material_name'] = \
+                        intramuscular_electrode_attributes['insulation_material_name']
+                    description['eeg_electrode_localization_system']['electrode_position_list'][-1][
+                        'electrode_model']['intramuscular_electrode']['insulation_material_description'] = \
+                        intramuscular_electrode_attributes['insulation_material_description']
+                    description['eeg_electrode_localization_system']['electrode_position_list'][-1][
+                        'electrode_model']['intramuscular_electrode']['lenght_of_exposed_tip'] = \
+                        intramuscular_electrode_attributes['lenght_of_exposed_tip']
+
+                if hasattr(eeg_electrode_position.electrode_model, 'needle_electrode'):
+                    needle_electrode_attributes = vars(eeg_electrode_position.electrode_model.needle_electrode)
+                    needle_electrode_attributes = handling_values(needle_electrode_attributes)
+                    size_description = ''
+                    if needle_electrode_attributes['size_of_conductive_contact_points_at_the_tip'] and \
+                            needle_electrode_attributes['size_unit']:
+                        size_description = surface_electrode_attributes[
+                                                                  'size_of_conductive_contact_points_at_the_tip'] \
+                                                              + " (" + surface_electrode_attributes['size_unit'] + ")"
+                    description['eeg_electrode_localization_system']['electrode_position_list'][-1]['electrode_model'][
+                        'needle_electrode'] = {}
+                    description['eeg_electrode_localization_system']['electrode_position_list'][-1]['electrode_model'][
+                        'needle_electrode']['size'] = needle_electrode_attributes['size']
+                    description['eeg_electrode_localization_system']['electrode_position_list'][-1]['electrode_model'][
+                        'needle_electrode']['size_of_conductive_contact_points_at_the_tip'] = size_description
+                    description['eeg_electrode_localization_system']['electrode_position_list'][-1]['electrode_model'][
+                        'needle_electrode']['number_of_conductive_contact_points_at_the_tip'] = \
+                        needle_electrode_attributes['number_of_conductive_contact_points_at_the_tip']
 
     return description
 
 
 def handling_values(dictionary_object):
+    result = {}
     for key, value in dictionary_object.items():
         if dictionary_object[key] is None:
-            dictionary_object[key] = ''
+            result[key] = ''
         elif isinstance(dictionary_object[key], bool):
-            dictionary_object[key] = _('Yes') if dictionary_object[key] else _('No')
+            result[key] = _('Yes') if dictionary_object[key] else _('No')
         else:
-            dictionary_object[key] = smart_str(dictionary_object[key])
+            result[key] = smart_str(dictionary_object[key])
 
-    return dictionary_object
+    return result
 
 
 def get_emg_setting_description(emg_setting_id):
     emg_setting = get_object_or_404(EMGSetting, pk=emg_setting_id)
 
-    emg_setting_model = getattr(modules['experiments.models'], 'EMGSetting')
-    db_emg_setting = emg_setting_model.objects.filter(id=emg_setting_id).distinct()
     emg_setting_attributes = vars(emg_setting)
 
-    del emg_setting_attributes['_state']
     emg_setting_attributes = handling_values(emg_setting_attributes)
-    description={}
-    description['emg_setting'] = []
-    description['emg_setting'].append({
+
+    description = {
         'name': emg_setting_attributes['name'],
         'description': emg_setting_attributes['description'],
         'acquisition_software': emg_setting_attributes['acquisition_software_version'],
-    })
+    }
 
     if hasattr(emg_setting, 'emg_ad_converter_setting'):
-        emg_ad_converter_setting_attributes = vars(db_emg_setting[0].emg_ad_converter_setting)
+        emg_ad_converter_setting_attributes = vars(emg_setting.emg_ad_converter_setting)
         emg_ad_converter_setting_attributes = handling_values(emg_ad_converter_setting_attributes)
-        description['emg_ad_converter_setting'] = []
-        description['emg_ad_converter_setting'].append({
+
+        description['emg_ad_converter_setting'] = {
             'sampling_rate_setted': emg_ad_converter_setting_attributes['sampling_rate']
-        })
+        }
 
         if hasattr(emg_setting.emg_ad_converter_setting, 'ad_converter'):
-            ad_converter_attributes = vars(db_emg_setting[0].emg_ad_converter_setting.ad_converter)
+            ad_converter_attributes = vars(emg_setting.emg_ad_converter_setting.ad_converter)
             ad_converter_attributes = handling_values(ad_converter_attributes)
-            description['emg_ad_converter_setting'].append({
-                'ad_converter': ad_converter_attributes['identification'],
-                'sample_rate (equipment)': ad_converter_attributes['sampling_rate'],
-                'signal_to_noise (equipment)': ad_converter_attributes['signal_to_noise_rate'],
-                'resolution (equipment)': ad_converter_attributes['resolution'],
-            })
+            description['emg_ad_converter_setting']['ad_converter'] = ad_converter_attributes['identification']
+            description['emg_ad_converter_setting']['sample_rate (equipment)'] = ad_converter_attributes[
+                'sampling_rate']
+            description['emg_ad_converter_setting']['signal_to_noise (equipment)'] = ad_converter_attributes[
+                'signal_to_noise_rate']
+            description['emg_ad_converter_setting']['resolution (equipment)'] = ad_converter_attributes['resolution']
 
-    if hasattr(db_emg_setting[0], 'emg_digital_filter_setting'):
-        emg_digital_filter_setting = vars(db_emg_setting[0].emg_digital_filter_setting)
+    if hasattr(emg_setting, 'emg_digital_filter_setting'):
+        emg_digital_filter_setting = vars(emg_setting.emg_digital_filter_setting)
         emg_digital_filter_setting = handling_values(emg_digital_filter_setting)
-        description['emg_digital_filter_setting'] = []
-        description['emg_digital_filter_setting'].append({
+        description['emg_digital_filter_setting'] = {
             'filter type name': emg_digital_filter_setting['filter_type_name'],
             'description': emg_digital_filter_setting['filter_type_description'],
             'high_pass': emg_digital_filter_setting['high_pass'],
@@ -1099,7 +1221,7 @@ def get_emg_setting_description(emg_setting_id):
             'high_notch': emg_digital_filter_setting['high_notch'],
             'low_notch': emg_digital_filter_setting['low_notch'],
             'order': emg_digital_filter_setting['order'],
-        })
+        }
 
     # to_many
     emg_electrode_settings = EMGElectrodeSetting.objects.filter(emg_setting=emg_setting)
@@ -1109,22 +1231,19 @@ def get_emg_setting_description(emg_setting_id):
         description['emg_electrode_settings'] = []
         description['emg_electrode_settings'].append({
             'name': emg_electrode_attributes['name'],
-            'electrode_model': [],
-            'emg_amplifier_setting': [],
-            'emg_preamplifier_setting': [],
-            'emg_electrode_placement_setting': [],
         })
 
-        if hasattr(db_emg_setting[0].emg_electrode_settings, 'electrode_model'):
-            electrode_model_attributes = vars(db_emg_setting[0].emg_electrode_settings.electrode_model)
+        if hasattr(emg_setting.emg_electrode_settings, 'electrode_model'):
+            electrode_model_attributes = vars(emg_setting.emg_electrode_settings.electrode_model)
             electrode_model_attributes = handling_values(electrode_model_attributes)
         if electrode_model_attributes.impedance and electrode_model_attributes.impedance_unit:
             impedance_description = electrode_model_attributes['impedance'] + " (" + electrode_model_attributes[
                 'impedance_unit'] + ")"
-        if electrode_model_attributes.inter_electrode_distance and electrode_model_attributes.inter_electrode_distance_unit:
+        if electrode_model_attributes.inter_electrode_distance and \
+                electrode_model_attributes.inter_electrode_distance_unit:
             electrode_distance_description = electrode_model_attributes['inter_electrode_distance'] + " (" + \
                                              electrode_model_attributes['inter_electrode_distance_unit'] + ")"
-        description['emg_electrode_settings']['electrode_model'].append({
+        description['emg_electrode_settings']['electrode_model'] = {
             'model_name': electrode_model_attributes['name'],
             'electrode type': electrode_model_attributes['electrode_type'],
             'description': electrode_model_attributes['description'],
@@ -1133,139 +1252,145 @@ def get_emg_setting_description(emg_setting_id):
             'impedance': impedance_description,
             'distance inter electrode': electrode_distance_description,
             'electrode_configuration_name': electrode_model_attributes['electrode_configuration_name'],
-        })
+        }
 
         if hasattr(emg_setting.emg_electrode_settings, 'emg_amplifier_setting'):
-            preamplifier = emg_setting.emg_electrode_settings.emg_amplifier_setting.amplifier
-            if preamplifier.impedance and preamplifier.impedance_unit:
-                amplifier_impedance_description = preamplifier.impedance + " (" + preamplifier.impedance_unit + ")"
-            description['emg_electrode_settings']['emg_amplifier_setting'].append({
-                'amplifier_name': preamplifier.identification,
-                'manufacturer_name': preamplifier.manufacturer_name,
-                'description': preamplifier.description if preamplifier.description else '',
-                'serial_number': preamplifier.serial_number if preamplifier.serial_number else '',
-                'gain': preamplifier.gain if preamplifier.gain else '',
-                'number of channels': preamplifier.number_of_channels if preamplifier.number_of_channels else '',
-                'impedance': amplifier_impedance_description,
-                'detection type': preamplifier.amplifier_detection_type_name if preamplifier.amplifier_detection_type_name
-                else '',
-                'tethering system': preamplifier.tethering_system_name if preamplifier.tethering_system_name else '',
-                'emg_analog_filter_setting': [],
-            })
+            emg_amplifier_setting_attributes = vars(emg_setting.emg_electrode_settings.emg_amplifier_setting)
+            emg_amplifier_setting_attributes = handling_values(emg_amplifier_setting_attributes)
+            emg_amplifier_attributes = vars(emg_setting.emg_electrode_settings.emg_amplifier_setting.amplifier)
+            emg_amplifier_attributes = handling_values(emg_amplifier_attributes)
+            impedance_description = emg_amplifier_attributes['input_impedance'] + " (" + emg_amplifier_attributes[
+                'input_impedance_unit'] + ")"
+            description['emg_electrode_settings']['emg_amplifier_setting'] = {
+                'identification': emg_amplifier_attributes['identification'],
+                'manufacturer_name': emg_amplifier_attributes['manufacturer_name'],
+                'serial_number': emg_amplifier_attributes['serial_number'],
+                'description': emg_amplifier_attributes['description'],
+                'gain_setted': emg_amplifier_setting_attributes['gain'],
+                'gain (equipment)': emg_amplifier_attributes['identification'],
+                'number_of_channels (equipment)': emg_amplifier_attributes['identification'],
+                'common_mode_rejection_ratio': emg_amplifier_attributes['identification'],
+                'input_impedance': impedance_description,
+                'amplifier_detection_type_name': emg_amplifier_attributes['amplifier_detection_type_name'],
+                'tethering_system_name': emg_amplifier_attributes['tethering_system_name'],
+            }
 
             if hasattr(emg_setting.emg_electrode_settings.emg_amplifier_setting, 'emg_analog_filter_setting'):
-                emg_preamplifier_filter_setting = emg_setting.emg_electrode_settings.emg_amplifier_setting
-                description['emg_electrode_settings']['emg_amplifier_setting']['emg_analog_filter_setting'].append({
-                    'low_pass': emg_preamplifier_filter_setting.low_pass if emg_preamplifier_filter_setting.low_pass else '',
-                    'high_pass': emg_preamplifier_filter_setting.high_pass if emg_preamplifier_filter_setting.high_pass else '',
-                    'low_band_pass': emg_preamplifier_filter_setting.low_band_pass if
-                    emg_preamplifier_filter_setting.low_band_pass else '',
-                    'high_band_pass': emg_preamplifier_filter_setting.high_band_pass if
-                    emg_preamplifier_filter_setting.high_band_pass else '',
-                    'low_notch': emg_preamplifier_filter_setting.low_notch if emg_preamplifier_filter_setting.low_notch else '',
-                    'high_notch': emg_preamplifier_filter_setting.high_notch if emg_preamplifier_filter_setting.high_notch else '',
-                    'order': emg_preamplifier_filter_setting.order if emg_preamplifier_filter_setting.order else '',
-                })
+                emg_amplifier_setting = emg_setting.emg_electrode_settings.emg_amplifier_setting
+                emg_analog_filter_setting_attributes = vars(emg_amplifier_setting.emg_analog_filter_setting)
+                emg_analog_filter_setting_attributes = handling_values(emg_analog_filter_setting_attributes)
+
+                description['emg_electrode_settings']['emg_amplifier_setting']['emg_analog_filter_setting'] = {
+                    'low_pass': emg_analog_filter_setting_attributes['low_pass'],
+                    'high_pass': emg_analog_filter_setting_attributes['high_pass'],
+                    'low_band_pass': emg_analog_filter_setting_attributes['low_band_pass'],
+                    'high_band_pass': emg_analog_filter_setting_attributes['high_band_pass'],
+                    'low_notch': emg_analog_filter_setting_attributes['low_notch'],
+                    'high_notch': emg_analog_filter_setting_attributes['high_notch'],
+                    'order': emg_analog_filter_setting_attributes['order'],
+                }
 
         if hasattr(emg_setting.emg_electrode_settings, 'emg_preamplifier_setting'):
-            preamplifier = emg_setting.emg_electrode_settings.emg_preamplifier_setting.amplifier
-            if preamplifier.impedance and preamplifier.impedance_unit:
-                amplifier_impedance_description = preamplifier.impedance + " (" + preamplifier.impedance_unit + ")"
-            description['emg_electrode_settings']['emg_preamplifier_setting'].append({
-                'amplifier_name': preamplifier.identification,
-                'manufacturer_name': preamplifier.manufacturer_name,
-                'description': preamplifier.description if preamplifier.description else '',
-                'serial_number': preamplifier.serial_number if preamplifier.serial_number else '',
-                'gain': preamplifier.gain if preamplifier.gain else '',
-                'number of channels': preamplifier.number_of_channels if preamplifier.number_of_channels else '',
-                'impedance': amplifier_impedance_description,
-                'detection type': preamplifier.amplifier_detection_type_name if preamplifier.amplifier_detection_type_name
-                else '',
-                'tethering system': preamplifier.tethering_system_name if preamplifier.tethering_system_name else '',
-                'emg_preamplifier_filter_setting': [],
-            })
+            emg_preamplifier_setting_attributes = vars(emg_setting.emg_electrode_settings.emg_preamplifier_setting)
+            emg_preamplifier_setting_attributes = handling_values(emg_preamplifier_setting_attributes)
+            preamplifier_attributes = vars(emg_setting.emg_electrode_settings.emg_preamplifier_setting.amplifier)
+            preamplifier_attributes = handling_values(preamplifier_attributes)
+            preamplifier_impedance_description = ''
+            if preamplifier_attributes['input_impedance'] and preamplifier_attributes['input_impedance_unit']:
+                preamplifier_impedance_description = preamplifier_attributes['input_impedance'] + " (" + \
+                                                     preamplifier_attributes['input_impedance_unit'] + ")"
+            description['emg_electrode_settings']['emg_preamplifier_setting'] = {
+                'amplifier_name': preamplifier_attributes['identification'],
+                'manufacturer_name': preamplifier_attributes['manufacturer_name'],
+                'description': preamplifier_attributes['description'],
+                'serial_number': preamplifier_attributes['serial_number'],
+                'gain': preamplifier_attributes['gain'],
+                'number of channels': preamplifier_attributes['number_of_channels'],
+                'common_mode_rejection_ratio': preamplifier_attributes['common_mode_rejection_ratio'],
+                'impedance': preamplifier_impedance_description,
+                'detection type': preamplifier_attributes['amplifier_detection_type_name'],
+                'tethering system': preamplifier_attributes['tethering_system_name'],
+                'low_pass': emg_preamplifier_setting_attributes['low_pass'],
+                'high_pass': emg_preamplifier_setting_attributes['high_pass'],
+                'low_band_pass': emg_preamplifier_setting_attributes['low_band_pass'],
+                'high_band_pass': emg_preamplifier_setting_attributes['high_band_pass'],
+                'low_notch': emg_preamplifier_setting_attributes['low_notch'],
+                'high_notch': emg_preamplifier_setting_attributes['high_notch'],
+                'order': emg_preamplifier_setting_attributes['order'],
+            }
 
-            if hasattr(emg_setting.emg_electrode_settings.emg_preamplifier_setting.emg_preamplifier_filter_setting):
-                emg_preamplifier_filter_setting = \
-                    emg_setting.emg_electrode_settings.emg_preamplifier_setting.emg_preamplifier_filter_setting
-                description['emg_electrode_settings']['emg_preamplifier_setting'][
-                    'emg_preamplifier_filter_setting'].append({
-                        'low_pass': emg_preamplifier_filter_setting.low_pass if
-                        emg_preamplifier_filter_setting.low_pass else '',
-                        'high_pass': emg_preamplifier_filter_setting.high_pass if
-                        emg_preamplifier_filter_setting.high_pass else '',
-                        'low_band_pass': emg_preamplifier_filter_setting.low_band_pass if
-                        emg_preamplifier_filter_setting.low_band_pass else '',
-                        'high_band_pass': emg_preamplifier_filter_setting.high_band_pass if
-                        emg_preamplifier_filter_setting.high_band_pass else '',
-                        'low_notch': emg_preamplifier_filter_setting.low_notch if
-                        emg_preamplifier_filter_setting.low_notch else '',
-                        'high_notch': emg_preamplifier_filter_setting.high_notch if
-                        emg_preamplifier_filter_setting.high_notch else '',
-                        'order': emg_preamplifier_filter_setting.order if emg_preamplifier_filter_setting.order else '',
-                })
+            if hasattr(emg_setting.emg_electrode_settings.emg_preamplifier_setting,
+                       'emg_preamplifier_filter_setting'):
+                emg_preamplifier_setting = emg_setting.emg_electrode_settings.emg_preamplifier_setting
+                emg_preamplifier_filter_setting_attributes = vars(
+                    emg_preamplifier_setting.emg_preamplifier_filter_setting)
+                emg_preamplifier_filter_setting_attributes = handling_values(emg_preamplifier_filter_setting_attributes)
+
+                description['emg_electrode_settings']['emg_amplifier_setting']['emg_analog_filter_setting'] = {
+                    'low_pass': emg_preamplifier_filter_setting_attributes['low_pass'],
+                    'high_pass': emg_preamplifier_filter_setting_attributes['high_pass'],
+                    'low_band_pass': emg_preamplifier_filter_setting_attributes['low_band_pass'],
+                    'high_band_pass': emg_preamplifier_filter_setting_attributes['high_band_pass'],
+                    'low_notch': emg_preamplifier_filter_setting_attributes['low_notch'],
+                    'high_notch': emg_preamplifier_filter_setting_attributes['high_notch'],
+                    'order': emg_preamplifier_filter_setting_attributes['order'],
+                }
 
             if hasattr(emg_setting.emg_electrode_settings, 'emg_electrode_placement_setting'):
-                emg_electrode_placement_setting = emg_setting.emg_electrode_settings.emg_electrode_placement_setting
-                description['emg_electrode_settings']['emg_electrode_placement_setting'].append({
-                    'muscle name': emg_electrode_placement_setting.muscle_name if
-                    emg_electrode_placement_setting.muscle_name else '',
-                    'muscle side': emg_electrode_placement_setting.muscle_side if
-                    emg_electrode_placement_setting.muscle_side else '',
-                    'remarks': emg_electrode_placement_setting.remarks if emg_electrode_placement_setting.remarks else '',
-                    'electrode_placement': []
-                })
-                if hasattr(emg_electrode_placement_setting, 'electrode_placement'):
-                    electrode_placement = emg_electrode_placement_setting.electrode_placement
-                    description['emg_electrode_settings']['emg_electrode_placement_setting']['electrode_placement'].append({
-                        'standardization system': electrode_placement.standardization_system_name if
-                        electrode_placement.standardization_system_name else '',
-                        'standardization system description': electrode_placement.standardization_system_description if
-                        electrode_placement.standardization_system_description else '',
-                        'muscle_anatomy_origin': electrode_placement.muscle_anatomy_origin if
-                        electrode_placement.muscle_anatomy_origin else '',
-                        'muscle_anatomy_insertion': electrode_placement.muscle_anatomy_insertion if
-                        electrode_placement.muscle_anatomy_insertion else '',
-                        'muscle_anatomy_function': electrode_placement.muscle_anatomy_function if
-                        electrode_placement.muscle_anatomy_function else '',
-                        'location': electrode_placement.location if electrode_placement.location else '',
-                        'placement type': electrode_placement.placement_type if electrode_placement.placement_type else '',
-                        'placement_type_description': []
-                    })
+                emg_electrode_settings = emg_setting.emg_electrode_settings
+                emg_electrode_placement_setting_attributes = vars(
+                    emg_electrode_settings.emg_electrode_placement_setting)
+                emg_electrode_placement_setting_attributes = handling_values(emg_electrode_placement_setting_attributes)
+                description['emg_electrode_settings']['emg_electrode_placement_setting'] = {
+                    'muscle name': emg_electrode_placement_setting_attributes['muscle_name'],
+                    'muscle side': emg_electrode_placement_setting_attributes['muscle_side'],
+                    'remarks': emg_electrode_placement_setting_attributes['remarks'],
+                }
 
-                    if hasattr(electrode_placement, 'emg_intramuscular_placement'):
-                        intramuscular_placement = electrode_placement.emg_intramuscular_placement
-                        description['emg_electrode_settings']['emg_electrode_placement_setting']['electrode_placement'][
-                            'placement_type_description'].append({
-                                'method_of_insertion': intramuscular_placement.method_of_insertion if
-                                intramuscular_placement.method_of_insertion else '',
-                                'depth_of_insertion': intramuscular_placement.depth_of_insertion if
-                                intramuscular_placement.depth_of_insertion else '',
-                            })
+                if hasattr(emg_electrode_settings.emg_electrode_placement_setting, 'emg_electrode_placement'):
+                    emg_electrode_placement_setting = emg_electrode_settings.emg_electrode_placement_setting
+                    emg_electrode_placement_attributes = vars(emg_electrode_placement_setting.emg_electrode_placement)
+                    description['emg_electrode_settings']['emg_electrode_placement_setting']['electrode_placement'] = {
+                        'standardization system': emg_electrode_placement_attributes['standardization_system_name'],
+                        'standardization system description': emg_electrode_placement_attributes[
+                            'standardization_system_description'],
+                        'muscle_anatomy_origin': emg_electrode_placement_attributes['muscle_anatomy_origin'],
+                        'muscle_anatomy_insertion': emg_electrode_placement_attributes['muscle_anatomy_insertion'],
+                        'muscle_anatomy_function': emg_electrode_placement_attributes['muscle_anatomy_function'],
+                        'location': emg_electrode_placement_attributes['location'],
+                        'placement type': emg_electrode_placement_attributes['placement_type'],
+                    }
 
-                    if hasattr(electrode_placement, 'emg_needle_placement'):
-                        needle_placement = electrode_placement.emg_needle_placement
+                    emg_electrode_placement = emg_electrode_placement_setting.emg_electrode_placement
+                    if hasattr(emg_electrode_placement, 'emg_intramuscular_placement'):
+                        emg_intramuscular_placement_attributes = vars(
+                            emg_electrode_placement.emg_intramuscular_placement)
+                        emg_intramuscular_placement_attributes = handling_values(emg_intramuscular_placement_attributes)
                         description['emg_electrode_settings']['emg_electrode_placement_setting']['electrode_placement'][
-                            'placement_type_description'].append({
-                                'depth_of_insertion': needle_placement.depth_of_insertion if
-                                needle_placement.depth_of_insertion else '',
-                            })
+                            'placement_type_description'] = {
+                                'method_of_insertion': emg_intramuscular_placement_attributes['method_of_insertion'],
+                                'depth_of_insertion': emg_intramuscular_placement_attributes['depth_of_insertion'],
+                            }
 
-                    if hasattr(electrode_placement, 'emg_surface_placement'):
-                        surface_placement = electrode_placement.emg_surface_placement
+                    if hasattr(emg_electrode_placement, 'emg_needle_placement'):
+                        emg_needle_placement_attributes = vars(emg_electrode_placement.emg_needle_placement)
+                        emg_needle_placement_attributes = handling_values(emg_needle_placement_attributes)
                         description['emg_electrode_settings']['emg_electrode_placement_setting']['electrode_placement'][
-                            'placement_type_description'].append({
-                                'start_posture': surface_placement.start_posture if
-                                surface_placement.start_posture else '',
-                                'orientation': surface_placement.orientation if
-                                surface_placement.orientation else '',
-                                'fixation_on_the_skin': surface_placement.fixation_on_the_skin if
-                                surface_placement.fixation_on_the_skin else '',
-                                'reference_electrode': surface_placement.reference_electrode if
-                                surface_placement.reference_electrode else '',
-                                'clinical_test': surface_placement.clinical_test if
-                                surface_placement.clinical_test else '',
-                            })
+                            'placement_type_description'] = {
+                                'depth_of_insertion': emg_needle_placement_attributes['depth_of_insertion'],
+                            }
+
+                    if hasattr(emg_electrode_placement, 'emg_surface_placement'):
+                        emg_surface_placement_attributes = vars(emg_electrode_placement.emg_surface_placement)
+                        emg_surface_placement_attributes = handling_values(emg_surface_placement_attributes)
+                        description['emg_electrode_settings']['emg_electrode_placement_setting']['electrode_placement'][
+                            'placement_type_description'] = {
+                                'start_posture': emg_surface_placement_attributes['start_posture'],
+                                'orientation': emg_surface_placement_attributes['orientation'],
+                                'fixation_on_the_skin': emg_surface_placement_attributes['fixation_on_the_skin'],
+                                'reference_electrode': emg_surface_placement_attributes['reference_electrode'],
+                                'clinical_test': emg_surface_placement_attributes['clinical_test'],
+                            }
 
     return description
 
@@ -1274,36 +1399,69 @@ def get_tms_data_description(tms_data_id):
     tms_description = {}
     tms_data = get_object_or_404(TMSData, pk=tms_data_id)
 
-    pulse_stimulus_type = ''
-    if hasattr(tms_data.tms_setting, 'tms_device_setting'):
-        pulse_stimulus_type = tms_data.tms_setting.tms_device_setting.pulse_stimulus_type
+    tms_data_attributes = vars(tms_data)
+
+    tms_data_attributes = handling_values(tms_data_attributes)
 
     tms_description['stimulation_description'] = {
-        'tms_stimulation_description': tms_data.description,
-        'pulse_stimulus': pulse_stimulus_type if pulse_stimulus_type else '',
-        'resting_motor threshold-RMT(%)': tms_data.resting_motor_threshold if tms_data.resting_motor_threshold else '',
-        'test_pulse_intensity_of_simulation(% over the %RMT)':
-            tms_data.test_pulse_intensity_of_simulation if tms_data.test_pulse_intensity_of_simulation else '',
-        'interval_between_pulses': tms_data.interval_between_pulses if tms_data.interval_between_pulses else '',
-        'interval_between_pulses_unit': tms_data.interval_between_pulses_unit if
-        tms_data.interval_between_pulses_unit else '',
-        'repetitive_pulse_frequency': tms_data.repetitive_pulse_frequency if tms_data.repetitive_pulse_frequency else '',
-        'coil_orientation': tms_data.coil_orientation if tms_data.coil_orientation else '',
-        'coil_orientation_angle': tms_data.coil_orientation_angle if tms_data.coil_orientation_angle else '',
-        'second_test_pulse_intensity (% over the %RMT)': tms_data.second_test_pulse_intensity if
-        tms_data.second_test_pulse_intensity else '',
-        'time_between_mep_trials': tms_data.time_between_mep_trials if tms_data.time_between_mep_trials else '',
-        'time_between_mep_trials_unit': tms_data.time_between_mep_trials_unit if
-        tms_data.time_between_mep_trials_unit else '',
+        'tms_stimulation_description': tms_data_attributes['description'],
+        'resting_motor threshold-RMT(%)': tms_data_attributes['resting_motor_threshold'],
+        'test_pulse_intensity_of_simulation(% over the %RMT)': tms_data_attributes[
+            'test_pulse_intensity_of_simulation'],
+        'interval_between_pulses': tms_data_attributes['interval_between_pulses'],
+        'interval_between_pulses_unit': tms_data_attributes['interval_between_pulses_unit'],
+        'repetitive_pulse_frequency': tms_data_attributes['repetitive_pulse_frequency'],
+        'coil_orientation': tms_data_attributes['coil_orientation'],
+        'coil_orientation_angle': tms_data_attributes['coil_orientation_angle'],
+        'second_test_pulse_intensity (% over the %RMT)': tms_data_attributes['second_test_pulse_intensity'],
+        'time_between_mep_trials': tms_data_attributes['time_between_mep_trials'],
+        'time_between_mep_trials_unit': tms_data_attributes['time_between_mep_trials_unit'],
     }
 
     tms_description['hotspot_position'] = {
-        'tms_localization_system_name': tms_data.localization_system_name,
-        'tms_localization_system_description': tms_data.localization_system_description if
-        tms_data.localization_system_description else '',
-        'brain_area': tms_data.brain_area_name,
-        'brain_area_description': tms_data.brain_area_description if tms_data.brain_area_description else '',
+        'hot_spot_map_filename': tms_data_attributes['hot_spot_map'].split('/')[-1],
+        'tms_localization_system_name': tms_data_attributes['localization_system_name'],
+        'tms_localization_system_description': tms_data_attributes['localization_system_description'],
+        'brain_area': tms_data_attributes['brain_area_name'],
+        'brain_area_description': tms_data_attributes['brain_area_description'],
+        'brain_area_system_name': tms_data_attributes['brain_area_system_name'],
+        'brain_area_system_description': tms_data_attributes['brain_area_system_description']
     }
+
+    if hasattr(tms_data, 'tms_setting'):
+        tms_setting_attributes = vars(tms_data.tms_setting)
+        tms_setting_attributes = handling_values(tms_setting_attributes)
+
+        tms_description['tms_setting'] = {
+            'name': tms_setting_attributes['name'],
+            'description': tms_setting_attributes['description'],
+        }
+
+    if hasattr(tms_data.tms_setting, 'tms_device_setting'):
+        tms_device_setting_attributes = vars(tms_data.tms_setting.tms_device_setting.pulse_stimulus_type)
+        tms_device_setting_attributes = handling_values(tms_device_setting_attributes)
+
+        tms_coil_model_attributes = vars(tms_data.tms_setting.tms_device_setting.coil_model)
+        tms_coil_model_attributes = handling_values(tms_coil_model_attributes)
+
+        tms_device_attributes = vars(tms_data.tms_setting.tms_device_setting.tms_device)
+        tms_device_attributes = handling_values(tms_device_attributes)
+
+        tms_description['tms_device_setting'] = {
+            'pulse_stimulus_type': tms_device_setting_attributes['pulse_stimulus_type'],
+            'manufacturer_name': tms_device_attributes['manufacturer_name'],
+            'equipment_type': tms_device_attributes['equipment_type'],
+            'identification': tms_device_attributes['identification'],
+            'description': tms_device_attributes['description'],
+            'serial_number': tms_device_attributes['serial_number'],
+            'pulse_type': tms_device_attributes['pulse_type'],
+            'coil_name': tms_coil_model_attributes['name'],
+            'coil_description': tms_coil_model_attributes['description'],
+            'coil_shape_name': tms_coil_model_attributes['coil_shape_name'],
+            'material_name': tms_coil_model_attributes['material_name'],
+            'material_description': tms_coil_model_attributes['material_description'],
+            'coil_design': tms_coil_model_attributes['coil_design'],
+        }
 
     return tms_description
 
