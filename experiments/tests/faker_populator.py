@@ -11,7 +11,7 @@ from faker import Factory
 from experiments.models import Gender, ClassificationOfDiseases, Keyword, \
     Collaborator, Step, TMSSetting, TMSDevice, CoilModel, TMSDeviceSetting
 from experiments.models import Experiment, Study, Group, Researcher
-from experiments.tests.tests_helper import create_experiment_groups, \
+from experiments.tests.tests_helper import create_group, \
     create_ethics_committee_info, create_step, create_tms_setting, \
     create_tms_device, create_coil_model, create_tms_device_setting, \
     create_tmsdata_objects_to_test_search
@@ -76,7 +76,7 @@ for i in range(1, 4):
         study.save()
 
     create_ethics_committee_info(experiment_owner1)
-    create_experiment_groups(randint(1, 3), experiment_owner1)
+    create_group(randint(1, 3), experiment_owner1)
 
 for i in range(4, 6):
     experiment_owner2 = Experiment.objects.create(
@@ -105,7 +105,7 @@ for i in range(4, 6):
         description=fake.text(),
         start_date=datetime.utcnow(), experiment=experiment_owner2
     )
-    create_experiment_groups(randint(1, 3), experiment_owner2)
+    create_group(randint(1, 3), experiment_owner2)
 
 # to test search (necessary to approve experiment(s) in front-end or
 # directly in database)

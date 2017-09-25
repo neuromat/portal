@@ -1,0 +1,8 @@
+{% load i18n %}
+{% if data.subquestion_description %}
+        {% for sd in data.subquestion_description %}
+            <input type="checkbox"> {{ sd }}<br>
+        {% endfor %}
+{% else %}
+    <p>{% trans "No data found" %}.</p>
+{% endif %}

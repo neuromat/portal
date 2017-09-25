@@ -1,3 +1,7 @@
+import csv
+
+import math
+import pandas
 from django.contrib import messages
 from django.contrib.auth.views import LoginView
 from django.core.mail import send_mail
@@ -8,7 +12,8 @@ from django.utils.translation import activate, LANGUAGE_SESSION_KEY, \
     ugettext as _
 
 from experiments.forms import NepSearchForm
-from experiments.models import Experiment, RejectJustification, Step
+from experiments.models import Experiment, RejectJustification, Step, \
+    Questionnaire
 from experiments.tasks import rebuild_haystack_index
 
 
@@ -46,6 +51,51 @@ def home_page(request):
                    'search_form': NepSearchForm()})
 
 
+def _get_nested_rec(key, group):
+    rec = dict()
+    rec['question_code'] = key[0]
+    rec['question_limesurvey_type'] = key[1]
+    rec['question_description'] = key[2]
+
+    for field in ['subquestion_description', 'option_description']:
+        if isinstance(group[field].unique()[0], float) and \
+                math.isnan(group[field].unique()[0]):
+            rec[field] = None
+        else:
+            rec[field] = list(group[field].unique())
+
+    return rec
+
+
+def _get_questionnaire(metadata):
+    # Put the questionnaire data into a temporary csv file
+    # TODO: see what is a temporary dir in RWindows
+    file = open('/tmp/questionnaire.csv', 'w')
+    file.write(metadata)
+    file.close()
+
+    # Remove the columns that won't be used and save in another temporary file
+    with open('/tmp/questionnaire.csv', 'r') as source:
+        rdr = csv.reader(source, skipinitialspace=True)
+        with open('/tmp/questionnaire_cleaned.csv', 'w') as result:
+            wtr = csv.writer(result)
+            for r in rdr:
+                wtr.writerow((r[2], r[3], r[4], r[6], r[8]))
+
+    q_cleaned = pandas.read_csv('/tmp/questionnaire_cleaned.csv')
+
+    records = []
+
+    for key, grp in q_cleaned.groupby(['question_code',
+                                       'question_limesurvey_type',
+                                       'question_description']):
+        rec = _get_nested_rec(key, grp)
+        records.append(rec)
+
+    records = dict(data=records)
+    return records
+
+
 def experiment_detail(request, slug):
     to_be_analysed_count = None  # will be None if home contains the list of
     # normal user
@@ -70,12 +120,26 @@ def experiment_detail(request, slug):
                 age_grouping[int(participant.age)] = 0
             age_grouping[int(participant.age)] += 1
 
+    # Get questionnaires for all groups
+    questionnaire = {}
+    for group in experiment.groups.all():
+        if group.steps.filter(type=Step.QUESTIONNAIRE).count() > 0:
+            questionnaire[group.title] = {}
+            for step in group.steps.filter(type=Step.QUESTIONNAIRE):
+                q = Questionnaire.objects.get(step_ptr=step)
+                # print(q.survey_metadata)  # DEBUG
+                questionnaire[group.title][q.id] = {}
+                questionnaire[group.title][q.id]['survey_name'] = q.survey_name
+                questionnaire[group.title][q.id]['survey_metadata'] = \
+                    _get_questionnaire(q.survey_metadata)
+
     return render(
         request, 'experiments/detail.html', {
             'experiment': experiment,
             'gender_grouping': gender_grouping,
             'age_grouping': age_grouping,
             'to_be_analysed_count': to_be_analysed_count,
+            'questionnaire': questionnaire
         }
     )
 

@@ -1,12 +1,13 @@
 import haystack
 import sys
+
 from django.contrib.auth.models import User
 from django.core.management import call_command
 from django.test import TestCase, override_settings
 from haystack.query import SearchQuerySet
 
 from experiments import views
-from experiments.models import Experiment
+from experiments.models import Experiment, Step, Questionnaire
 from experiments.tasks import rebuild_haystack_index
 from experiments.tests.tests_helper import apply_setup, global_setup_ut
 
@@ -20,16 +21,6 @@ class HomePageTest(TestCase):
     def test_uses_home_template(self):
         response = self.client.get('/')
         self.assertTemplateUsed(response, 'experiments/home.html')
-
-    def test_access_experiment_detail_after_GET_experiment(self):
-        experiment_slug = str(Experiment.objects.first().slug)
-        response = self.client.get('/experiments/' + experiment_slug + '/')
-        self.assertEqual(response.status_code, 200)
-
-    def test_uses_detail_template(self):
-        experiment_slug = str(Experiment.objects.first().slug)
-        response = self.client.get('/experiments/' + experiment_slug + '/')
-        self.assertTemplateUsed(response, 'experiments/detail.html')
 
     def test_trustee_can_change_experiment_status_with_a_POST_request(self):
         trustee_user = User.objects.get(username='claudia')
@@ -172,9 +163,84 @@ TEST_HAYSTACK_CONNECTIONS = {
 }
 
 
-# TODO!
+# TODO: test other stuf
 class ExperimentDetailTest(TestCase):
-    pass
+
+    def setUp(self):
+        global_setup_ut()
+
+    def test_access_experiment_detail_after_GET_experiment(self):
+        slug = str(Experiment.objects.first().slug)
+        response = self.client.get('/experiments/' + slug + '/')
+        self.assertEqual(response.status_code, 200)
+
+    def test_uses_detail_template(self):
+        slug = str(Experiment.objects.first().slug)
+        response = self.client.get('/experiments/' + slug + '/')
+        self.assertTemplateUsed(response, 'experiments/detail.html')
+
+    def test_access_experiment_detail_returns_questionnaire_data(self):
+        experiment = Experiment.objects.last()
+        slug = str(experiment.slug)
+        response = self.client.get('/experiments/' + slug + '/')
+
+        # We've made last experiment approved contain questionnaire data in
+        # tests helper
+        q_steps = Step.objects.filter(type=Step.QUESTIONNAIRE)
+        groups_with_qs = experiment.groups.filter(steps__in=q_steps)
+        if groups_with_qs.count() == 0:
+            self.fail('There are no groups with questionnaires. Have you '
+                      'been created the questionnaires in tests helper?')
+        for group in groups_with_qs:
+            self.assertContains(
+                response,
+                'Questionnaires for group ' + group.title
+            )
+            for step in group.steps.filter(type=Step.QUESTIONNAIRE):
+                questionnaire = Questionnaire.objects.get(step_ptr=step)
+                self.assertContains(
+                    response,
+                    'Questionnaire ' + questionnaire.survey_name
+                )
+
+        # Sample asserts for first questionnaire
+        self.assertIn('História de fratura', response.content.decode())
+        self.assertIn('Já fez alguma cirurgia ortopédica?',
+                      response.content.decode())
+        self.assertIn('Fez alguma cirurgia de nervo?',
+                      response.content.decode())
+        self.assertIn('Identifique o evento que levou ao trauma do seu plexo '
+                      'braquial. É possível marcar mais do que um evento.',
+                      response.content.decode())
+        self.assertIn('Teve alguma fratura associada à lesão?',
+                      response.content.decode())
+        self.assertIn('The user enters a date in a date field',
+                      response.content.decode())
+
+        # Sample asserts for second questionnaire
+        self.assertIn('Qual o lado da lesão?', response.content.decode())
+        self.assertIn('Instituição do Estudo', response.content.decode())
+        self.assertIn('The user enters a free text',
+                      response.content.decode())
+        self.assertIn('Tipo(s) de lesão(ões):', response.content.decode())
+        self.assertIn('Trombose', response.content.decode())
+        self.assertIn('Anexar exames.', response.content.decode())
+        self.assertIn('The user uploads file(s)',
+                      response.content.decode())
+        self.assertIn('<em>The user answers</em> yes <em>or</em> not',
+                      response.content.decode())
+
+        # Sample asserts for third questionnaire
+        self.assertIn('Refere dor após a lesão?', response.content.decode())
+        self.assertIn('EVA da dor principal:', response.content.decode())
+        self.assertIn('Qual região apresenta alteração do trofismo?',
+                      response.content.decode())
+        self.assertIn('Atrofia', response.content.decode())
+        self.assertIn('Qual(is) artéria(s) e/ou vaso(s) foram acometidos?',
+                      response.content.decode())
+        self.assertIn('Artéria axilar', response.content.decode())
+        self.assertIn('Quando foi submetido(a) à cirurgia(s) de plexo '
+                      'braquial (mm/aaaa)?', response.content.decode())
 
 
 @override_settings(HAYSTACK_CONNECTIONS=TEST_HAYSTACK_CONNECTIONS)
