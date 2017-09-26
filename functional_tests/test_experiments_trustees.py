@@ -120,9 +120,11 @@ class TrusteeTest(FunctionalTestTrustee):
         self.assertEqual('', modal_body)
 
     def test_trustee_can_see_experiments_to_be_analysed_sign(self):
-        experiments_to_be_analysed = Experiment.objects.filter(status=Experiment.TO_BE_ANALYSED)
+        experiments_to_be_analysed = Experiment.objects.filter(
+            status=Experiment.TO_BE_ANALYSED
+        )
         new_experiments = self.browser.find_element_by_id('new_experiments')
-        # TODO: we are using a bad technique - badger is greater or equal
+        # TODO: we are using a bad technique - badger is greater or equal to
         # TODO: zero or -1
         badger = new_experiments.get_attribute('class').find('badger')
         if experiments_to_be_analysed:
@@ -416,7 +418,7 @@ class TrusteeTest(FunctionalTestTrustee):
         # The trustee click in the experiment of the list that has ethics
         # commitee info data
         self.browser.find_element_by_link_text('View').find_element_by_xpath(
-            "//a[@href='/experiments/" + str(experiment.id) + "/']"
+            "//a[@href='/experiments/" + experiment.slug + "/']"
         ).click()
         time.sleep(1)
 

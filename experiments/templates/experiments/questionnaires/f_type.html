@@ -1,0 +1,19 @@
+{% load i18n %}
+{% if data.subquestion_description %}
+    <ul>
+        {% for sd in data.subquestion_description %}
+            <li>{{ sd }}</li>
+            {% if data.option_description %}
+                    {% for od in data.option_description %}
+                        <input type="radio" value="{{ od }}"
+                               class="input-disabled" disabled><label
+                            class="questionnaire-options" for="{{ od }}">&nbsp;&nbsp;{{ od }}</label><br>
+                    {% endfor %}
+            {% else %}
+                <p>{% trans "No data found" %}.</p>
+            {% endif %}
+        {% endfor %}
+    </ul>
+{% else %}
+    <p>{% trans "No data found" %}.</p>
+{% endif %}

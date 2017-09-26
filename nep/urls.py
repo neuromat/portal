@@ -27,7 +27,7 @@ urlpatterns = [
     url(r'^login/$', views.NepLoginView.as_view(), name='login'),
 
     url(r'^', include('django.contrib.auth.urls')),
-    url(r'^experiments/(?P<experiment_id>[0-9]+)/$',
+    url(r'^experiments/(?P<slug>[\w-]+)/$',
         views.experiment_detail, name='experiment-detail'),
     url(r'^experiments/(?P<experiment_id>[0-9]+)/change_status',
         views.change_status, name='change-status'),
