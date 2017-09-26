@@ -109,6 +109,9 @@ def download_create(experiment_id, template_name):
         # process the data per participant
         error_msg = export.download_data_per_participant()
 
+        # process the data per questionnaire
+        error_msg = export.download_data_per_questionnaire()
+
         # create zip file and include files
         export_complete_filename = ""
         if export.files_to_zip_list:

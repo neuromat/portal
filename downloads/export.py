@@ -976,6 +976,11 @@ class ExportExecution:
 
         return error_msg
 
+    def download_data_per_questionnaire(self):
+        error_msg = ''
+
+        return error_msg
+
 
 def get_eeg_setting_description(eeg_setting_id):
     eeg_setting = get_object_or_404(EEGSetting, pk=eeg_setting_id)
@@ -1472,7 +1477,7 @@ def get_tms_setting_description(tms_setting_id):
 
     if tms_setting:
         tms_setting_description = {
-            'name': tms_setting.name if tms_setting.name else '',
+            'name': tms_setting.name,
             'description': tms_setting.description if tms_setting.description else '',
         }
 
@@ -1480,13 +1485,14 @@ def get_tms_setting_description(tms_setting_id):
 
 
 def get_context_tree_description(context_tree_id):
-    context_tree_description = {}
     context_tree = get_object_or_404(ContextTree, pk=context_tree_id)
-    if context_tree:
-        context_tree_description = {
-            'name': context_tree.name if context_tree.name else '',
-            'description': context_tree.description if context_tree.description else '',
-            'setting_text': context_tree.setting_text if context_tree.setting_text else '',
-        }
+    context_tree_attributes = vars(context_tree)
+    context_tree_attributes = handling_values(context_tree_attributes)
+
+    context_tree_description = {
+        'name': context_tree_attributes['name'],
+        'description': context_tree['description'],
+        'setting_text': context_tree['setting_text'],
+    }
 
     return context_tree_description
