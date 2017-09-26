@@ -638,6 +638,30 @@ class GroupAPITest(APITestCase):
                     'experiment': groups[4].experiment.title,
                     'inclusion_criteria':
                         list(groups[4].inclusion_criteria.all())
+                },
+                {
+                    'id': groups[5].id,
+                    'title': groups[5].title,
+                    'description': groups[5].description,
+                    'experiment': groups[5].experiment.title,
+                    'inclusion_criteria':
+                        list(groups[5].inclusion_criteria.all())
+                },
+                {
+                    'id': groups[6].id,
+                    'title': groups[6].title,
+                    'description': groups[6].description,
+                    'experiment': groups[6].experiment.title,
+                    'inclusion_criteria':
+                        list(groups[6].inclusion_criteria.all())
+                },
+                {
+                    'id': groups[7].id,
+                    'title': groups[7].title,
+                    'description': groups[7].description,
+                    'experiment': groups[7].experiment.title,
+                    'inclusion_criteria':
+                        list(groups[7].inclusion_criteria.all())
                 }
             ]
         )
@@ -694,6 +718,30 @@ class GroupAPITest(APITestCase):
                     'experiment': groups[4].experiment.title,
                     'inclusion_criteria':
                         list(groups[4].inclusion_criteria.all())
+                },
+                {
+                    'id': groups[5].id,
+                    'title': groups[5].title,
+                    'description': groups[5].description,
+                    'experiment': groups[5].experiment.title,
+                    'inclusion_criteria':
+                        list(groups[5].inclusion_criteria.all())
+                },
+                {
+                    'id': groups[6].id,
+                    'title': groups[6].title,
+                    'description': groups[6].description,
+                    'experiment': groups[6].experiment.title,
+                    'inclusion_criteria':
+                        list(groups[6].inclusion_criteria.all())
+                },
+                {
+                    'id': groups[7].id,
+                    'title': groups[7].title,
+                    'description': groups[7].description,
+                    'experiment': groups[7].experiment.title,
+                    'inclusion_criteria':
+                        list(groups[7].inclusion_criteria.all())
                 }
             ]
         )
