@@ -222,13 +222,13 @@ class ExperimentDetailTest(FunctionalTest):
 
     def test_does_not_display_questionnaire_tab_if_there_are_not_questionnaires(self):
         ##
-        # We pick an experiment without questionnaires. The first approved
+        # We pick an experiment without questionnaires. The second approved
         # experiment hasn't questionnaires steps in any experiment protocol
         # of no one group. See tests helper
         ##
         experiment = Experiment.objects.filter(
             status=Experiment.APPROVED
-        ).first()
+        ).all()[1]
 
         # The new visitor is in home page and sees the list of experiments.
         # She clicks in second "View" link and is redirected to experiment
@@ -253,7 +253,7 @@ class ExperimentDetailTest(FunctionalTest):
         ).last()
 
         # The new visitor is in home page and sees the list of experiments.
-        # She clicks in second "View" link and is redirected to experiment
+        # She clicks in a "View" link and is redirected to experiment
         # detail page
         self.browser.find_element_by_xpath(
             "//a[@href='/experiments/" + experiment.slug + "/']"
@@ -354,3 +354,33 @@ class ExperimentDetailTest(FunctionalTest):
         self.assertIn('Artéria axilar', questionnaires_content)
         self.assertIn('Quando foi submetido(a) à cirurgia(s) de plexo '
                       'braquial (mm/aaaa)?', questionnaires_content)
+
+    def test_invalid_questionnaire_displays_message(self):
+        ##
+        # We've created invalid Questionnaire data in tests helper in first
+        # experiment approved
+        ##
+        experiment = Experiment.objects.filter(
+            status=Experiment.APPROVED
+        ).first()
+
+        # The new visitor is at home page and sees the list of experiments.
+        # She clicks in a "View" link and is redirected to experiment
+        # detail page
+        self.browser.find_element_by_xpath(
+            "//a[@href='/experiments/" + experiment.slug + "/']"
+        ).click()
+        time.sleep(1)
+
+        # As there's a questionnaire from a group that has the wrong number
+        # of columns, when the new visitor clicks in Questionnaires tab she
+        # sees a message telling her that something is wrong with that
+        # questionnaire.
+        self.browser.find_element_by_link_text('Questionnaires').click()
+
+        questionnaires_content = self.browser.find_element_by_id(
+            'questionnaires_tab'
+        ).text
+
+        self.assertIn('This questionnaire is in invalid format, and can\'t '
+                      'be displayed', questionnaires_content)

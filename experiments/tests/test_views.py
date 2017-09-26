@@ -163,7 +163,8 @@ TEST_HAYSTACK_CONNECTIONS = {
 }
 
 
-# TODO: test other stuf
+# TODO: we are testing only questionnaire view part. Complete with other
+# TODO: tests: groups, studies, settings etc
 class ExperimentDetailTest(TestCase):
 
     def setUp(self):
@@ -242,12 +243,53 @@ class ExperimentDetailTest(TestCase):
         self.assertIn('Quando foi submetido(a) à cirurgia(s) de plexo '
                       'braquial (mm/aaaa)?', response.content.decode())
 
-    def test_access_experiment_detail_without_questionnaires_returns_null_questionnaires(self):
+    def test_access_experiment_without_questionnaires_returns_null_questionnaires(self):
         # First experiment has not questionnaires. See tests helper
         experiment = Experiment.objects.first()
         response = self.client.get('/experiments/' + experiment.slug + '/')
 
         self.assertFalse(response.context['questionnaires'])
+
+    def test_access_experiment_with_invalid_questionnaire_returns_invalid_questionnaire(self):
+        # First approved experiment has an invalid questionnaire in first
+        # group. See tests helper
+        experiment = Experiment.objects.filter(
+            status=Experiment.APPROVED).first()
+        group = experiment.groups.first()
+        step = group.steps.get(type=Step.QUESTIONNAIRE)
+        questionnaire = Questionnaire.objects.get(step_ptr=step)
+
+        response = self.client.get('/experiments/' + experiment.slug + '/')
+
+        self.assertEqual(
+            response.context['questionnaires']
+            [group.title][questionnaire.id]['survey_metadata'],
+            'invalid_questionnaire'
+        )
+
+    def test_access_experiment_with_one_valid_questionnaire_and_other_invalid(self):
+        # Last 'to be analysed' experiment has an invalid questionnaire in
+        # first group and a valid questionnaire in last group. See tests
+        # helper.
+        experiment = Experiment.objects.filter(
+            status=Experiment.TO_BE_ANALYSED).last()
+        group1 = experiment.groups.first()
+        group2 = experiment.groups.last()
+        step1 = group1.steps.get(type=Step.QUESTIONNAIRE)
+        step2 = group2.steps.get(type=Step.QUESTIONNAIRE)
+        q1 = Questionnaire.objects.get(step_ptr=step1)
+        q2 = Questionnaire.objects.get(step_ptr=step2)
+
+        response = self.client.get('/experiments/' + experiment.slug + '/')
+
+        self.assertEqual(
+            response.context['questionnaires'][group1.title][q1.id][
+                'survey_metadata'], 'invalid_questionnaire'
+        )
+        self.assertNotEqual(
+            response.context['questionnaires'][group2.title][q2.id][
+                'survey_metadata'], 'invalid_questionnaire'
+        )
 
 
 @override_settings(HAYSTACK_CONNECTIONS=TEST_HAYSTACK_CONNECTIONS)

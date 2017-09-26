@@ -67,6 +67,36 @@ def _get_nested_rec(key, group):
     return rec
 
 
+def _isvalid(source_path):
+    # tests for number of columns
+    with open(source_path, 'r') as source:
+        reader = csv.reader(source, skipinitialspace=True)
+        for row in reader:
+            # the number of columns in csv file must be 11
+            if len(row) != 11:
+                return False
+
+    # tests for column titles
+    with open(source_path, 'r') as source:
+        reader = csv.reader(source, skipinitialspace=True)
+        for row in reader:
+            if row[0] != 'questionnaire_id' or \
+                            row[1] != 'questionnaire_title' or \
+                            row[2] != 'question_code' or \
+                            row[3] != 'question_limesurvey_type' or \
+                            row[4] != 'question_description' or \
+                            row[5] != 'subquestion_code' or \
+                            row[6] != 'subquestion_description' or \
+                            row[7] != 'option_code' or \
+                            row[8] != 'option_description' or \
+                            row[9] != 'option_value' or \
+                            row[10] != 'column_title':
+                return False
+            break
+
+    return True
+
+
 def _get_questionnaire(metadata):
     # Put the questionnaire data into a temporary csv file
     # TODO: see what is a temporary dir in Rwindows
@@ -74,13 +104,16 @@ def _get_questionnaire(metadata):
     file.write(metadata)
     file.close()
 
+    if not _isvalid('/tmp/questionnaire.csv'):
+        return 'invalid_questionnaire'
+
     # Remove the columns that won't be used and save in another temporary file
     with open('/tmp/questionnaire.csv', 'r') as source:
-        rdr = csv.reader(source, skipinitialspace=True)
+        reader = csv.reader(source, skipinitialspace=True)
         with open('/tmp/questionnaire_cleaned.csv', 'w') as result:
-            wtr = csv.writer(result)
-            for r in rdr:
-                wtr.writerow((r[2], r[3], r[4], r[6], r[8]))
+            writer = csv.writer(result)
+            for r in reader:
+                writer.writerow((r[2], r[3], r[4], r[6], r[8]))
 
     q_cleaned = pandas.read_csv('/tmp/questionnaire_cleaned.csv')
 
@@ -128,7 +161,8 @@ def experiment_detail(request, slug):
             for step in group.steps.filter(type=Step.QUESTIONNAIRE):
                 q = Questionnaire.objects.get(step_ptr=step)
                 questionnaires[group.title][q.id] = {}
-                questionnaires[group.title][q.id]['survey_name'] = q.survey_name
+                questionnaires[group.title][q.id]['survey_name'] = \
+                    q.survey_name
                 questionnaires[group.title][q.id]['survey_metadata'] = \
                     _get_questionnaire(q.survey_metadata)
 

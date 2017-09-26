@@ -61,8 +61,6 @@ def create_experiment(qtty, owner, status):
             sent_date=datetime.utcnow(),
             status=status,
             data_acquisition_done=choice([True, False]),
-            slug='slug' + str(randint(1, 1000000))  # TODO: guarantee that
-            # TODO: is unique
         )
         create_study(experiment)
         create_group(randint(2, 3), experiment)
@@ -627,7 +625,8 @@ def global_setup_ft():
     experiment = Experiment.objects.filter(
         status=Experiment.APPROVED
     ).last()
-    create_group(2, experiment)  # experiment4 is approved. See above.
+    create_group(2, experiment)  # TODO: not necessary while creating groups
+    # TODO: inside create_experiment function. This has to be refactor.
     group_first = experiment.groups.first()
     create_questionnaire(settings.BASE_DIR +
                          '/experiments/tests/questionnaire1.csv', group_first
@@ -638,6 +637,17 @@ def global_setup_ft():
     group_last = experiment.groups.last()
     create_questionnaire(settings.BASE_DIR +
                          '/experiments/tests/questionnaire3.csv', group_last
+                         )
+
+    # Create invalid Questionnaire object
+    # (requires invalid files 'questionnaire4.csv' in 'experiments/tests'
+    # subdirectory)
+    experiment = Experiment.objects.filter(
+        status=Experiment.APPROVED
+    ).first()
+    group = experiment.groups.first()
+    create_questionnaire(settings.BASE_DIR +
+                         '/experiments/tests/questionnaire4.csv', group
                          )
 
 
@@ -721,7 +731,7 @@ def global_setup_ut():
     # To test search
     create_eegsetting_objects_to_test_search()
 
-    # Create Questionnaire objects
+    # Create valid Questionnaire objects
     # (requires the files 'questionnaire1.csv', 'questionnaire2.csv' and
     # 'questionnaire3.csv' being generated in 'experiments/tests' subdirectory)
     experiment = Experiment.objects.filter(
@@ -739,6 +749,31 @@ def global_setup_ut():
     create_questionnaire(settings.BASE_DIR +
                          '/experiments/tests/questionnaire3.csv', group_last
                          )
+
+    # Create invalid Questionnaire object
+    # (requires file 'questionnaire4.csv', being generated in
+    # 'experiments/tests' subdirectory)
+    experiment = Experiment.objects.filter(
+        status=Experiment.APPROVED
+    ).first()
+    create_group(1, experiment)
+    group = experiment.groups.last()
+    create_questionnaire(settings.BASE_DIR +
+                         '/experiments/tests/questionnaire4.csv', group)
+
+    # Create an invalid and a valid Questionnaire objects
+    # (requires the files 'questionnaire5.csv' and 'questionnaire6.csv,
+    # being generated in 'experiments/tests' subdirectory)
+    experiment = Experiment.objects.filter(
+        status=Experiment.TO_BE_ANALYSED
+    ).last()
+    create_group(2, experiment)
+    group = experiment.groups.first()
+    create_questionnaire(settings.BASE_DIR +
+                         '/experiments/tests/questionnaire5.csv', group)
+    group = experiment.groups.last()
+    create_questionnaire(settings.BASE_DIR +
+                         '/experiments/tests/questionnaire6.csv', group)
 
 
 def apply_setup(setup_func):
