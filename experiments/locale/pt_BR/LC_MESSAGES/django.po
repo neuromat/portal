@@ -342,7 +342,7 @@ msgstr ""
 
 #: experiments/templates/experiments/footer.html:15
 msgid "Related Projects"
-msgstr ""
+msgstr "Projetos Relacionados"
 
 #: experiments/templates/experiments/footer.html:24
 msgid "Follow us"
