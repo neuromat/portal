@@ -150,13 +150,9 @@ def download_create(experiment_id, template_name):
 
             update_export_instance(input_export_file, output_download_file, export_instance)
 
-            print("finalizado corretamente")
-
         # delete temporary directory: from base_directory and below
         base_export_directory = path.join(settings.MEDIA_ROOT, path.join("temp", str(export_instance.id)))
         rmtree(base_export_directory, ignore_errors=True)
-
-        print("finalizado corretamente 2")
 
         if template_name != "":
             return download_complete_filename, error_msg
