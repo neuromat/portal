@@ -310,8 +310,13 @@ h5.match {
 
 .nep-footer {
   color: #fff;
-  background: #80868a;
+  background: #333;
   border-radius: 3px;
+}
+
+.footer-content-align {
+  text-align: center;
+  margin-top:20px;
 }
 
 .nep-footer h4 {
