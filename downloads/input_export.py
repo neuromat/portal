@@ -5,10 +5,10 @@ from json import dump, load
 
 
 BASE_DIRECTORY = "EXPERIMENT_DOWNLOAD"
-PER_PARTICIPANT_DIRECTORY = "Per_participant"
-PER_QUESTIONNAIRE_DIRECTORY = "Per_questionnaire"
+PER_PARTICIPANT_DIRECTORY = "Per_participant_data"
+PER_QUESTIONNAIRE_DIRECTORY = "Per_questionnaire_data"
 QUESTIONNAIRE_METADATA_DIRECTORY = "Questionnaire_metadata"
-PARTICIPANT_DATA_DIRECTORY = "Participant_data"
+PARTICIPANT_DATA_DIRECTORY = "Per_participant_data"
 EXPERIMENT_DATA_DIRECTORY = "Experiment_data"
 EXPORT_FILENAME = "download.zip"
 EXPORT_EXPERIMENT_FILENAME = "download_experiment.zip"

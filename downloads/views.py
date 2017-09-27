@@ -32,7 +32,8 @@ def create_export_instance():
 
 def download_view(request, experiment_id):
     template_name = "experiments/detail.html"
-
+    experiment = get_object_or_404(Experiment,pk=experiment_id)
+    slug = experiment.slug
     complete_filename, error_msg = download_create(experiment_id, template_name)
 
     if error_msg != "":
@@ -50,11 +51,12 @@ def download_view(request, experiment_id):
         response['Content-Disposition'] = 'attachment; filename="export.zip"'
         response['Content-Length'] = path.getsize(complete_filename)
         response['Set-Cookie'] = 'fileDownload=true; path=/'
+        response['slug'] = slug
         return response
     else:
         messages.error(request, "Download data was not generated.")
 
-    return HttpResponseRedirect(template_name)
+    return HttpResponseRedirect(template_name, slug)
 
 
 def get_export_instance(export_id):
