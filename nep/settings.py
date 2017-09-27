@@ -115,6 +115,7 @@ LANGUAGES = (
 
 LOCALE_PATHS = (
     os.path.join(BASE_DIR, 'experiments/locale'),
+    os.path.join(BASE_DIR, 'downloads/locale')
 )
 
 USE_I18N = True
