@@ -270,18 +270,18 @@ class ExportExecution:
                                 return error_msg
 
                         export_directory_eeg_step = path.join(export_directory_experimental_protocol, eeg_step_name)
+                        if hasattr(eeg_step, 'eeg'):
+                            default_eeg = get_object_or_404(EEG, pk=eeg_step.id)
+                            eeg_default_setting_description = get_eeg_setting_description(default_eeg.eeg_setting.id)
+                            if eeg_default_setting_description:
+                                eeg_setting_filename = "%s.json" % "eeg_default_setting"
+                                complete_filename_eeg_setting = path.join(directory_eeg_step, eeg_setting_filename)
 
-                        default_eeg = get_object_or_404(EEG, pk=eeg_step.id)
-                        eeg_default_setting_description = get_eeg_setting_description(default_eeg.eeg_setting.id)
-                        if eeg_default_setting_description:
-                            eeg_setting_filename = "%s.json" % "eeg_default_setting"
-                            complete_filename_eeg_setting = path.join(directory_eeg_step, eeg_setting_filename)
+                                self.files_to_zip_list.append([complete_filename_eeg_setting, export_directory_eeg_step])
 
-                            self.files_to_zip_list.append([complete_filename_eeg_setting, export_directory_eeg_step])
-
-                            with open(complete_filename_eeg_setting.encode('utf-8'), 'w', newline='',
-                                      encoding='UTF-8') as outfile:
-                                json.dump(eeg_default_setting_description, outfile, indent=4)
+                                with open(complete_filename_eeg_setting.encode('utf-8'), 'w', newline='',
+                                          encoding='UTF-8') as outfile:
+                                    json.dump(eeg_default_setting_description, outfile, indent=4)
 
                 emg_setting_list = Step.objects.filter(group=group, type='emg')
                 if emg_setting_list:
@@ -296,17 +296,18 @@ class ExportExecution:
 
                         export_directory_emg_step = path.join(export_directory_experimental_protocol, emg_step_name)
 
-                        default_emg = get_object_or_404(EMG, pk=emg_step.id)
-                        emg_default_setting_description = get_emg_setting_description(default_emg.emg_setting.id)
-                        if emg_default_setting_description:
-                            emg_setting_filename = "%s.json" % "emg_default_setting"
-                            complete_filename_emg_setting = path.join(directory_emg_step, emg_setting_filename)
+                        if hasattr(eeg_step, 'emg'):
+                            default_emg = get_object_or_404(EMG, pk=emg_step.id)
+                            emg_default_setting_description = get_emg_setting_description(default_emg.emg_setting.id)
+                            if emg_default_setting_description:
+                                emg_setting_filename = "%s.json" % "emg_default_setting"
+                                complete_filename_emg_setting = path.join(directory_emg_step, emg_setting_filename)
 
-                            self.files_to_zip_list.append([complete_filename_emg_setting, export_directory_emg_step])
+                                self.files_to_zip_list.append([complete_filename_emg_setting, export_directory_emg_step])
 
-                            with open(complete_filename_emg_setting.encode('utf-8'), 'w', newline='',
-                                      encoding='UTF-8') as outfile:
-                                json.dump(emg_default_setting_description, outfile, indent=4)
+                                with open(complete_filename_emg_setting.encode('utf-8'), 'w', newline='',
+                                          encoding='UTF-8') as outfile:
+                                    json.dump(emg_default_setting_description, outfile, indent=4)
 
                 tms_setting_list = Step.objects.filter(group=group, type='tms')
                 if tms_setting_list:
@@ -321,17 +322,18 @@ class ExportExecution:
 
                         export_directory_tms_step = path.join(export_directory_experimental_protocol, tms_step_name)
 
-                        default_tms = get_object_or_404(TMS, pk=tms_step.id)
-                        tms_default_setting_description = get_tms_setting_description(default_tms.tms_setting.id)
-                        if tms_default_setting_description:
-                            tms_setting_filename = "%s.json" % "tms_default_setting"
-                            complete_filename_tms_setting = path.join(directory_tms_step, tms_setting_filename)
+                        if hasattr(eeg_step, 'tms'):
+                            default_tms = get_object_or_404(TMS, pk=tms_step.id)
+                            tms_default_setting_description = get_tms_setting_description(default_tms.tms_setting.id)
+                            if tms_default_setting_description:
+                                tms_setting_filename = "%s.json" % "tms_default_setting"
+                                complete_filename_tms_setting = path.join(directory_tms_step, tms_setting_filename)
 
-                            self.files_to_zip_list.append([complete_filename_tms_setting, export_directory_tms_step])
+                                self.files_to_zip_list.append([complete_filename_tms_setting, export_directory_tms_step])
 
-                            with open(complete_filename_tms_setting.encode('utf-8'), 'w', newline='',
-                                      encoding='UTF-8') as outfile:
-                                json.dump(tms_default_setting_description, outfile, indent=4)
+                                with open(complete_filename_tms_setting.encode('utf-8'), 'w', newline='',
+                                          encoding='UTF-8') as outfile:
+                                    json.dump(tms_default_setting_description, outfile, indent=4)
 
                 goalkeeper_game_list = Step.objects.filter(group=group, type='goalkeeper_game')
                 if goalkeeper_game_list:

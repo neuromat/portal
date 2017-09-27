@@ -56,7 +56,7 @@ def download_view(request, experiment_id):
     else:
         messages.error(request, "Download data was not generated.")
 
-    return HttpResponseRedirect(template_name, slug)
+    return HttpResponseRedirect(template_name, args=(slug,))
 
 
 def get_export_instance(export_id):
