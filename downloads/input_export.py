@@ -40,12 +40,10 @@ class InputExport:
         return self.data
 
     def write(self, output_filename):
-        print("write")
         with open(output_filename.encode('utf-8'), 'w', encoding='UTF-8') as outfile:
             dump(self.data, outfile)
 
     def build_header(self, export_per_experiment):
-        print("header")
         # /NES_EXPORT
         self.data["base_directory"] = BASE_DIRECTORY
         self.data["per_participant_directory"] = PER_PARTICIPANT_DIRECTORY

@@ -131,7 +131,7 @@ a:hover.nep-btn {
 .top-small {
   font-size: smaller;
   display: inline-block;
-  width: 40%; /* TODO: make relative, try does not use magic number */
+  width: 34%; /* TODO: make relative, try does not use magic number */
   margin-top: 5px;
   border-left: 1px solid #2b2d2d;
   padding-left: 10px;
@@ -310,8 +310,13 @@ h5.match {
 
 .nep-footer {
   color: #fff;
-  background: #80868a;
+  background: #333;
   border-radius: 3px;
+}
+
+.footer-content-align {
+  text-align: center;
+  margin-top:20px;
 }
 
 .nep-footer h4 {
@@ -448,7 +453,7 @@ h5.match {
       padding: 0 5px;
     }
     .top-small {
-      width: 50%;
+      width: 44%;
     }
     .top-alignment-right {
       padding: 5px 0 10px 0;

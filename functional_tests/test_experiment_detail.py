@@ -283,6 +283,36 @@ class ExperimentDetailTest(FunctionalTest):
                     questionnaires_content
                 )
 
+    def test_detail_button_expands_questionnaire_to_display_questions_and_answers(self):
+        ##
+        # We've created Questionnaire data in tests helper from a Sample
+        # of a questionnaire from NES, in csv format
+        ##
+        experiment = Experiment.objects.filter(
+            status=Experiment.APPROVED
+        ).last()
+
+        # When the new visitor visits an experiment that has questionnaires,
+        # in right side of each questionnaire title that is a 'Detail'
+        # button. When she clicks on it, the questionnaire expand to display
+        # the questions and answers.
+        self.browser.find_element_by_xpath(
+            "//a[@href='/experiments/" + experiment.slug + "/']"
+        ).click()
+        time.sleep(1)
+
+        self.browser.find_element_by_link_text('Questionnaires').click()
+
+        button_details = self.browser.find_element_by_id(
+            'questionnaires_tab'
+        ).find_element_by_link_text('Details')
+        button_details.click()
+        time.sleep(1)
+        button_details.click()
+        time.sleep(1)  # just to see better before page closes
+
+        self.assertEqual(button_details.text, 'Details')
+
     def test_can_view_questionnaires_content(self):
         ##
         # We've created three questionnaires in an experiment, two are from one
@@ -305,6 +335,13 @@ class ExperimentDetailTest(FunctionalTest):
         # in 'Expand' button of the Questionnaires sections she sees
         # the questionnaires' content as a series of questions and answers
         self.browser.find_element_by_link_text('Questionnaires').click()
+        questionnaires = self.browser.find_element_by_id(
+            'questionnaires_tab'
+        ).find_elements_by_link_text('Details')
+        for q in questionnaires:
+            q.click()
+        time.sleep(1)
+
         # TODO: click on the 'Expand' buttons just for simulate user
         # TODO: interaction, as the questionnaires' content is in html page
         questionnaires_content = self.browser.find_element_by_id(
@@ -384,3 +421,4 @@ class ExperimentDetailTest(FunctionalTest):
 
         self.assertIn('This questionnaire is in invalid format, and can\'t '
                       'be displayed', questionnaires_content)
+

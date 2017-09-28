@@ -1,22 +1,31 @@
 {% load i18n %}
-<footer id="id_footer_section" class="container nep-footer">
-    <hr>
+<div id="id_footer_section" class="container nep-footer">
+    <div class="col-md-6 footer-content-align">
+        <a href="http://neuromat.numec.prp.usp.br/" target="_blank"><img src="../../media/Neuromat.png" alt=""></a>
+        <p>{% trans "Iniciative" %}</p>
+    </div>
+    <div class="col-md-6 footer-content-align">
+        <a href="http://www.fapesp.br/" target="_blank"><img src="../../media/Fapesp.png" alt=""></a>
+        <p>{% trans "Support" %}</p>
+    </div>
+    <div class="col-md-12">
+        <hr>
+    </div>
     <section class="col-md-3">
-        <h4>NeuroMat</h4>
+        <h4>{% trans "Related Projects" %}</h4>
         <ul class="list-group">
-            <li class="list-group-item"><a href="">{% trans "Research" %}</a></li>
-            <li class="list-group-item"><a href="">{% trans "Tools" %}</a></li>
-            <li class="list-group-item"><a href="">{% trans "In the media" %}</a></li>
-            <li class="list-group-item"><a href="">{% trans "Events" %}</a></li>
-            <li class="list-group-item"><a href="">{% trans "Opportunities" %}</a></li>
+            <li class="list-group-item"><a href="http://neuromat.numec.prp.usp.br/" target="_blank">NeuroMat</a></li>
+            <li class="list-group-item"><a href="http://abraco.numec.prp.usp.br/" target="_blank">Abraço</a></li>
+            <li class="list-group-item"><a href="https://amparo.numec.prp.usp.br/" target="_blank">AMPARO</a></li>
+            <li class="list-group-item"><a href="http://game.numec.prp.usp.br/" target="_blank">Jogo do Goleiro</a></li>
         </ul>
     </section>
     <section class="col-md-3">
         <h4>{% trans "Follow us" %}</h4>
         <ul class="list-group">
-            <li class="list-group-item"><a href="">Social 1</a></li>
-            <li class="list-group-item"><a href="">Social 2</a></li>
-            <li class="list-group-item"><a href="">Social 3</a></li>
+            <li class="list-group-item"><a href="https://www.facebook.com/neuromathematics" target="_blank">Facebook</a></li>
+            <li class="list-group-item"><a href="https://www.youtube.com/user/neuromathematics/videos" target="_blank">Youtube</a></li>
+            <li class="list-group-item"><a href="https://github.com/neuromat/" target="_blank">Github</a></li>
         </ul>
     </section>
     <section id="id_footer_contact" class="col-md-6">
@@ -42,8 +51,7 @@
     </section>
     <div id="id_footer_license" class="footer-license">
         <p>
-            {% trans "This site content is licensed under a " %}Creative Commons Attributions
-            3.0
+            {% trans "This site content is licensed under a " %}Creative Commons Attributions 4.0
         </p>
     </div>
-</footer>
+</div>
