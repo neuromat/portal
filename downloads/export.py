@@ -797,20 +797,23 @@ class ExportExecution:
                             export_eeg_directory = eeg_data['export_directory_step']
 
                             eeg_data = get_object_or_404(EEGData, pk=eeg_data['data_id'])
-                            # download eeg raw data file
-                            eeg_data_filename = eeg_data.file.file.name.split('/')[-1]
-                            # ex. Users/.../EXPERIMENT_DOWNLOAD/Group_group.title/Participants/PXXXX/Step_XX_EEG/eeg.raw
-                            complete_eeg_data_filename = path.join(eeg_directory, eeg_data_filename)
-                            eeg_raw_data_file = path.join(path.join(settings.BASE_DIR, "media/"),
-                                                          eeg_data.file.file.name)
 
-                            with open(eeg_raw_data_file, 'rb') as f:
-                                data = f.read()
+                            for file in eeg_data.files.all():
 
-                            with open(complete_eeg_data_filename, 'wb') as f:
-                                f.write(data)
+                                # download eeg raw data file
+                                eeg_data_filename = file.file.name.split('/')[-1]
+                                # ex. Users/.../EXPERIMENT_DOWNLOAD/Group_group.title/Participants/PXXXX/Step_XX_EEG/eeg.raw
+                                complete_eeg_data_filename = path.join(eeg_directory, eeg_data_filename)
+                                eeg_raw_data_file = path.join(path.join(settings.BASE_DIR, "media/"),
+                                                              file.file.name)
 
-                            self.files_to_zip_list.append([complete_eeg_data_filename, export_eeg_directory])
+                                with open(eeg_raw_data_file, 'rb') as f:
+                                    data = f.read()
+
+                                with open(complete_eeg_data_filename, 'wb') as f:
+                                    f.write(data)
+
+                                self.files_to_zip_list.append([complete_eeg_data_filename, export_eeg_directory])
 
                             # create eeg_setting_description
                             eeg_setting_description = get_eeg_setting_description(eeg_data.eeg_setting_id)
@@ -843,20 +846,23 @@ class ExportExecution:
                             export_emg_directory = emg_data['export_directory_step']
 
                             emg_data = get_object_or_404(EMGData, pk=emg_data['data_id'])
-                            # download emg raw data file
-                            emg_data_filename = emg_data.file.file.name.split('/')[-1]
-                            # ex. Users/.../EXPERIMENT_DOWNLOAD/Group_group.title/Participants/PXXXX/Step_XX_EMG/emg.raw
-                            complete_emg_data_filename = path.join(emg_directory, emg_data_filename)
-                            emg_raw_data_file = path.join(path.join(settings.BASE_DIR, "media/"),
-                                                          emg_data.file.file.name)
 
-                            with open(emg_raw_data_file, 'rb') as f:
-                                data = f.read()
+                            for file in emg_data.files.all():
 
-                            with open(complete_emg_data_filename, 'wb') as f:
-                                f.write(data)
+                                # download emg raw data file
+                                emg_data_filename = file.file.name.split('/')[-1]
+                                # ex. Users/.../EXPERIMENT_DOWNLOAD/Group_group.title/Participants/PXXXX/Step_XX_EMG/emg.raw
+                                complete_emg_data_filename = path.join(emg_directory, emg_data_filename)
+                                emg_raw_data_file = path.join(path.join(settings.BASE_DIR, "media/"),
+                                                              file.file.name)
 
-                            self.files_to_zip_list.append([complete_emg_data_filename, export_emg_directory])
+                                with open(emg_raw_data_file, 'rb') as f:
+                                    data = f.read()
+
+                                with open(complete_emg_data_filename, 'wb') as f:
+                                    f.write(data)
+
+                                self.files_to_zip_list.append([complete_emg_data_filename, export_emg_directory])
 
                             # download emg_setting_description
                             emg_setting_description = get_emg_setting_description(emg_data.emg_setting_id)
@@ -935,22 +941,25 @@ class ExportExecution:
                             export_additional_data_directory = additional_data['export_directory_step']
 
                             data_file = get_object_or_404(AdditionalData, pk=additional_data['data_id'])
-                            file_name = data_file.file.file.name.split('/')[-1]
-                            # read file from repository
-                            additional_data_filename = path.join(settings.BASE_DIR, 'media') + '/' + \
-                                                       data_file.file.file.name
 
-                            # ex. /Users/.../NES_EXPORT/Experiment_data/Group_XXX/Participants/PXXXX/
-                            # Step_XX_step_TYPE/file_name.format_type
-                            complete_additional_data_filename = path.join(additional_data_directory, file_name)
-                            with open(additional_data_filename, 'rb') as f:
-                                data = f.read()
+                            for file in data_file.files.all():
 
-                            with open(complete_additional_data_filename, 'wb') as f:
-                                f.write(data)
+                                file_name = file.file.name.split('/')[-1]
+                                # read file from repository
+                                additional_data_filename = path.join(settings.BASE_DIR, 'media') + '/' + \
+                                                           file.file.name
 
-                            self.files_to_zip_list.append([complete_additional_data_filename,
-                                                           export_additional_data_directory])
+                                # ex. /Users/.../NES_EXPORT/Experiment_data/Group_XXX/Participants/PXXXX/
+                                # Step_XX_step_TYPE/file_name.format_type
+                                complete_additional_data_filename = path.join(additional_data_directory, file_name)
+                                with open(additional_data_filename, 'rb') as f:
+                                    data = f.read()
+
+                                with open(complete_additional_data_filename, 'wb') as f:
+                                    f.write(data)
+
+                                self.files_to_zip_list.append([complete_additional_data_filename,
+                                                               export_additional_data_directory])
 
             # if exist completed questionnaires
             if 'questionnaire_metadata' in self.per_group_data[group_id]:
