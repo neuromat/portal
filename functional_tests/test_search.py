@@ -543,3 +543,33 @@ class SearchTest(FunctionalTest):
             'eegsetting-matches'
         ).text
         self.assertIn('eegsettingname', eegsetting_text)
+
+    def test_search_questionnaire_data_returns_correct_objects(self):
+        # Joselina wants to search for experiments that contains some
+        # questionnaire data
+        self.search_for('\"História de fratura\" \"trauma do seu plexo '
+                        'braquial\" \"Lesão por arma de fogo\" \"Qual o lado '
+                        'da lesão\" \"Extensão do Cotovelo\"')
+
+        # As there are two questionnaires with terms searched by Joselina,
+        # they are displayed in search results
+        self.verify_n_objects_in_table_rows(2, 'questionnaire-matches')
+        self.verify_n_objects_in_table_rows(0, 'eegsetting-matches')
+        self.verify_n_objects_in_table_rows(0, 'tmsdata-matches')
+        self.verify_n_objects_in_table_rows(0, 'coilmodel-matches')
+        self.verify_n_objects_in_table_rows(0, 'tmsdevice-matches')
+        self.verify_n_objects_in_table_rows(0, 'tmsdevicesetting-matches')
+        self.verify_n_objects_in_table_rows(0, 'tmssetting-matches')
+        self.verify_n_objects_in_table_rows(0, 'experiment-matches')
+        self.verify_n_objects_in_table_rows(0, 'study-matches')
+        self.verify_n_objects_in_table_rows(0, 'group-matches')
+        self.verify_n_objects_in_table_rows(0, 'experimentalprotocol-matches')
+
+        questionnaire_text = self.browser.find_element_by_class_name(
+            'questionnaire-matches'
+        ).text
+        self.assertIn('História de fratura', questionnaire_text)
+        self.assertIn('trauma do seu plexo braquial', questionnaire_text)
+        self.assertIn('Lesão por arma de fogo', questionnaire_text)
+        self.assertIn('Qual o lado da lesão', questionnaire_text)
+        self.assertIn('Extensão do Cotovelo', questionnaire_text)

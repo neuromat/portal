@@ -1,4 +1,4 @@
-from django.db.models import Max, Q
+from django.db.models import Max
 
 from experiments import models
 
@@ -17,3 +17,5 @@ class ExperimentVersion:
             return 0
         else:
             return last_exp_version['version__max']
+
+

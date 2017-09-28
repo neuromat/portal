@@ -1,0 +1,21 @@
+{% load highlight %}
+{% load i18n %}
+<tr class="questionnaire-matches">
+    <td>
+        <h5 class="match">
+            <a href="
+{% url 'experiment-detail' result.object.group.experiment.slug %}"><strong
+            >{% trans "Experiment" %}: </strong>{{ result.object.group.experiment.title }}
+                <strong>> {% trans "Group" %}: </strong>
+                {{ result.object.group.title }}<strong> > {% trans "Step" %}:
+                </strong>{{ result.object.identification }}<strong> >
+                    {% trans "Questionnaire" %}:
+                </strong>{{ result.object.survey_name }}
+            </a><br><br>
+        </h5>
+        <strong>{% trans "name" %}: </strong>
+        {% highlight result.object.survey_name with query %}
+        <strong>{% trans "data" %}: </strong>
+        {% highlight result.object.survey_metadata with query %}&nbsp;
+    </td>
+</tr>
