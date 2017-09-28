@@ -59,9 +59,11 @@
                    title="{% trans "Download zip file with experiment data and metadata" %}">
                     {% trans "Download experiment data" %}</a>
             {% else %}
-                <a id="button_download" href="/downloads/{{ experiment.id }}" class="fileDownloadCustomRichExperience nep-btn"
+                <a id="button_download"
+                   href="{% url 'download_view' experiment_id=experiment.id %}"
+                   class="fileDownloadCustomRichExperience nep-btn"
                     data-toggle="tooltip" data-placement="top"
-                   title="{% trans "Download zip file with experiment data and metadata" %}">
+                   title="{% trans "Generate download zip file with experiment data and metadata" %}">
                     {% trans "Download experiment data" %}</a>
             {% endif %}
         </div>
