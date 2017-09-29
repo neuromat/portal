@@ -52,7 +52,10 @@ ROOT_URLCONF = 'nep.urls'
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/'
 
-# Haystack - change 'URL' to reflect the elasticsearch server location/port
+##
+# Haystack
+##
+# change 'URL' to reflect the elasticsearch server location/port
 HAYSTACK_CONNECTIONS = {
     'default': {
         'ENGINE':
@@ -62,6 +65,7 @@ HAYSTACK_CONNECTIONS = {
     }
 }
 HAYSTACK_DEFAULT_OPERATOR = 'OR'
+HAYSTACK_CUSTOM_HIGHLIGHTER = 'experiments.appclasses.NepHighlighter'
 
 TEMPLATES = [
     {
