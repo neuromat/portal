@@ -134,4 +134,4 @@ class NewVisitorTest(FunctionalTest):
         footer_license_text = self.browser.find_element_by_id(
             'id_footer_license').text
         self.assertIn('This site content is licensed under a Creative Commons '
-                      'Attributions 3.0', footer_license_text)
+                      'Attributions 4.0', footer_license_text)
