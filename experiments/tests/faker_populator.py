@@ -110,7 +110,7 @@ for i in range(4, 6):
 # to test search (necessary to approve experiment(s) in front-end or
 # directly in database)
 group = Group.objects.first()
-group.description = 'Plexus brachial (com EMG) is writed in wrong order. ' \
+group.description = 'Plexus brachial (com EMG) is written in wrong order. ' \
                     'Correct is Brachial plexus.'
 ic = ClassificationOfDiseases.objects.create(
     code='BP', description='brachial Plexus',

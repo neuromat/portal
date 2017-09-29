@@ -55,6 +55,9 @@
                 {% if result.model_name == 'eegsetting' %}
                     {% include 'search/eegsetting.html' %}
                 {% endif %}
+                {% if result.model_name == 'questionnaire' %}
+                    {% include 'search/questionnaires.html' %}
+                {% endif %}
             {% empty %}
                 <p>{% trans "No results found" %}.</p>
             {% endfor %}

@@ -312,8 +312,7 @@
                     {% for q_key, q_value in group_values.items %}
                         {% if q_value.survey_metadata != 'invalid_questionnaire' %}
                             <div class="panel panel-default nep-panel-group">
-                                <strong>Questionnaire
-                                    {{ q_value.survey_name }}</strong>
+                                <strong>Questionnaire {{ q_value.survey_name }}</strong>
                                 <div class="pull-right">
                                     <a href="#collapse{{ q_key }}"
                                        role="button"
