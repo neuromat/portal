@@ -64,14 +64,20 @@
             </tbody>
         </table>
 
-        {% if page.has_previous or page.has_next %}
+        {% if page_obj.has_previous or page_obj.has_next %}
             <div>
-                {% if page.has_previous %}<a href="?q={{ query }}&amp;page={{ page.previous_page_number }}">
-                {% endif %}&laquo; {% trans "Previous" %}{% if page.has_previous %}</a>{% endif %}
+                {% if page_obj.has_previous %}
+                    <a href="?q={{ query }}&amp;page={{ page_obj.previous_page_number }}">
+                {% endif %}
+                &laquo; {% trans "Previous" %}
+                {% if page_obj.has_previous %}</a>{% endif %}
                 |
-                {% if page.has_next %}<a href="?q={{ query }}&amp;page={{ page.next_page_number }}">{% endif %}
+                {% if page_obj.has_next %}
+                    <a href="?q={{ query }}&amp;page={{ page_obj.next_page_number }}">
+                {% endif %}
                 {% trans "Next" %}
-                &raquo;{% if page.has_next %}</a>{% endif %}
+                &raquo;{% if page_obj.has_next %}</a>{% endif %}
+                <br><br>
             </div>
         {% endif %}
         {#        {% else %}#}
