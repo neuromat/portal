@@ -3,6 +3,7 @@ from experiments.models import Experiment
 from django.conf import settings
 from django.contrib import messages
 from django.shortcuts import render, get_object_or_404
+from django.template import loader
 from django.http import HttpResponse, HttpResponseRedirect
 
 from .export import create_directory, ExportExecution
@@ -31,9 +32,12 @@ def create_export_instance():
 
 
 def download_view(request, experiment_id):
-    template_name = "experiments/detail.html"
 
+    template_name = "experiments/detail.html"
     complete_filename, error_msg = download_create(experiment_id, template_name)
+
+    experiment = get_object_or_404(Experiment, pk=experiment_id)
+    slug = experiment.slug
 
     if error_msg != "":
         messages.error(request, error_msg)
@@ -46,15 +50,18 @@ def download_view(request, experiment_id):
         # print("antes do fim: httpResponse")
         #
         zip_file = open(complete_filename, 'rb')
+        # t = loader.get_template('experiments/detail.html')
+        # c = {'slug': slug}
+        # response = HttpResponse(t.render(c, request), content_type='application/zip')
         response = HttpResponse(zip_file, content_type='application/zip')
         response['Content-Disposition'] = 'attachment; filename="export.zip"'
         response['Content-Length'] = path.getsize(complete_filename)
         response['Set-Cookie'] = 'fileDownload=true; path=/'
+        response['slug'] = slug
         return response
     else:
         messages.error(request, "Download data was not generated.")
-
-    return HttpResponseRedirect(template_name)
+        return HttpResponseRedirect(template_name, args=(slug,))
 
 
 def get_export_instance(export_id):
