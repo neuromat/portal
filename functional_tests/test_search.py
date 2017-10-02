@@ -440,9 +440,9 @@ class SearchTest(FunctionalTest):
         # TODO: test for choice representation!
         self.search_for('single_pulse')
 
-        # As there is one TMSDeviceSetting object with that name, she sees just
-        # one row in Search Results list
-        self.verify_n_objects_in_table_rows(1, 'tmsdevicesetting-matches')
+        # As there is three TMSDeviceSetting object with that name, she sees
+        # just one row in Search Results list
+        self.verify_n_objects_in_table_rows(3, 'tmsdevicesetting-matches')
         self.verify_n_objects_in_table_rows(0, 'tmssetting-matches')
         self.verify_n_objects_in_table_rows(0, 'experiment-matches')
         self.verify_n_objects_in_table_rows(0, 'study-matches')

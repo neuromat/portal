@@ -601,14 +601,14 @@ def global_setup_ft():
     # TODO: IMPORTANT! when creating a new TMSDevice and a new CoilModel to
     # TODO: associate with new TMSDeviceSetting, the tests with filters in
     # TODO: test_search fails. See
-    # create_tms_device(1)  # 2º TMSDevice
-    # tms_device = TMSDevice.objects.last()
-    # tms_device.manufacturer_name = 'Siemens'
-    # tms_device.save()
-    # create_coil_model(1)  # 2º CoilModel
-    # coil_model = CoilModel.objects.last()
-    # coil_model.name = 'Magstim'
-    # coil_model.save()
+    create_tms_device(1)  # 2º TMSDevice
+    tms_device = TMSDevice.objects.last()
+    tms_device.manufacturer_name = 'Siemens'
+    tms_device.save()
+    create_coil_model(1)  # 2º CoilModel
+    coil_model = CoilModel.objects.last()
+    coil_model.name = 'Magstim'
+    coil_model.save()
     create_tms_device_setting(1, tms_setting, tms_device, coil_model)  # 3º
     # TMSDeviceSetting
 
