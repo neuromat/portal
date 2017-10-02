@@ -3,7 +3,7 @@
     <h2>{% trans "Open Database for Experiments in Neuroscience" %}</h2>
     <h4 id="id_detail_title" class="detail-title">{{ experiment.title }}</h4>
     <div id="id_link_home" class="detail-back-search">
-        <a href="{% url 'home' %}" class="nep-btn">{% trans "Back Home" %}</a>
+        <a href="{% url 'home' %}" class="nep-return"> <span class="glyphicon glyphicon-menu-left"></span>{% trans "Back Home" %}</a>
     </div>
     <div id="id_detail_description" class="detail-description">{{ experiment.description }}</div>
     {% if experiment.data_acquisition_done %}
@@ -19,7 +19,7 @@
         </div>
     {% endif %}
     {% if experiment.project_url %}
-        <a href="{{ experiment.project_url }}">{% trans "Project Info" %}</a>&nbsp;
+        <a class="nep-btn-secondary" href="{{ experiment.project_url }}"> <span class="glyphicon glyphicon-info-sign"> </span>{% trans "Project Info" %}</a>&nbsp;
         {# TODO: Uggly "gambis": needs to solve via css. Fix this! #}
     {% else %}
         <a href="#">&nbsp;</a>
@@ -54,16 +54,16 @@
 
         <div class="align-right">
             {% if experiment.download_url %}
-                <a id="button_download" href="{{ experiment.download_url.url }}" class="nep-btn"
+                <a id="button_download" href="{{ experiment.download_url.url }}" class="nep-btn-secondary"
                     data-toggle="tooltip" data-placement="top"
-                   title="{% trans "Download zip file with experiment data and metadata" %}">
+                   title="{% trans "Download zip file with experiment data and metadata" %}"> <span class="glyphicon glyphicon-download-alt"></span>
                     {% trans "Download experiment data" %}</a>
             {% else %}
                 <a id="button_download"
                    href="{% url 'download_view' experiment_id=experiment.id %}"
-                   class="fileDownloadCustomRichExperience nep-btn"
+                   class="fileDownloadCustomRichExperience nep-btn-secondary"
                     data-toggle="tooltip" data-placement="top"
-                   title="{% trans "Generate download zip file with experiment data and metadata" %}">
+                   title="{% trans "Generate download zip file with experiment data and metadata" %}"> <span class="glyphicon glyphicon-download-alt"></span>
                     {% trans "Download experiment data" %}</a>
             {% endif %}
         </div>
