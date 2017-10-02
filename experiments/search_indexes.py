@@ -67,6 +67,21 @@ class ExperimentalProtocolIndex(indexes.SearchIndex, indexes.Indexable):
         return self.get_model().objects.filter(group__in=groups)
 
 
+class StepIndex(indexes.SearchIndex, indexes.Indexable):
+    text = indexes.CharField(document=True, use_template=True)
+    group = indexes.CharField(model_attr='group__id')
+
+    def get_model(self):
+        return Step
+
+    def index_queryset(self, using=None):
+        experiments = Experiment.lastversion_objects.filter(
+            status=Experiment.APPROVED
+        )
+        groups = Group.objects.filter(experiment__in=experiments)
+        return self.get_model().objects.filter(group__in=groups)
+
+
 class TMSSettingIndex(indexes.SearchIndex, indexes.Indexable):
     text = indexes.CharField(document=True, use_template=True)
     experiment = indexes.CharField(model_attr='experiment__id')

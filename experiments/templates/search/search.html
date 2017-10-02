@@ -37,6 +37,9 @@
                 {% if result.model_name == 'experimentalprotocol' %}
                     {% include 'search/experimental_protocol.html' %}
                 {% endif %}
+                {% if result.model_name == 'step' %}
+                    {% include 'search/step.html' %}
+                {% endif %}
                 {% if result.model_name == 'tmssetting' %}
                     {% include 'search/tmssetting.html' %}
                 {% endif %}
