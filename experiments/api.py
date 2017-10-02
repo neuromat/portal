@@ -17,7 +17,7 @@ from experiments.models import Experiment, Study, User, ProtocolComponent, \
     EMGPreamplifierSetting, EMGAmplifierSetting, EMGPreamplifierFilterSetting, EMGAnalogFilterSetting, \
     EMGElectrodePlacementSetting, \
     EMGSurfacePlacement, EMGIntramuscularPlacement, EMGNeedlePlacement
-from downloads.views import download_create
+from experiments.tasks import build_download_file
 
 
 ###################
@@ -715,24 +715,74 @@ class FileSerializer(serializers.ModelSerializer):
         fields = ('id', 'file',)
 
 
+class FileIDSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = File
+        fields = ('id',)
+
+
 class EEGDataSerializer(serializers.ModelSerializer):
+    files = FileIDSerializer(many=True, read_only=False)
 
     class Meta:
         model = EEGData
         fields = ('id',
                   'step', 'participant', 'date', 'time',
-                  'description', 'file', 'file_format',
-                  'eeg_setting', 'eeg_cap_size', 'eeg_setting_reason_for_change')
+                  'description', 'file_format',
+                  'eeg_setting', 'eeg_cap_size', 'eeg_setting_reason_for_change', 'files')
+
+    def create(self, validated_data):
+        eeg_data = EEGData.objects.create(
+            step=validated_data['step'],
+            participant=validated_data['participant'],
+            date=validated_data['date'],
+            time=validated_data['time'],
+            description=validated_data['description'],
+            file_format=validated_data['file_format'],
+            eeg_setting=validated_data['eeg_setting'],
+            eeg_setting_reason_for_change=validated_data['eeg_setting_reason_for_change'],
+            eeg_cap_size=validated_data['eeg_cap_size'])
+
+        if 'files' in self.initial_data:
+            files = self.initial_data['files']
+            for file in files:
+                # trying to get the file
+                file_to_add = File.objects.filter(id=file['id'])
+                if file_to_add:
+                    eeg_data.files.add(file_to_add.first())
+        return eeg_data
 
 
 class EMGDataSerializer(serializers.ModelSerializer):
+    files = FileIDSerializer(many=True, read_only=False)
 
     class Meta:
         model = EMGData
         fields = ('id',
                   'step', 'participant', 'date', 'time',
-                  'description', 'file', 'file_format',
-                  'emg_setting', 'emg_setting_reason_for_change')
+                  'description', 'file_format',
+                  'emg_setting', 'emg_setting_reason_for_change', 'files')
+
+    def create(self, validated_data):
+        emg_data = EMGData.objects.create(
+            step=validated_data['step'],
+            participant=validated_data['participant'],
+            date=validated_data['date'],
+            time=validated_data['time'],
+            description=validated_data['description'],
+            file_format=validated_data['file_format'],
+            emg_setting=validated_data['emg_setting'],
+            emg_setting_reason_for_change=validated_data['emg_setting_reason_for_change'])
+
+        if 'files' in self.initial_data:
+            files = self.initial_data['files']
+            for file in files:
+                # trying to get the file
+                file_to_add = File.objects.filter(id=file['id'])
+                if file_to_add:
+                    emg_data.files.add(file_to_add.first())
+        return emg_data
 
 
 class TMSDataSerializer(serializers.ModelSerializer):
@@ -752,12 +802,33 @@ class TMSDataSerializer(serializers.ModelSerializer):
 
 
 class GoalkeeperGameDataSerializer(serializers.ModelSerializer):
+    files = FileIDSerializer(many=True, read_only=False)
+
     class Meta:
         model = GoalkeeperGameData
         fields = ('id',
                   'step', 'participant', 'date', 'time',
-                  'description', 'file', 'file_format',
-                  'sequence_used_in_context_tree')
+                  'description', 'file_format',
+                  'sequence_used_in_context_tree', 'files')
+
+    def create(self, validated_data):
+        goalkeeper_game_data = GoalkeeperGameData.objects.create(
+            step=validated_data['step'],
+            participant=validated_data['participant'],
+            date=validated_data['date'],
+            time=validated_data['time'],
+            description=validated_data['description'],
+            file_format=validated_data['file_format'],
+            sequence_used_in_context_tree=validated_data['sequence_used_in_context_tree'])
+
+        if 'files' in self.initial_data:
+            files = self.initial_data['files']
+            for file in files:
+                # trying to get the file
+                file_to_add = File.objects.filter(id=file['id'])
+                if file_to_add:
+                    goalkeeper_game_data.files.add(file_to_add.first())
+        return goalkeeper_game_data
 
 
 class QuestionnaireResponseSerializer(serializers.ModelSerializer):
@@ -769,19 +840,59 @@ class QuestionnaireResponseSerializer(serializers.ModelSerializer):
 
 
 class AdditionalDataSerializer(serializers.ModelSerializer):
+    files = FileIDSerializer(many=True, read_only=False)
+
     class Meta:
         model = AdditionalData
         fields = ('id',
                   'step', 'participant', 'date', 'time',
-                  'description', 'file', 'file_format')
+                  'description', 'file_format', 'files')
+
+    def create(self, validated_data):
+        additional_data = AdditionalData.objects.create(
+            step=validated_data['step'],
+            participant=validated_data['participant'],
+            date=validated_data['date'],
+            time=validated_data['time'],
+            description=validated_data['description'],
+            file_format=validated_data['file_format'])
+
+        if 'files' in self.initial_data:
+            files = self.initial_data['files']
+            for file in files:
+                # trying to get the file
+                file_to_add = File.objects.filter(id=file['id'])
+                if file_to_add:
+                    additional_data.files.add(file_to_add.first())
+        return additional_data
 
 
 class GenericDataCollectionDataSerializer(serializers.ModelSerializer):
+    files = FileIDSerializer(many=True, read_only=False)
+
     class Meta:
         model = GenericDataCollectionData
         fields = ('id',
                   'step', 'participant', 'date', 'time',
-                  'description', 'file', 'file_format')
+                  'description', 'file_format', 'files')
+
+    def create(self, validated_data):
+        generic_data_collection_data = GenericDataCollectionData.objects.create(
+            step=validated_data['step'],
+            participant=validated_data['participant'],
+            date=validated_data['date'],
+            time=validated_data['time'],
+            description=validated_data['description'],
+            file_format=validated_data['file_format'])
+
+        if 'files' in self.initial_data:
+            files = self.initial_data['files']
+            for file in files:
+                # trying to get the file
+                file_to_add = File.objects.filter(id=file['id'])
+                if file_to_add:
+                    generic_data_collection_data.files.add(file_to_add.first())
+        return generic_data_collection_data
 
 #############
 # API Views #
@@ -839,10 +950,12 @@ class ExperimentViewSet(viewsets.ModelViewSet):
         nes_id = self.kwargs['experiment_nes_id']
         owner = self.request.user
         exp_version = appclasses.ExperimentVersion(nes_id, owner)
+        version = exp_version.get_last_version()
         serializer.save(
             owner=owner, version=exp_version.get_last_version(), nes_id=nes_id
         )
-        # download_filename = download_create(request='GET', experiment_id=nes_id, template_name="")
+        experiment = Experiment.objects.filter(nes_id=nes_id, version=version).values('id')[0]
+        build_download_file(int(experiment['id']), template_name="")
 
 
 class StudyViewSet(viewsets.ModelViewSet):

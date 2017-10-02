@@ -1,0 +1,3 @@
+{{ object.survey_name }}
+{{ object.survey_metadata }}
+{{ object.group }}

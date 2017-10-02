@@ -3,6 +3,7 @@ from os import path
 from django.db import models
 from django.db.models import Max, Q
 from django.contrib.auth.models import User
+from django.template.defaultfilters import slugify
 
 
 # custom managers
@@ -65,13 +66,35 @@ class Experiment(models.Model):
     )
     trustee = models.ForeignKey(User, null=True,
                                 blank=True, related_name='experiments')
+    # TODO: We want slug field do not save empty string, but in console we
+    # TODO: do can save an experiment with empty string, even when we set
+    # TODO: blank=False. By the way, when doing this makemigrations doesn't
+    # TODO: detect the change. This implies that the experiments are being
+    # TODO: saved in tests, with slug='', what we don't want. The tests should
+    # TODO: regret when saving experiments with slug=''.
+    slug = models.SlugField(max_length=100, unique=True)
 
-    # Managers
     objects = models.Manager()
     lastversion_objects = CurrentExperimentManager()
 
     class Meta:
         unique_together = ('nes_id', 'owner', 'version')
+
+    # save slug field if it's first time save
+    def save(self, *args, **kwargs):
+        if not self.id:
+            count = Experiment.objects.filter(
+                slug__startswith=slugify(self.title)
+            ).count()
+
+            # if there're slugs that starts with same name adds 1 to
+            # count to save as unique slug
+            if count > 0:
+                self.slug = slugify(self.title + '-' + str(count + 1))
+            else:
+                self.slug = slugify(self.title)
+
+        super(Experiment, self).save()
 
 
 class ClassificationOfDiseases(models.Model):
@@ -606,7 +629,6 @@ class File(models.Model):
 
 class DataFile(models.Model):
     description = models.TextField()
-    file = models.ForeignKey(File)
     file_format = models.CharField(max_length=50)
 
     class Meta:
@@ -617,11 +639,13 @@ class EEGData(DataCollection, DataFile):
     eeg_setting = models.ForeignKey(EEGSetting)
     eeg_setting_reason_for_change = models.TextField(null=True, blank=True, default='')
     eeg_cap_size = models.CharField(max_length=30, null=True, blank=True)
+    files = models.ManyToManyField(File, related_name='eeg_data_list')
 
 
 class EMGData(DataFile, DataCollection):
     emg_setting = models.ForeignKey(EMGSetting)
     emg_setting_reason_for_change = models.TextField(null=True, blank=True, default='')
+    files = models.ManyToManyField(File, related_name='emg_data_list')
 
 
 class TMSData(DataCollection):
@@ -658,6 +682,7 @@ class TMSData(DataCollection):
 
 class GoalkeeperGameData(DataCollection, DataFile):
     sequence_used_in_context_tree = models.TextField(null=True, blank=True)
+    files = models.ManyToManyField(File, related_name='goalkeeper_game_data_list')
 
 
 class RejectJustification(models.Model):
@@ -671,8 +696,8 @@ class QuestionnaireResponse(DataCollection):
 
 
 class GenericDataCollectionData(DataFile, DataCollection):
-    pass
+    files = models.ManyToManyField(File, related_name='generic_data_collection_data_list')
 
 
 class AdditionalData(DataFile, DataCollection):
-    pass
+    files = models.ManyToManyField(File, related_name='additional_data_list')

@@ -543,3 +543,108 @@ class SearchTest(FunctionalTest):
             'eegsetting-matches'
         ).text
         self.assertIn('eegsettingname', eegsetting_text)
+
+    def test_search_questionnaire_data_returns_correct_objects_1(self):
+        # Joselina wants to search for experiments that contains some
+        # questionnaire data
+        self.search_for('\"História de fratura\"')
+
+        # As there are two questionnaires with terms searched by Joselina,
+        # they are displayed in search results
+        # TODO: we verify for 3 objects because test is catching invalid
+        # TODO: questionnaires. See note 'Backlog' in notebook, 09/28/2017
+        self.verify_n_objects_in_table_rows(1, 'questionnaire-matches')
+        self.verify_n_objects_in_table_rows(0, 'eegsetting-matches')
+        self.verify_n_objects_in_table_rows(0, 'tmsdata-matches')
+        self.verify_n_objects_in_table_rows(0, 'coilmodel-matches')
+        self.verify_n_objects_in_table_rows(0, 'tmsdevice-matches')
+        self.verify_n_objects_in_table_rows(0, 'tmsdevicesetting-matches')
+        self.verify_n_objects_in_table_rows(0, 'tmssetting-matches')
+        self.verify_n_objects_in_table_rows(0, 'experiment-matches')
+        self.verify_n_objects_in_table_rows(0, 'study-matches')
+        self.verify_n_objects_in_table_rows(0, 'group-matches')
+        self.verify_n_objects_in_table_rows(0, 'experimentalprotocol-matches')
+
+        questionnaire_text = self.browser.find_element_by_class_name(
+            'questionnaire-matches'
+        ).text
+        self.assertIn('História de fratura', questionnaire_text)
+
+    def test_search_questionnaire_data_returns_correct_objects_2(self):
+        # Joselina wants to search for experiments that contains some
+        # questionnaire data
+        self.search_for('\"trauma do seu plexo\"')
+
+        # As there are two questionnaires with terms searched by Joselina,
+        # they are displayed in search results
+        # TODO: we verify for 3 objects because test is catching invalid
+        # TODO: questionnaires. See note 'Backlog' in notebook, 09/28/2017
+        self.verify_n_objects_in_table_rows(1, 'questionnaire-matches')
+        self.verify_n_objects_in_table_rows(0, 'eegsetting-matches')
+        self.verify_n_objects_in_table_rows(0, 'tmsdata-matches')
+        self.verify_n_objects_in_table_rows(0, 'coilmodel-matches')
+        self.verify_n_objects_in_table_rows(0, 'tmsdevice-matches')
+        self.verify_n_objects_in_table_rows(0, 'tmsdevicesetting-matches')
+        self.verify_n_objects_in_table_rows(0, 'tmssetting-matches')
+        self.verify_n_objects_in_table_rows(0, 'experiment-matches')
+        self.verify_n_objects_in_table_rows(0, 'study-matches')
+        self.verify_n_objects_in_table_rows(0, 'group-matches')
+        self.verify_n_objects_in_table_rows(0, 'experimentalprotocol-matches')
+
+        questionnaire_text = self.browser.find_element_by_class_name(
+            'questionnaire-matches'
+        ).text
+        self.assertIn('trauma do seu plexo', questionnaire_text)
+
+    def test_search_questionnaire_data_returns_correct_objects_3(self):
+        # Joselina wants to search for experiments that contains a phrase
+        self.search_for('\"Lesão por arma de fogo\"')
+
+        # As there are two questionnaires with terms searched by Joselina,
+        # they are displayed in search results
+        # TODO: we verify for 3 objects because test is catching invalid
+        # TODO: questionnaires. See note 'Backlog' in notebook, 09/28/2017
+        self.verify_n_objects_in_table_rows(2, 'questionnaire-matches')
+        self.verify_n_objects_in_table_rows(0, 'eegsetting-matches')
+        self.verify_n_objects_in_table_rows(0, 'tmsdata-matches')
+        self.verify_n_objects_in_table_rows(0, 'coilmodel-matches')
+        self.verify_n_objects_in_table_rows(0, 'tmsdevice-matches')
+        self.verify_n_objects_in_table_rows(0, 'tmsdevicesetting-matches')
+        self.verify_n_objects_in_table_rows(0, 'tmssetting-matches')
+        self.verify_n_objects_in_table_rows(0, 'experiment-matches')
+        self.verify_n_objects_in_table_rows(0, 'study-matches')
+        self.verify_n_objects_in_table_rows(0, 'group-matches')
+        self.verify_n_objects_in_table_rows(0,
+                                            'experimentalprotocol-matches')
+
+        questionnaire_text = self.browser.find_element_by_class_name(
+            'questionnaire-matches'
+        ).text
+        self.assertIn('Lesão por arma de fogo', questionnaire_text)
+
+    def test_search_questionnaire_data_returns_correct_objects_4(self):
+        # Joselina wants to search for experiments that contains some
+        # questionnaire data
+        self.search_for('\"História de fratura\" \"Qual o lado da lesão\"')
+
+        # As there are two questionnaires with terms searched by Joselina,
+        # they are displayed in search results
+        # TODO: we verify for 3 objects because test is catching invalid
+        # TODO: questionnaires. See note 'Backlog' in notebook, 09/28/2017
+        self.verify_n_objects_in_table_rows(2, 'questionnaire-matches')
+        self.verify_n_objects_in_table_rows(0, 'eegsetting-matches')
+        self.verify_n_objects_in_table_rows(0, 'tmsdata-matches')
+        self.verify_n_objects_in_table_rows(0, 'coilmodel-matches')
+        self.verify_n_objects_in_table_rows(0, 'tmsdevice-matches')
+        self.verify_n_objects_in_table_rows(0, 'tmsdevicesetting-matches')
+        self.verify_n_objects_in_table_rows(0, 'tmssetting-matches')
+        self.verify_n_objects_in_table_rows(0, 'experiment-matches')
+        self.verify_n_objects_in_table_rows(0, 'study-matches')
+        self.verify_n_objects_in_table_rows(0, 'group-matches')
+        self.verify_n_objects_in_table_rows(0, 'experimentalprotocol-matches')
+
+        questionnaire_rows = self.browser.find_element_by_id(
+            'search_table'
+        ).text
+        self.assertIn('História de fratura', questionnaire_rows)
+        self.assertIn('Qual o lado da lesão', questionnaire_rows)

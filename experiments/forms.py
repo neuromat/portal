@@ -85,6 +85,8 @@ class NepSearchForm(SearchForm):
                     result = result.filter_or(content=words.__next__())
                 elif word == 'NOT':
                     result = result.exclude(content=words.__next__())
+                # if "word" is compounded of more than one non blank word the
+                # term is inside quotes
                 elif len(word.split()) > 1:
                     result = result.filter(content__exact=word)
                 else:

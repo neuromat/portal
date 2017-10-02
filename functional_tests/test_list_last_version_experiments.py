@@ -119,7 +119,7 @@ class NewVisitorTest(FunctionalTest):
         # about ways of contact institution.
         footer_contact = self.browser.find_element_by_id('id_footer_contact')
         footer_header_text = footer_contact.find_element_by_tag_name('h4').text
-        self.assertIn('Contact', footer_header_text)
+        self.assertIn('CONTACT', footer_header_text)
         footer_content = footer_contact.find_element_by_id(
             'id_footer_contact').text
         self.assertIn('Address:', footer_content)
@@ -134,4 +134,4 @@ class NewVisitorTest(FunctionalTest):
         footer_license_text = self.browser.find_element_by_id(
             'id_footer_license').text
         self.assertIn('This site content is licensed under a Creative Commons '
-                      'Attributions 3.0', footer_license_text)
+                      'Attributions 4.0', footer_license_text)

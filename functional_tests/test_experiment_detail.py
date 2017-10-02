@@ -1,8 +1,9 @@
 import time
 
+from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.common.keys import Keys
 
-from experiments.models import Experiment, Questionnaire
+from experiments.models import Experiment, Questionnaire, Step
 from functional_tests.base import FunctionalTest
 
 
@@ -17,9 +18,9 @@ class ExperimentDetailTest(FunctionalTest):
         # The new visitor is in home page and see the list of experiments.
         # She clicks in second "View" link and is redirected to experiment
         # detail page
-        # TODO: frequently fails to catch second link
+        # TODO: frequently fails to catch second link (see if it's solved)
         link = self.browser.find_element_by_xpath(
-            "//a[@href='/experiments/" + str(experiment.id) + "/']"
+            "//a[@href='/experiments/" + experiment.slug + "/']"
         )
         link.click()
         # list_links = self.browser.find_elements_by_link_text('View')
@@ -210,7 +211,7 @@ class ExperimentDetailTest(FunctionalTest):
         # detail page
         # TODO: frequently fails to catch second link
         self.browser.find_element_by_xpath(
-            "//a[@href='/experiments/" + str(experiment.id) + "/']"
+            "//a[@href='/experiments/" + str(experiment.slug) + "/']"
         ).click()
         time.sleep(1)
 
@@ -219,42 +220,205 @@ class ExperimentDetailTest(FunctionalTest):
             'Questionnaires')
         self.assertEqual('Questionnaires', questionnaires_tab.text)
 
-    def test_can_view_questionnaire_content(self):
+    def test_does_not_display_questionnaire_tab_if_there_are_not_questionnaires(self):
         ##
-        # We've created Questionnaire data in tests helper from a Sample
-        # of NES
+        # We pick an experiment without questionnaires. The second approved
+        # experiment hasn't questionnaires steps in any experiment protocol
+        # of no one group. See tests helper
         ##
         experiment = Experiment.objects.filter(
             status=Experiment.APPROVED
-        ).last()
-        questionnaire = Questionnaire.objects.first()
+        ).all()[1]
 
         # The new visitor is in home page and sees the list of experiments.
         # She clicks in second "View" link and is redirected to experiment
         # detail page
-        # TODO: frequently fails to catch second link
         self.browser.find_element_by_xpath(
-            "//a[@href='/experiments/" + str(experiment.id) + "/']"
+            "//a[@href='/experiments/" + experiment.slug + "/']"
+        ).click()
+        time.sleep(1)
+
+        # As there are no questionnaires for this experiment, she can't see
+        # the Questionnaires tab and Questionnaires content
+        with self.assertRaises(NoSuchElementException):
+            self.browser.find_element_by_link_text('Questionnaires')
+
+    def test_can_view_group_questionnaires_and_questionnaires_titles(self):
+        ##
+        # We've created Questionnaire data in tests helper from a Sample
+        # of a questionnaire from NES, in csv format
+        ##
+        experiment = Experiment.objects.filter(
+            status=Experiment.APPROVED
+        ).last()
+
+        # The new visitor is in home page and sees the list of experiments.
+        # She clicks in a "View" link and is redirected to experiment
+        # detail page
+        self.browser.find_element_by_xpath(
+            "//a[@href='/experiments/" + experiment.slug + "/']"
         ).click()
         time.sleep(1)
 
         # When the new visitor clicks in the Questionnaires tab, she sees
-        # the questionnaires questions and answers.
-        # The questionnaires tab has a questionnaire's title
-        title_text = self.browser.find_element_by_id(
-            'questionnaire_title').text
-        self.assertEqual(questionnaire.survey_name, title_text)
-        # The questionnaires tab has the sequence of questions and answers
+        # the groups questionnaires and the questionnaires' titles as
+        # headers of the questionnaires contents
+        self.browser.find_element_by_link_text('Questionnaires').click()
+        q_steps = Step.objects.filter(type=Step.QUESTIONNAIRE)
+        questionnaires_content = self.browser.find_element_by_id(
+            'questionnaires_tab').text
+        groups_with_qs = experiment.groups.filter(steps__in=q_steps)
+        if groups_with_qs.count() == 0:
+            self.fail('There are no groups with questionnaires. Have you '
+                      'been created the questionnaires in tests helper?')
+        for group in groups_with_qs:
+            self.assertIn(
+                'Questionnaires for group ' + group.title,
+                questionnaires_content
+            )
+            for step in group.steps.filter(type=Step.QUESTIONNAIRE):
+                questionnaire = Questionnaire.objects.get(step_ptr=step)
+                self.assertIn(
+                    'Questionnaire ' + questionnaire.survey_name,
+                    questionnaires_content
+                )
+
+    def test_detail_button_expands_questionnaire_to_display_questions_and_answers(self):
         ##
-        # We check if some entries in our questionnaire example appear in
-        # questionnaire content
+        # We've created Questionnaire data in tests helper from a Sample
+        # of a questionnaire from NES, in csv format
         ##
-        content_text = self.browser.find_element_by_id(
-            'questionnaire_content').text
-        self.assertIn('História da fratura', content_text)
-        self.assertIn('Fratura da costela', content_text)
-        self.assertIn('Já fez alguma cirurgia ortopédica?', content_text)
-        self.assertIn('Fez alguma cirurgia de nervo?', content_text)
-        self.assertIn('História prévia de dor?', content_text)
-        self.assertIn('Fratura vertebral cervical', content_text)
-        self.assertIn('Fratura vertebral torácica', content_text)
+        experiment = Experiment.objects.filter(
+            status=Experiment.APPROVED
+        ).last()
+
+        # When the new visitor visits an experiment that has questionnaires,
+        # in right side of each questionnaire title that is a 'Detail'
+        # button. When she clicks on it, the questionnaire expand to display
+        # the questions and answers.
+        self.browser.find_element_by_xpath(
+            "//a[@href='/experiments/" + experiment.slug + "/']"
+        ).click()
+        time.sleep(1)
+
+        self.browser.find_element_by_link_text('Questionnaires').click()
+
+        button_details = self.browser.find_element_by_id(
+            'questionnaires_tab'
+        ).find_element_by_link_text('Details')
+        button_details.click()
+        time.sleep(1)
+        button_details.click()
+        time.sleep(1)  # just to see better before page closes
+
+        self.assertEqual(button_details.text, 'Details')
+
+    def test_can_view_questionnaires_content(self):
+        ##
+        # We've created three questionnaires in an experiment, two are from one
+        # group and one are from another group. We test questions and
+        # answers from this three questionnaires. See tests helper.
+        ##
+        experiment = Experiment.objects.filter(
+            status=Experiment.APPROVED
+        ).last()
+
+        # The new visitor is in home page and sees the list of experiments.
+        # She clicks in second "View" link and is redirected to experiment
+        # detail page.
+        self.browser.find_element_by_xpath(
+            "//a[@href='/experiments/" + experiment.slug + "/']"
+        ).click()
+        time.sleep(1)
+
+        # When the new visitor clicks in the Questionnaires tab, then click
+        # in 'Expand' button of the Questionnaires sections she sees
+        # the questionnaires' content as a series of questions and answers
+        self.browser.find_element_by_link_text('Questionnaires').click()
+        questionnaires = self.browser.find_element_by_id(
+            'questionnaires_tab'
+        ).find_elements_by_link_text('Details')
+        for q in questionnaires:
+            q.click()
+        time.sleep(1)
+
+        # TODO: click on the 'Expand' buttons just for simulate user
+        # TODO: interaction, as the questionnaires' content is in html page
+        questionnaires_content = self.browser.find_element_by_id(
+            'questionnaires_tab').text
+
+        ##
+        # Sample asserts for first questionnaire
+        ##
+        self.assertIn('História de fratura', questionnaires_content)
+        self.assertIn('Já fez alguma cirurgia ortopédica?',
+                      questionnaires_content)
+        self.assertIn('Fez alguma cirurgia de nervo?',
+                      questionnaires_content)
+        self.assertIn('Identifique o evento que levou ao trauma do seu plexo '
+                      'braquial. É possível marcar mais do que um evento.',
+                      questionnaires_content)
+        self.assertIn('Teve alguma fratura associada à lesão?',
+                      questionnaires_content)
+        self.assertIn('The user enters a date in a date field',
+                      questionnaires_content)
+
+        ##
+        #  Sample asserts for second questionnaire
+        ##
+        self.assertIn('Qual o lado da lesão?', questionnaires_content)
+        self.assertIn('Instituição do Estudo', questionnaires_content)
+        self.assertIn('The user enters a free text',
+                      questionnaires_content)
+        self.assertIn('Tipo(s) de lesão(ões):', questionnaires_content)
+        self.assertIn('Trombose', questionnaires_content)
+        self.assertIn('Anexar exames.', questionnaires_content)
+        self.assertIn('The user uploads file(s)',
+                      questionnaires_content)
+        self.assertIn('The user answers yes or not',
+                      questionnaires_content)
+
+        ##
+        # Sample asserts for third questionnaire
+        ##
+        self.assertIn('Refere dor após a lesão?', questionnaires_content)
+        self.assertIn('EVA da dor principal:', questionnaires_content)
+        self.assertIn('Qual região apresenta alteração do trofismo?',
+                      questionnaires_content)
+        self.assertIn('Atrofia', questionnaires_content)
+        self.assertIn('Qual(is) artéria(s) e/ou vaso(s) foram acometidos?',
+                      questionnaires_content)
+        self.assertIn('Artéria axilar', questionnaires_content)
+        self.assertIn('Quando foi submetido(a) à cirurgia(s) de plexo '
+                      'braquial (mm/aaaa)?', questionnaires_content)
+
+    def test_invalid_questionnaire_displays_message(self):
+        ##
+        # We've created invalid Questionnaire data in tests helper in first
+        # experiment approved
+        ##
+        experiment = Experiment.objects.filter(
+            status=Experiment.APPROVED
+        ).first()
+
+        # The new visitor is at home page and sees the list of experiments.
+        # She clicks in a "View" link and is redirected to experiment
+        # detail page
+        self.browser.find_element_by_xpath(
+            "//a[@href='/experiments/" + experiment.slug + "/']"
+        ).click()
+        time.sleep(1)
+
+        # As there's a questionnaire from a group that has the wrong number
+        # of columns, when the new visitor clicks in Questionnaires tab she
+        # sees a message telling her that something is wrong with that
+        # questionnaire.
+        self.browser.find_element_by_link_text('Questionnaires').click()
+
+        questionnaires_content = self.browser.find_element_by_id(
+            'questionnaires_tab'
+        ).text
+
+        self.assertIn('This questionnaire is in invalid format, and can\'t '
+                      'be displayed', questionnaires_content)
+

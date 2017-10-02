@@ -15,7 +15,7 @@ import random
 from nep import settings
 
 
-def create_experiment_groups(qtty, experiment):
+def create_group(qtty, experiment):
     """
     :param qtty: Number of groups
     :param experiment: Experiment model instance
@@ -56,14 +56,14 @@ def create_experiment(qtty, owner, status):
             title=fake.text(max_nb_chars=15),
             description=fake.text(max_nb_chars=200),
             nes_id=randint(1, 10000),  # TODO: guarantee that this won't
-            # genetates constraint violaton (nes_id, owner_id)
+            # TODO: genetates constraint violaton (nes_id, owner_id)
             owner=owner, version=1,
             sent_date=datetime.utcnow(),
             status=status,
-            data_acquisition_done=choice([True, False])
+            data_acquisition_done=choice([True, False]),
         )
         create_study(experiment)
-        create_experiment_groups(randint(2, 3), experiment)
+        create_group(randint(2, 3), experiment)
 
 
 def create_trustee_users():
@@ -367,22 +367,26 @@ def create_eegsetting_objects_to_test_search():
 
 def create_questionnaire(source, group):
     """
-    Get the data from source file containing quesuestionnaire csv data,
+    Get the data from source file containing questionnaire csv data,
     and populates Questionnaire object
-    :param group: the
-    :param source: the file to read from
+    :param source: file to read from
+    :param group: Group model instance
     """
     file = open(source, 'r')
-    file.readline()  # skip first line with column titles
-    questionnaire_title = file.readline().split(',')[1]  # gets the
-    # questionnaire title in second line second column
-    file.close()  # close file to gets all data
-    file = open(source, 'r')
-    metadata = file.readlines()
-
+    # skip first line with column titles
+    file.readline()
+    # gets the questionnaire title in second line second column
+    questionnaire_title = file.readline().split(',')[1]
+    file.close()
+    # open again to get all data
+    with open(source, 'r') as fp:
+        metadata = fp.read()
     Questionnaire.objects.create(
-        group=group, survey_name=questionnaire_title, survey_metadata=metadata,
-        order=randint(1, 10)
+        group=group, order=randint(1, 10),
+        identification='questionnaire',
+        type=Step.QUESTIONNAIRE,
+        survey_name=questionnaire_title,
+        survey_metadata=metadata
     )
 
 
@@ -429,7 +433,7 @@ def global_setup_ft():
     # html with search results, causing dificulty to search 'Brachial
     # Plexus' in experiment title in test_search.py.
     # Related to: test_search_returns_only_last_version_experiment test.
-    experiment.pk = None
+    # experiment.pk = None # ???
     experiment.version = 2
     experiment.save()
 
@@ -493,7 +497,7 @@ def global_setup_ft():
     create_step(1, group, Step.EMG)
 
     # To test search
-    create_experiment_groups(
+    create_group(
         1, Experiment.objects.filter(status=Experiment.APPROVED).first()
     )
     group = Group.objects.last()
@@ -615,17 +619,36 @@ def global_setup_ft():
     # Create EEGSetting object to test search
     create_eegsetting_objects_to_test_search()
 
-    ##
-    # Create Questionnaire object
-    # (requires the file 'questionnaire.csv' being generated in
-    # 'experiments/tests' subdirectory)
-    ##
+    # Create Questionnaire objects
+    # (requires valid files 'questionnaire1.csv', 'questionnaire2.csv' and
+    # 'questionnaire3.csv' in 'experiments/tests' subdirectory)
     experiment = Experiment.objects.filter(
         status=Experiment.APPROVED
     ).last()
+    create_group(2, experiment)  # TODO: not necessary while creating groups
+    # TODO: inside create_experiment function. This has to be refactor.
+    group_first = experiment.groups.first()
+    create_questionnaire(settings.BASE_DIR +
+                         '/experiments/tests/questionnaire1.csv', group_first
+                         )
+    create_questionnaire(settings.BASE_DIR +
+                         '/experiments/tests/questionnaire2.csv', group_first
+                         )
+    group_last = experiment.groups.last()
+    create_questionnaire(settings.BASE_DIR +
+                         '/experiments/tests/questionnaire3.csv', group_last
+                         )
+
+    # Create invalid Questionnaire object
+    # (requires invalid files 'questionnaire4.csv' in 'experiments/tests'
+    # subdirectory)
+    experiment = Experiment.objects.filter(
+        status=Experiment.APPROVED
+    ).first()
     group = experiment.groups.first()
     create_questionnaire(settings.BASE_DIR +
-                         '/experiments/tests/questionnaire.csv', group)
+                         '/experiments/tests/questionnaire4.csv', group
+                         )
 
 
 def global_setup_ut():
@@ -644,30 +667,33 @@ def global_setup_ut():
     experiment1 = Experiment.objects.create(
         title='Experiment 1', nes_id=1, owner=owner1,
         version=1, sent_date=datetime.utcnow(),
-        status=Experiment.TO_BE_ANALYSED
+        status=Experiment.TO_BE_ANALYSED,
     )
     experiment2 = Experiment.objects.create(
         title='Experiment 2', nes_id=1, owner=owner2,
         version=1, sent_date=datetime.utcnow(),
         status=Experiment.UNDER_ANALYSIS,
-        trustee=models.User.objects.get(username='claudia')
+        trustee=models.User.objects.get(username='claudia'),
     )
     experiment3 = Experiment.objects.create(
         title='Experiment 3', nes_id=2, owner=owner2,
         version=1, sent_date=datetime.utcnow(),
-        status=Experiment.TO_BE_ANALYSED
+        status=Experiment.TO_BE_ANALYSED,
     )
     experiment4 = Experiment.objects.create(
         title='Experiment 4', nes_id=3, owner=owner1,
         version=1, sent_date=datetime.utcnow(),
-        status=Experiment.APPROVED
+        status=Experiment.APPROVED,
     )
     experiment5 = Experiment.objects.create(
         title='Experiment 5', nes_id=4, owner=owner2,
         version=1, sent_date=datetime.utcnow(),
-        status=Experiment.APPROVED
+        status=Experiment.APPROVED,
     )
     create_ethics_committee_info(experiment3)
+
+    create_group(2, experiment1)
+    create_group(1, experiment2)
 
     study1 = Study.objects.create(start_date=datetime.utcnow(),
                                   experiment=experiment1)
@@ -704,6 +730,50 @@ def global_setup_ut():
 
     # To test search
     create_eegsetting_objects_to_test_search()
+
+    # Create valid Questionnaire objects
+    # (requires the files 'questionnaire1.csv', 'questionnaire2.csv' and
+    # 'questionnaire3.csv' being generated in 'experiments/tests' subdirectory)
+    experiment = Experiment.objects.filter(
+        status=Experiment.APPROVED
+    ).last()
+    create_group(2, experiment)
+    group_first = experiment.groups.first()
+    create_questionnaire(settings.BASE_DIR +
+                         '/experiments/tests/questionnaire1.csv', group_first
+                         )
+    create_questionnaire(settings.BASE_DIR +
+                         '/experiments/tests/questionnaire2.csv', group_first
+                         )
+    group_last = experiment.groups.last()
+    create_questionnaire(settings.BASE_DIR +
+                         '/experiments/tests/questionnaire3.csv', group_last
+                         )
+
+    # Create invalid Questionnaire object
+    # (requires file 'questionnaire4.csv', being generated in
+    # 'experiments/tests' subdirectory)
+    experiment = Experiment.objects.filter(
+        status=Experiment.APPROVED
+    ).first()
+    create_group(1, experiment)
+    group = experiment.groups.last()
+    create_questionnaire(settings.BASE_DIR +
+                         '/experiments/tests/questionnaire4.csv', group)
+
+    # Create an invalid and a valid Questionnaire objects
+    # (requires the files 'questionnaire5.csv' and 'questionnaire6.csv,
+    # being generated in 'experiments/tests' subdirectory)
+    experiment = Experiment.objects.filter(
+        status=Experiment.TO_BE_ANALYSED
+    ).last()
+    create_group(2, experiment)
+    group = experiment.groups.first()
+    create_questionnaire(settings.BASE_DIR +
+                         '/experiments/tests/questionnaire5.csv', group)
+    group = experiment.groups.last()
+    create_questionnaire(settings.BASE_DIR +
+                         '/experiments/tests/questionnaire6.csv', group)
 
 
 def apply_setup(setup_func):

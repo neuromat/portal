@@ -131,7 +131,7 @@ a:hover.nep-btn {
 .top-small {
   font-size: smaller;
   display: inline-block;
-  width: 40%; /* TODO: make relative, try does not use magic number */
+  width: 34%; /* TODO: make relative, try does not use magic number */
   margin-top: 5px;
   border-left: 1px solid #2b2d2d;
   padding-left: 10px;
@@ -181,8 +181,8 @@ a:hover.nep-btn {
 }
 
 .dropdown-menu {
-        background-color: rgba(255,255,255,.8);
-        border: 1px solid rgba(226, 222, 218, 0.5);
+    background-color: rgba(255,255,255,.8);
+    border: 1px solid rgba(226, 222, 218, 0.5);
 }
 
 /*
@@ -190,13 +190,21 @@ a:hover.nep-btn {
   Header
   ========================================
  */
-
+.nep-background {
+    background-color: #EA285B;
+    height: 228px;
+    display: inline-block;
+    margin: 2em auto;
+    border-radius: 100%;
+}
 .header-home {
-  background: #a6aaad;
-  text-align: center;
-  border-top-left-radius: 7px;
-  border-top-right-radius: 7px;
-  border-bottom: 5px solid #60c8a3;
+    background-image:url("../../media/site/Background.png");
+    background-repeat: no-repeat;
+    background-size: 1171px;
+    text-align: center;
+    border-top-left-radius: 7px;
+    border-top-right-radius: 7px;
+    border-bottom: 5px solid #60c8a3;
 }
 
 .detail-header {
@@ -310,8 +318,13 @@ h5.match {
 
 .nep-footer {
   color: #fff;
-  background: #80868a;
+  background: #333;
   border-radius: 3px;
+}
+
+.footer-content-align {
+  text-align: center;
+  margin-top:20px;
 }
 
 .nep-footer h4 {
@@ -350,7 +363,16 @@ h5.match {
 }
 
 .experiment-table thead{
-  background: #60c8a3;
+    border-left: 4px solid #52af8e;
+    border-bottom: 5px solid transparent;
+    background: #60c8a3;
+}
+
+/*
+This changes the style of the left edge of the table row that is selected
+ */
+.table-hover>tbody>tr:hover {
+    border-left: 5px solid #f5f5f5;
 }
 
 /*
@@ -384,6 +406,23 @@ h5.match {
   ========================================
  */
 /* overrides bootstrap class */
+
+/* This is changing the appearance of the Bootstrap Primary button */
+.btn-primary {
+    color: #fff;
+    background-color: #60c8a3 ;
+    border-color: #60c8a3;
+}
+
+.btn-primary:hover {
+    background-color: #52af8e ;
+    border-color: #52af8e;
+}
+
+.btn-primary:focus, .btn-primary:active {
+    background-color: #52af8e ;
+    border-color: #4a9c7f;
+}
 
 .list-group-item {
   background: transparent;
@@ -448,7 +487,7 @@ h5.match {
       padding: 0 5px;
     }
     .top-small {
-      width: 50%;
+      width: 44%;
     }
     .top-alignment-right {
       padding: 5px 0 10px 0;

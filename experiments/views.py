@@ -12,9 +12,9 @@ from django.utils.translation import activate, LANGUAGE_SESSION_KEY, \
     ugettext as _
 
 from experiments.forms import NepSearchForm
-from experiments.models import Experiment, RejectJustification, Questionnaire, \
-    Step
-from experiments.tasks import rebuild_haystack_index, build_download_file
+from experiments.models import Experiment, RejectJustification, Step, \
+    Questionnaire
+from experiments.tasks import rebuild_haystack_index
 
 
 def home_page(request):
@@ -51,35 +51,69 @@ def home_page(request):
                    'search_form': NepSearchForm()})
 
 
-def _get_nested_rec(key, grp):
-    rec = {}
+def _get_nested_rec(key, group):
+    rec = dict()
     rec['question_code'] = key[0]
     rec['question_limesurvey_type'] = key[1]
     rec['question_description'] = key[2]
 
     for field in ['subquestion_description', 'option_description']:
-        if isinstance(grp[field].unique()[0], float) and \
-                math.isnan(grp[field].unique()[0]):
+        if isinstance(group[field].unique()[0], float) and \
+                math.isnan(group[field].unique()[0]):
             rec[field] = None
         else:
-            rec[field] = list(grp[field].unique())
+            rec[field] = list(group[field].unique())
 
     return rec
 
 
+def _isvalid(source_path):
+    # tests for number of columns
+    with open(source_path, 'r') as source:
+        reader = csv.reader(source, skipinitialspace=True)
+        for row in reader:
+            # the number of columns in csv file must be 11
+            if len(row) != 11:
+                return False
+
+    # tests for column titles
+    with open(source_path, 'r') as source:
+        reader = csv.reader(source, skipinitialspace=True)
+        for row in reader:
+            if row[0] != 'questionnaire_id' or \
+                            row[1] != 'questionnaire_title' or \
+                            row[2] != 'question_code' or \
+                            row[3] != 'question_limesurvey_type' or \
+                            row[4] != 'question_description' or \
+                            row[5] != 'subquestion_code' or \
+                            row[6] != 'subquestion_description' or \
+                            row[7] != 'option_code' or \
+                            row[8] != 'option_description' or \
+                            row[9] != 'option_value' or \
+                            row[10] != 'column_title':
+                return False
+            break
+
+    return True
+
+
 def _get_questionnaire(metadata):
     # Put the questionnaire data into a temporary csv file
+    # TODO: see what is a temporary dir in Rwindows
     file = open('/tmp/questionnaire.csv', 'w')
     file.write(metadata)
     file.close()
 
+    if not _isvalid('/tmp/questionnaire.csv'):
+        return 'invalid_questionnaire'
+
     # Remove the columns that won't be used and save in another temporary file
     with open('/tmp/questionnaire.csv', 'r') as source:
-        rdr = csv.reader(source, skipinitialspace=True)
+        reader = csv.reader(source, skipinitialspace=True)
         with open('/tmp/questionnaire_cleaned.csv', 'w') as result:
-            wtr = csv.writer(result)
-            for r in rdr:
-                wtr.writerow((r[2], r[3], r[4], r[6], r[8]))
+            writer = csv.writer(result)
+            for r in reader:
+                writer.writerow((r[2], r[3], r[4], r[6], r[8]))
 
     q_cleaned = pandas.read_csv('/tmp/questionnaire_cleaned.csv')
 
@@ -92,11 +126,10 @@ def _get_questionnaire(metadata):
         records.append(rec)
 
     records = dict(data=records)
-
     return records
 
 
-def experiment_detail(request, experiment_id):
+def experiment_detail(request, slug):
     to_be_analysed_count = None  # will be None if home contains the list of
     # normal user
     if request.user.is_authenticated and \
@@ -105,7 +138,7 @@ def experiment_detail(request, experiment_id):
         to_be_analysed_count = all_experiments.filter(
             status=Experiment.TO_BE_ANALYSED).count()
 
-    experiment = Experiment.objects.get(pk=experiment_id)
+    experiment = Experiment.objects.get(slug=slug)
 
     gender_grouping = {}
     age_grouping = {}
@@ -121,15 +154,16 @@ def experiment_detail(request, experiment_id):
             age_grouping[int(participant.age)] += 1
 
     # Get questionnaires for all groups
-    questionnaire = {}
+    questionnaires = {}
     for group in experiment.groups.all():
         if group.steps.filter(type=Step.QUESTIONNAIRE).count() > 0:
-            questionnaire[group.title] = {}
+            questionnaires[group.title] = {}
             for step in group.steps.filter(type=Step.QUESTIONNAIRE):
                 q = Questionnaire.objects.get(step_ptr=step)
-                questionnaire[group.title][q.id] = {}
-                questionnaire[group.title][q.id]['survey_name'] = q.survey_name
-                questionnaire[group.title][q.id]['survey_metadata'] = \
+                questionnaires[group.title][q.id] = {}
+                questionnaires[group.title][q.id]['survey_name'] = \
+                    q.survey_name
+                questionnaires[group.title][q.id]['survey_metadata'] = \
                     _get_questionnaire(q.survey_metadata)
 
     return render(
@@ -138,7 +172,7 @@ def experiment_detail(request, experiment_id):
             'gender_grouping': gender_grouping,
             'age_grouping': age_grouping,
             'to_be_analysed_count': to_be_analysed_count,
-            'questionnaire': questionnaire
+            'questionnaires': questionnaires
         }
     )
 
@@ -245,7 +279,7 @@ def change_status(request, experiment_id):
 
     if experiment.status == Experiment.APPROVED:
         rebuild_haystack_index.delay()
-        # build_download_file(request, experiment.id).delay()
+        # build_download_file(experiment.id).delay()
 
     return HttpResponseRedirect('/')
 

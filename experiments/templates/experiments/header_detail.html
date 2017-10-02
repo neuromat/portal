@@ -55,12 +55,16 @@
         <div class="align-right">
             {% if experiment.download_url %}
                 <a id="button_download" href="{{ experiment.download_url.url }}" class="nep-btn"
-                    data-toggle="tooltip" data-placement="top" title="{% trans "Download file" %}">
+                    data-toggle="tooltip" data-placement="top"
+                   title="{% trans "Download zip file with experiment data and metadata" %}">
                     {% trans "Download experiment data" %}</a>
             {% else %}
-                <a id="button_download" href="/downloads/{{ experiment.id }}" class="fileDownloadCustomRichExperience nep-btn"
-                    data-toggle="tooltip" data-placement="top" title="{% trans "Generate Download file" %}">
-                    {% trans "Generate experiment data" %}</a>
+                <a id="button_download"
+                   href="{% url 'download_view' experiment_id=experiment.id %}"
+                   class="fileDownloadCustomRichExperience nep-btn"
+                    data-toggle="tooltip" data-placement="top"
+                   title="{% trans "Generate download zip file with experiment data and metadata" %}">
+                    {% trans "Download experiment data" %}</a>
             {% endif %}
         </div>
 

@@ -31,7 +31,7 @@
                    data-logged_user="{{ request.user }}">
                 {{ experiment.get_status_display }}</a>
             </td>
-            <td><a href="{% url 'experiment-detail' experiment.id %}"
+            <td><a href="{% url 'experiment-detail' experiment.slug %}"
                    class="nep-btn">{% trans "View" %}</a></td>
         </tr>
     {% endfor %}
