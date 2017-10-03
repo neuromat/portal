@@ -309,6 +309,7 @@ class NepSearchView(SearchView):
     # TODO: see if it's necessary
     def get_queryset(self):
         queryset = super(NepSearchView, self).get_queryset()
+        return queryset.all()
 
     def get_context_data(self, *args, **kwargs):
         context = super(NepSearchView, self).get_context_data(**kwargs)
