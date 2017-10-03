@@ -67,7 +67,7 @@ HAYSTACK_CONNECTIONS = {
 HAYSTACK_DEFAULT_OPERATOR = 'OR'
 HAYSTACK_CUSTOM_HIGHLIGHTER = 'experiments.appclasses.NepHighlighter'
 # TODO: this is for doesn't paginate the SearchQueryset from NepSearchForm
-# TODO: this has to be solved after first release. It's just a jerry-rig
+# TODO: this has to be solved after first Portal release. It's just a jerry-rig
 HAYSTACK_SEARCH_RESULTS_PER_PAGE = 500
 
 TEMPLATES = [

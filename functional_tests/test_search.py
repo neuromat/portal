@@ -30,6 +30,7 @@ class SearchTest(FunctionalTest):
         stderr_backup, sys.stderr = sys.stderr, \
                                     open('/tmp/haystack_errors.txt', 'w+')
         call_command(action, verbosity=0, interactive=False)
+        sys.stderr.close()
         sys.stderr = stderr_backup
 
     def verify_n_objects_in_table_rows(self, n, row_class):
@@ -494,9 +495,6 @@ class SearchTest(FunctionalTest):
         self.assertIn('Magstim', tmsdevicesetting_text)
 
     def test_search_tmsdata_returns_correct_objects(self):
-        # TODO: we are testing manually because search tests is giving
-        # TODO: non-deterministics results uncontrollably from now one
-        # TODO: irrespective of any testing jerry-rigs to make tests pass.
         # Obs.: the tests commented bellow "passed" manually in localhost,
         # by creating entries in faker_populator.
 

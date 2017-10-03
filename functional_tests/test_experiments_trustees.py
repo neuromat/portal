@@ -1,6 +1,7 @@
 import re
 import time
 
+import sys
 from django.core import mail
 from django.core.management import call_command
 from selenium.webdriver.common.keys import Keys
@@ -465,13 +466,26 @@ class TrusteeTest(FunctionalTestTrustee):
         # Claudia is redirected to home page. She logs out the system
         self.browser.find_element_by_link_text('Log Out').click()
         # TODO: we're running rebuild_index manually, because the celery
-        # TODO: task is TODO: not beeing recognized by tests. See:
+        # TODO: task is not beeing recognized by tests. See:
         # TODO: https://stackoverflow.com/questions/4055860/unit-testing-with
         # TODO: -django-celery
         # TODO: http://bwreilly.github.io/blog/2013/07/21/testing-search
         # TODO: -haystack-in-django/
         # TODO: https://buxty.com/b/2012/12/testing-django-haystack-whoosh/
+        # Redirect sys.stderr to avoid display
+        # "GET http://127.0.0.1:9200/haystack/_mapping"
+        # during tests.
+        # TODO: see:
+        # https://github.com/django-haystack/django-haystack/issues/1142
+        stderr_backup, sys.stderr = sys.stderr, \
+                                    open('/tmp/haystack_errors.txt', 'w+')
+        # First time calling call_command does not give time to create de
+        # file '/tmp/haystack_errors.txt' (I guess), so we give some time to
+        # file to be created.
+        # time.sleep(0.2)
         call_command('rebuild_index', verbosity=0, interactive=False)
+        sys.stderr.close()
+        sys.stderr = stderr_backup
 
         # Coincidentally a researcher arrives to the site, just a few moments
         # after Claudia logged out from Portal, and searches for
