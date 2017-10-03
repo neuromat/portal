@@ -563,6 +563,7 @@ class TMS(Step):
 
 
 class Questionnaire(Step):
+    code = models.CharField(max_length=150)
     survey_name = models.CharField(max_length=255)
     survey_metadata = models.TextField(null=True, blank=True)
 
