@@ -49,8 +49,8 @@
     <div id="id_detail_study" class="detail-study">{% trans "From study" %}: <a
             href="#" data-toggle="modal" data-target="#study_modal">{{ experiment.study.title }}</a>
     </div>
-    <div><input id="experimentId" type="hidden" value=
-            "{{ experiment.id }}"></div>
+    {# this is for downloads app #}
+    <div><input id="experimentId" type="hidden" value="{{ experiment.slug }}"></div>
 
         <div class="align-right">
             {% if experiment.download_url %}
