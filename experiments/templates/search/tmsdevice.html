@@ -5,7 +5,7 @@
     <tr class="tmsdevice-matches">
         <td>
             <h5 class="match">
-                <a href="{% url 'experiment-detail' tms_device_setting.tms_setting.experiment.id %}">
+                <a href="{% url 'experiment-detail' tms_device_setting.tms_setting.experiment.slug %}">
                     <strong>{% trans "Experiment" %}: </strong>
                     {{ tms_device_setting.tms_setting.experiment.title }}
                     <strong>> {% trans "TMS Setting" %}: </strong>

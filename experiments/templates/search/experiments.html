@@ -3,7 +3,7 @@
 <tr class="experiment-matches">
     <td>
         <h5 class="match">
-            <a href="{% url 'experiment-detail' result.object.id %}"><strong>
+            <a href="{% url 'experiment-detail' result.object.slug %}"><strong>
                 {% trans "Experiment" %}: </strong>{{ result.object.title }}</a><br><br>
         </h5>
         <strong>{% trans "title" %}: </strong>
