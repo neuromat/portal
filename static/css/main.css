@@ -480,6 +480,7 @@ This changes the style of the left edge of the table row that is selected
     color: #fff;
     background-color: #60c8a3 ;
     border-color: #60c8a3;
+    margin: 4px;
 }
 
 .btn-primary:hover {
