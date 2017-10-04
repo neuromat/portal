@@ -574,7 +574,7 @@ def global_setup_ft():
     tms_setting.name = 'tmssettingname'
     tms_setting.save()
     # Create TMSDeviceSetting from a TMSSetting to test search
-    # Required creating TMSSetting from experimenta Approved, first
+    # Required creating TMSSetting from experiment Approved, first
     create_tms_device(1)  # 1º TMSDevice
     tms_device = TMSDevice.objects.last()
     tms_device.manufacturer_name = 'Siemens'
@@ -583,8 +583,8 @@ def global_setup_ft():
     coil_model = CoilModel.objects.last()
     coil_model.name = 'Magstim'
     coil_model.save()
-    create_tms_device_setting(1, tms_setting, tms_device, coil_model)  #
     # 1º TMSDeviceSetting
+    create_tms_device_setting(1, tms_setting, tms_device, coil_model)  #
     tms_device_setting = TMSDeviceSetting.objects.last()
     tms_device_setting.pulse_stimulus_type = 'single_pulse'
     tms_device_setting.save()
@@ -592,8 +592,11 @@ def global_setup_ft():
     # created above to test searching TMSDevice and CoilModel
     create_tms_setting(1, experiment)  # 2º TMSSetting
     tms_setting = TMSSetting.objects.last()
-    create_tms_device_setting(1, tms_setting, tms_device, coil_model)  # 2º
-    # TMSDeviceSetting
+    # 2º TMSDeviceSetting
+    create_tms_device_setting(1, tms_setting, tms_device, coil_model)
+    tms_device_setting = TMSDeviceSetting.objects.last()
+    tms_device_setting.pulse_stimulus_type = 'single_pulse'
+    tms_device_setting.save()
     # Create others TMSDevice and CoilModel associated with TMSDeviceSetting >
     # TMSSetting > Experiment
     create_tms_setting(1, experiment)  # 3º TMSSetting
@@ -601,19 +604,20 @@ def global_setup_ft():
     # TODO: IMPORTANT! when creating a new TMSDevice and a new CoilModel to
     # TODO: associate with new TMSDeviceSetting, the tests with filters in
     # TODO: test_search fails. See
-    # create_tms_device(1)  # 2º TMSDevice
-    # tms_device = TMSDevice.objects.last()
-    # tms_device.manufacturer_name = 'Siemens'
-    # tms_device.save()
-    # create_coil_model(1)  # 2º CoilModel
-    # coil_model = CoilModel.objects.last()
-    # coil_model.name = 'Magstim'
-    # coil_model.save()
-    create_tms_device_setting(1, tms_setting, tms_device, coil_model)  # 3º
-    # TMSDeviceSetting
-
+    create_tms_device(1)  # 2º TMSDevice
+    tms_device = TMSDevice.objects.last()
+    tms_device.manufacturer_name = 'Siemens'
+    tms_device.save()
+    create_coil_model(1)  # 2º CoilModel
+    coil_model = CoilModel.objects.last()
+    coil_model.name = 'Magstim'
+    coil_model.save()
+    # 3º TMSDeviceSetting
+    create_tms_device_setting(1, tms_setting, tms_device, coil_model)
+    tms_device_setting = TMSDeviceSetting.objects.last()
+    tms_device_setting.pulse_stimulus_type = 'single_pulse'
+    tms_device_setting.save()
     # Create TMSData objects to test search
-    # TODO: the tests returns (sic) non-deterministic search results.
     create_tmsdata_objects_to_test_search()
 
     # Create EEGSetting object to test search

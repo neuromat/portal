@@ -3,8 +3,7 @@
 <tr class="questionnaire-matches">
     <td>
         <h5 class="match">
-            <a href="
-{% url 'experiment-detail' result.object.group.experiment.slug %}"><strong
+            <a href="{% url 'experiment-detail' result.object.group.experiment.slug %}"><strong
             >{% trans "Experiment" %}: </strong>{{ result.object.group.experiment.title }}
                 <strong>> {% trans "Group" %}: </strong>
                 {{ result.object.group.title }}<strong> > {% trans "Step" %}:

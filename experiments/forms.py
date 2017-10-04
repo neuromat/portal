@@ -50,7 +50,8 @@ class NepSearchForm(SearchForm):
         if not self.is_valid():
             return self.no_query_found()
 
-        if not self.cleaned_data.get('q'):
+        if not self.cleaned_data.get('q') and \
+                not self.cleaned_data.get('filter'):
             return self.no_query_found()
 
         sqs = self._parse_query(self.cleaned_data['q'])
@@ -60,15 +61,11 @@ class NepSearchForm(SearchForm):
 
         return sqs
 
-    def no_query_found(self):
-        return self.searchqueryset.all()
-
     def _parse_query(self, query):
         """
         Parse query treating modifiers 'AND', 'OR', 'NOT' to make what they're
         supposed to.
         :param query: query entered in search input box in form
-        :param sqs: SearchQuerySet until now
         :return: SearchQuerySet object
         """
         words = iter(shlex.split(query))

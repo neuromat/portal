@@ -1,3 +1,4 @@
+import random
 import sys
 
 import haystack
@@ -30,6 +31,7 @@ class SearchTest(FunctionalTest):
         stderr_backup, sys.stderr = sys.stderr, \
                                     open('/tmp/haystack_errors.txt', 'w+')
         call_command(action, verbosity=0, interactive=False)
+        sys.stderr.close()
         sys.stderr = stderr_backup
 
     def verify_n_objects_in_table_rows(self, n, row_class):
@@ -440,9 +442,9 @@ class SearchTest(FunctionalTest):
         # TODO: test for choice representation!
         self.search_for('single_pulse')
 
-        # As there is one TMSDeviceSetting object with that name, she sees just
-        # one row in Search Results list
-        self.verify_n_objects_in_table_rows(1, 'tmsdevicesetting-matches')
+        # As there is three TMSDeviceSetting object with that name, she sees
+        # just one row in Search Results list
+        self.verify_n_objects_in_table_rows(3, 'tmsdevicesetting-matches')
         self.verify_n_objects_in_table_rows(0, 'tmssetting-matches')
         self.verify_n_objects_in_table_rows(0, 'experiment-matches')
         self.verify_n_objects_in_table_rows(0, 'study-matches')
@@ -494,9 +496,6 @@ class SearchTest(FunctionalTest):
         self.assertIn('Magstim', tmsdevicesetting_text)
 
     def test_search_tmsdata_returns_correct_objects(self):
-        # TODO: we are testing manually because search tests is giving
-        # TODO: non-deterministics results uncontrollably from now one
-        # TODO: irrespective of any testing jerry-rigs to make tests pass.
         # Obs.: the tests commented bellow "passed" manually in localhost,
         # by creating entries in faker_populator.
 
@@ -623,6 +622,7 @@ class SearchTest(FunctionalTest):
         self.assertIn('Lesão por arma de fogo', questionnaire_text)
 
     def test_search_questionnaire_data_returns_correct_objects_4(self):
+
         # Joselina wants to search for experiments that contains some
         # questionnaire data
         self.search_for('\"História de fratura\" \"Qual o lado da lesão\"')
@@ -648,3 +648,24 @@ class SearchTest(FunctionalTest):
         ).text
         self.assertIn('História de fratura', questionnaire_rows)
         self.assertIn('Qual o lado da lesão', questionnaire_rows)
+
+    def test_click_in_a_search_result_display_experiment_detail_page(self):
+        # TODO: the test tests for some match types not all. Wold be better
+        # TODO: to test for each and all match types.
+
+        # The researcher searches for 'brachial' term
+        self.search_for('brachial')
+
+        # She obtains some results. She clicks in on result link randomly
+        # and is redirected to experiment detail page
+        results_table = self.browser.find_element_by_id('search_table')
+
+        links = results_table.find_elements_by_tag_name('a')
+        random_link = random.choice(links)
+        random_link.click()
+        time.sleep(1)
+
+        detail_content_title = \
+            self.browser.find_element_by_tag_name('h2').text
+        self.assertEqual(detail_content_title,
+                         'Open Database for Experiments in Neuroscience')

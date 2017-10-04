@@ -78,10 +78,10 @@ i#new_experiments {
 }
 
 .nep-btn {
-  background: #60c8a3;
+  background: #52af8e;
   color: #fff;
-  padding: 2px 12px;
-  border-radius: 18px;
+  padding: 3px 12px;
+  border-radius: 15px;
   vertical-align: middle;
 }
 
@@ -92,6 +92,47 @@ a.nep-btn {
 a:hover.nep-btn {
   color: #fff;
   background: #a9b2b9;
+}
+
+.nep-btn-secondary {
+    background: none;
+    color: #4C5455;
+    padding: 3px 0px;
+    vertical-align: middle;
+}
+
+a.nep-btn-secondary {
+  text-decoration: none;
+}
+
+a:hover.nep-btn-secondary {
+  color: #52af8e;
+}
+
+.nep-btn-secondary .glyphicon {
+    top: 2px;
+    margin-right: 2px;
+}
+
+.nep-return {
+    background: #596465;
+    color: #fff;
+    padding: 3px 12px;
+    border-radius: 15px;
+    vertical-align: middle;
+}
+
+a.nep-return {
+  text-decoration: none;
+}
+
+a:hover.nep-return {
+  color: #fff;
+  background: #a9b2b9;
+}
+
+.nep-return .glyphicon {
+    top: 2px;
 }
 
 /*
@@ -234,7 +275,9 @@ a:hover.nep-btn {
 }
 
 .detail-header-hr {
-  margin-bottom: 4px;
+  border-top: 1px solid #a6aaad;
+  margin-top: 10px;
+  margin-bottom: 10px;
 }
 
 .detail-study {
@@ -400,6 +443,11 @@ This changes the style of the left edge of the table row that is selected
   margin: 0 auto;
 }
 
+.portal-tab-content{
+    border-bottom: solid 10px #52af8e;
+    margin-bottom: 10px;
+}
+
 /*
   ========================================
   Bootstrap overrides
@@ -422,6 +470,22 @@ This changes the style of the left edge of the table row that is selected
 .btn-primary:focus, .btn-primary:active {
     background-color: #52af8e ;
     border-color: #4a9c7f;
+}
+
+.nav-tabs {
+    border-bottom: 1px solid #60c8a3;
+}
+
+.nav-tabs>li>a:hover {
+    border-color: #60c8a3;
+    border-radius: 4px 4px 0 0;
+}
+
+.nav-tabs>li.active>a, .nav-tabs>li.active>a:focus, .nav-tabs>li.active>a:hover {
+    color: #fff;
+    background-color: #60c8a3;
+    border: 1px solid #60c8a3;
+    border-radius: 4px 4px 0 0;
 }
 
 .list-group-item {

@@ -8,7 +8,6 @@ from haystack.query import SearchQuerySet
 
 from experiments import views
 from experiments.models import Experiment, Step, Questionnaire
-from experiments.tasks import rebuild_haystack_index
 from experiments.tests.tests_helper import apply_setup, global_setup_ut
 
 
@@ -314,6 +313,7 @@ class SearchTest(TestCase):
         stderr_backup, sys.stderr = sys.stderr, \
                                     open('/tmp/haystack_errors.txt', 'w+')
         call_command(action, verbosity=0, interactive=False)
+        sys.stderr.close()
         sys.stderr = stderr_backup
 
     def test_search_redirects_to_homepage_with_search_results(self):
@@ -338,7 +338,12 @@ class SearchTest(TestCase):
 
         # We are calling method directly without delay method. Test is not
         # recognizing the result, although celery log reports success.
-        rebuild_haystack_index()
+        # rebuild_haystack_index()
+        # When calling 'rebuild_haystack_index()' in tests that boring
+        # warning message from haystack pop in tests results, so we redirect
+        # sys.stderr to a temp file and call_command manually, like we did in
+        # functional tests
+        self.haystack_index('rebuild_index')
 
         # Tests helper creates an experiment UNDER_ANALYSIS with 'Experiment
         # 2' as experiment title
