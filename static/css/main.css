@@ -112,13 +112,15 @@ a:hover.nep-btn-secondary {
 .nep-btn-secondary .glyphicon {
     top: 2px;
     margin-right: 2px;
+    font-size: 17px;
 }
 
 .nep-return {
-    background: #596465;
-    color: #fff;
+    background: #ffffff;
+    color: #626e6f;
     padding: 3px 12px;
-    border-radius: 15px;
+    border: 1px solid #626e6f;
+    border-radius: 2px;
     vertical-align: middle;
 }
 
@@ -128,11 +130,16 @@ a.nep-return {
 
 a:hover.nep-return {
   color: #fff;
-  background: #a9b2b9;
+  background: #626e6f;
+  border: none;
 }
 
 .nep-return .glyphicon {
     top: 2px;
+}
+
+.label-success {
+    background-color: #3a70a5;
 }
 
 /*
@@ -375,6 +382,19 @@ h5.match {
   margin-bottom: 15px;
 }
 
+.nep-footer span {
+  background-color: #ffffff;
+    color: #333;
+    padding: 5px;
+    margin-right: 5px;
+    font-size: 23px;
+    border-radius: 3px;
+}
+
+.nep-footer .fa-facebook{
+    padding: 5px 8px;
+}
+
 .nep-footer a {
   color: #ffffff;
 }
@@ -460,6 +480,7 @@ This changes the style of the left edge of the table row that is selected
     color: #fff;
     background-color: #60c8a3 ;
     border-color: #60c8a3;
+    margin: 4px;
 }
 
 .btn-primary:hover {
@@ -492,7 +513,6 @@ This changes the style of the left edge of the table row that is selected
   background: transparent;
   border: none;
   padding: 5px 0px;
-  text-transform: uppercase;
 }
 
 #protocol_image_full .modal-dialog {
