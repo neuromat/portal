@@ -60,7 +60,7 @@ def _create_slug(experiment):
         )
         if slugs.count() > 0:
             experiment.slug = slugify(experiment.title) + \
-                        '-' + str(slugs.count() + 1)
+                              '-' + str(slugs.count() + 1)
         else:
             experiment.slug = slugify(experiment.title)
 

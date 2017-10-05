@@ -162,19 +162,6 @@ class ExperimentModelTest(TestCase):
         with self.assertRaises(ValidationError):
             e2.full_clean()
 
-    def test_slug_is_a_slugyfication_of_title_field(self):
-        for experiment in Experiment.objects.all():
-            count = Experiment.objects.filter(
-                slug__startswith=slugify(experiment.title)
-            ).count()
-            # if there're slugs that starts with same name, adds 1 to
-            # count to save as unique slug
-            if count > 1:
-                slug = slugify(experiment.title + '-' + str(count))
-            else:
-                slug = slugify(experiment.title)
-            self.assertEqual(slug, experiment.slug)
-
     def test_creating_experiment_creates_predefined_slug(self):
         fake = Factory.create()
 
