@@ -11,7 +11,7 @@ class NepSearchForm(SearchForm):
         widget=forms.TextInput(
             attrs={'type': 'search',
                    'placeholder': _('Type key terms/words to be searched'),
-                   'class': 'search-box',
+                   'class': 'form-control',
                    'data-toggle': 'tooltip',
                    'data-placement': 'bottom',
                    'title': _('You can search for terms in quotes to search '
@@ -42,7 +42,7 @@ class NepSearchForm(SearchForm):
             ('multiunit', _('Multiunit recording'))
         ],
         widget=forms.SelectMultiple(
-            attrs={'id': 'filter_box', 'class': 'selectpicker search-select'}
+            attrs={'id': 'filter_box', 'class': 'form-control selectpicker'}
         )
     )
 
