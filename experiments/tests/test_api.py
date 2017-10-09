@@ -9,7 +9,7 @@ from rest_framework.test import APITestCase
 from experiments import api
 from experiments.helpers import generate_image_file
 from experiments.models import Experiment, Study, Group, Researcher, \
-    Collaborator
+    Collaborator, ClassificationOfDiseases
 from experiments.tests.tests_helper import global_setup_ut, apply_setup
 
 
@@ -813,124 +813,35 @@ class GroupAPITest(APITestCase):
             }
         )
         self.client.logout()
-        new_group = Group.objects.last()  # can retrieve last because we
-        # just post new group
+        # can retrieve last because we just post new group
+        new_group = Group.objects.last()
         self.assertEqual(new_group.experiment.id, experiment_v2.id)
 
-
-# @apply_setup(global_setup_ut)
-# class ProtocolComponentAPITest(APITestCase):
-#     list_url = reverse('api_protocol_components-list')
-#
-#     def setUp(self):
-#         global_setup_ut()
-#         owner = User.objects.get(username='lab1')
-#         experiment = Experiment.objects.get(owner=owner)
-#         ProtocolComponent.objects.create(
-#             identification='An identification',
-#             component_type='A component type',
-#             nes_id=1, experiment=experiment, owner=owner
-#         )
-#         ProtocolComponent.objects.create(
-#             identification='Other identification',
-#             component_type='Other component type',
-#             nes_id=2, experiment=experiment, owner=owner
-#         )
-#
-#     def test_get_returns_all_protocolcomponents(self):
-#         protocol_component1 = ProtocolComponent.objects.get(nes_id=1)
-#         protocol_component2 = ProtocolComponent.objects.get(nes_id=2)
-#         response = self.client.get(self.list_url)
-#         self.assertEqual(
-#             json.loads(response.content.decode('utf8')),
-#             [
-#                 {
-#                     'id': protocol_component1.id,
-#                     'identification': protocol_component1.identification,
-#                     'description': protocol_component1.description,
-#                     'duration_value': protocol_component1.duration_value,
-#                     'component_type': protocol_component1.component_type,
-#                     'nes_id': protocol_component1.nes_id,
-#                     'experiment': protocol_component1.experiment.title,
-#                     'owner': protocol_component1.owner.username
-#                 },
-#                 {
-#                     'id': protocol_component2.id,
-#                     'identification': protocol_component2.identification,
-#                     'description': protocol_component2.description,
-#                     'duration_value': protocol_component2.duration_value,
-#                     'component_type': protocol_component2.component_type,
-#                     'nes_id': protocol_component2.nes_id,
-#                     'experiment': protocol_component2.experiment.title,
-#                     'owner': protocol_component2.owner.username
-#                 }
-#             ]
-#         )
-#
-#     def test_POSTing_a_new_protocolcomponent(self):
-#         owner = User.objects.get(username='lab1')
-#         experiment = Experiment.objects.get(owner=owner)
-#
-#         self.client.login(username=owner.username, password='nep-lab1')
-#         response = self.client.post(
-#             self.list_url,
-#             {
-#                 'identification': 'An identification',
-#                 'description': 'A description',
-#                 'duration_value': 4,
-#                 'component_type': 'A component type',
-#                 'nes_id': 17,
-#                 'experiment': experiment.nes_id
-#             }
-#         )
-#         self.client.logout()
-#         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-#         new_protocolcomponent = ProtocolComponent.objects.first()
-#         self.assertEqual(new_protocolcomponent.identification,
-#                          'An identification')
-#
-#     def test_PUTing_an_existing_protocolcomponent(self):
-#         owner = User.objects.get(username='lab1')
-#         experiment = Experiment.objects.get(owner=owner)
-#         protocol_component = ProtocolComponent.objects.get(
-#             nes_id=1, owner=owner
-#         )
-#         detail_url1 = reverse(
-#             'api_protocol_components-detail',
-#             kwargs={'nes_id': protocol_component.nes_id}
-#         )
-#         self.client.login(username=owner.username, password='nep-lab1')
-#         resp_patch = self.client.patch(
-#             detail_url1,
-#             {
-#                 'identification': 'Changed identification',
-#                 'description': 'Changed description',
-#                 'duration_value': 2,
-#                 'component_type': 'Changed component type',
-#                 'experiment': experiment.nes_id
-#             }
-#         )
-#         self.assertEqual(resp_patch.status_code, status.HTTP_200_OK)
-#
-#         # test protocol_component updated
-#         updated_protocol_component = ProtocolComponent.objects.get(
-#             nes_id=protocol_component.nes_id, owner=owner)
-#         detail_url2 = reverse(
-#             'api_protocol_components-detail',
-#             kwargs={'nes_id': updated_protocol_component.nes_id}
-#         )
-#         resp_get = self.client.get(detail_url2)
-#         self.assertEqual(
-#             json.loads(resp_get.content.decode('utf8')),
-#             {
-#                 'id': updated_protocol_component.id,
-#                 'identification': 'Changed identification',
-#                 'description': 'Changed description',
-#                 'duration_value': 2,
-#                 'component_type': 'Changed component type',
-#                 'nes_id': updated_protocol_component.nes_id,
-#                 'experiment': updated_protocol_component.experiment.title,
-#                 'owner': updated_protocol_component.owner.username
-#             }
-#         )
-#         self.client.logout()
+    def test_POSTing_new_group_adds_pre_existent_classification_of_diseases(self):
+        owner = User.objects.get(username='lab1')
+        experiment = Experiment.objects.get(nes_id=1, owner=owner)
+        self.client.login(username=owner.username, password='nep-lab1')
+        list_url = reverse('api_experiment_groups-list',
+                           kwargs={'experiment_nes_id': experiment.nes_id})
+        response = self.client.post(
+            list_url,
+            {
+                'title': 'A title',
+                'description': 'A description',
+                # we post inclusion_criteria's that exists in
+                # ClassificationOfDiseases table (this table is
+                # pre-populated in db)
+                'inclusion_criteria': [
+                    {'code': 'A00'}, {'code': 'A1782'}, {'code': 'A3681'},
+                    {'code': 'A74'}
+                ]
+            }, format='json'
+        )
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        new_group = Group.objects.last()
+        self.assertEqual(new_group.inclusion_criteria.all().count(), 4)
+        for inclusion_criteria in new_group.inclusion_criteria.all():
+            self.assertEqual(inclusion_criteria,
+                             ClassificationOfDiseases.objects.get(
+                                 code=inclusion_criteria))
+        self.client.logout()
