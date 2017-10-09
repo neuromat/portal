@@ -829,8 +829,9 @@ class GroupAPITest(APITestCase):
                 'title': 'A title',
                 'description': 'A description',
                 # we post inclusion_criteria's that exists in
-                # ClassificationOfDiseases table (this table is
-                # pre-populated in db)
+                # ClassificationOfDiseases table. We create entries in tests
+                # helper (this table is pre-populated in db in production
+                # and homologation environments )
                 'inclusion_criteria': [
                     {'code': 'A00'}, {'code': 'A1782'}, {'code': 'A3681'},
                     {'code': 'A74'}
@@ -843,5 +844,42 @@ class GroupAPITest(APITestCase):
         for inclusion_criteria in new_group.inclusion_criteria.all():
             self.assertEqual(inclusion_criteria,
                              ClassificationOfDiseases.objects.get(
-                                 code=inclusion_criteria))
+                                 code=inclusion_criteria.code))
+        self.client.logout()
+
+    def test_POSTing_new_group_with_non_existing_cod_saves_not_recognized_code(self):
+        # cod = classification of diseases
+        owner = User.objects.get(username='lab1')
+        experiment = Experiment.objects.get(nes_id=1, owner=owner)
+        self.client.login(username=owner.username, password='nep-lab1')
+        list_url = reverse('api_experiment_groups-list',
+                           kwargs={'experiment_nes_id': experiment.nes_id})
+        response = self.client.post(
+            list_url,
+            {
+                'title': 'A title',
+                'description': 'A description',
+                # we post inclusion_criteria's that exists in
+                # ClassificationOfDiseases table. We create entries in tests
+                # helper (this table is pre-populated in db in production
+                # and homologation environments )
+                'inclusion_criteria': [
+                    {'code': 'A009647'}, {'code': 'Z034754'}
+                ]
+            }, format='json'
+        )
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        new_group = Group.objects.last()
+        self.assertEqual(new_group.inclusion_criteria.all().count(), 2)
+        for inclusion_criteria in new_group.inclusion_criteria.all():
+            self.assertEqual(inclusion_criteria,
+                             ClassificationOfDiseases.objects.get(
+                                 code=inclusion_criteria.code))
+            self.assertEqual(
+                inclusion_criteria.description, 'Code not recognized'
+            )
+            self.assertEqual(
+                inclusion_criteria.abbreviated_description,
+                'Code not recognized'
+            )
         self.client.logout()

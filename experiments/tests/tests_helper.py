@@ -779,6 +779,24 @@ def global_setup_ut():
     create_questionnaire(settings.BASE_DIR +
                          '/experiments/tests/questionnaire6.csv', group)
 
+    # Create some entries in ClassificationOfDiseases to test adding real codes
+    create_classification_of_deseases(1)
+    cd = ClassificationOfDiseases.objects.last()
+    cd.code = 'A00'
+    cd.save()
+    create_classification_of_deseases(1)
+    cd = ClassificationOfDiseases.objects.last()
+    cd.code = 'A1782'
+    cd.save()
+    create_classification_of_deseases(1)
+    cd = ClassificationOfDiseases.objects.last()
+    cd.code = 'A3681'
+    cd.save()
+    create_classification_of_deseases(1)
+    cd = ClassificationOfDiseases.objects.last()
+    cd.code = 'A74'
+    cd.save()
+
 
 def apply_setup(setup_func):
     """

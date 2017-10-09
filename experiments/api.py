@@ -507,6 +507,18 @@ class GroupSerializer(serializers.ModelSerializer):
                     group.inclusion_criteria.add(
                         classification_of_diseases.first()
                     )
+                else:
+                    # If there's not classification of disease, the code
+                    # sent is not in International classification of diseases,
+                    # so we add that code to display to user with a 'Code
+                    # not recognized' description.
+                    cod, created = \
+                        ClassificationOfDiseases.objects.get_or_create(
+                            code=criteria['code'],
+                            description='Code not recognized',
+                            abbreviated_description='Code not recognized'
+                        )
+                    group.inclusion_criteria.add(cod)
         return group
 
 
