@@ -250,6 +250,7 @@ a:hover.nep-return {
     border-radius: 100%;
 }
 .header-home {
+    background-color: #A4A6A7;
     background-image:url("../../media/site/Background.png");
     background-repeat: no-repeat;
     background-size: 1171px;
@@ -265,6 +266,14 @@ a:hover.nep-return {
   border-right: 1px solid #a6aaad;
   border-top-left-radius: 7px;
   border-top-right-radius: 7px;
+}
+
+.container-form-header {
+    margin: 0 130px;
+}
+
+.spacing-form{
+    margin: 12px 0 20px 0;
 }
 
 .detail-header h2{
@@ -497,6 +506,11 @@ This changes the style of the left edge of the table row that is selected
     border-color: #4a9c7f;
 }
 
+.form-group .btn-primary {
+    float: right;
+    margin: 0;
+}
+
 .nav-tabs {
     border-bottom: 1px solid #60c8a3;
 }
@@ -583,6 +597,9 @@ This changes the style of the left edge of the table row that is selected
     .top-login-language {
       text-align: center;
     }
+    .container-form-header {
+    margin: 0;
+}
 }
 /* smartphone landscape or tablet portrait */
 @media (min-width: 481px) and (max-width: 767px) {
@@ -595,10 +612,16 @@ This changes the style of the left edge of the table row that is selected
     .top-login-language {
       text-align: center;
     }
+    .container-form-header {
+        margin: 0;
+    }
 }
 /* desktop */
 @media (min-width: 768px) and (max-width: 1024px) {
     .top-alignment-right {
       padding: 0 0 10px 0;
+    }
+    .container-form-header {
+      margin: 0;
     }
 }

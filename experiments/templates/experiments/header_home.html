@@ -3,14 +3,16 @@
     {% load bootstrap %}
     <h1>{% trans "Neuroscience Experiments Database" %}</h1>
     <h4>{% trans "An Open Database for Experiments in Neuroscience" %}</h4>
-    <form id="search_form" action="/search">
-        {# Busca textual #}
-        {{ search_form.q}}
-
-        {# Busca por tipos #}
-        {{ search_form.filter }}
-
-        <div class="form-group">
+    <form id="searchon_form" action="/search" class="container-form-header">
+        <div class="col-xs-12 col-sm-12 col-md-12">
+            {# Busca textual #}
+            {{ search_form.q}}
+        </div>
+        <div class="spacing-form col-xs-12 col-sm-10 col-md-10">
+            {# Busca por tipos #}
+            {{ search_form.filter }}
+        </div>
+        <div class="spacing-form form-group col-xs-12 col-sm-2 col-md-2">
             <input id="submit_terms" class="btn btn-primary" type="submit" value="Search">
         </div>
     </form>
