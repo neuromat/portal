@@ -126,7 +126,7 @@ class Experiment(models.Model):
 class ClassificationOfDiseases(models.Model):
     code = models.CharField(max_length=10)
     description = models.CharField(max_length=300)
-    abbreviated_description = models.CharField(max_length=190)
+    abbreviated_description = models.CharField(max_length=300)
     parent = models.ForeignKey('self', null=True, related_name='children')
 
     def __str__(self):
