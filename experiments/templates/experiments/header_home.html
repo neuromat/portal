@@ -1,10 +1,15 @@
 <header class="container header-home">
     {% load i18n %}
     {% load bootstrap %}
-     <h1>{% trans "Neuroscience Experiments Database" %}</h1>
+    <h1>{% trans "Neuroscience Experiments Database" %}</h1>
     <h4>{% trans "An Open Database for Experiments in Neuroscience" %}</h4>
     <form id="search_form" action="/search">
-        {{ search_form|bootstrap }}
+        {# Busca textual #}
+        {{ search_form.q}}
+
+        {# Busca por tipos #}
+        {{ search_form.filter }}
+
         <div class="form-group">
             <input id="submit_terms" class="btn btn-primary" type="submit" value="Search">
         </div>

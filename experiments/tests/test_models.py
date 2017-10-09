@@ -162,26 +162,16 @@ class ExperimentModelTest(TestCase):
         with self.assertRaises(ValidationError):
             e2.full_clean()
 
-    def test_slug_is_a_slugyfication_of_title_field(self):
-        for experiment in Experiment.objects.all():
-            count = Experiment.objects.filter(
-                slug__startswith=slugify(experiment.title)
-            ).count()
-            # if there're slugs that starts with same name, adds 1 to
-            # count to save as unique slug
-            if count > 1:
-                slug = slugify(experiment.title + '-' + str(count))
-            else:
-                slug = slugify(experiment.title)
-            self.assertEqual(slug, experiment.slug)
-
     def test_creating_experiment_creates_predefined_slug(self):
         fake = Factory.create()
 
+        experiments_now = Experiment.objects.all().count()
+
+        # create experiment: nes_id 1, owner lab1, first version
         e1 = Experiment.objects.create(
             title='This is a slug',
             description=fake.text(max_nb_chars=200),
-            nes_id=randint(1, 1000000),
+            nes_id=experiments_now + 1,
             owner=User.objects.get(username='lab1'),
             version=1, sent_date=datetime.utcnow(),
             status=Experiment.TO_BE_ANALYSED,
@@ -189,29 +179,82 @@ class ExperimentModelTest(TestCase):
         )
         self.assertEqual(slugify(e1.title), e1.slug)
 
-        # create another experiment with same title
+        # create experiment: nes_id 1, owner lab1, second version,
+        # title unaltered
         e2 = Experiment.objects.create(
             title='This is a slug',
             description=fake.text(max_nb_chars=200),
-            nes_id=randint(1, 1000000),
+            nes_id=experiments_now + 1,
             owner=User.objects.get(username='lab1'),
-            version=1, sent_date=datetime.utcnow(),
+            version=2, sent_date=datetime.utcnow(),
             status=Experiment.TO_BE_ANALYSED,
             data_acquisition_done=True,
         )
-        self.assertEqual(slugify(e1.title + '-' + str(2)), e2.slug)
+        self.assertEqual(slugify(e1.title) + '-v2', e2.slug)
 
-        # create one more with same title
+        # create experiment: nes_id 1, owner lab1, third version, title altered
         e3 = Experiment.objects.create(
+            title='This is another slug',
+            description=fake.text(max_nb_chars=200),
+            nes_id=experiments_now + 1,
+            owner=User.objects.get(username='lab1'),
+            version=3, sent_date=datetime.utcnow(),
+            status=Experiment.TO_BE_ANALYSED,
+            data_acquisition_done=True,
+        )
+        self.assertEqual(slugify(e1.title) + '-v3', e3.slug)
+
+        # create experiment: nes_id 2, owner lab2, first version,
+        # existing title from other experiment
+        e4 = Experiment.objects.create(
             title='This is a slug',
             description=fake.text(max_nb_chars=200),
-            nes_id=randint(1, 1000000),
+            nes_id=experiments_now + 2,
             owner=User.objects.get(username='lab2'),
             version=1, sent_date=datetime.utcnow(),
             status=Experiment.TO_BE_ANALYSED,
             data_acquisition_done=True,
         )
-        self.assertEqual(slugify(e1.title + '-' + str(3)), e3.slug)
+        self.assertEqual(slugify(e4.title) + '-2', e4.slug)
+
+        # create experiment: nes_id 2, owner lab2, second version,
+        # title unaltered
+        e5 = Experiment.objects.create(
+            title='This is a slug',
+            description=fake.text(max_nb_chars=200),
+            nes_id=experiments_now + 2,
+            owner=User.objects.get(username='lab2'),
+            version=2, sent_date=datetime.utcnow(),
+            status=Experiment.TO_BE_ANALYSED,
+            data_acquisition_done=True,
+        )
+        self.assertEqual(slugify(e4.title) + '-2-v2', e5.slug)
+
+        # create experiment: nes_id 2, owner lab2, third version,
+        # title unaltered
+        e6 = Experiment.objects.create(
+            title='This is a slug',
+            description=fake.text(max_nb_chars=200),
+            nes_id=experiments_now + 2,
+            owner=User.objects.get(username='lab2'),
+            version=3, sent_date=datetime.utcnow(),
+            status=Experiment.TO_BE_ANALYSED,
+            data_acquisition_done=True,
+        )
+        self.assertEqual(slugify(e4.title) + '-2-v3', e6.slug)
+
+        # create experiment: nes_id 3, owner lab2, first version,
+        # non-existing title from other experiment
+        e7 = Experiment.objects.create(
+            title='This is one more slug',
+            description=fake.text(max_nb_chars=200),
+            nes_id=experiments_now + 3,
+            owner=User.objects.get(username='lab2'),
+            version=1, sent_date=datetime.utcnow(),
+            status=Experiment.TO_BE_ANALYSED,
+            data_acquisition_done=True,
+        )
+        self.assertEqual(slugify(e7.title), e7.slug)
 
 
 @apply_setup(global_setup_ut)

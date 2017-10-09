@@ -129,8 +129,6 @@ class NewVisitorTest(FunctionalTest):
         self.assertIn('+55 11 3091-1717', footer_content)
         self.assertIn('Email:', footer_content)
         self.assertIn('neuromat@numec.prp.usp.br', footer_content)
-        self.assertIn('Media contact:', footer_content)
-        self.assertIn('comunicacao@numec.prp.usp.br', footer_content)
         footer_license_text = self.browser.find_element_by_id(
             'id_footer_license').text
         self.assertIn('This site content is licensed under a Creative Commons '

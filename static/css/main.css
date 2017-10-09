@@ -25,6 +25,10 @@ label.questionnaire-options {
   font-weight: normal;
 }
 
+span.not-recognized {
+    color: red;
+}
+
 /*
   ========================================
   Links

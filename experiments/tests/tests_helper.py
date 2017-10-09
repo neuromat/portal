@@ -544,8 +544,36 @@ def global_setup_ft():
     gender1 = Gender.objects.create(name='male')
     gender2 = Gender.objects.create(name='female')
 
-    # Create some entries for ClassificationOfDiseases
-    create_classification_of_deseases(10)
+    # Create some invalid entries for ClassificationOfDiseases model.
+    # They are invalid because in create_classification_of_diseases method
+    # the code are generated with a faker.
+    create_classification_of_deseases(1)
+    cd = ClassificationOfDiseases.objects.last()
+    cd.description = 'Code not recognized'
+    cd.save()
+    create_classification_of_deseases(1)
+    cd = ClassificationOfDiseases.objects.last()
+    cd.description = 'Code not recognized'
+    cd.save()
+
+    # Create valid entries for ClassificationOfDiseases model.
+    # We give valid codes to the objects created.
+    create_classification_of_deseases(1)
+    cd = ClassificationOfDiseases.objects.last()
+    cd.code = 'A00'
+    cd.save()
+    create_classification_of_deseases(1)
+    cd = ClassificationOfDiseases.objects.last()
+    cd.code = 'A1782'
+    cd.save()
+    create_classification_of_deseases(1)
+    cd = ClassificationOfDiseases.objects.last()
+    cd.code = 'A3681'
+    cd.save()
+    create_classification_of_deseases(1)
+    cd = ClassificationOfDiseases.objects.last()
+    cd.code = 'A74'
+    cd.save()
 
     # Create randint(3, 7) participants for each group (requires create
     # groups before)
@@ -778,6 +806,24 @@ def global_setup_ut():
     group = experiment.groups.last()
     create_questionnaire(settings.BASE_DIR +
                          '/experiments/tests/questionnaire6.csv', group)
+
+    # Create some entries in ClassificationOfDiseases to test adding real codes
+    create_classification_of_deseases(1)
+    cd = ClassificationOfDiseases.objects.last()
+    cd.code = 'A00'
+    cd.save()
+    create_classification_of_deseases(1)
+    cd = ClassificationOfDiseases.objects.last()
+    cd.code = 'A1782'
+    cd.save()
+    create_classification_of_deseases(1)
+    cd = ClassificationOfDiseases.objects.last()
+    cd.code = 'A3681'
+    cd.save()
+    create_classification_of_deseases(1)
+    cd = ClassificationOfDiseases.objects.last()
+    cd.code = 'A74'
+    cd.save()
 
 
 def apply_setup(setup_func):
