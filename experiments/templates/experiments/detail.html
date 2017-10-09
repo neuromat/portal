@@ -59,7 +59,11 @@
                                         {% trans "Inclusion criterias" %}:
                                         <br>
                                         {% for criteria in group.inclusion_criteria.all %}
-                                            {{ criteria.code }} - {{ criteria.description }}{% if not forloop.last %},{% endif %}
+                                            {% if criteria.description != 'Code not recognized' %}
+                                                {{ criteria.code }} - {{ criteria.description }}{% if not forloop.last %},{% endif %}
+                                            {% else %}
+                                                <span class="not-recognized">{{ criteria.code }} - {{ criteria.description }}</span>{% if not forloop.last %},{% endif %}
+                                            {% endif %}
                                         {% endfor %}
                                     {% endif %}
                                 </div>

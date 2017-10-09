@@ -150,7 +150,7 @@ class ExperimentDetailTest(FunctionalTest):
         # Testing Statistics, Groups and Settings
         ##
 
-        # She hit ESC to exit Study modal and clicks the Groups tab
+        # She hits ESC to exit Study modal and clicks the Groups tab
         study_modal = self.browser.find_element_by_id('study_modal')
         study_modal.send_keys(Keys.ESCAPE)
         time.sleep(1)
@@ -161,6 +161,7 @@ class ExperimentDetailTest(FunctionalTest):
         # in that group. There is also the information criteria that was
         # used to include each group.
         groups_tab_content = self.browser.find_element_by_id('groups_tab').text
+        code_not_recognized_instances = 0
         for group in experiment.groups.all():
             self.assertIn(group.title, groups_tab_content)
             self.assertIn(group.description, groups_tab_content)
@@ -171,6 +172,16 @@ class ExperimentDetailTest(FunctionalTest):
                 for ic in group.inclusion_criteria.all():
                     self.assertIn(ic.code + ' - ' + ic.description,
                                   groups_tab_content)
+            code_not_recognized_instances = code_not_recognized_instances + \
+                group.inclusion_criteria.filter(
+                        description='Code not recognized'
+                ).count()
+        code_not_recognized_in_template = \
+            len(self.browser.find_elements_by_class_name('not-recognized'))
+        self.assertEqual(
+            code_not_recognized_instances, code_not_recognized_in_template
+        )
+
         # Finally, at right of each group information there is a button
         # written 'Details'. She clicks on the first link and the panel
         # expands displaying textual representation of the experimental
