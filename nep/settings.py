@@ -34,6 +34,7 @@ INSTALLED_APPS = [
     'downloads',
     'bootstrapform',
     'django_celery_results',
+    'modeltranslation',
 ]
 
 MIDDLEWARE = [
