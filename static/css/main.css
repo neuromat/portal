@@ -44,6 +44,10 @@ a:hover, a.nep-disabled {
   text-decoration: none;
 }
 
+a:focus, a:hover {
+  color: #fdfdfd;
+}
+
 *.icon-grey {
   color: grey;
 }
@@ -477,8 +481,8 @@ This changes the style of the left edge of the table row that is selected
 }
 
 .portal-tab-content{
-    border-bottom: solid 10px #52af8e;
-    margin-bottom: 10px;
+  border-bottom: solid 10px #52af8e;
+  margin-bottom: 10px;
 }
 
 /*
@@ -631,3 +635,10 @@ This changes the style of the left edge of the table row that is selected
       margin: 0;
     }
 }
+
+@media (min-width: 1200px) {
+ #settings_tab .container {
+    width: 1135px;
+}
+}
+
