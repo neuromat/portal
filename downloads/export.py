@@ -532,7 +532,7 @@ class ExportExecution:
                     participant_code = questionnaire.participant.code
                     # get questionnaire (survey)
                     survey = get_object_or_404(Questionnaire, pk=step_questionnaire.id)
-                    questionnaire_code = survey.id
+                    questionnaire_code = survey.code
                     questionnaire_title = "%s_%s" % (str(questionnaire_code), str(survey.survey_name))
                     # questionnaire response fields list
                     questionnaire_response_fields = json.loads(questionnaire.limesurvey_response)
@@ -607,13 +607,18 @@ class ExportExecution:
                                                               participant_code_directory_name)
                 if participant_code not in self.per_group_data[group_id]['data_per_participant']:
                     self.per_group_data[group_id]['data_per_participant'][participant_code] = {}
-                if 'eeg_data' not in self.per_group_data[group_id]['data_per_participant'][participant_code]:
-                    self.per_group_data[group_id]['data_per_participant'][participant_code]['eeg_data'] = []
-                self.per_group_data[group_id]['data_per_participant'][participant_code]['eeg_data'].append({
+                if 'eeg_data_list' not in self.per_group_data[group_id]['data_per_participant'][participant_code]:
+                    self.per_group_data[group_id]['data_per_participant'][participant_code]['eeg_data_list'] = []
+                    self.per_group_data[group_id]['data_per_participant'][participant_code]['data_index'] = 1
+                else:
+                    self.per_group_data[group_id]['data_per_participant'][participant_code]['data_index'] += 1
+                index = str(self.per_group_data[group_id]['data_per_participant'][participant_code]['data_index'])
+                self.per_group_data[group_id]['data_per_participant'][participant_code]['eeg_data_list'].append({
                     'step_identification': eeg_participant.step.identification,
                     'setting_id': eeg_participant.eeg_setting_id,
                     'data_id': eeg_participant.id,
                     'directory_step_name': directory_step_name,
+                    'eeg_data_directory_name': "EEGData_" + index,
                     'directory_step': path.join(participant_code_directory, directory_step_name),
                     'export_directory_step': path.join(export_participant_code_directory, directory_step_name),
                 })
@@ -629,13 +634,18 @@ class ExportExecution:
                                                               participant_code_directory_name)
                 if participant_code not in self.per_group_data[group_id]['data_per_participant']:
                     self.per_group_data[group_id]['data_per_participant'][participant_code] = {}
-                if 'emg_data' not in self.per_group_data[group_id]['data_per_participant'][participant_code]:
-                    self.per_group_data[group_id]['data_per_participant'][participant_code]['emg_data'] = []
-                self.per_group_data[group_id]['data_per_participant'][participant_code]['emg_data'].append({
+                if 'emg_data_list' not in self.per_group_data[group_id]['data_per_participant'][participant_code]:
+                    self.per_group_data[group_id]['data_per_participant'][participant_code]['emg_data_list'] = []
+                    self.per_group_data[group_id]['data_per_participant'][participant_code]['data_index'] = 1
+                else:
+                    self.per_group_data[group_id]['data_per_participant'][participant_code]['data_index'] += 1
+                index = str(self.per_group_data[group_id]['data_per_participant'][participant_code]['data_index'])
+                self.per_group_data[group_id]['data_per_participant'][participant_code]['emg_data_list'].append({
                     'step_identification': emg_participant.step.identification,
                     'setting_id': emg_participant.emg_setting_id,
                     'data_id': emg_participant.id,
                     'directory_step_name': directory_step_name,
+                    'emg_data_directory_name': "EMGData_" + index,
                     'directory_step': path.join(participant_code_directory, directory_step_name),
                     'export_directory_step': path.join(export_participant_code_directory, directory_step_name),
                 })
@@ -673,13 +683,19 @@ class ExportExecution:
                                                               participant_code_directory_name)
                 if participant_code not in self.per_group_data[group_id]['data_per_participant']:
                     self.per_group_data[group_id]['data_per_participant'][participant_code] = {}
-                if 'additional_data' not in self.per_group_data[group_id]['data_per_participant'][participant_code]:
-                    self.per_group_data[group_id]['data_per_participant'][participant_code]['additional_data'] = []
-                self.per_group_data[group_id]['data_per_participant'][participant_code]['additional_data'].append({
+                if 'additional_data_list' not in self.per_group_data[group_id]['data_per_participant'][
+                    participant_code]:
+                    self.per_group_data[group_id]['data_per_participant'][participant_code]['additional_data_list'] = []
+                    self.per_group_data[group_id]['data_per_participant'][participant_code]['data_index'] = 1
+                else:
+                    self.per_group_data[group_id]['data_per_participant'][participant_code]['data_index'] += 1
+                index = str(self.per_group_data[group_id]['data_per_participant'][participant_code]['data_index'])
+                self.per_group_data[group_id]['data_per_participant'][participant_code]['additional_data_list'].append({
                     'step_identification': additional_data.step.identification,
                     'setting_id': '',
                     'data_id': additional_data.id,
                     'directory_step_name': directory_step_name,
+                    'additional_data_directory_name': "AdditionalData_" + index,
                     'directory_step': path.join(participant_code_directory, directory_step_name),
                     'export_directory_step': path.join(export_participant_code_directory, directory_step_name),
                 })
@@ -695,33 +711,46 @@ class ExportExecution:
                                                               participant_code_directory_name)
                 if participant_code not in self.per_group_data[group_id]['data_per_participant']:
                     self.per_group_data[group_id]['data_per_participant'][participant_code] = {}
-                if 'generic_data' not in self.per_group_data[group_id]['data_per_participant'][participant_code]:
-                    self.per_group_data[group_id]['data_per_participant'][participant_code]['generic_data'] = []
-                self.per_group_data[group_id]['data_per_participant'][participant_code]['generic_data'].append({
+                if 'generic_data_list' not in self.per_group_data[group_id]['data_per_participant'][participant_code]:
+                    self.per_group_data[group_id]['data_per_participant'][participant_code]['generic_data_list'] = []
+                    self.per_group_data[group_id]['data_per_participant'][participant_code]['data_index'] = 1
+                else:
+                    self.per_group_data[group_id]['data_per_participant'][participant_code]['data_index'] += 1
+                index = str(self.per_group_data[group_id]['data_per_participant'][participant_code]['data_index'])
+                self.per_group_data[group_id]['data_per_participant'][participant_code]['generic_data_list'].append({
                     'step_identification': generic_data.step.identification,
                     'setting_id': '',
                     'data_id': generic_data.id,
                     'directory_step_name': directory_step_name,
+                    'generic_data_directory_name': "GenericData_" + index,
                     'directory_step': path.join(participant_code_directory, directory_step_name),
                     'export_directory_step': path.join(export_participant_code_directory, directory_step_name),
                 })
 
-                goalkeeper_data_list = GoalkeeperGameData.objects.filter(participant__in=participant_group_list)
-                for goalkeeper_data in goalkeeper_data_list:
-                    participant_code = "Participant_" + goalkeeper_data.participant.code
-                    directory_step_name = "STEP_" + str(goalkeeper_data.step.numeration) + "_" + \
-                                          goalkeeper_data.step.type.upper()
-                    participant_code_directory = path.join(participant_directory, participant_code)
-                    export_participant_code_directory = path.join(export_participant_directory, participant_code)
-                    if participant_code not in self.per_group_data[group_id]['data_per_participant']:
-                        self.per_group_data[group_id]['data_per_participant'][participant_code] = {}
-                    if 'goalkeeper_data' not in self.per_group_data[group_id]['data_per_participant'][participant_code]:
-                        self.per_group_data[group_id]['data_per_participant'][participant_code]['goalkeeper_data'] = []
-                    self.per_group_data[group_id]['data_per_participant'][participant_code]['goalkeeper_data'].append({
+            goalkeeper_data_list = GoalkeeperGameData.objects.filter(participant__in=participant_group_list)
+            for goalkeeper_data in goalkeeper_data_list:
+                participant_code = "Participant_" + goalkeeper_data.participant.code
+                directory_step_name = "STEP_" + str(goalkeeper_data.step.numeration) + "_" + \
+                                      goalkeeper_data.step.type.upper()
+                participant_code_directory = path.join(participant_directory, participant_code)
+                export_participant_code_directory = path.join(export_participant_directory, participant_code)
+                if participant_code not in self.per_group_data[group_id]['data_per_participant']:
+                    self.per_group_data[group_id]['data_per_participant'][participant_code] = {}
+                if 'goalkeeper_data_list' not in self.per_group_data[group_id]['data_per_participant'][
+                    participant_code]:
+                    self.per_group_data[group_id]['data_per_participant'][participant_code][
+                        'goalkeeper_data_list'] = []
+                    self.per_group_data[group_id]['data_per_participant'][participant_code]['data_index'] = 1
+                else:
+                    self.per_group_data[group_id]['data_per_participant'][participant_code]['data_index'] += 1
+                index = str(self.per_group_data[group_id]['data_per_participant'][participant_code]['data_index'])
+                self.per_group_data[group_id]['data_per_participant'][participant_code][
+                    'goalkeeper_data_list'].append({
                         'step_identification': goalkeeper_data.step.identification,
                         'setting_id': '',
                         'data_id': goalkeeper_data.id,
                         'directory_step_name': directory_step_name,
+                        'goalkeeper_data_directory_name': "GoalkeeperData_" + index,
                         'directory_step': path.join(participant_code_directory, directory_step_name),
                         'export_directory_step': path.join(export_participant_code_directory, directory_step_name),
                     })
@@ -776,9 +805,9 @@ class ExportExecution:
                             self.files_to_zip_list.append([complete_filename_questionnaire,
                                                            export_questionnaire_directory])
 
-                    if 'eeg_data' in self.per_group_data[group_id]['data_per_participant'][participant_code]:
+                    if 'eeg_data_list' in self.per_group_data[group_id]['data_per_participant'][participant_code]:
                         eeg_data_list = self.per_group_data[group_id]['data_per_participant'][participant_code][
-                            'eeg_data']
+                            'eeg_data_list']
                         for eeg_data in eeg_data_list:
                             eeg_directory = eeg_data['directory_step']
                             # ex. Users/.../EXPERIMENT_DOWNLOAD/Group_group.title/Participants/PXXXX/Step_XX_EEG
@@ -790,14 +819,28 @@ class ExportExecution:
                             # ex. EXPERIMENT_DOWNLOAD/Group_group.title/Participants/PXXXX/Step_XX_EEG
                             export_eeg_directory = eeg_data['export_directory_step']
 
+                            # to create EEGData directory
+                            directory_data_name = eeg_data['eeg_data_directory_name']
+                            path_per_eeg_data = path.join(eeg_directory, directory_data_name)
+                            if not path.exists(path_per_eeg_data):
+                                # ex. /Users/.../NES_EXPORT/Experiment_data/Group_XXX/Per_participant/Participant_123
+                                # /Step_X_aaa/EEGData_index
+                                error_msg, path_per_eeg_data = create_directory(eeg_directory, directory_data_name)
+                                if error_msg != "":
+                                    return error_msg
+                            # ex. /NES_EXPORT/Experiment_data/Group_XXX/Per_participant/Participant_123/Step_X_aaa
+                            # /EEGData_index
+                            export_eeg_data_directory = path.join(export_eeg_directory, directory_data_name)
+
                             eeg_data = get_object_or_404(EEGData, pk=eeg_data['data_id'])
 
                             for file in eeg_data.files.all():
 
                                 # download eeg raw data file
                                 eeg_data_filename = file.file.name.split('/')[-1]
-                                # ex. Users/.../EXPERIMENT_DOWNLOAD/Group_group.title/Participants/PXXXX/Step_XX_EEG/eeg.raw
-                                complete_eeg_data_filename = path.join(eeg_directory, eeg_data_filename)
+                                # ex. Users/.../EXPERIMENT_DOWNLOAD/Group_group.title/Participants/PXXXX/Step_XX_EEG
+                                # /EEGData_index/eeg.raw
+                                complete_eeg_data_filename = path.join(path_per_eeg_data, eeg_data_filename)
                                 eeg_raw_data_file = path.join(path.join(settings.BASE_DIR, "media/"),
                                                               file.file.name)
 
@@ -807,7 +850,7 @@ class ExportExecution:
                                 with open(complete_eeg_data_filename, 'wb') as f:
                                     f.write(data)
 
-                                self.files_to_zip_list.append([complete_eeg_data_filename, export_eeg_directory])
+                                self.files_to_zip_list.append([complete_eeg_data_filename, export_eeg_data_directory])
 
                             # create eeg_setting_description
                             eeg_setting_description = get_eeg_setting_description(eeg_data.eeg_setting_id)
@@ -817,17 +860,36 @@ class ExportExecution:
 
                                 # ex. Users/.../EXPERIMENT_DOWNLOAD/Group_group.title/Participants/PXXXX/Step_XX_EEG/
                                 # eeg_rawfilename_setting_description.json#
-                                complete_setting_filename = path.join(eeg_directory, eeg_setting_filename)
+                                complete_setting_filename = path.join(path_per_eeg_data, eeg_setting_filename)
 
-                                self.files_to_zip_list.append([complete_setting_filename, export_eeg_directory])
+                                self.files_to_zip_list.append([complete_setting_filename, export_eeg_data_directory])
 
                                 with open(complete_setting_filename.encode('utf-8'), 'w', newline='',
                                           encoding='UTF-8') as outfile:
                                     json.dump(eeg_setting_description, outfile, indent=4)
 
-                    if 'emg_data' in self.per_group_data[group_id]['data_per_participant'][participant_code]:
+                            # if sensor position image exist
+                            eeg_electrode_localization_system = eeg_data.eeg_setting.eeg_electrode_localization_system
+                            if hasattr(eeg_electrode_localization_system, 'map_image_file'):
+                                sensor_position_filename = "%s.png" % "sensor_position"
+                                map_filename = eeg_electrode_localization_system.map_image_file.name
+                                sensors_positions_image = settings.BASE_DIR + settings.MEDIA_URL + map_filename
+
+                                complete_sensor_position_filename = path.join(path_per_eeg_data,
+                                                                              sensor_position_filename)
+
+                                with open(sensors_positions_image, 'rb') as f:
+                                    data = f.read()
+
+                                with open(complete_sensor_position_filename, 'wb') as f:
+                                    f.write(data)
+
+                                self.files_to_zip_list.append([complete_sensor_position_filename,
+                                                               export_eeg_data_directory])
+
+                    if 'emg_data_list' in self.per_group_data[group_id]['data_per_participant'][participant_code]:
                         emg_data_list = self.per_group_data[group_id]['data_per_participant'][participant_code][
-                            'emg_data']
+                            'emg_data_list']
                         for emg_data in emg_data_list:
                             emg_directory = emg_data['directory_step']
                             # ex. Users/.../EXPERIMENT_DOWNLOAD/Group_group.title/Participants/PXXXX/Step_XX_EMG
@@ -839,14 +901,28 @@ class ExportExecution:
                             # ex. EXPERIMENT_DOWNLOAD/Group_group.title/Participants/PXXXX/Step_XX_EMG
                             export_emg_directory = emg_data['export_directory_step']
 
+                            # to create EMGData directory
+                            directory_data_name = emg_data['emg_data_directory_name']
+                            path_per_emg_data = path.join(emg_directory, directory_data_name)
+                            if not path.exists(path_per_emg_data):
+                                # ex. /Users/.../NES_EXPORT/Experiment_data/Group_XXX/Per_participant/Participant_123
+                                # /Step_X_aaa/EMGData_index
+                                error_msg, path_per_emg_data = create_directory(emg_directory, directory_data_name)
+                                if error_msg != "":
+                                    return error_msg
+                            # ex. /NES_EXPORT/Experiment_data/Group_XXX/Per_participant/Participant_123/Step_X_aaa
+                            # /EMGData_index
+                            export_emg_data_directory = path.join(export_emg_directory, directory_data_name)
+
                             emg_data = get_object_or_404(EMGData, pk=emg_data['data_id'])
 
                             for file in emg_data.files.all():
 
                                 # download emg raw data file
                                 emg_data_filename = file.file.name.split('/')[-1]
-                                # ex. Users/.../EXPERIMENT_DOWNLOAD/Group_group.title/Participants/PXXXX/Step_XX_EMG/emg.raw
-                                complete_emg_data_filename = path.join(emg_directory, emg_data_filename)
+                                # ex. Users/.../EXPERIMENT_DOWNLOAD/Group_group.title/Participants/PXXXX/Step_XX_EMG
+                                # /EMGData_index/emg.raw
+                                complete_emg_data_filename = path.join(path_per_emg_data, emg_data_filename)
                                 emg_raw_data_file = path.join(path.join(settings.BASE_DIR, "media/"),
                                                               file.file.name)
 
@@ -856,7 +932,7 @@ class ExportExecution:
                                 with open(complete_emg_data_filename, 'wb') as f:
                                     f.write(data)
 
-                                self.files_to_zip_list.append([complete_emg_data_filename, export_emg_directory])
+                                self.files_to_zip_list.append([complete_emg_data_filename, export_emg_data_directory])
 
                             # download emg_setting_description
                             emg_setting_description = get_emg_setting_description(emg_data.emg_setting_id)
@@ -864,11 +940,11 @@ class ExportExecution:
                                 emg_setting_filename = "%s_%s.json" % (emg_data_filename.split(".")[0],
                                                                        "setting_description")
 
-                                # ex. Users/.../EXPERIMENT_DOWNLOAD/Group_group.title/Participants/PXXXX/Step_XX_EMG/
-                                # emg_rawfilename_setting_description.json#
-                                complete_setting_filename = path.join(emg_directory, emg_setting_filename)
+                                # ex. Users/.../EXPERIMENT_DOWNLOAD/Group_group.title/Participants/PXXXX/Step_XX_EMG
+                                # /EMGData_index/emg_rawfilename_setting_description.json#
+                                complete_setting_filename = path.join(path_per_emg_data, emg_setting_filename)
 
-                                self.files_to_zip_list.append([complete_setting_filename, export_emg_directory])
+                                self.files_to_zip_list.append([complete_setting_filename, export_emg_data_directory])
 
                                 with open(complete_setting_filename.encode('utf-8'), 'w', newline='',
                                           encoding='UTF-8') as outfile:
@@ -932,7 +1008,21 @@ class ExportExecution:
                                 if error_msg != "":
                                     return error_msg
                             # ex. EXPERIMENT_DOWNLOAD/Group_group.title/Participants/PXXXX/Step_XX_step_TYPE
-                            export_additional_data_directory = additional_data['export_directory_step']
+                            export_data_directory = additional_data['export_directory_step']
+
+                            # to create AdditionalData directory
+                            directory_data_name = additional_data['additional_data_directory_name']
+                            path_per_additional_data = path.join(additional_data_directory, directory_data_name)
+                            if not path.exists(path_per_additional_data):
+                                # ex. /Users/.../NES_EXPORT/Experiment_data/Group_XXX/Per_participant/Participant_123
+                                # /Step_X_aaa/AdditionalData_index
+                                error_msg, path_per_additional_data = create_directory(additional_data_directory,
+                                                                                       directory_data_name)
+                                if error_msg != "":
+                                    return error_msg
+                            # ex. /NES_EXPORT/Experiment_data/Group_XXX/Per_participant/Participant_123/Step_X_aaa
+                            # /AdditionalData_index
+                            export_additional_data_directory = path.join(export_data_directory, directory_data_name)
 
                             data_file = get_object_or_404(AdditionalData, pk=additional_data['data_id'])
 
@@ -945,7 +1035,7 @@ class ExportExecution:
 
                                 # ex. /Users/.../NES_EXPORT/Experiment_data/Group_XXX/Participants/PXXXX/
                                 # Step_XX_step_TYPE/file_name.format_type
-                                complete_additional_data_filename = path.join(additional_data_directory, file_name)
+                                complete_additional_data_filename = path.join(path_per_additional_data, file_name)
                                 with open(additional_data_filename, 'rb') as f:
                                     data = f.read()
 
@@ -954,6 +1044,111 @@ class ExportExecution:
 
                                 self.files_to_zip_list.append([complete_additional_data_filename,
                                                                export_additional_data_directory])
+
+                    if 'goalkeeper_data_list' in self.per_group_data[group_id]['data_per_participant'][
+                            participant_code]:
+                        goalkeeper_data_list = self.per_group_data[group_id]['data_per_participant'][
+                            participant_code]['goalkeeper_data_list']
+
+                        for goalkeeper_data in goalkeeper_data_list:
+                            goalkeeper_game_directory = goalkeeper_data['directory_step_name']
+                            if not path.exists(goalkeeper_game_directory):
+                                # ex. Users/.../EXPERIMENT_DOWNLOAD/Group_group.title/Participants/PXXXX
+                                # /Step_XX_step_TYPE
+                                error_msg, goalkeeper_step_directory = create_directory(participant_directory,
+                                                                                        goalkeeper_data[
+                                                                                            'directory_step_name'])
+                                if error_msg != "":
+                                    return error_msg
+
+                                # ex. EXPERIMENT_DOWNLOAD/Group_group.title/Participants/PXXXX/Step_XX_step_TYPE
+                                export_data_directory = goalkeeper_data['export_directory_step']
+
+                                # to create GoalkeeperData directory
+                                directory_data_name = goalkeeper_data['goalkeeper_data_directory_name']
+                                path_per_goalkeeper_data = path.join(goalkeeper_step_directory, directory_data_name)
+                                if not path.exists(path_per_goalkeeper_data):
+                                    # /Users/.../NES_EXPORT/Experiment_data/Group_XXX/Per_participant/Participant_123
+                                    # /Step_X_aaa/GoalkeeperData_index
+                                    error_msg, path_per_goalkeeper_data = create_directory(goalkeeper_step_directory,
+                                                                                           directory_data_name)
+                                    if error_msg != "":
+                                        return error_msg
+                                # ex. /NES_EXPORT/Experiment_data/Group_XXX/Per_participant/Participant_123/Step_X_aaa
+                                # /GoalkeeperData_index
+                                export_goalkeeper_data_directory = path.join(export_data_directory, directory_data_name)
+                                # GoalkeeperGameData query
+                                data_file = get_object_or_404(GoalkeeperGameData, pk=goalkeeper_data['data_id'])
+
+                                for context_tree_file in data_file.files.all():
+                                    file_name = context_tree_file.file.name.split('/')[-1]
+                                    # read file from repository
+                                    context_tree_filename = path.join(settings.BASE_DIR, 'media') + '/' + \
+                                                            context_tree_file.file.name
+
+                                    # ex. /Users/.../NES_EXPORT/Experiment_data/Group_XXX/Participants/PXXXX/
+                                    # Step_XX_step_TYPE/GoalkeeperData_index/file_name.format_type
+                                    complete_context_tree_filename = path.join(path_per_goalkeeper_data, file_name)
+                                    with open(context_tree_filename, 'rb') as f:
+                                        data = f.read()
+
+                                    with open(complete_context_tree_filename, 'wb') as f:
+                                        f.write(data)
+
+                                    self.files_to_zip_list.append([complete_context_tree_filename,
+                                                                   export_goalkeeper_data_directory])
+
+                    if 'generic_data_list' in self.per_group_data[group_id]['data_per_participant'][
+                        participant_code]:
+                        generic_data_list = self.per_group_data[group_id]['data_per_participant'][
+                            participant_code]['generic_data_list']
+
+                        for generic_data in generic_data_list:
+                            generic_data_directory = generic_data['directory_step_name']
+                            if not path.exists(generic_data_directory):
+                                # ex. Users/.../EXPERIMENT_DOWNLOAD/Group_group.title/Participants/PXXXX
+                                # /Step_XX_step_TYPE
+                                error_msg, generic_step_directory = create_directory(participant_directory, generic_data[
+                                    'directory_step_name'])
+                                if error_msg != "":
+                                    return error_msg
+
+                                # ex. EXPERIMENT_DOWNLOAD/Group_group.title/Participants/PXXXX/Step_XX_step_TYPE
+                                export_data_directory = generic_data['export_directory_step']
+
+                                # to create GoalkeeperData directory
+                                directory_data_name = generic_data['generic_data_directory_name']
+                                path_per_generic_data = path.join(generic_step_directory, directory_data_name)
+                                if not path.exists(path_per_generic_data):
+                                    # ex. /Users/.../NES_EXPORT/Experiment_data/Group_XXX/Per_participant/Participant_123
+                                    # /Step_X_aaa/GenericData_index
+                                    error_msg, path_per_generic_data = create_directory(generic_step_directory,
+                                                                                        directory_data_name)
+                                    if error_msg != "":
+                                        return error_msg
+                                # ex. /NES_EXPORT/Experiment_data/Group_XXX/Per_participant/Participant_123/Step_X_aaa
+                                # /GenericData_index
+                                export_generic_data_directory = path.join(export_data_directory, directory_data_name)
+                                # GenericData query
+                                data_file = get_object_or_404(GenericDataCollectionData, pk=generic_data['data_id'])
+
+                                for generic_file in data_file.files.all():
+                                    generic_file_name = generic_file.file.name.split('/')[-1]
+                                    # read file from repository
+                                    path_generic_file = path.join(settings.BASE_DIR, 'media') + '/' + \
+                                                        generic_file.file.name
+
+                                    # ex. /Users/.../NES_EXPORT/Experiment_data/Group_XXX/Participants/PXXXX/
+                                    # Step_XX_step_TYPE/GenericData_index/file_name.format_type
+                                    complete_generic_filename = path.join(path_per_generic_data, generic_file_name)
+                                    with open(path_generic_file, 'rb') as f:
+                                        data = f.read()
+
+                                    with open(complete_generic_filename, 'wb') as f:
+                                        f.write(data)
+
+                                    self.files_to_zip_list.append([complete_generic_filename,
+                                                                   export_generic_data_directory])
 
         return error_msg
 
@@ -1066,9 +1261,9 @@ def get_eeg_setting_description(eeg_setting_id):
             'gain_setted': eeg_amplifier_setting_attributes['gain'],
             'sampling_rate_setted': eeg_amplifier_setting_attributes['sampling_rate'],
             'number_of_channels_used': eeg_amplifier_setting_attributes['number_of_channels_used'],
-            'gain (equipment)': eeg_amplifier_attributes['identification'],
-            'number_of_channels (equipment)': eeg_amplifier_attributes['identification'],
-            'common_mode_rejection_ratio': eeg_amplifier_attributes['identification'],
+            'gain (equipment)': eeg_amplifier_attributes['gain'],
+            'number_of_channels (equipment)': eeg_amplifier_attributes['number_of_channels'],
+            'common_mode_rejection_ratio': eeg_amplifier_attributes['common_mode_rejection_ratio'],
             'input_impedance': impedance_description,
             'amplifier_detection_type_name': eeg_amplifier_attributes['amplifier_detection_type_name'],
             'tethering_system_name': eeg_amplifier_attributes['tethering_system_name'],
