@@ -8,3 +8,4 @@ django-bootstrap-form>=3.3
 celery>=4.1.0
 django-celery-results>=1.0.1
 pandas>=0.20.3
+django-modeltranslation>=0.12.1
