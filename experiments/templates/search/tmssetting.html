@@ -3,7 +3,8 @@
 <tr class="tmssetting-matches">
     <td>
         <h5 class="match">
-            <a href="{% url 'experiment-detail' result.object.experiment.id %}"><strong>{% trans "Experiment" %}: </strong>{{ result.object.experiment.title }}
+            <a href="{% url 'experiment-detail' result.object.experiment.slug %}"><strong
+            >{% trans "Experiment" %}: </strong>{{ result.object.experiment.title }}
                 <strong>> {% trans "TMS Setting" %}: </strong>
                 {{ result.object.name }}</a><br><br>
         </h5>

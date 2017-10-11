@@ -3,7 +3,8 @@
 <tr class="study-matches">
     <td>
         <h5 class="match">
-            <a href="{% url 'experiment-detail' result.object.experiment.id %}"><strong>{% trans "Experiment" %}: </strong>{{ result.object.experiment.title }}
+            <a href="{% url 'experiment-detail' result.object.experiment.slug %}"><strong
+            >{% trans "Experiment" %}: </strong>{{ result.object.experiment.title }}
                 <strong>> {% trans "Study" %}: </strong>
                 {{ result.object.title }}</a><br><br>
         </h5>

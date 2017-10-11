@@ -475,6 +475,8 @@ class ProtocolComponentSerializer(serializers.ModelSerializer):
 
 
 class ClassificationOfDiseasesSerializer(serializers.Serializer):
+    code = serializers.CharField(max_length=10)
+
     class Meta:
         model = ClassificationOfDiseases
         fields = ('code',)
@@ -482,11 +484,13 @@ class ClassificationOfDiseasesSerializer(serializers.Serializer):
 
 class GroupSerializer(serializers.ModelSerializer):
     experiment = serializers.ReadOnlyField(source='experiment.title')
-    inclusion_criteria = ClassificationOfDiseasesSerializer(many=True, read_only=False)
+    inclusion_criteria = ClassificationOfDiseasesSerializer(many=True,
+                                                            read_only=False)
 
     class Meta:
         model = Group
-        fields = ('id', 'title', 'description', 'experiment', 'inclusion_criteria')
+        fields = ('id', 'title', 'description', 'experiment',
+                  'inclusion_criteria')
 
     def create(self, validated_data):
         group = Group.objects.create(experiment=validated_data['experiment'],
@@ -495,9 +499,26 @@ class GroupSerializer(serializers.ModelSerializer):
         if 'inclusion_criteria' in self.initial_data:
             inclusion_criteria = self.initial_data['inclusion_criteria']
             for criteria in inclusion_criteria:
-                classification_of_diseases = ClassificationOfDiseases.objects.filter(code=criteria['code'])
+                classification_of_diseases = \
+                    ClassificationOfDiseases.objects.filter(
+                        code=criteria['code']
+                    )
                 if classification_of_diseases:
-                    group.inclusion_criteria.add(classification_of_diseases.first())
+                    group.inclusion_criteria.add(
+                        classification_of_diseases.first()
+                    )
+                else:
+                    # If there's not classification of disease, the code
+                    # sent is not in International classification of diseases,
+                    # so we add that code to display to user with a 'Code
+                    # not recognized' description.
+                    cod, created = \
+                        ClassificationOfDiseases.objects.get_or_create(
+                            code=criteria['code'],
+                            description='Code not recognized',
+                            abbreviated_description='Code not recognized'
+                        )
+                    group.inclusion_criteria.add(cod)
         return group
 
 
@@ -1045,7 +1066,7 @@ class GroupViewSet(viewsets.ModelViewSet):
             exp_nes_id, owner
         ).get_last_version()
         # TODO: if last_version == 0 generates exception: "no experiment was
-        # created yet"
+        # TODO: created yet"
         experiment = Experiment.objects.get(
             nes_id=exp_nes_id, owner=owner, version=last_version
         )

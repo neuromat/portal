@@ -22,12 +22,47 @@ class CurrentExperimentManager(models.Manager):
             .filter(q_statement)
 
 
+# custom methods
 def get_data_file_dir(instance, filename):
     directory = "download"
     if isinstance(instance, Experiment):
         directory = path.join(directory, instance.id)
 
     return path.join(directory, filename)
+
+
+def _create_slug(experiment):
+    """
+    Create experiment slug attribute if is the first time saving
+    Obs.: method to be used only with Experiment model instances
+    :param experiment: the Experiment model instance
+    """
+    older_versions = Experiment.objects.filter(
+        nes_id=experiment.nes_id, owner=experiment.owner
+    )
+    # if it is not first version
+    if older_versions.count() > 0:
+        # adds '-v#' to the end of slugified title, where '#' is the
+        # version number of the new experiment
+        experiment.slug = older_versions.first().slug + '-v' + \
+                          str(older_versions.count() + 1)
+    else:
+        # filter and count by slug = <slug> or slug = <slug>-<#>
+        # Slugs can be one of:
+        # 1) <slug>
+        # 2) <slug>-<#>
+        # 3) <slug>-<#>-v<#>
+        # we're filter and counting 1º and 2º form of slugs. Those
+        # forms determine if slug base, <slug>, conflicts with a new
+        # experiment created.
+        slugs = Experiment.objects.filter(
+            slug__regex=r'^' + slugify(experiment.title) + '($|-[0-9]+$)'
+        )
+        if slugs.count() > 0:
+            experiment.slug = slugify(experiment.title) + \
+                              '-' + str(slugs.count() + 1)
+        else:
+            experiment.slug = slugify(experiment.title)
 
 
 # models
@@ -83,16 +118,7 @@ class Experiment(models.Model):
     # save slug field if it's first time save
     def save(self, *args, **kwargs):
         if not self.id:
-            count = Experiment.objects.filter(
-                slug__startswith=slugify(self.title)
-            ).count()
-
-            # if there're slugs that starts with same name adds 1 to
-            # count to save as unique slug
-            if count > 0:
-                self.slug = slugify(self.title + '-' + str(count + 1))
-            else:
-                self.slug = slugify(self.title)
+            _create_slug(self)
 
         super(Experiment, self).save()
 

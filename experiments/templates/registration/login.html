@@ -20,8 +20,7 @@
 
             {% if next %}
                 {% if user.is_authenticated %}
-                    <p>
-                        {% trans "Invalid account. Please sign in with a valid account." %}</p>
+                    <p>{% trans "Invalid account. Please sign in with a valid account." %}</p>
                 {% else %}
                     <p>{% trans "Please sign in with your account to access this website." %}</p>
                 {% endif %}
@@ -41,7 +40,7 @@
                 </table>
 
                 <input id="id_submit" type="submit" value="login"
-                       class="pull-right" />
+                       class="pull-right btn btn-primary" />
                 <input type="hidden" name="next" value="{{ next }}" />
             </form>
 
