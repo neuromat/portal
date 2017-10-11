@@ -100,6 +100,7 @@ a.nep-btn {
 a:hover.nep-btn {
   color: #fff;
   background: #a9b2b9;
+    border: 1px solid #a9b2b9;
 }
 
 .nep-btn-secondary {
@@ -443,16 +444,12 @@ h5.match {
 }
 
 .experiment-table thead{
-    border-left: 4px solid #52af8e;
     border-bottom: 5px solid transparent;
     background: #60c8a3;
 }
 
-/*
-This changes the style of the left edge of the table row that is selected
- */
-.table-hover>tbody>tr:hover {
-    border-left: 5px solid #f5f5f5;
+.titulo{
+    border-left: 4px solid #52af8e;
 }
 
 /*
