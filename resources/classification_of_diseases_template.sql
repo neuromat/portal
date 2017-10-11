@@ -1,3 +1,9 @@
-COPY experiments_classificationofdiseases(code, description, abbreviated_description) FROM
-'<install_dir>/resources/icd10cm_order_2014.csv' DELIMITER
-',' CSV HEADER;
+COPY experiments_classificationofdiseases(
+  code,
+  description, abbreviated_description,
+  description_en, abbreviated_description_en,
+  description_pt_br, abbreviated_description_pt_br)
+FROM '<install_dir>/resources/cid-10.csv'
+DELIMITER ','
+CSV
+HEADER;
