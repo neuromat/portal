@@ -269,11 +269,11 @@ a:hover.nep-return {
 }
 
 .container-form-header {
-    margin: 0 130px;
+    margin: 0 200px;
 }
 
 .spacing-form{
-    margin: 12px 0 20px 0;
+    margin: 15px 0 20px 0;
 }
 
 .detail-header h2{
@@ -489,6 +489,12 @@ This changes the style of the left edge of the table row that is selected
 /* overrides bootstrap class */
 
 /* This is changing the appearance of the Bootstrap Primary button */
+
+.container-form-header .btn {
+    display: inline-block;
+    padding: 6px 30px;
+}
+
 .btn-primary {
     color: #fff;
     background-color: #60c8a3 ;
