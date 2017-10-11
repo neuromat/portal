@@ -60,7 +60,7 @@
                                         <br>
                                         {% for criteria in group.inclusion_criteria.all %}
                                             {% if criteria.description != 'Code not recognized' %}
-                                                {{ criteria.code }} - {{ criteria.description }}{% if not forloop.last %},{% endif %}
+                                                {{ criteria.code }} - {{ criteria.description }}{% if not forloop.last %};{% endif %}
                                             {% else %}
                                                 <span class="not-recognized">{{ criteria.code }} - {{ criteria.description }}</span>{% if not forloop.last %},{% endif %}
                                             {% endif %}
