@@ -1,7 +1,7 @@
 import shlex
 
 from django import forms
-from django.utils.translation import ugettext as _
+from django.utils.translation import ugettext_lazy as _
 from haystack.forms import SearchForm
 
 
@@ -42,7 +42,8 @@ class NepSearchForm(SearchForm):
             ('multiunit', _('Multiunit recording'))
         ],
         widget=forms.SelectMultiple(
-            attrs={'id': 'filter_box', 'class': 'form-control selectpicker'}
+            attrs={'id': 'filter_box', 'class': 'form-control selectpicker',
+                   'title': _('Select one or more data collection types')}
         )
     )
 

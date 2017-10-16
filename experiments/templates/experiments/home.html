@@ -136,9 +136,9 @@
                 '"' + experiment.title + '"');
             let modal_body = modal.find('.modal-body');
             let html = statuses_radio_options(experiment, statuses, logged_user);
-            modal_body.text('Please select an option:');
+            modal_body.text("{% trans 'Please select an option:' %}");
             modal_body.append(html);
-            {# if trustee will reprove experiment, force her to write justification #}
+            {# if trustee will disapprove experiment, force her to write justification #}
             {# message #}
             let modal_form = $('#id_status_choices');
             modal_form.find('input').on('change', function() {
