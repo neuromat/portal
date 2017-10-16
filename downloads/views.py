@@ -50,9 +50,7 @@ def download_view(request, experiment_id):
         # print("antes do fim: httpResponse")
         #
         zip_file = open(complete_filename, 'rb')
-        # t = loader.get_template('experiments/detail.html')
-        # c = {'slug': slug}
-        # response = HttpResponse(t.render(c, request), content_type='application/zip')
+
         response = HttpResponse(zip_file, content_type='application/zip')
         response['Content-Disposition'] = 'attachment; filename="export.zip"'
         response['Content-Length'] = path.getsize(complete_filename)

@@ -443,7 +443,7 @@
             }
             var data = google.visualization.arrayToDataTable(data_array);
             var options = {
-                title: 'Gender of the participants',
+                title: "{% trans 'Gender of the participants' %}",
                 pieHole: 0.3
             };
             var chart = new google.visualization.PieChart(document.getElementById('gender-chart'));
@@ -457,13 +457,13 @@
             }
             var data = google.visualization.arrayToDataTable(data_array);
             var options = {
-                title: 'Age of the participants',
+                title: "{% trans 'Age of the participants' %}",
                 legend: { position: 'none' },
                 hAxis: {
-                    title: 'Age (years)'
+                    title: "{% trans 'Age (years)' %}"
                 },
                 vAxis: {
-                    title: 'Amount'
+                    title: "{% trans 'Total' %}"
                 }
             };
             var chart = new google.visualization.ColumnChart(document.getElementById('age-chart'));
