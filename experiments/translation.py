@@ -1,6 +1,6 @@
 from modeltranslation.translator import TranslationOptions, translator
 
-from experiments.models import ClassificationOfDiseases
+from experiments.models import ClassificationOfDiseases, Gender
 
 
 class ClassificationOfDiseasesTranslationOptions(TranslationOptions):
@@ -10,3 +10,10 @@ class ClassificationOfDiseasesTranslationOptions(TranslationOptions):
 translator.register(
     ClassificationOfDiseases, ClassificationOfDiseasesTranslationOptions
 )
+
+
+# class GenderTranslationOptions(TranslationOptions):
+#     fields = ('name',)
+#
+#
+# translator.register(Gender, GenderTranslationOptions)

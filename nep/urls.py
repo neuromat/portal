@@ -13,6 +13,7 @@ from downloads import urls
 
 # internationalization
 js_info_dict = {
+    'domain': 'djangojs',
     'packages': ('experiments',),
 }
 
