@@ -205,7 +205,6 @@ class ExportExecution:
             if hasattr(group, 'experimental_protocol'):
                 # build diseases inclusion criteria
                 if group.inclusion_criteria.all():
-                    inclusion_criteria_list = []
                     group_inclusion_criteria_list = self.process_group_inclusion_disease(group.inclusion_criteria.all())
 
                     group_inclusion_disease_filename = "%s.csv" % "Group_inclusion_criteria_disease"
@@ -296,7 +295,7 @@ class ExportExecution:
 
                         export_directory_emg_step = path.join(export_directory_experimental_protocol, emg_step_name)
 
-                        if hasattr(eeg_step, 'emg'):
+                        if hasattr(emg_step, 'emg'):
                             default_emg = get_object_or_404(EMG, pk=emg_step.id)
                             emg_default_setting_description = get_emg_setting_description(default_emg.emg_setting.id)
                             if emg_default_setting_description:
@@ -322,7 +321,7 @@ class ExportExecution:
 
                         export_directory_tms_step = path.join(export_directory_experimental_protocol, tms_step_name)
 
-                        if hasattr(eeg_step, 'tms'):
+                        if hasattr(tms_step, 'tms'):
                             default_tms = get_object_or_404(TMS, pk=tms_step.id)
                             tms_default_setting_description = get_tms_setting_description(default_tms.tms_setting.id)
                             if tms_default_setting_description:
@@ -996,9 +995,10 @@ class ExportExecution:
 
                                     self.files_to_zip_list.append([complete_hotspot_filename, export_tms_directory])
 
-                    if 'additional_data' in self.per_group_data[group_id]['data_per_participant'][participant_code]:
+                    if 'additional_data_list' in self.per_group_data[group_id]['data_per_participant'][
+                        participant_code]:
                         additional_data_list = self.per_group_data[group_id]['data_per_participant'][
-                            participant_code]['additional_data']
+                            participant_code]['additional_data_list']
                         for additional_data in additional_data_list:
                             additional_data_directory = additional_data['directory_step']
                             # ex. Users/.../EXPERIMENT_DOWNLOAD/Group_group.title/Participants/PXXXX/Step_XX_step_TYPE
