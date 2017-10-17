@@ -1,6 +1,6 @@
 import json
-import struct
 
+from decimal import Decimal
 from os import path, makedirs
 from csv import writer
 from django.conf import settings
@@ -436,6 +436,8 @@ class ExportExecution:
             result = ''
         elif isinstance(field, bool):
             result = _('Yes') if field else _('No')
+        elif isinstance(field, Decimal):
+            result = field
         else:
             result = smart_str(field)
         return result
@@ -685,10 +687,15 @@ class ExportExecution:
                 if 'additional_data_list' not in self.per_group_data[group_id]['data_per_participant'][
                     participant_code]:
                     self.per_group_data[group_id]['data_per_participant'][participant_code]['additional_data_list'] = []
-                    self.per_group_data[group_id]['data_per_participant'][participant_code]['data_index'] = 1
+                if additional_data.step.type not in self.per_group_data[group_id]['data_per_participant'][
+                    participant_code]:
+                    self.per_group_data[group_id]['data_per_participant'][participant_code][
+                        additional_data.step.type] = {'data_index': 1}
                 else:
-                    self.per_group_data[group_id]['data_per_participant'][participant_code]['data_index'] += 1
-                index = str(self.per_group_data[group_id]['data_per_participant'][participant_code]['data_index'])
+                    self.per_group_data[group_id]['data_per_participant'][participant_code][
+                        additional_data.step.type]['data_index'] += 1
+                index = str(self.per_group_data[group_id]['data_per_participant'][participant_code][
+                                additional_data.step.type]['data_index'])
                 self.per_group_data[group_id]['data_per_participant'][participant_code]['additional_data_list'].append({
                     'step_identification': additional_data.step.identification,
                     'setting_id': '',
