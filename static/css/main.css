@@ -44,8 +44,9 @@ a:hover, a.nep-disabled {
   text-decoration: none;
 }
 
-a:focus, a:hover {
-  color: #fdfdfd;
+a:focus {
+  color: #a9b2b9;
+  text-decoration: none;
 }
 
 *.icon-grey {
