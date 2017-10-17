@@ -8,6 +8,10 @@ h1, h3, h4, h5, p {
   margin-bottom: 15px;
 }
 
+h5 {
+    font-weight: bold;
+}
+
 p.alert{
   color: red;
 }
@@ -18,7 +22,7 @@ span.alert{
 }
 
 pre.textual-protocol {
-  font-family: "Liberation Sans", serif;
+  font-family: "Liberation Sans", sans-serif;
 }
 
 label.questionnaire-options {
@@ -27,6 +31,12 @@ label.questionnaire-options {
 
 span.not-recognized {
     color: red;
+}
+
+blockquote {
+    margin: 10px 0;
+    border-left: 1px solid #333;
+    font-size: inherit;
 }
 
 /*
@@ -484,6 +494,10 @@ h5.match {
 .portal-tab-content{
   border-bottom: solid 10px #52af8e;
   margin-bottom: 10px;
+}
+
+.spacing-content {
+    margin-top: 20px;
 }
 
 /*
