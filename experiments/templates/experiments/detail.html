@@ -89,9 +89,9 @@
             <!-- Settings tab -->
             <div role="tabpanel" class="tab-pane" id="settings_tab">
                 {% if experiment.eegsetting_set.all %}
-                    <h4>{% trans "EEG Settings" %}</h4>
+                    <h5 class="spacing-content">{% trans "EEG Settings" %}</h5>
                     {% for eeg_setting in experiment.eegsetting_set.all %}
-                        <div class="panel panel-default nep-panel-group container">
+                        <div class="panel panel-default nep-panel-group">
                             <strong>{{ eeg_setting.name }}</strong><br/>
                             {{ eeg_setting.description }}
                             <div class="pull-right">
@@ -103,10 +103,9 @@
                                  class="panel-collapse collapse out" role="tabpanel" aria-labelledby="heading_eeg_setting_{{ eeg_setting.id }}">
                                 {% if eeg_setting.eeg_amplifier_setting %}
                                     <blockquote>
-                                        <h5><p>
-
-                                            <h3>{% trans "Amplifier: " %}{{ eeg_setting.eeg_amplifier_setting.eeg_amplifier.identification }}</h3><br/>
-                                            {{ eeg_setting.eeg_amplifier_setting.eeg_amplifier.description }}<br/>
+                                        <p>
+                                            <strong>{% trans "Amplifier: " %}{{ eeg_setting.eeg_amplifier_setting.eeg_amplifier.identification }}</strong> </br>
+                                            {{ eeg_setting.eeg_amplifier_setting.eeg_amplifier.description }}
                                             {% if eeg_setting.eeg_amplifier_setting.eeg_amplifier.serial_number %}
                                                 {% trans "serial number: " %}{{ eeg_setting.eeg_amplifier_setting.eeg_amplifier.serial_number }}<br/>
                                             {% endif %}
@@ -137,8 +136,7 @@
                                             {% if eeg_setting.eeg_amplifier_setting.number_of_channels_used %}
                                                 {% trans "number of used channels: " %}{{ eeg_setting.eeg_amplifier_setting.number_of_channels_used }}<br/>
                                             {% endif %}
-
-                                        </p></h5>
+                                        </p>
                                     </blockquote>
 
                                 {% endif %}
@@ -147,7 +145,7 @@
                     {% endfor %}
                 {% endif %}
                 {% if experiment.emgsetting_set.all %}
-                    <h4>{% trans "EMG Settings" %}</h4>
+                    <h5 class="spacing-content">{% trans "EMG Settings" %}</h5>
                     {% for emg_setting in experiment.emgsetting_set.all %}
                         <div class="panel panel-default nep-panel-group container">
                             <strong>{{ emg_setting.name }}</strong><br/>
@@ -162,8 +160,7 @@
                                  class="panel-collapse collapse out" role="tabpanel" aria-labelledby="heading_emg_setting_{{ emg_setting.id }}">
                                 {% if emg_setting.emg_digital_filter_setting %}
                                     <blockquote>
-                                        <h5><p>
-
+                                        <p>
                                             <strong>{% trans "Digital filter setting: " %}</strong><br/>
                                             {% trans "filter type name: " %}{{ emg_setting.emg_digital_filter_setting.filter_type_name }}<br/>
                                             {% if emg_setting.emg_digital_filter_setting.filter_type_description %}
@@ -190,15 +187,13 @@
                                             {% if emg_setting.emg_digital_filter_setting.order %}
                                                 {% trans "order: " %}{{ emg_setting.emg_digital_filter_setting.order }}<br/>
                                             {% endif %}
-
-                                        </p></h5>
+                                        </p>
                                     </blockquote>
 
                                 {% endif %}
                                 {% if emg_setting.emg_ad_converter_setting %}
                                     <blockquote>
-                                        <h5><p>
-
+                                        <p>
                                             <strong>{% trans "A/D converter setting: " %}{{ emg_setting.emg_ad_converter_setting.ad_converter.identification }}</strong><br/>
                                             {{ emg_setting.emg_ad_converter_setting.ad_converter.description }}<br/>
                                             {% if emg_setting.emg_ad_converter_setting.ad_converter.serial_number %}
@@ -216,17 +211,15 @@
                                             {% if emg_setting.emg_ad_converter_setting.sampling_rate %}
                                                 {% trans "sampling rate setting: " %}{{ emg_setting.emg_ad_converter_setting.sampling_rate }}<br/>
                                             {% endif %}
-
-                                        </p></h5>
+                                        </p>
                                     </blockquote>
-
                                 {% endif %}
                             </div>
                         </div>
                     {% endfor %}
                 {% endif %}
                 {% if experiment.tmssetting_set.all %}
-                    <h4>{% trans "TMS Settings" %}</h4>
+                    <h5 class="spacing-content">{% trans "TMS Settings" %}</h5>
                     {% for tms_setting in experiment.tmssetting_set.all %}
                         <div class="panel panel-default nep-panel-group container">
                             <strong>{{ tms_setting.name }}</strong><br/>
@@ -241,10 +234,9 @@
                                  class="panel-collapse collapse out" role="tabpanel" aria-labelledby="heading_tms_setting_{{ tms_setting.id }}">
                                 {% if tms_setting.tms_device_setting %}
                                     <blockquote>
-                                        <h5><p>
-
+                                        <p>
                                             {% if tms_setting.tms_device_setting.pulse_stimulus_type %}
-                                                {% trans "pulse stimulus type: " %}{{ tms_setting.tms_device_setting.pulse_stimulus_type }}<br/>
+                                                <strong> {% trans "pulse stimulus type: " %}{{ tms_setting.tms_device_setting.pulse_stimulus_type }}</strong> </br>
                                             {% endif %}
 
                                             <br/>
@@ -276,8 +268,7 @@
                                             {% if tms_setting.tms_device_setting.coil_model.coil_design %}
                                                 {% trans "coil design: " %}{{ tms_setting.tms_device_setting.coil_model.coil_design }}<br/>
                                             {% endif %}
-
-                                        </p></h5>
+                                        </p>
                                     </blockquote>
 
                                 {% endif %}
@@ -287,7 +278,7 @@
                     {% endfor %}
                 {% endif %}
                 {% if experiment.contexttree_set.all %}
-                    <h4>{% trans "Context trees" %}</h4>
+                    <h5 class="spacing-content">{% trans "Context trees" %}</h5>
                     {% for context_tree in experiment.contexttree_set.all %}
                         <div class="panel panel-default nep-panel-group container">
                             <strong>{{ context_tree.name }}</strong><br/>
@@ -312,7 +303,7 @@
             <!-- Questionnaires tab -->
             <div role="tabpanel" class="tab-pane" id="questionnaires_tab">
                 {% for group_key, group_values in questionnaires.items %}
-                    <h4>Questionnaires for group {{ group_key }}</h4>
+                    <h6>Questionnaires for group {{ group_key }}</h6>
                     {% for q_key, q_value in group_values.items %}
                         {% if q_value.survey_metadata != 'invalid_questionnaire' %}
                             <div class="panel panel-default nep-panel-group">
