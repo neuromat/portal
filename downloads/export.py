@@ -875,23 +875,24 @@ class ExportExecution:
                                     json.dump(eeg_setting_description, outfile, indent=4)
 
                             # if sensor position image exist
-                            eeg_electrode_localization_system = eeg_data.eeg_setting.eeg_electrode_localization_system
-                            if hasattr(eeg_electrode_localization_system, 'map_image_file'):
-                                sensor_position_filename = "%s.png" % "sensor_position"
-                                map_filename = eeg_electrode_localization_system.map_image_file.name
-                                sensors_positions_image = settings.BASE_DIR + settings.MEDIA_URL + map_filename
+                            if hasattr(eeg_data.eeg_setting, "eeg_electrode_localization_system"):
+                                eeg_electrode_localization_system = eeg_data.eeg_setting.eeg_electrode_localization_system
+                                if hasattr(eeg_electrode_localization_system, 'map_image_file'):
+                                    sensor_position_filename = "%s.png" % "sensor_position"
+                                    map_filename = eeg_electrode_localization_system.map_image_file.name
+                                    sensors_positions_image = settings.BASE_DIR + settings.MEDIA_URL + map_filename
 
-                                complete_sensor_position_filename = path.join(path_per_eeg_data,
-                                                                              sensor_position_filename)
+                                    complete_sensor_position_filename = path.join(path_per_eeg_data,
+                                                                                  sensor_position_filename)
 
-                                with open(sensors_positions_image, 'rb') as f:
-                                    data = f.read()
+                                    with open(sensors_positions_image, 'rb') as f:
+                                        data = f.read()
 
-                                with open(complete_sensor_position_filename, 'wb') as f:
-                                    f.write(data)
+                                    with open(complete_sensor_position_filename, 'wb') as f:
+                                        f.write(data)
 
-                                self.files_to_zip_list.append([complete_sensor_position_filename,
-                                                               export_eeg_data_directory])
+                                    self.files_to_zip_list.append([complete_sensor_position_filename,
+                                                                   export_eeg_data_directory])
 
                     if 'emg_data_list' in self.per_group_data[group_id]['data_per_participant'][participant_code]:
                         emg_data_list = self.per_group_data[group_id]['data_per_participant'][participant_code][
