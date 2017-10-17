@@ -40,13 +40,12 @@ a {
 }
 
 a:hover, a.nep-disabled {
-  color: #a9b2b9;
+  color: #626e6f;
   text-decoration: none;
 }
 
-a:focus {
-  color: #a9b2b9;
-  text-decoration: none;
+a:focus, a:hover {
+  color: #626e6f;
 }
 
 *.icon-grey {
@@ -101,7 +100,7 @@ a.nep-btn {
 a:hover.nep-btn {
   color: #fff;
   background: #a9b2b9;
-    border: 1px solid #a9b2b9;
+  border: 1px solid #a9b2b9;
 }
 
 .nep-btn-secondary {
