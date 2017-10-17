@@ -97,10 +97,14 @@ a.nep-btn {
   text-decoration: none;
 }
 
-a:hover.nep-btn {
+.nep-btn:hover {
   color: #fff;
   background: #a9b2b9;
-  border: 1px solid #a9b2b9;
+}
+
+.nep-btn:focus {
+  color: #fff;
+  background: #a9b2b9;
 }
 
 .nep-btn-secondary {
@@ -114,7 +118,7 @@ a.nep-btn-secondary {
   text-decoration: none;
 }
 
-a:hover.nep-btn-secondary {
+.nep-btn-secondary:hover {
   color: #52af8e;
 }
 
