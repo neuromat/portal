@@ -5,23 +5,23 @@ from subprocess import call
 from django.contrib.auth import models
 from faker import Factory
 
+from experiments.models import Experiment, Study, Group, Researcher
 # python manage.py shell < experiments/tests/faker_populator.py
 # TODO: when executing from bash command line, final line identifier breaks
 # imports. We are kepping in Collaborator in same line
 from experiments.models import Gender, ClassificationOfDiseases, Keyword, \
     Collaborator, Step, TMSSetting, TMSDevice, CoilModel, TMSDeviceSetting
-from experiments.models import Experiment, Study, Group, Researcher
+from experiments.tests.tests_helper import create_classification_of_deseases
+from experiments.tests.tests_helper import create_experiment_protocol
 from experiments.tests.tests_helper import create_group, \
     create_ethics_committee_info, create_step, create_tms_setting, \
     create_tms_device, create_coil_model, create_tms_device_setting, \
-    create_tmsdata_objects_to_test_search
-from experiments.tests.tests_helper import create_classification_of_deseases
-from experiments.tests.tests_helper import create_experiment_protocol
+    create_tmsdata_objects_to_test_search, create_questionnaire
+from experiments.tests.tests_helper import create_keyword
 from experiments.tests.tests_helper import create_participant
 from experiments.tests.tests_helper import create_study_collaborator
-from experiments.tests.tests_helper import create_keyword
+from nep import settings
 from nep.local_settings import BASE_DIR
-
 
 # Clear sqlite database and run migrate
 call(['rm', BASE_DIR + '/db.sqlite3'])
@@ -218,6 +218,13 @@ tmsds = create_tms_device_setting(1, tms_setting, tms_device, coil_model)
 
 # Create TMSData to test search
 create_tmsdata_objects_to_test_search()
+
+# Create questionnaires
+experiment = Experiment.objects.last()
+group = experiment.groups.first()
+create_questionnaire(settings.BASE_DIR +
+                     '/experiments/tests/questionnaire1.csv', group
+                     )
 
 # TODO: After populating models we call 'manage.py rebuild_index --noinput' to
 # TODO: rebuild haystack search index - to manually test searching.
