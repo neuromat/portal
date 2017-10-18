@@ -1,7 +1,8 @@
 import csv
-
 import math
 import pandas
+import tempfile
+
 from django.contrib import messages
 from django.contrib.auth.views import LoginView
 from django.core.mail import send_mail
@@ -99,23 +100,23 @@ def _isvalid(source_path):
 
 def _get_questionnaire(metadata):
     # Put the questionnaire data into a temporary csv file
-    # TODO: see what is a temporary dir in Rwindows
-    file = open('/tmp/questionnaire.csv', 'w')
+    temp_dir = tempfile.mkdtemp()
+    file = open(temp_dir + '/questionnaire.csv', 'w')
     file.write(metadata)
     file.close()
 
-    if not _isvalid('/tmp/questionnaire.csv'):
+    if not _isvalid(temp_dir + '/questionnaire.csv'):
         return 'invalid_questionnaire'
 
     # Remove the columns that won't be used and save in another temporary file
-    with open('/tmp/questionnaire.csv', 'r') as source:
+    with open(temp_dir + '/questionnaire.csv', 'r') as source:
         reader = csv.reader(source, skipinitialspace=True)
-        with open('/tmp/questionnaire_cleaned.csv', 'w') as result:
+        with open(temp_dir + '/questionnaire_cleaned.csv', 'w') as result:
             writer = csv.writer(result)
             for r in reader:
                 writer.writerow((r[2], r[3], r[4], r[6], r[8]))
 
-    q_cleaned = pandas.read_csv('/tmp/questionnaire_cleaned.csv')
+    q_cleaned = pandas.read_csv(temp_dir + '/questionnaire_cleaned.csv')
 
     records = []
 
