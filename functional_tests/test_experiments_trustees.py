@@ -505,3 +505,24 @@ class TrusteeTest(FunctionalTestTrustee):
             'experiment-matches'
         ).text
         self.assertIn('Experiment analysed by Claudia', experiment_text)
+
+    def test_hover_mouse_over_notification_bel_display_tooltip(self):
+        ##
+        # First we get the total of experiments to be analysed
+        ##
+        experiments = Experiment.objects.filter(
+            status=Experiment.TO_BE_ANALYSED
+        ).count()
+
+        # When the trustee pass the mouse over the notification bell at top
+        # of the page, she sees a tooltip that displays how many experiments
+        # has to be analysed
+        notification_bell = self.browser.find_element_by_id('new_experiments')
+        tooltip_toggle = notification_bell.get_attribute('data-toggle')
+        self.assertEqual('tooltip', tooltip_toggle)
+        tooltip_text = notification_bell.get_attribute('title')
+        self.assertEqual(
+            'There is(are) ' + str(experiments) +
+            ' experiments to be analysed',
+            tooltip_text
+        )
