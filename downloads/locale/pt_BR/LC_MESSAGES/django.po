@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-10-11 13:40-0300\n"
+"POT-Creation-Date: 2017-10-18 09:05-0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -18,34 +18,34 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
-#: .\downloads\export.py:29
+#: downloads/export.py:29
 msgid "Gender"
 msgstr ""
 
-#: .\downloads\export.py:30
+#: downloads/export.py:30
 msgid "Age"
 msgstr ""
 
-#: .\downloads\export.py:31
+#: downloads/export.py:31
 msgid "Participant code"
 msgstr ""
 
-#: .\downloads\export.py:35
+#: downloads/export.py:35
 msgid "Code"
 msgstr ""
 
-#: .\downloads\export.py:36
+#: downloads/export.py:36
 msgid "Description"
 msgstr ""
 
-#: .\downloads\export.py:38
+#: downloads/export.py:38
 msgid "Abbreviated description"
 msgstr ""
 
-#: .\downloads\export.py:439 .\downloads\export.py:1233
+#: downloads/export.py:439 downloads/export.py:1233
 msgid "Yes"
 msgstr ""
 
-#: .\downloads\export.py:439 .\downloads\export.py:1233
+#: downloads/export.py:439 downloads/export.py:1233
 msgid "No"
 msgstr ""

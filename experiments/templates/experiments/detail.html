@@ -120,7 +120,7 @@
                                                 {% trans "common mode rejection ratio: " %}{{ eeg_setting.eeg_amplifier_setting.eeg_amplifier.common_mode_rejection_ratio }}<br/>
                                             {% endif %}
                                             {% if eeg_setting.eeg_amplifier_setting.eeg_amplifier.input_impedance %}
-                                                {% trans "input_impedance: " %}{{ eeg_setting.eeg_amplifier_setting.eeg_amplifier.input_impedance }} {{ eeg_setting.eeg_amplifier_setting.eeg_amplifier.input_impedance_unit }}<br/>
+                                                {% trans "input impedance: " %}{{ eeg_setting.eeg_amplifier_setting.eeg_amplifier.input_impedance }} {{ eeg_setting.eeg_amplifier_setting.eeg_amplifier.input_impedance_unit }}<br/>
                                             {% endif %}
                                             {% if eeg_setting.eeg_amplifier_setting.eeg_amplifier.amplifier_detection_type_name %}
                                                 {% trans "amplifier detection type: " %}{{ eeg_setting.eeg_amplifier_setting.eeg_amplifier.amplifier_detection_type_name }}<br/>
@@ -176,16 +176,16 @@
                                                 {% trans "high pass: " %}{{ emg_setting.emg_digital_filter_setting.high_pass }}<br/>
                                             {% endif %}
                                             {% if emg_setting.emg_digital_filter_setting.low_band_pass %}
-                                                {% trans "low_band_pass: " %}{{ emg_setting.emg_digital_filter_setting.low_band_pass }}<br/>
+                                                {% trans "low band pass: " %}{{ emg_setting.emg_digital_filter_setting.low_band_pass }}<br/>
                                             {% endif %}
                                             {% if emg_setting.emg_digital_filter_setting.high_band_pass %}
-                                                {% trans "high_band_pass: " %}{{ emg_setting.emg_digital_filter_setting.high_band_pass }}<br/>
+                                                {% trans "high band pass: " %}{{ emg_setting.emg_digital_filter_setting.high_band_pass }}<br/>
                                             {% endif %}
                                             {% if emg_setting.emg_digital_filter_setting.low_notch %}
-                                                {% trans "low_notch: " %}{{ emg_setting.emg_digital_filter_setting.low_notch }}<br/>
+                                                {% trans "low notch: " %}{{ emg_setting.emg_digital_filter_setting.low_notch }}<br/>
                                             {% endif %}
                                             {% if emg_setting.emg_digital_filter_setting.high_notch %}
-                                                {% trans "high_notch: " %}{{ emg_setting.emg_digital_filter_setting.high_notch }}<br/>
+                                                {% trans "high notch: " %}{{ emg_setting.emg_digital_filter_setting.high_notch }}<br/>
                                             {% endif %}
                                             {% if emg_setting.emg_digital_filter_setting.order %}
                                                 {% trans "order: " %}{{ emg_setting.emg_digital_filter_setting.order }}<br/>
@@ -436,27 +436,36 @@
         google.charts.setOnLoadCallback(drawColumnChart);
 
         function drawPieChart() {
-            var data_array = [['Gender', 'Number of participants']];
-            var django_data = {{ gender_grouping|safe }};
-            for (var item in django_data){
-                data_array.push([item, django_data[item]])
+            let data_array = [['Gender', 'Number of participants']];
+            let django_data = {{ gender_grouping|safe }};
+            for (let item in django_data) {
+                /* Define translation of 'male'/'female' here as we've got
+                   problems trying to traslate with django-modeltranlation.
+                   See comments (and TODOs) in translation.py */
+                {% get_current_language as LANGUAGE_CODE %}
+                {% if LANGUAGE_CODE == 'pt-br' %}
+                    let item_lang = (item === 'male' ? 'homens' : 'mulheres');
+                {% else %}
+                    let item_lang = item;
+                {% endif %}
+                data_array.push([item_lang, django_data[item]])
             }
-            var data = google.visualization.arrayToDataTable(data_array);
-            var options = {
+            let data = google.visualization.arrayToDataTable(data_array);
+            let options = {
                 title: "{% trans 'Gender of the participants' %}",
                 pieHole: 0.3
             };
-            var chart = new google.visualization.PieChart(document.getElementById('gender-chart'));
+            let chart = new google.visualization.PieChart(document.getElementById('gender-chart'));
             chart.draw(data, options);
         }
         function drawColumnChart() {
-            var data_array = [['Age', 'amount' ]];
-            var django_data = {{ age_grouping|safe }};
-            for (var item in django_data){
+            let data_array = [['Age', "{% trans 'total' %}" ]];
+            let django_data = {{ age_grouping|safe }};
+            for (let item in django_data){
                 data_array.push([item, django_data[item]])
             }
-            var data = google.visualization.arrayToDataTable(data_array);
-            var options = {
+            let data = google.visualization.arrayToDataTable(data_array);
+            let options = {
                 title: "{% trans 'Age of the participants' %}",
                 legend: { position: 'none' },
                 hAxis: {
@@ -466,7 +475,7 @@
                     title: "{% trans 'Total' %}"
                 }
             };
-            var chart = new google.visualization.ColumnChart(document.getElementById('age-chart'));
+            let chart = new google.visualization.ColumnChart(document.getElementById('age-chart'));
             chart.draw(data, options);
         }
     </script>
