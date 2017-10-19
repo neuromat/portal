@@ -200,7 +200,10 @@ class ExperimentDetailTest(TestCase):
                 questionnaire = Questionnaire.objects.get(step_ptr=step)
                 self.assertContains(
                     response,
-                    'Questionnaire ' + questionnaire.survey_name
+                    'Questionnaire ' +
+                    questionnaire.q_languages.get(
+                        language_code='en'
+                    ).survey_name
                 )
 
         # Sample asserts for first questionnaire

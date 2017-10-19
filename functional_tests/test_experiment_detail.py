@@ -295,18 +295,18 @@ class ExperimentDetailTest(FunctionalTest):
         self.wait_for_detail_page_charge()
 
         ##
-        # We get questionnaire steps objects
+        # We get groups objects with questionnaire steps
         ##
         q_steps = Step.objects.filter(type=Step.QUESTIONNAIRE)
+        groups_with_qs = experiment.groups.filter(steps__in=q_steps)
 
         # When the new visitor clicks in the Questionnaires tab, she sees
         # the groups questionnaires and the questionnaires' titles as
         # headers of the questionnaires contents
         self.browser.find_element_by_link_text('Questionnaires').click()
-
         questionnaires_content = self.browser.find_element_by_id(
-            'questionnaires_tab').text
-        groups_with_qs = experiment.groups.filter(steps__in=q_steps)
+            'questionnaires_tab'
+        ).text
         if groups_with_qs.count() == 0:
             self.fail('There are no groups with questionnaires. Have you '
                       'been created the questionnaires in tests helper?')
@@ -317,8 +317,12 @@ class ExperimentDetailTest(FunctionalTest):
             )
             for step in group.steps.filter(type=Step.QUESTIONNAIRE):
                 questionnaire = Questionnaire.objects.get(step_ptr=step)
+                questionnaire_language = \
+                    questionnaire.q_languages.get(
+                        language_code='en'
+                    )
                 self.assertIn(
-                    'Questionnaire ' + questionnaire.survey_name,
+                    'Questionnaire ' + questionnaire_language.survey_name,
                     questionnaires_content
                 )
 

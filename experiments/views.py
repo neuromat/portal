@@ -98,7 +98,7 @@ def _isvalid(source_path):
     return True
 
 
-def _get_questionnaire(metadata):
+def _get_questionnaire_metadata(metadata):
     # Put the questionnaire data into a temporary csv file
     temp_dir = tempfile.mkdtemp()
     file = open(temp_dir + '/questionnaire.csv', 'w')
@@ -163,9 +163,11 @@ def experiment_detail(request, slug):
                 q = Questionnaire.objects.get(step_ptr=step)
                 questionnaires[group.title][q.id] = {}
                 questionnaires[group.title][q.id]['survey_name'] = \
-                    q.survey_name
+                    q.q_languages.get(language_code='en').survey_name
                 questionnaires[group.title][q.id]['survey_metadata'] = \
-                    _get_questionnaire(q.survey_metadata)
+                    _get_questionnaire_metadata(
+                        q.q_languages.get(language_code='en').survey_metadata
+                    )
 
     return render(
         request, 'experiments/detail.html', {

@@ -593,8 +593,10 @@ class Questionnaire(Step):
 
 
 class QuestionnaireLanguage(models.Model):
-    questionnaire = models.ForeignKey(Questionnaire)
-    language_code = models.CharField(null=False, blank=False, max_length=30)
+    questionnaire = models.ForeignKey(
+        Questionnaire, related_name='q_languages'
+    )
+    language_code = models.CharField(max_length=30)
     survey_name = models.CharField(max_length=255)
     survey_metadata = models.TextField(null=True, blank=True)
 
