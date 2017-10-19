@@ -729,7 +729,7 @@ class QuestionnaireStepSerializer(serializers.ModelSerializer):
                   'interval_between_repetitions_value',
                   'interval_between_repetitions_unit',
                   'random_position',
-                  'code', 'survey_name', 'survey_metadata')
+                  'code')
 
 
 class FileSerializer(serializers.ModelSerializer):

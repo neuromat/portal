@@ -8,8 +8,6 @@ from experiments import api
 router = DefaultRouter()
 router.register(r'experiments', api.ExperimentViewSet,
                 base_name='api_experiments')
-# router.register(r'protocol_components', api.ProtocolComponentViewSet,
-#                 base_name='api_protocol_components')
 
 # Groups
 api_experiment_groups_list = api.GroupViewSet.as_view({

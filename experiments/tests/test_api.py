@@ -1,5 +1,6 @@
 import json
 from datetime import datetime
+from unittest import skip
 
 from django.contrib.auth.models import User
 from django.urls import reverse
@@ -9,7 +10,7 @@ from rest_framework.test import APITestCase
 from experiments import api
 from experiments.helpers import generate_image_file
 from experiments.models import Experiment, Study, Group, Researcher, \
-    Collaborator, ClassificationOfDiseases
+    Collaborator, ClassificationOfDiseases, Questionnaire, Step
 from experiments.tests.tests_helper import global_setup_ut, apply_setup
 
 
@@ -883,3 +884,41 @@ class GroupAPITest(APITestCase):
                 'Code not recognized'
             )
         self.client.logout()
+
+
+class QuestionnaireStepAPITest(APITestCase):
+
+    def setUp(self):
+        global_setup_ut()
+
+    @skip
+    def test_get_returns_all_questionnairesteps_short_url(self):
+        # TODO: implement it!
+        pass
+
+    @skip
+    def test_get_returns_all_questionnairesteps_long_url(self):
+        # TODO: implement it!
+        pass
+
+    def test_POSTing_a_new_questionnairestep(self):
+        owner = User.objects.get(username='lab1')
+        experiment = Experiment.objects.get(nes_id=1, owner=owner)
+        group = Group.objects.filter(experiment=experiment).first()
+        self.client.login(username=owner.username, password='nep-lab1')
+        list_url = reverse('api_questionnaire_step-list',
+                           kwargs={'pk': group.id})
+        response = self.client.post(
+            list_url,
+            {
+                'code': 'U2',
+                'identification': 'Banda Irlandesa',
+                'numeration': '2',
+                'type': Step.QUESTIONNAIRE,
+                'order': '20'
+            }
+        )
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.client.logout()
+        new_questionnairestep = Questionnaire.objects.last()
+        self.assertEqual(new_questionnairestep.code, 'U2')
