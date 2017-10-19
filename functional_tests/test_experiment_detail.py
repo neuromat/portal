@@ -9,6 +9,18 @@ from functional_tests.base import FunctionalTest
 
 class ExperimentDetailTest(FunctionalTest):
 
+    def wait_for_detail_page_charge(self):
+        ##
+        # First we wait for the page completely charge. For this we
+        # guarantee an element of the page is there. As any of the
+        # statistics, groups, and settings tab is always there, we wait for
+        # Group tab.
+        ##
+        self.wait_for(lambda: self.assertEqual(
+            self.browser.find_element_by_link_text('Groups').text,
+            'Groups'
+        ))
+
     # TODO: break by tabs
     def test_can_view_detail_page(self):
         experiment = Experiment.objects.filter(
@@ -23,15 +35,13 @@ class ExperimentDetailTest(FunctionalTest):
             "//a[@href='/experiments/" + experiment.slug + "/']"
         )
         link.click()
-        # list_links = self.browser.find_elements_by_link_text('View')
-        # list_links[0].click()
-        time.sleep(1)
 
         # She sees a new page with a header title: Open Database
         # for Experiments in Neuroscience.
-        page_header_text = self.browser.find_element_by_tag_name('h2').text
-        self.assertIn('Open Database for Experiments in Neuroscience',
-                      page_header_text)
+        self.wait_for(lambda: self.assertIn(
+            'Open Database for Experiments in Neuroscience',
+            self.browser.find_element_by_tag_name('h2').text
+        ))
 
         # In header she notices three elements besides header title:
         # Experiment title, experiment detail, and a button to go back home
@@ -81,10 +91,13 @@ class ExperimentDetailTest(FunctionalTest):
 
         # She clicks in Related study link and see a modal with Study data
         self.browser.find_element_by_link_text(experiment.study.title).click()
-        time.sleep(1)
+
         # The modal has the study title and the study description
-        study_title = self.browser.find_element_by_id('modal_study_title').text
-        self.assertIn(experiment.study.title, study_title)
+        self.wait_for(lambda: self.assertIn(
+            experiment.study.title,
+            self.browser.find_element_by_id('modal_study_title').text
+        ))
+
         study_description = self.browser.find_element_by_id(
             'study_description').text
         # It indicates that the study was made by a researcher
@@ -189,26 +202,35 @@ class ExperimentDetailTest(FunctionalTest):
         group = experiment.groups.first()
         link_details = self.browser.find_element_by_link_text('Details')
         link_details.click()
-        time.sleep(1)
-        expanded_panel = self.browser.find_element_by_id('collapse' +
-                                                         str(group.id)).text
-        self.assertIn('Textual description', expanded_panel)
-        self.assertIn(group.experimental_protocol.textual_description,
-                      expanded_panel)
+
+        self.wait_for(lambda: self.assertIn(
+            'Textual description',
+            self.browser.find_element_by_id('collapse' + str(group.id)).text
+        ))
+
+        self.assertIn(
+            group.experimental_protocol.textual_description,
+            self.browser.find_element_by_id('collapse' + str(group.id)).text
+        )
 
         # She notices that the protocol experiment image is a link. When she
         # clicks on it, a modal is displayed with the full image.
         self.browser.find_element_by_id('protocol_image').click()
-        time.sleep(1)
+        ##
+        # We wait for modal pops up
+        ##
+        self.wait_for(lambda: self.assertIn(
+            'Graphical representation',
+            self.browser.find_element_by_id('modal_protocol_title').text
+        ))
+
         modal = self.browser.find_element_by_id('protocol_image_full')
-        modal_title = self.browser.find_element_by_class_name(
-            'modal-title').text
-        self.assertIn(modal_title, 'Graphical representation')
         protocol_image_path = modal.find_element_by_tag_name(
-            'img').get_attribute('src')
+            'img'
+        ).get_attribute('src')
         self.assertTrue(
-            '/media/' + str(experiment.groups.first()
-                            .experimental_protocol.image),
+            '/media/' +
+            str(experiment.groups.first().experimental_protocol.image),
             protocol_image_path
         )
 
@@ -224,12 +246,12 @@ class ExperimentDetailTest(FunctionalTest):
         self.browser.find_element_by_xpath(
             "//a[@href='/experiments/" + str(experiment.slug) + "/']"
         ).click()
-        time.sleep(1)
 
         # There's a tab written Questionnaires
-        questionnaires_tab = self.browser.find_element_by_link_text(
-            'Questionnaires')
-        self.assertEqual('Questionnaires', questionnaires_tab.text)
+        self.wait_for(lambda: self.assertEqual(
+            self.browser.find_element_by_link_text('Questionnaires').text,
+            'Questionnaires'
+        ))
 
     def test_does_not_display_questionnaire_tab_if_there_are_not_questionnaires(self):
         ##
@@ -247,7 +269,7 @@ class ExperimentDetailTest(FunctionalTest):
         self.browser.find_element_by_xpath(
             "//a[@href='/experiments/" + experiment.slug + "/']"
         ).click()
-        time.sleep(1)
+        self.wait_for_detail_page_charge()
 
         # As there are no questionnaires for this experiment, she can't see
         # the Questionnaires tab and Questionnaires content
@@ -269,13 +291,19 @@ class ExperimentDetailTest(FunctionalTest):
         self.browser.find_element_by_xpath(
             "//a[@href='/experiments/" + experiment.slug + "/']"
         ).click()
-        time.sleep(1)
+
+        self.wait_for_detail_page_charge()
+
+        ##
+        # We get questionnaire steps objects
+        ##
+        q_steps = Step.objects.filter(type=Step.QUESTIONNAIRE)
 
         # When the new visitor clicks in the Questionnaires tab, she sees
         # the groups questionnaires and the questionnaires' titles as
         # headers of the questionnaires contents
         self.browser.find_element_by_link_text('Questionnaires').click()
-        q_steps = Step.objects.filter(type=Step.QUESTIONNAIRE)
+
         questionnaires_content = self.browser.find_element_by_id(
             'questionnaires_tab').text
         groups_with_qs = experiment.groups.filter(steps__in=q_steps)
@@ -310,7 +338,7 @@ class ExperimentDetailTest(FunctionalTest):
         self.browser.find_element_by_xpath(
             "//a[@href='/experiments/" + experiment.slug + "/']"
         ).click()
-        time.sleep(1)
+        self.wait_for_detail_page_charge()
 
         self.browser.find_element_by_link_text('Questionnaires').click()
 
@@ -320,7 +348,7 @@ class ExperimentDetailTest(FunctionalTest):
         button_details.click()
         time.sleep(1)
         button_details.click()
-        time.sleep(1)  # just to see better before page closes
+        time.sleep(1)  # just to see better on the browser, before page closes
 
         self.assertEqual(button_details.text, 'Details')
 
@@ -340,10 +368,10 @@ class ExperimentDetailTest(FunctionalTest):
         self.browser.find_element_by_xpath(
             "//a[@href='/experiments/" + experiment.slug + "/']"
         ).click()
-        time.sleep(1)
+        self.wait_for_detail_page_charge()
 
         # When the new visitor clicks in the Questionnaires tab, then click
-        # in 'Expand' button of the Questionnaires sections she sees
+        # in 'Details' button of the Questionnaires sections she sees
         # the questionnaires' content as a series of questions and answers
         self.browser.find_element_by_link_text('Questionnaires').click()
         questionnaires = self.browser.find_element_by_id(
@@ -351,16 +379,17 @@ class ExperimentDetailTest(FunctionalTest):
         ).find_elements_by_link_text('Details')
         for q in questionnaires:
             q.click()
-        time.sleep(1)
+        time.sleep(0.5)
 
-        # TODO: click on the 'Expand' buttons just for simulate user
+        # TODO: click on the 'Details' buttons just for simulate user
         # TODO: interaction, as the questionnaires' content is in html page
         questionnaires_content = self.browser.find_element_by_id(
             'questionnaires_tab').text
 
         ##
-        # Sample asserts for first questionnaire
+        # Sample asserts for first questionnaire.
         ##
+
         self.assertIn('História de fratura', questionnaires_content)
         self.assertIn('Já fez alguma cirurgia ortopédica?',
                       questionnaires_content)
@@ -418,7 +447,7 @@ class ExperimentDetailTest(FunctionalTest):
         self.browser.find_element_by_xpath(
             "//a[@href='/experiments/" + experiment.slug + "/']"
         ).click()
-        time.sleep(1)
+        self.wait_for_detail_page_charge()
 
         # As there's a questionnaire from a group that has the wrong number
         # of columns, when the new visitor clicks in Questionnaires tab she
@@ -432,4 +461,3 @@ class ExperimentDetailTest(FunctionalTest):
 
         self.assertIn('This questionnaire is in invalid format, and can\'t '
                       'be displayed', questionnaires_content)
-
