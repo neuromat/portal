@@ -516,7 +516,10 @@ class GroupSerializer(serializers.ModelSerializer):
                         ClassificationOfDiseases.objects.get_or_create(
                             code=criteria['code'],
                             description='Code not recognized',
-                            abbreviated_description='Code not recognized'
+                            abbreviated_description='Code not recognized',
+                            description_pt_br='Códico não reconhecido',
+                            abbreviated_description_pt_br='Código não '
+                                                          'reconhecido'
                         )
                     group.inclusion_criteria.add(cod)
         return group
