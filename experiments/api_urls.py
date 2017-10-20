@@ -8,8 +8,6 @@ from experiments import api
 router = DefaultRouter()
 router.register(r'experiments', api.ExperimentViewSet,
                 base_name='api_experiments')
-# router.register(r'protocol_components', api.ProtocolComponentViewSet,
-#                 base_name='api_protocol_components')
 
 # Groups
 api_experiment_groups_list = api.GroupViewSet.as_view({
@@ -356,6 +354,13 @@ api_questionnaire_step_list =\
         'post': 'create'
     })
 
+# Questionnaire Language
+api_questionnaire_language_list =\
+    api.QuestionnaireLanguageViewSet.as_view({
+        'get': 'list',
+        'post': 'create'
+    })
+
 # Files
 api_file_list =\
     api.FileViewSet.as_view({
@@ -564,6 +569,11 @@ urlpatterns = [
     # Questionnaire Step
     url(r'^groups/(?P<pk>[0-9]+)/questionnaire_step/$',
         api_questionnaire_step_list, name='api_questionnaire_step-list'),
+
+    # Questionnaire Language
+    url(r'^questionnaire_step/(?P<pk>[0-9]+)/questionnaire_language/$',
+        api_questionnaire_language_list,
+        name='api_questionnaire_language-list'),
 
     # File
     url(r'^files/$', api_file_list, name='api_file-list'),
