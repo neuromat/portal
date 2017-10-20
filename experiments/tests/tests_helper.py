@@ -8,7 +8,7 @@ from experiments.helpers import generate_image_file
 from experiments.models import Experiment, Study, Group, Researcher, \
     Collaborator, Participant, Gender, ExperimentalProtocol, \
     ClassificationOfDiseases, Keyword, Step, TMSSetting, TMSDevice, CoilModel, \
-    TMSDeviceSetting, TMSData, EEGSetting, Questionnaire
+    TMSDeviceSetting, TMSData, EEGSetting, Questionnaire, QuestionnaireLanguage
 
 import random
 
@@ -372,6 +372,19 @@ def create_questionnaire(source, group):
     :param source: file to read from
     :param group: Group model instance
     """
+    faker = Factory.create()
+
+    ##
+    # Create Questionnaire
+    Questionnaire.objects.create(
+        code=faker.ssn(),
+        group=group, order=randint(1, 10),
+        identification='questionnaire',
+        type=Step.QUESTIONNAIRE,
+    )
+
+    ##
+    # Catch file to read the data
     file = open(source, 'r')
     # skip first line with column titles
     file.readline()
@@ -381,10 +394,11 @@ def create_questionnaire(source, group):
     # open again to get all data
     with open(source, 'r') as fp:
         metadata = fp.read()
-    Questionnaire.objects.create(
-        group=group, order=randint(1, 10),
-        identification='questionnaire',
-        type=Step.QUESTIONNAIRE,
+
+    # Create Questionnaire Language
+    QuestionnaireLanguage.objects.create(
+        questionnaire=Questionnaire.objects.last(),
+        language_code='en',
         survey_name=questionnaire_title,
         survey_metadata=metadata
     )
