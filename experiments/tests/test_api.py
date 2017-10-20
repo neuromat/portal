@@ -10,7 +10,8 @@ from rest_framework.test import APITestCase
 from experiments import api
 from experiments.helpers import generate_image_file
 from experiments.models import Experiment, Study, Group, Researcher, \
-    Collaborator, ClassificationOfDiseases, Questionnaire, Step
+    Collaborator, ClassificationOfDiseases, Questionnaire, Step, \
+    QuestionnaireLanguage, QuestionnaireDefaultLanguage
 from experiments.tests.tests_helper import global_setup_ut, apply_setup
 
 
@@ -922,3 +923,77 @@ class QuestionnaireStepAPITest(APITestCase):
         self.client.logout()
         new_questionnairestep = Questionnaire.objects.last()
         self.assertEqual(new_questionnairestep.code, 'U2')
+
+
+class QuestionnaireLanguageAPITest(APITestCase):
+
+    def setUp(self):
+        global_setup_ut()
+
+    @skip
+    def test_get_returns_all_questionnairelanguages_short_url(self):
+        # TODO: implement it!
+        pass
+
+    @skip
+    def test_get_returns_all_questionnairelanguages_long_url(self):
+        # TODO: implement it!
+        pass
+
+    def test_POSTing_a_new_questionnairelanguage_not_default(self):
+        owner = User.objects.get(username='lab1')
+        questionnaire = Questionnaire.objects.first()
+        self.client.login(username=owner.username, password='nep-lab1')
+        list_url = reverse('api_questionnaire_language-list',
+                           kwargs={'pk': questionnaire.id})
+        response = self.client.post(
+            list_url,
+            {
+                'language_code': 'pt-br',
+                'survey_name': 'Um lindo questionário',
+                'survey_metadata': 'Uma _string_ gigante representando um '
+                                   'questionário que vem do NES que está em '
+                                   'csv'
+            }
+        )
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.client.logout()
+        new_questionnaire_language = QuestionnaireLanguage.objects.last()
+        self.assertEqual(
+            new_questionnaire_language.survey_name, 'Um lindo questionário'
+        )
+
+    def test_POSTing_a_new_questionnairelanguage_default(self):
+        owner = User.objects.get(username='lab1')
+        questionnaire = Questionnaire.objects.first()
+        self.client.login(username=owner.username, password='nep-lab1')
+        list_url = reverse('api_questionnaire_language-list',
+                           kwargs={'pk': questionnaire.id})
+        response = self.client.post(
+            list_url,
+            {
+                'language_code': 'pt-br',
+                'survey_name': 'Um lindo questionário que é o default',
+                'survey_metadata': 'Uma _string_ gigante representando um '
+                                   'questionário que vem do NES que está em '
+                                   'csv e que é o default',
+                'default': True
+            }
+        )
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.client.logout()
+        new_questionnaire_language = QuestionnaireLanguage.objects.last()
+        self.assertEqual(
+            new_questionnaire_language.survey_name,
+            'Um lindo questionário que é o default'
+        )
+        questionnaire_default_language = \
+            QuestionnaireDefaultLanguage.objects.first()
+        self.assertEqual(
+            questionnaire_default_language.questionnaire,
+            questionnaire
+        )
+        self.assertEqual(
+            questionnaire_default_language.questionnaire_language,
+            new_questionnaire_language
+        )

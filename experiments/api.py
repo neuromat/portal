@@ -8,15 +8,21 @@ from experiments.models import Experiment, Study, User, ProtocolComponent, \
     Keyword, ClassificationOfDiseases, \
     EEGSetting, EMGSetting, TMSSetting, ContextTree, Step, File, \
     EEGData, EMGData, TMSData, GoalkeeperGameData, QuestionnaireResponse, \
-    AdditionalData, GenericDataCollectionData, EEG, EMG, TMS, Instruction, Pause, Task, TaskForTheExperimenter, \
+    AdditionalData, GenericDataCollectionData, EEG, EMG, TMS, Instruction, \
+    Pause, Task, TaskForTheExperimenter, \
     GenericDataCollection, Stimulus, GoalkeeperGame, SetOfStep, Questionnaire, \
-    EEGAmplifierSetting, Amplifier, EEGSolution, EEGFilterSetting, EEGElectrodeNet, \
-    SurfaceElectrode, NeedleElectrode, IntramuscularElectrode, EEGElectrodeLocalizationSystem, EEGElectrodePosition, \
+    EEGAmplifierSetting, Amplifier, EEGSolution, EEGFilterSetting, \
+    EEGElectrodeNet, \
+    SurfaceElectrode, NeedleElectrode, IntramuscularElectrode, \
+    EEGElectrodeLocalizationSystem, EEGElectrodePosition, \
     TMSDeviceSetting, TMSDevice, CoilModel, \
-    EMGDigitalFilterSetting, ADConverter, EMGADConverterSetting, EMGElectrodeSetting, \
-    EMGPreamplifierSetting, EMGAmplifierSetting, EMGPreamplifierFilterSetting, EMGAnalogFilterSetting, \
+    EMGDigitalFilterSetting, ADConverter, EMGADConverterSetting, \
+    EMGElectrodeSetting, \
+    EMGPreamplifierSetting, EMGAmplifierSetting, EMGPreamplifierFilterSetting, \
+    EMGAnalogFilterSetting, \
     EMGElectrodePlacementSetting, \
-    EMGSurfacePlacement, EMGIntramuscularPlacement, EMGNeedlePlacement
+    EMGSurfacePlacement, EMGIntramuscularPlacement, EMGNeedlePlacement, \
+    QuestionnaireLanguage, QuestionnaireDefaultLanguage
 from experiments.tasks import build_download_file
 
 
@@ -730,6 +736,19 @@ class QuestionnaireStepSerializer(serializers.ModelSerializer):
                   'interval_between_repetitions_unit',
                   'random_position',
                   'code')
+
+
+class QuestionnaireLanguageSerializer(serializers.ModelSerializer):
+    questionnaire = serializers.ReadOnlyField(source='questionnaire.code')
+    is_default = serializers.SerializerMethodField()
+
+    class Meta:
+        model = QuestionnaireLanguage
+        fields = ('id', 'questionnaire', 'language_code', 'survey_name',
+                  'survey_metadata', 'is_default')
+
+    def get_is_default(self, obj):
+        return self.context.get('is_default')
 
 
 class FileSerializer(serializers.ModelSerializer):
@@ -1652,6 +1671,29 @@ class QuestionnaireStepViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         group = Group.objects.get(pk=self.kwargs['pk'])
         serializer.save(group=group)
+
+
+class QuestionnaireLanguageViewSet(viewsets.ModelViewSet):
+    serializer_class = QuestionnaireLanguageSerializer
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
+
+    def get_queryset(self):
+        return QuestionnaireLanguage.objects.filter(
+            questionnaire_id=self.kwargs['pk']
+        )
+
+    def perform_create(self, serializer):
+        questionnaire = Questionnaire.objects.get(pk=self.kwargs['pk'])
+        questionnaire_language = serializer.save(questionnaire=questionnaire)
+
+        if self.request.data.get('default') == 'True':
+            QuestionnaireDefaultLanguage.objects.create(
+                questionnaire=questionnaire,
+                questionnaire_language=questionnaire_language
+            )
+
+    def perform_update(self, serializer):
+        pass
 
 
 class FileViewSet(viewsets.ModelViewSet):
