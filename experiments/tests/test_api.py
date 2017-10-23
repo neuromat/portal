@@ -977,7 +977,7 @@ class QuestionnaireLanguageAPITest(APITestCase):
                 'survey_metadata': 'Uma _string_ gigante representando um '
                                    'questionário que vem do NES que está em '
                                    'csv e que é o default',
-                'default': True
+                'is_default': True
             }
         )
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
