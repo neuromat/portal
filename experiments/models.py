@@ -605,7 +605,7 @@ class QuestionnaireLanguage(models.Model):
 
 
 class QuestionnaireDefaultLanguage(models.Model):
-    questionnaire = models.ForeignKey(Questionnaire)
+    questionnaire = models.ForeignKey(Questionnaire, unique=True)
     questionnaire_language = models.ForeignKey(QuestionnaireLanguage)
 
 
