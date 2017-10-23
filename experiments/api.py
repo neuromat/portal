@@ -1686,13 +1686,14 @@ class QuestionnaireLanguageViewSet(viewsets.ModelViewSet):
         questionnaire = Questionnaire.objects.get(pk=self.kwargs['pk'])
         questionnaire_language = serializer.save(questionnaire=questionnaire)
 
-        if self.request.data.get('default') == 'True':
+        if self.request.data.get('is_default'):
             QuestionnaireDefaultLanguage.objects.create(
                 questionnaire=questionnaire,
                 questionnaire_language=questionnaire_language
             )
 
     def perform_update(self, serializer):
+        # TODO: implement it!
         pass
 
 
