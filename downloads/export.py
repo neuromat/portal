@@ -535,6 +535,7 @@ class ExportExecution:
                     survey = get_object_or_404(Questionnaire, pk=step_questionnaire.id)
                     questionnaire_code = survey.code
                     questionnaire_title = "%s_%s" % (str(questionnaire_code), str(survey.survey_name))
+
                     # questionnaire response fields list
                     questionnaire_response_fields = json.loads(questionnaire.limesurvey_response)
                     questionnaire_response_fields_list = questionnaire_response_fields['answers']
