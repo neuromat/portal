@@ -7,7 +7,8 @@ from django.test import TestCase, override_settings
 from haystack.query import SearchQuerySet
 
 from experiments import views
-from experiments.models import Experiment, Step, Questionnaire
+from experiments.models import Experiment, Step, Questionnaire, \
+    QuestionnaireDefaultLanguage, QuestionnaireLanguage
 from experiments.tests.tests_helper import apply_setup, global_setup_ut
 
 
@@ -169,6 +170,19 @@ class ExperimentDetailTest(TestCase):
     def setUp(self):
         global_setup_ut()
 
+    def get_q_default_language_or_first(self, questionnaire):
+        # TODO: correct this to adapt to unique QuestionnaireDefaultLanguage
+        # TODO: model with OneToOne with Questionnaire
+        qdl = QuestionnaireDefaultLanguage.objects.filter(
+            questionnaire=questionnaire
+        ).first()
+        if qdl:
+            return qdl.questionnaire_language
+        else:
+            return QuestionnaireLanguage.objects.filter(
+                questionnaire=questionnaire
+            ).first()
+
     def test_access_experiment_detail_after_GET_experiment(self):
         slug = str(Experiment.objects.first().slug)
         response = self.client.get('/experiments/' + slug + '/')
@@ -180,7 +194,7 @@ class ExperimentDetailTest(TestCase):
         self.assertTemplateUsed(response, 'experiments/detail.html')
 
     def test_access_experiment_detail_returns_questionnaire_data(self):
-        # Last experiment has questionnaires. See tests helper
+        # Last experiment approved has questionnaires. See tests helper
         experiment = Experiment.objects.last()
         response = self.client.get('/experiments/' + experiment.slug + '/')
 
@@ -198,12 +212,15 @@ class ExperimentDetailTest(TestCase):
             )
             for step in group.steps.filter(type=Step.QUESTIONNAIRE):
                 questionnaire = Questionnaire.objects.get(step_ptr=step)
+                # the rule is display default questionnaire language data or
+                # first questionnaire language data if not set default
+                # questionnaire language. So we mimic the function
+                # _get_q_default_language_or_first from views that do that.
+                q_language = self.get_q_default_language_or_first(
+                    questionnaire
+                )
                 self.assertContains(
-                    response,
-                    'Questionnaire ' +
-                    questionnaire.q_languages.get(
-                        language_code='en'
-                    ).survey_name
+                    response, 'Questionnaire ' + q_language.survey_name
                 )
 
         # Sample asserts for first questionnaire

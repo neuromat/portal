@@ -949,7 +949,9 @@ class QuestionnaireLanguageAPITest(APITestCase):
         response = self.client.post(
             list_url,
             {
-                'language_code': 'pt-br',
+                # we put a fr questionnaire language tests helper creates a
+                # pt-br questionnaire language
+                'language_code': 'fr',
                 'survey_name': 'Um lindo questionário',
                 'survey_metadata': 'Uma _string_ gigante representando um '
                                    'questionário que vem do NES que está em '
@@ -965,6 +967,8 @@ class QuestionnaireLanguageAPITest(APITestCase):
 
     def test_POSTing_a_new_questionnairelanguage_default(self):
         owner = User.objects.get(username='lab1')
+        # we get the only questionnaire in 'pt-br' that we create in tests
+        # helper
         questionnaire = Questionnaire.objects.first()
         self.client.login(username=owner.username, password='nep-lab1')
         list_url = reverse('api_questionnaire_language-list',
@@ -972,9 +976,9 @@ class QuestionnaireLanguageAPITest(APITestCase):
         response = self.client.post(
             list_url,
             {
-                'language_code': 'pt-br',
+                'language_code': 'en',
                 'survey_name': 'Um lindo questionário que é o default',
-                'survey_metadata': 'Uma _string_ gigante representando um '
+                'survey_metadata': 'Uma "string" grande representando um '
                                    'questionário que vem do NES que está em '
                                    'csv e que é o default',
                 'is_default': True
@@ -988,7 +992,7 @@ class QuestionnaireLanguageAPITest(APITestCase):
             'Um lindo questionário que é o default'
         )
         questionnaire_default_language = \
-            QuestionnaireDefaultLanguage.objects.first()
+            QuestionnaireDefaultLanguage.objects.last()
         self.assertEqual(
             questionnaire_default_language.questionnaire,
             questionnaire
@@ -997,3 +1001,6 @@ class QuestionnaireLanguageAPITest(APITestCase):
             questionnaire_default_language.questionnaire_language,
             new_questionnaire_language
         )
+
+    def test_POSTing_new_questionnairelanguage_cant_create_more_default_languages(self):
+        pass
