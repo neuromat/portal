@@ -470,10 +470,10 @@ class ExperimentDetailTest(FunctionalTest):
     def test_can_see_all_language_links_of_questionnaires_if_available(self):
         ##
         # We've created two questionnaires in tests helper from a Sample
-        # of a questionnaire from NES, in csv format. The questionnaires are
-        # associated with a group of the last experiment created in tests
-        # helper. One of the questionnaires has three languages, English,
-        # French, and Brazilian Portuguese. The other has two languages,
+        # of questionnaires from NES, in csv format. The questionnaires are
+        # associated with a group of the last approved experiment created in
+        # tests helper. One of the questionnaires has three languages, English,
+        # Italian, and Brazilian Portuguese. The other has two languages,
         # English and German.
         ##
         experiment = Experiment.objects.filter(

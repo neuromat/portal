@@ -18,40 +18,6 @@ from experiments.models import Experiment, RejectJustification, Step, \
 from experiments.tasks import rebuild_haystack_index
 
 
-def home_page(request):
-    to_be_analysed_count = None  # will be None if home contains the list of
-    # normal user
-    if request.user.is_authenticated and \
-            request.user.groups.filter(name='trustees').exists():
-        all_experiments = \
-            Experiment.lastversion_objects.all()
-        # We put experiments in following order:
-        # TO_BE_ANALYSED, UNDER_ANALYSIS, NOT_APPROVED and APPROVED
-        to_be_analysed = all_experiments.filter(
-            status=Experiment.TO_BE_ANALYSED)
-        under_analysis = all_experiments.filter(
-            status=Experiment.UNDER_ANALYSIS)
-        not_approved = all_experiments.filter(status=Experiment.NOT_APPROVED)
-        approved = all_experiments.filter(status=Experiment.APPROVED)
-        experiments = to_be_analysed | under_analysis | not_approved | approved
-        to_be_analysed_count = to_be_analysed.count()
-    else:
-        experiments = Experiment.lastversion_objects.filter(
-            status=Experiment.APPROVED
-        )
-
-    for experiment in experiments:
-        experiment.total_participants = \
-            sum([len(group.participants.all())
-                 for group in experiment.groups.all()])
-
-    return render(request, 'experiments/home.html',
-                  {'experiments': experiments,
-                   'to_be_analysed_count': to_be_analysed_count,
-                   'table_title': 'List of Experiments',
-                   'search_form': NepSearchForm()})
-
-
 def _get_nested_rec(key, group):
     rec = dict()
     rec['question_code'] = key[0]
@@ -144,9 +110,43 @@ def _get_q_default_language_or_first(questionnaire):
         ).first()
 
 
-def experiment_detail(request, slug):
+def home_page(request):
     to_be_analysed_count = None  # will be None if home contains the list of
     # normal user
+    if request.user.is_authenticated and \
+            request.user.groups.filter(name='trustees').exists():
+        all_experiments = \
+            Experiment.lastversion_objects.all()
+        # We put experiments in following order:
+        # TO_BE_ANALYSED, UNDER_ANALYSIS, NOT_APPROVED and APPROVED
+        to_be_analysed = all_experiments.filter(
+            status=Experiment.TO_BE_ANALYSED)
+        under_analysis = all_experiments.filter(
+            status=Experiment.UNDER_ANALYSIS)
+        not_approved = all_experiments.filter(status=Experiment.NOT_APPROVED)
+        approved = all_experiments.filter(status=Experiment.APPROVED)
+        experiments = to_be_analysed | under_analysis | not_approved | approved
+        to_be_analysed_count = to_be_analysed.count()
+    else:
+        experiments = Experiment.lastversion_objects.filter(
+            status=Experiment.APPROVED
+        )
+
+    for experiment in experiments:
+        experiment.total_participants = \
+            sum([len(group.participants.all())
+                 for group in experiment.groups.all()])
+
+    return render(request, 'experiments/home.html',
+                  {'experiments': experiments,
+                   'to_be_analysed_count': to_be_analysed_count,
+                   'table_title': 'List of Experiments',
+                   'search_form': NepSearchForm()})
+
+
+def experiment_detail(request, slug):
+    # will be None if home contains the list for common user
+    to_be_analysed_count = None
     if request.user.is_authenticated and \
             request.user.groups.filter(name='trustees').exists():
         all_experiments = Experiment.lastversion_objects.all()
@@ -168,7 +168,7 @@ def experiment_detail(request, slug):
                 age_grouping[int(participant.age)] = 0
             age_grouping[int(participant.age)] += 1
 
-    # Get default (language) questionnaires (or first) for all groups
+    # get default (language) questionnaires (or first) for all groups
     questionnaires = {}
     for group in experiment.groups.all():
         if group.steps.filter(type=Step.QUESTIONNAIRE).count() > 0:
@@ -182,9 +182,7 @@ def experiment_detail(request, slug):
                 questionnaires[group.title][q.id]['survey_name'] = \
                     questioinnaire.survey_name
                 questionnaires[group.title][q.id]['survey_metadata'] = \
-                    _get_questionnaire_metadata(
-                        questioinnaire.survey_metadata
-                    )
+                    _get_questionnaire_metadata(questioinnaire.survey_metadata)
 
     return render(
         request, 'experiments/detail.html', {
