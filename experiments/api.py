@@ -1007,7 +1007,8 @@ class ExperimentViewSet(viewsets.ModelViewSet):
             owner=owner, version=exp_version.get_last_version(), nes_id=nes_id
         )
         experiment = Experiment.objects.filter(nes_id=nes_id, version=version).values('id')[0]
-        build_download_file(int(experiment['id']), template_name="")
+        # TODO: uncomment after fix error during the build
+        # build_download_file(int(experiment['id']), template_name="")
 
 
 class StudyViewSet(viewsets.ModelViewSet):
