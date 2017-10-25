@@ -510,3 +510,57 @@ class ExperimentDetailTest(FunctionalTest):
         self.assertEqual(q_lang_codes.count('fr'), 1)
         self.assertEqual(q_lang_codes.count('pt-br'), 1)
         self.assertEqual(q_lang_codes.count('de'), 1)
+
+    def test_clicking_in_language_link_of_questionnaire_render_appropriate_language(self):
+        ##
+        # We've created two questionnaires in tests helper from a Sample
+        # of questionnaires from NES, in csv format. The questionnaires are
+        # associated with a group of the last approved experiment created in
+        # tests helper. One of the questionnaires has three languages, English,
+        # French, and Brazilian Portuguese. The other has two languages,
+        # English and German. Besides, we have a third questionnaire created
+        # in tests helper that has only the English language associated to it.
+        ##
+        experiment = Experiment.objects.filter(
+            status=Experiment.APPROVED
+        ).last()
+
+        # The visitor clicks in the experiment with questionnaire in home page
+        self.browser.find_element_by_xpath(
+            "//a[@href='/experiments/" + experiment.slug + "/']"
+        ).click()
+        self.wait_for_detail_page_charge()
+
+        # When the new visitor clicks in the Questionnaires tab, then click
+        # in 'Details' button of the first questionnaire she sees
+        # the questionnaires content as a series of questions and answers
+        self.browser.find_element_by_link_text('Questionnaires').click()
+        self.browser.find_element_by_id(
+            'questionnaires_tab'
+        ).find_element_by_link_text('Details').click()
+
+        # The first questionnaire has three languages: English, French and
+        # Brazilian Portuguese.
+        ##
+        # The visitor clicks in 'pt-br' link and after a refreshing of the
+        # questionnaire session, she sees the English version of the
+        # questionnaire
+        self.browser.find_element_by_link_text('pt-br').click()
+        time.sleep(1)
+
+        questionnaires_content = self.browser.find_element_by_id(
+            'questionnaires_tab').text
+
+        # Sample asserts for first questionnaire, Portuguese language
+        self.assertIn('História de fratura', questionnaires_content)
+        self.assertIn('Já fez alguma cirurgia ortopédica?',
+                      questionnaires_content)
+        self.assertIn('Fez alguma cirurgia de nervo?',
+                      questionnaires_content)
+        self.assertIn('Identifique o evento que levou ao trauma do seu plexo '
+                      'braquial. É possível marcar mais do que um evento.',
+                      questionnaires_content)
+        self.assertIn('Teve alguma fratura associada à lesão?',
+                      questionnaires_content)
+        self.assertIn('The user enters a date in a date field',
+                      questionnaires_content)

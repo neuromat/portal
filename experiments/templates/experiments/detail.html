@@ -303,14 +303,14 @@
             <!-- Questionnaires tab -->
             <div role="tabpanel" class="tab-pane" id="questionnaires_tab">
                 {% for group_key, group_values in questionnaires.items %}
-                    <h6>{% trans 'Questionnaires for group' %} {{ group_key }}</h6>
+                    <h4>{% trans 'Questionnaires for group' %} {{ group_key }}</h4>
                     {% for q_key, q_value in group_values.items %}
                         {% if q_value.survey_metadata != 'invalid_questionnaire' %}
-                            <div class="panel panel-default nep-panel-group">
+                            <div id="{{ q_key }}" class="panel panel-default nep-panel-group">
                                 <div class="questionnaire-languages">
                                     {% for lang_code in q_value.language_codes %}
                                         <ul>
-                                            <li>{{ lang_code }}</li>
+                                            <li><a href="#" id="lang_{{ lang_code }}">{{ lang_code }}</a></li>
                                         </ul>
                                     {% endfor %}
                                 </div>
@@ -477,5 +477,29 @@
             let chart = new google.visualization.ColumnChart(document.getElementById('age-chart'));
             chart.draw(data, options);
         }
+    </script>
+    {##}
+    {# Script related to Questionnaires tab #}
+    {##}
+    <script>
+        $("a#lang_pt-BR").click(function () {
+            // TODO: is there a better way, instead of parent(), closest(), parent(), closest()
+            const questionnaire_id =
+                $(this).parent().closest("div").parent().closest("div").attr("id");
+            const url = "http://experiments/questionnaire_language/";
+            $.ajax(url, {
+                data: {
+                    questionnaire_id: questionnaire_id,
+                    lang_code: "pt_BR"
+                },
+                success: function(data) {
+                    questionnaire.html("<p>It works!</p>");
+                },
+                error: function () {
+                    console.log("Didn't work for questionnaire " +
+                        questionnaire_id);
+                }
+            })
+        });
     </script>
 {% endblock %}
