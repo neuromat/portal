@@ -697,17 +697,17 @@ def global_setup_ft():
         settings.BASE_DIR + '/experiments/tests/questionnaire1.csv',
         'en'
     )
-    # create questionnaire language data in Italian for questionnaire1
+    # create questionnaire language data in French for questionnaire1
     create_questionnaire_language(
         questionnaire1,
-        settings.BASE_DIR + '/experiments/tests/questionnaire1.csv',
-        'it'
+        settings.BASE_DIR + '/experiments/tests/questionnaire1_fr.csv',
+        'fr'
     )
     # create questionnaire language data in Brazilian Portuguese for
     # questionnaire1
     create_questionnaire_language(
         questionnaire1,
-        settings.BASE_DIR + '/experiments/tests/questionnaire1.csv',
+        settings.BASE_DIR + '/experiments/tests/questionnaire1_pt-br.csv',
         'pt-br'
     )
 
@@ -722,7 +722,7 @@ def global_setup_ft():
     # create questionnaire language data in German for questionnaire2
     create_questionnaire_language(
         questionnaire2,
-        settings.BASE_DIR + '/experiments/tests/questionnaire2.csv',
+        settings.BASE_DIR + '/experiments/tests/questionnaire2_de.csv',
         'de'
     )
 

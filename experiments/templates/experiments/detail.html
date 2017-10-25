@@ -303,10 +303,17 @@
             <!-- Questionnaires tab -->
             <div role="tabpanel" class="tab-pane" id="questionnaires_tab">
                 {% for group_key, group_values in questionnaires.items %}
-                    <h6>Questionnaires for group {{ group_key }}</h6>
+                    <h6>{% trans 'Questionnaires for group' %} {{ group_key }}</h6>
                     {% for q_key, q_value in group_values.items %}
                         {% if q_value.survey_metadata != 'invalid_questionnaire' %}
                             <div class="panel panel-default nep-panel-group">
+                                <div class="questionnaire-languages">
+                                    {% for lang_code in q_value.language_codes %}
+                                        <ul>
+                                            <li>{{ lang_code }}</li>
+                                        </ul>
+                                    {% endfor %}
+                                </div>
                                 <strong>Questionnaire {{ q_value.survey_name }}</strong>
                                 <div class="pull-right">
                                     <a href="#collapse{{ q_key }}"
@@ -319,7 +326,6 @@
                                         {% trans 'Details' %}
                                     </a>
                                 </div>
-                                <div class="questionnaire-languages"></div>
                                 <div class="panel-collapse collapse"
                                      id="collapse{{ q_key }}"
                                      role="tabpanel"

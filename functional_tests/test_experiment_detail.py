@@ -394,16 +394,15 @@ class ExperimentDetailTest(FunctionalTest):
         ##
         # Sample asserts for first questionnaire.
         ##
-
-        self.assertIn('História de fratura', questionnaires_content)
-        self.assertIn('Já fez alguma cirurgia ortopédica?',
+        self.assertIn('History of fracture?', questionnaires_content)
+        self.assertIn('Have you ever had any orthopedic surgery?',
                       questionnaires_content)
-        self.assertIn('Fez alguma cirurgia de nervo?',
+        self.assertIn('Did you have any nerve surgery?',
                       questionnaires_content)
-        self.assertIn('Identifique o evento que levou ao trauma do seu plexo '
-                      'braquial. É possível marcar mais do que um evento.',
+        self.assertIn('Identify the event that led to the trauma of your '
+                      'brachial plexus. You can mark more than one event.',
                       questionnaires_content)
-        self.assertIn('Teve alguma fratura associada à lesão?',
+        self.assertIn('Did you have any fractures associated with the injury?',
                       questionnaires_content)
         self.assertIn('The user enters a date in a date field',
                       questionnaires_content)
@@ -411,17 +410,16 @@ class ExperimentDetailTest(FunctionalTest):
         ##
         #  Sample asserts for second questionnaire
         ##
-        self.assertIn('Qual o lado da lesão?', questionnaires_content)
-        self.assertIn('Instituição do Estudo', questionnaires_content)
+        self.assertIn('What side of the injury?', questionnaires_content)
+        self.assertIn('Institution of the Study', questionnaires_content)
         self.assertIn('The user enters a free text',
                       questionnaires_content)
-        self.assertIn('Tipo(s) de lesão(ões):', questionnaires_content)
-        self.assertIn('Trombose', questionnaires_content)
-        self.assertIn('Anexar exames.', questionnaires_content)
+        self.assertIn('Injury type (s):', questionnaires_content)
+        self.assertIn('Thrombosis', questionnaires_content)
+        self.assertIn('Attach exams.', questionnaires_content)
         self.assertIn('The user uploads file(s)',
                       questionnaires_content)
-        self.assertIn('The user answers yes or not',
-                      questionnaires_content)
+        self.assertIn('The user answers yes or not', questionnaires_content)
 
         ##
         # Sample asserts for third questionnaire
@@ -473,8 +471,9 @@ class ExperimentDetailTest(FunctionalTest):
         # of questionnaires from NES, in csv format. The questionnaires are
         # associated with a group of the last approved experiment created in
         # tests helper. One of the questionnaires has three languages, English,
-        # Italian, and Brazilian Portuguese. The other has two languages,
-        # English and German.
+        # French, and Brazilian Portuguese. The other has two languages,
+        # English and German. Besides, we have a third questionnaire created
+        # in tests helper that has only the English language associated to it.
         ##
         experiment = Experiment.objects.filter(
             status=Experiment.APPROVED
@@ -498,11 +497,16 @@ class ExperimentDetailTest(FunctionalTest):
         lang_elements = self.browser.find_elements_by_class_name(
             'questionnaire-languages'
         )
-        lang_el_0 = lang_elements[0]
-        lang_el_1 = lang_elements[1]
+        ##
+        # As in the template the order of questionnaires varies from one
+        # access to another, we join all questionnaires language codes in
+        # one list to make assertions below
+        ##
+        q_lang_codes = ''
+        for lang in lang_elements:
+            q_lang_codes = q_lang_codes + ' ' + lang.text
 
-        self.assertIn('en', lang_el_0.text)
-        self.assertIn('fr', lang_el_0.text)
-        self.assertIn('pt-BR', lang_el_0.text)
-        self.assertIn('en', lang_el_1.text)
-        self.assertIn('de', lang_el_1.text)
+        self.assertEqual(q_lang_codes.count('en'), 3)
+        self.assertEqual(q_lang_codes.count('fr'), 1)
+        self.assertEqual(q_lang_codes.count('pt-br'), 1)
+        self.assertEqual(q_lang_codes.count('de'), 1)

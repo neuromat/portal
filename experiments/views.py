@@ -98,7 +98,7 @@ def _get_questionnaire_metadata(metadata):
 
 def _get_q_default_language_or_first(questionnaire):
     # TODO: correct this to adapt to unique QuestionnaireDefaultLanguage
-    # TODO: model with OneToOne with Questionnaire
+    # TODO: model with OneToOne relation with Questionnaire
     qdl = QuestionnaireDefaultLanguage.objects.filter(
         questionnaire=questionnaire
     ).first()
@@ -108,6 +108,17 @@ def _get_q_default_language_or_first(questionnaire):
         return QuestionnaireLanguage.objects.filter(
             questionnaire=questionnaire
         ).first()
+
+
+def _get_available_languages(questionnaire):
+    q_languages = QuestionnaireLanguage.objects.filter(
+        questionnaire=questionnaire
+    )
+    lang_code = []
+    for q_language in q_languages:
+        lang_code.append(q_language.language_code)
+
+    return lang_code
 
 
 def home_page(request):
@@ -178,11 +189,14 @@ def experiment_detail(request, slug):
                 questionnaires[group.title][q.id] = {}
                 # get questionnaire default language data or first
                 # questionnaire language
-                questioinnaire = _get_q_default_language_or_first(q)
+                questioinnaire_default = _get_q_default_language_or_first(q)
+
                 questionnaires[group.title][q.id]['survey_name'] = \
-                    questioinnaire.survey_name
+                    questioinnaire_default.survey_name
                 questionnaires[group.title][q.id]['survey_metadata'] = \
-                    _get_questionnaire_metadata(questioinnaire.survey_metadata)
+                    _get_questionnaire_metadata(questioinnaire_default.survey_metadata)
+                questionnaires[group.title][q.id]['language_codes'] = \
+                    _get_available_languages(q)
 
     return render(
         request, 'experiments/detail.html', {
