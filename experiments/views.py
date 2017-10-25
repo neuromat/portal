@@ -14,7 +14,7 @@ from django.utils.translation import activate, LANGUAGE_SESSION_KEY, \
 
 from experiments.forms import NepSearchForm
 from experiments.models import Experiment, RejectJustification, Step, \
-    Questionnaire
+    Questionnaire, QuestionnaireDefaultLanguage, QuestionnaireLanguage
 from experiments.tasks import rebuild_haystack_index
 
 
@@ -98,7 +98,7 @@ def _isvalid(source_path):
     return True
 
 
-def _get_questionnaire(metadata):
+def _get_questionnaire_metadata(metadata):
     # Put the questionnaire data into a temporary csv file
     temp_dir = tempfile.mkdtemp()
     file = open(temp_dir + '/questionnaire.csv', 'w')
@@ -130,6 +130,20 @@ def _get_questionnaire(metadata):
     return records
 
 
+def _get_q_default_language_or_first(questionnaire):
+    # TODO: correct this to adapt to unique QuestionnaireDefaultLanguage
+    # TODO: model with OneToOne with Questionnaire
+    qdl = QuestionnaireDefaultLanguage.objects.filter(
+        questionnaire=questionnaire
+    ).first()
+    if qdl:
+        return qdl.questionnaire_language
+    else:
+        return QuestionnaireLanguage.objects.filter(
+            questionnaire=questionnaire
+        ).first()
+
+
 def experiment_detail(request, slug):
     to_be_analysed_count = None  # will be None if home contains the list of
     # normal user
@@ -154,7 +168,7 @@ def experiment_detail(request, slug):
                 age_grouping[int(participant.age)] = 0
             age_grouping[int(participant.age)] += 1
 
-    # Get questionnaires for all groups
+    # Get default (language) questionnaires (or first) for all groups
     questionnaires = {}
     for group in experiment.groups.all():
         if group.steps.filter(type=Step.QUESTIONNAIRE).count() > 0:
@@ -162,10 +176,15 @@ def experiment_detail(request, slug):
             for step in group.steps.filter(type=Step.QUESTIONNAIRE):
                 q = Questionnaire.objects.get(step_ptr=step)
                 questionnaires[group.title][q.id] = {}
+                # get questionnaire default language data or first
+                # questionnaire language
+                questioinnaire = _get_q_default_language_or_first(q)
                 questionnaires[group.title][q.id]['survey_name'] = \
-                    q.survey_name
+                    questioinnaire.survey_name
                 questionnaires[group.title][q.id]['survey_metadata'] = \
-                    _get_questionnaire(q.survey_metadata)
+                    _get_questionnaire_metadata(
+                        questioinnaire.survey_metadata
+                    )
 
     return render(
         request, 'experiments/detail.html', {

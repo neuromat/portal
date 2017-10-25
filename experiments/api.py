@@ -8,15 +8,21 @@ from experiments.models import Experiment, Study, User, ProtocolComponent, \
     Keyword, ClassificationOfDiseases, \
     EEGSetting, EMGSetting, TMSSetting, ContextTree, Step, File, \
     EEGData, EMGData, TMSData, GoalkeeperGameData, QuestionnaireResponse, \
-    AdditionalData, GenericDataCollectionData, EEG, EMG, TMS, Instruction, Pause, Task, TaskForTheExperimenter, \
+    AdditionalData, GenericDataCollectionData, EEG, EMG, TMS, Instruction, \
+    Pause, Task, TaskForTheExperimenter, \
     GenericDataCollection, Stimulus, GoalkeeperGame, SetOfStep, Questionnaire, \
-    EEGAmplifierSetting, Amplifier, EEGSolution, EEGFilterSetting, EEGElectrodeNet, \
-    SurfaceElectrode, NeedleElectrode, IntramuscularElectrode, EEGElectrodeLocalizationSystem, EEGElectrodePosition, \
+    EEGAmplifierSetting, Amplifier, EEGSolution, EEGFilterSetting, \
+    EEGElectrodeNet, \
+    SurfaceElectrode, NeedleElectrode, IntramuscularElectrode, \
+    EEGElectrodeLocalizationSystem, EEGElectrodePosition, \
     TMSDeviceSetting, TMSDevice, CoilModel, \
-    EMGDigitalFilterSetting, ADConverter, EMGADConverterSetting, EMGElectrodeSetting, \
-    EMGPreamplifierSetting, EMGAmplifierSetting, EMGPreamplifierFilterSetting, EMGAnalogFilterSetting, \
+    EMGDigitalFilterSetting, ADConverter, EMGADConverterSetting, \
+    EMGElectrodeSetting, \
+    EMGPreamplifierSetting, EMGAmplifierSetting, EMGPreamplifierFilterSetting, \
+    EMGAnalogFilterSetting, \
     EMGElectrodePlacementSetting, \
-    EMGSurfacePlacement, EMGIntramuscularPlacement, EMGNeedlePlacement
+    EMGSurfacePlacement, EMGIntramuscularPlacement, EMGNeedlePlacement, \
+    QuestionnaireLanguage, QuestionnaireDefaultLanguage
 from experiments.tasks import build_download_file
 
 
@@ -516,7 +522,10 @@ class GroupSerializer(serializers.ModelSerializer):
                         ClassificationOfDiseases.objects.get_or_create(
                             code=criteria['code'],
                             description='Code not recognized',
-                            abbreviated_description='Code not recognized'
+                            abbreviated_description='Code not recognized',
+                            description_pt_br='Códico não reconhecido',
+                            abbreviated_description_pt_br='Código não '
+                                                          'reconhecido'
                         )
                     group.inclusion_criteria.add(cod)
         return group
@@ -726,7 +735,29 @@ class QuestionnaireStepSerializer(serializers.ModelSerializer):
                   'interval_between_repetitions_value',
                   'interval_between_repetitions_unit',
                   'random_position',
-                  'code', 'survey_name', 'survey_metadata')
+                  'code')
+
+
+class QuestionnaireLanguageSerializer(serializers.ModelSerializer):
+    questionnaire = serializers.ReadOnlyField(source='questionnaire.code')
+    is_default = serializers.BooleanField(required=False)
+
+    class Meta:
+        model = QuestionnaireLanguage
+        fields = ('id', 'questionnaire', 'language_code', 'survey_name',
+                  'survey_metadata', 'is_default')
+
+    def create(self, validated_data):
+        validated_data.pop('is_default')
+        return super(QuestionnaireLanguageSerializer, self).create(
+            validated_data
+        )
+
+    def update(self, instance, validated_data):
+        validated_data.pop('is_default')
+        return super(QuestionnaireLanguageSerializer, self).update(
+            instance, validated_data
+        )
 
 
 class FileSerializer(serializers.ModelSerializer):
@@ -976,7 +1007,8 @@ class ExperimentViewSet(viewsets.ModelViewSet):
             owner=owner, version=exp_version.get_last_version(), nes_id=nes_id
         )
         experiment = Experiment.objects.filter(nes_id=nes_id, version=version).values('id')[0]
-        build_download_file(int(experiment['id']), template_name="")
+        # TODO: uncomment after fix error during the build
+        # build_download_file(int(experiment['id']), template_name="")
 
 
 class StudyViewSet(viewsets.ModelViewSet):
@@ -1649,6 +1681,30 @@ class QuestionnaireStepViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         group = Group.objects.get(pk=self.kwargs['pk'])
         serializer.save(group=group)
+
+
+class QuestionnaireLanguageViewSet(viewsets.ModelViewSet):
+    serializer_class = QuestionnaireLanguageSerializer
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
+
+    def get_queryset(self):
+        return QuestionnaireLanguage.objects.filter(
+            questionnaire_id=self.kwargs['pk']
+        )
+
+    def perform_create(self, serializer):
+        questionnaire = Questionnaire.objects.get(pk=self.kwargs['pk'])
+        questionnaire_language = serializer.save(questionnaire=questionnaire)
+
+        if self.request.data.get('is_default'):
+            QuestionnaireDefaultLanguage.objects.create(
+                questionnaire=questionnaire,
+                questionnaire_language=questionnaire_language
+            )
+
+    def perform_update(self, serializer):
+        # TODO: implement it!
+        pass
 
 
 class FileViewSet(viewsets.ModelViewSet):

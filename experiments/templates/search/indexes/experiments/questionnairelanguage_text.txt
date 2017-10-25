@@ -1,3 +1,4 @@
 {{ object.survey_name }}
 {{ object.survey_metadata }}
-{{ object.group }}
+{{ object.language_code }}
+{{ object.questionnaire }}

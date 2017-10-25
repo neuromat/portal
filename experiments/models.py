@@ -590,8 +590,23 @@ class TMS(Step):
 
 class Questionnaire(Step):
     code = models.CharField(max_length=150)
+
+
+class QuestionnaireLanguage(models.Model):
+    questionnaire = models.ForeignKey(
+        Questionnaire, related_name='q_languages'
+    )
+    language_code = models.CharField(max_length=30)
     survey_name = models.CharField(max_length=255)
     survey_metadata = models.TextField(null=True, blank=True)
+
+    class Meta:
+        unique_together = ('questionnaire', 'language_code')
+
+
+class QuestionnaireDefaultLanguage(models.Model):
+    questionnaire = models.OneToOneField(Questionnaire, related_name='questionnaire_default_language')
+    questionnaire_language = models.ForeignKey(QuestionnaireLanguage)
 
 
 class Instruction(Step):

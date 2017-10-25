@@ -5,18 +5,20 @@ from subprocess import call
 from django.contrib.auth import models
 from faker import Factory
 
-from experiments.models import Experiment, Study, Group, Researcher
+from experiments.models import Experiment, Study, Group, Researcher, \
+    Questionnaire
 # python manage.py shell < experiments/tests/faker_populator.py
 # TODO: when executing from bash command line, final line identifier breaks
 # imports. We are kepping in Collaborator in same line
 from experiments.models import Gender, ClassificationOfDiseases, Keyword, \
     Collaborator, Step, TMSSetting, TMSDevice, CoilModel, TMSDeviceSetting
-from experiments.tests.tests_helper import create_classification_of_deseases
+from experiments.tests.tests_helper import create_classification_of_deseases, \
+    create_questionnaire
 from experiments.tests.tests_helper import create_experiment_protocol
 from experiments.tests.tests_helper import create_group, \
     create_ethics_committee_info, create_step, create_tms_setting, \
     create_tms_device, create_coil_model, create_tms_device_setting, \
-    create_tmsdata_objects_to_test_search, create_questionnaire
+    create_tmsdata_objects_to_test_search, create_questionnaire_language
 from experiments.tests.tests_helper import create_keyword
 from experiments.tests.tests_helper import create_participant
 from experiments.tests.tests_helper import create_study_collaborator
@@ -222,9 +224,13 @@ create_tmsdata_objects_to_test_search()
 # Create questionnaires
 experiment = Experiment.objects.last()
 group = experiment.groups.first()
-create_questionnaire(settings.BASE_DIR +
-                     '/experiments/tests/questionnaire1.csv', group
-                     )
+create_questionnaire(1, group)
+questionnaire1 = Questionnaire.objects.last()
+create_questionnaire_language(
+    questionnaire1,
+    settings.BASE_DIR + '/experiments/tests/questionnaire1.csv',
+    'en'
+)
 
 # TODO: After populating models we call 'manage.py rebuild_index --noinput' to
 # TODO: rebuild haystack search index - to manually test searching.

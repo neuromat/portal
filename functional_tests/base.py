@@ -4,6 +4,7 @@ import os
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 from django.test import override_settings
 from selenium import webdriver
+from selenium.common.exceptions import WebDriverException
 from selenium.webdriver.common.keys import Keys
 
 from experiments.tests.tests_helper import global_setup_ft, apply_setup
@@ -18,6 +19,8 @@ TEST_HAYSTACK_CONNECTIONS = {
         'TIMEOUT': 60 * 10,
     }
 }
+
+MAX_WAIT = 10
 
 
 @override_settings(HAYSTACK_CONNECTIONS=TEST_HAYSTACK_CONNECTIONS)
@@ -42,6 +45,17 @@ class FunctionalTest(StaticLiveServerTestCase):
 
     def tearDown(self):
         self.browser.quit()
+
+    def wait_for(self, fn):
+        start_time = time.time()
+        while True:
+            try:
+                return fn()
+            except (AssertionError, WebDriverException) as e:
+                if time.time() - start_time > MAX_WAIT:
+                    raise e
+                time.sleep(0.5)
+
 
 
 @apply_setup(global_setup_ft)
@@ -74,3 +88,15 @@ class FunctionalTestTrustee(StaticLiveServerTestCase):
 
     def tearDown(self):
         self.browser.quit()
+
+    # TODO: same definition as in FunctionalTest class (remember moto: "three
+    # TODO: strikes and refactor". Second now.
+    def wait_for(self, fn):
+        start_time = time.time()
+        while True:
+            try:
+                return fn()
+            except (AssertionError, WebDriverException) as e:
+                if time.time() - start_time > MAX_WAIT:
+                    raise e
+                time.sleep(0.5)
