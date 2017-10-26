@@ -227,16 +227,18 @@ class ExperimentDetailTest(TestCase):
                     response, 'Questionnaire ' + q_language.survey_name
                 )
 
-        # Sample asserts for first questionnaire
-        self.assertIn('History of fracture?', response.content.decode())
-        self.assertIn('Have you ever had any orthopedic surgery?',
+        # Sample asserts for first questionnaire (in Portuguese, as first
+        # questionnaire, first language, created in tests helper is in
+        # Portuguese).
+        self.assertIn('História de fratura', response.content.decode())
+        self.assertIn('Já fez alguma cirurgia ortopédica?',
                       response.content.decode())
-        self.assertIn('Did you have any nerve surgery?',
+        self.assertIn('Fez alguma cirurgia de nervo?',
                       response.content.decode())
-        self.assertIn('Identify the event that led to the trauma of your '
-                      'brachial plexus. You can mark more than one event.',
+        self.assertIn('Identifique o evento que levou ao trauma do seu plexo '
+                      'braquial. É possível marcar mais do que um evento.',
                       response.content.decode())
-        self.assertIn('Did you have any fractures associated with the injury?',
+        self.assertIn('Teve alguma fratura associada à lesão?',
                       response.content.decode())
         self.assertIn('The user enters a date in a date field',
                       response.content.decode())
@@ -524,7 +526,7 @@ class SearchTest(TestCase):
         self.assertEqual(response.status_code, 200)
         # TODO: we verify for 3 objects because test is catching invalid
         # TODO: questionnaires. See note 'Backlog' in notebook, 09/28/2017
-        self.assertContains(response, '<tr', 4)  # because in search results
+        self.assertContains(response, '<tr', 1)  # because in search results
         # templates it's '<tr class ...>'
         # TODO: needs to know if it was brought correct results
 

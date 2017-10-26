@@ -462,8 +462,9 @@ class ExperimentDetailTest(FunctionalTest):
             'questionnaires_tab'
         ).text
 
-        self.assertIn('This questionnaire is in invalid format, and can\'t '
-                      'be displayed', questionnaires_content)
+        self.assertIn('The questionnaire in this language is in invalid '
+                      'format, and can\'t be displayed',
+                      questionnaires_content)
 
     def test_can_see_all_language_links_of_questionnaires_if_available(self):
         ##
