@@ -224,7 +224,7 @@ create_tmsdata_objects_to_test_search()
 # Create questionnaires
 experiment = Experiment.objects.last()
 group = experiment.groups.first()
-create_questionnaire(1, group)
+create_questionnaire(1, 'q1', group)
 questionnaire1 = Questionnaire.objects.last()
 create_questionnaire_language(
     questionnaire1,

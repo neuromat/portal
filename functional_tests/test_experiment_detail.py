@@ -524,6 +524,10 @@ class ExperimentDetailTest(FunctionalTest):
         experiment = Experiment.objects.filter(
             status=Experiment.APPROVED
         ).last()
+        ##
+        # questionnaire with code='q1' defined in tests helper
+        ##
+        questionnaire = Questionnaire.objects.get(code='q1')
 
         # The visitor clicks in the experiment with questionnaire in home page
         self.browser.find_element_by_xpath(
@@ -531,22 +535,23 @@ class ExperimentDetailTest(FunctionalTest):
         ).click()
         self.wait_for_detail_page_charge()
 
-        # When the new visitor clicks in the Questionnaires tab, then click
-        # in 'Details' button of the first questionnaire she sees
-        # the questionnaires content as a series of questions and answers
+        # She clicks in Questionnaires tab
         self.browser.find_element_by_link_text('Questionnaires').click()
-        self.browser.find_element_by_id(
-            'questionnaires_tab'
-        ).find_element_by_link_text('Details').click()
 
-        # The first questionnaire has three languages: English, French and
+        #
+        # Questionnaire with code='q1' has three languages: English, French and
         # Brazilian Portuguese.
         ##
-        # The visitor clicks in 'pt-br' link and after a refreshing of the
-        # questionnaire session, she sees the English version of the
-        # questionnaire
+        # The visitor clicks in 'pt-br' link and the questionnaire
+        # session refreshes
         self.browser.find_element_by_link_text('pt-br').click()
         time.sleep(1)
+
+        # When she clicks in Detail button, she can see the questionnaire
+        # with questions and answers in Portugues.
+        self.browser.find_element_by_xpath(
+            "//a[@href='#collapse" + str(questionnaire.id) + "']"
+        ).click()
 
         questionnaires_content = self.browser.find_element_by_id(
             'questionnaires_tab').text
@@ -562,5 +567,5 @@ class ExperimentDetailTest(FunctionalTest):
                       questionnaires_content)
         self.assertIn('Teve alguma fratura associada à lesão?',
                       questionnaires_content)
-        self.assertIn('The user enters a date in a date field',
+        self.assertIn('The user answers yes or not',
                       questionnaires_content)

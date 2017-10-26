@@ -401,17 +401,19 @@ def create_questionnaire_language(questionnaire, source, language):
         )
 
 
-def create_questionnaire(qtty, group):
+def create_questionnaire(qtty, code, group):
     """
     Create qtty questionnaire(s) for a group
     :param qtty: quantity of questionnaires to be created
+    :param code: code of the questionnaire (defined to ease questionnaire
+    testing)
     :param group: Group model instance
     """
     faker = Factory.create()
 
     for i in range(qtty):
         Questionnaire.objects.create(
-            code=faker.ssn(),
+            code=code,
             group=group, order=randint(1, 10),
             identification='questionnaire',
             type=Step.QUESTIONNAIRE,
@@ -689,7 +691,7 @@ def global_setup_ft():
     # TODO: inside create_experiment function. This has to be refactor.
     create_group(2, experiment)
     group_first = experiment.groups.first()
-    create_questionnaire(1, group_first)
+    create_questionnaire(1, 'q1', group_first)
     questionnaire1 = Questionnaire.objects.last()
     # create questionnaire language data default for questionnaire1
     create_questionnaire_language(
@@ -711,7 +713,7 @@ def global_setup_ft():
         'pt-br'
     )
 
-    create_questionnaire(1, group_first)
+    create_questionnaire(1, 'q2', group_first)
     questionnaire2 = Questionnaire.objects.last()
     # create questionnaire language data default for questionnaire2
     create_questionnaire_language(
@@ -727,7 +729,7 @@ def global_setup_ft():
     )
 
     group_last = experiment.groups.last()
-    create_questionnaire(1, group_last)
+    create_questionnaire(1, 'q3', group_last)
     questionnaire3 = Questionnaire.objects.last()
     # create questionnaire language data default for questionnaire3
     create_questionnaire_language(
@@ -743,7 +745,7 @@ def global_setup_ft():
         status=Experiment.APPROVED
     ).first()
     group = experiment.groups.first()
-    create_questionnaire(1, group)
+    create_questionnaire(1, 'q4', group)
     questionnaire4 = Questionnaire.objects.last()
     # create questionnaire language data default for questionnaire4
     create_questionnaire_language(
@@ -841,12 +843,12 @@ def global_setup_ut():
     ).last()
     create_group(2, experiment)
     group_first = experiment.groups.first()
-    create_questionnaire(1, group_first)
+    create_questionnaire(1, 'q1', group_first)
     questionnaire1 = Questionnaire.objects.last()
     # create questionnaire language data pt-br for questionnaire1
     create_questionnaire_language(
         questionnaire1,
-        settings.BASE_DIR + '/experiments/tests/questionnaire1.csv',
+        settings.BASE_DIR + '/experiments/tests/questionnaire1_pt-br.csv',
         # our tests helper always consider 'en' as Default Language,
         # so we create this time as 'pt-br' to test creating questionnaire
         # default language in test_api (by the moment only test_api tests
@@ -857,7 +859,7 @@ def global_setup_ut():
     # create questionnaire language data fr for questionnaire1
     create_questionnaire_language(
         questionnaire1,
-        settings.BASE_DIR + '/experiments/tests/questionnaire1.csv',
+        settings.BASE_DIR + '/experiments/tests/questionnaire1_fr.csv',
         # our tests helper always consider 'en' as Default Language,
         # so we create this time as 'pt-br' to test creating questionnaire
         # default language in test_api (by the moment only test_api tests
@@ -867,7 +869,7 @@ def global_setup_ut():
     )
 
     # create questionnaire language data default for questionnaire2
-    create_questionnaire(1, group_first)
+    create_questionnaire(1, 'q2', group_first)
     questionnaire2 = Questionnaire.objects.last()
     create_questionnaire_language(
         questionnaire2,
@@ -875,16 +877,15 @@ def global_setup_ut():
         'en'
     )
     # create questionnaire language data de for questionnaire2
-    create_questionnaire(1, group_first)
     questionnaire2 = Questionnaire.objects.last()
     create_questionnaire_language(
         questionnaire2,
-        settings.BASE_DIR + '/experiments/tests/questionnaire2.csv',
+        settings.BASE_DIR + '/experiments/tests/questionnaire2_de.csv',
         'de'
     )
 
     group_last = experiment.groups.last()
-    create_questionnaire(1, group_last)
+    create_questionnaire(1, 'q3', group_last)
     questionnaire3 = Questionnaire.objects.last()
     # create questionnaire language data default for questionnaire3
     create_questionnaire_language(
@@ -901,7 +902,7 @@ def global_setup_ut():
     ).first()
     create_group(1, experiment)
     group = experiment.groups.last()
-    create_questionnaire(1, group)
+    create_questionnaire(1, 'q4', group)
     # create questionnaire language data default for questionnaire4
     questionnaire4 = Questionnaire.objects.last()
     create_questionnaire_language(
@@ -918,7 +919,7 @@ def global_setup_ut():
     ).last()
     create_group(2, experiment)
     group = experiment.groups.first()
-    create_questionnaire(1, group)
+    create_questionnaire(1, 'q5', group)
     questionnaire5 = Questionnaire.objects.last()
     # create questionnaire language data default for questionnaire5
     create_questionnaire_language(
@@ -927,7 +928,7 @@ def global_setup_ut():
         'en'
     )
     group = experiment.groups.last()
-    create_questionnaire(1, group)
+    create_questionnaire(1, 'q6', group)
     questionnaire6 = Questionnaire.objects.last()
     create_questionnaire_language(
         questionnaire6,
