@@ -305,16 +305,19 @@
                 {% for group_key, group_values in questionnaires.items %}
                     <h4>{% trans 'Questionnaires for group' %} {{ group_key }}</h4>
                     {% for q_key, q_value in group_values.items %}
-                        {% if q_value.survey_metadata != 'invalid_questionnaire' %}
-                            <div id="{{ q_key }}" class="panel panel-default nep-panel-group">
-                                <div class="questionnaire-languages">
-                                    {% for lang_code in q_value.language_codes %}
-                                        <ul>
-                                            <li><a href="#" onclick="ajax_questionnaire_language(event, {{ q_key }}, '{{ lang_code }}')">{{ lang_code }}</a></li>
-                                        </ul>
-                                    {% endfor %}
-                                </div>
-                                <strong>Questionnaire {{ q_value.survey_name }}</strong>
+                        <div class="questionnaire-languages">
+                            {% for lang_code in q_value.language_codes %}
+                                <ul>
+                                    <li><a href="#" onclick="ajax_questionnaire_language(event, {{ q_key }}, '{{ lang_code }}')">{{ lang_code }}</a></li>
+                                </ul>
+                            {% endfor %}
+                        </div>
+                        <div id="{{ q_key }}" class="panel panel-default nep-panel-group">
+                            {# TODO: this part of template is identical (except for the variables, and the load tag) #}
+                            {# TODO: the template'experiments/questionnaires/ajax_questionnaire_language.html' #}
+                            {# TODO: that renders the questionnaire in other languages. Refactor! #}
+                            <strong>Questionnaire {{ q_value.survey_name }}</strong>
+                            {% if q_value.survey_metadata != 'invalid_questionnaire' %}
                                 <div class="pull-right">
                                     <a href="#collapse{{ q_key }}"
                                        role="button"
@@ -361,12 +364,12 @@
                                         {% endfor %}
                                     </section>
                                 </div>
-                            </div>
-                        {% else %}
-                            <p>
-                                {% trans "This questionnaire is in invalid format, and can't be displayed" %}
-                            </p>
-                        {% endif %}
+                            {% else %}
+                                <p>
+                                    {% trans "The questionnaire in this language is in invalid format, and can't be displayed" %}
+                                </p>
+                            {% endif %}
+                        </div>
                     {% endfor %}
                 {% endfor %}
             </div>
@@ -487,13 +490,8 @@
             let url = "/experiments/questionnaire_language/" +
                 questionnaire_id + "/" + lang_code;
             $.ajax(url, {
-                dataType: "json",
                 success: function(data) {
-                    $("div#" + data["questionnaire_id"]).html(
-                        "<p>It works for " + "questionnaire_id " +
-                        data["questionnaire_id"] + " and lang_code " +
-                        data["lang_code"] + "</p>"
-                    );
+                    $("div#" + questionnaire_id).html(data);
                 },
                 error: function (jqXHR, textStatus, errorThrown) {
                     console.log("The request to change questionnaire " +
@@ -501,6 +499,6 @@
                         "error: " + errorThrown);
                 }
             })
-        };
+        }
     </script>
 {% endblock %}

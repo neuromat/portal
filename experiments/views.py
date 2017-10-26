@@ -2,13 +2,13 @@ import csv
 import math
 import pandas
 import tempfile
-import json
 
 from django.contrib import messages
 from django.contrib.auth.views import LoginView
 from django.core.mail import send_mail
 from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import render
+from django.template.loader import render_to_string
 from haystack.generic_views import SearchView
 from django.utils.translation import activate, LANGUAGE_SESSION_KEY, \
     ugettext as _
@@ -195,7 +195,9 @@ def experiment_detail(request, slug):
                 questionnaires[group.title][q.id]['survey_name'] = \
                     questioinnaire_default.survey_name
                 questionnaires[group.title][q.id]['survey_metadata'] = \
-                    _get_questionnaire_metadata(questioinnaire_default.survey_metadata)
+                    _get_questionnaire_metadata(
+                        questioinnaire_default.survey_metadata
+                    )
                 questionnaires[group.title][q.id]['language_codes'] = \
                     _get_available_languages(q)
 
@@ -326,11 +328,19 @@ def ajax_to_be_analysed(request):
 
 
 def ajax_questionnaire_languages(request, questionnaire_id, lang_code):
-    data = dict()
-    data['questionnaire_id'] = questionnaire_id
-    data['lang_code'] = lang_code
+    questionnaire_language = QuestionnaireLanguage.objects.get(
+        questionnaire=questionnaire_id, language_code=lang_code
+    )
 
-    return HttpResponse(json.dumps(data), content_type='application/json')
+    q_language = dict()
+    q_language['survey_name'] = questionnaire_language.survey_name
+    q_language['survey_metadata'] = _get_questionnaire_metadata(
+        questionnaire_language.survey_metadata)
+
+    q_language_tmpl = render_to_string(
+        'experiments/questionnaires/ajax_questionnaire_language.html',
+        {'q_language': q_language, 'questionnaire_id': questionnaire_id})
+    return HttpResponse(q_language_tmpl)
 
 
 def language_change(request, language_code):

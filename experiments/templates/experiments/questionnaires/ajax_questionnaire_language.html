@@ -1,0 +1,56 @@
+{# TODO: this template is identical (except for the variables, and the load tag) the part of #}
+{# TODO:'experiments/detail.html' that renders the questionnaire. Refactor! #}
+{% load i18n %}
+<strong>Questionnaire {{ q_language.survey_name }}</strong>
+{% if q_language.survey_metadata != 'invalid_questionnaire' %}
+    <div class="pull-right">
+        <a href="#collapse{{ questionnaire_id }}"
+           role="button"
+           data-toggle="collapse"
+           data-parent="#accordion"
+           aria-expanded="false"
+           aria-controls="collapse{{ questionnaire_id }}"
+           class="nep-btn">
+            {% trans 'Details' %}
+        </a>
+    </div>
+    <div class="panel-collapse collapse"
+         id="collapse{{ questionnaire_id }}"
+         role="tabpanel"
+         aria-labelledby="heading{{ questionnaire_id }}">
+        <section id="questionnaire_title"><br>
+            {% for data in q_language.survey_metadata.data %}
+                <ul>
+                    <li>{{ data.question_description }}</li>
+                    {% if data.question_limesurvey_type == 'F' %}
+                        {% include 'experiments/questionnaires/f_type.html' %}
+                    {% elif data.question_limesurvey_type == 'L' %}
+                        {% include 'experiments/questionnaires/l_type.html' %}
+                    {% elif data.question_limesurvey_type == 'M' or data.question_limesurvey_type == 'B' or data.question_limesurvey_type == 'P' %}
+                        {% include 'experiments/questionnaires/m_type.html' %}
+                    {% elif data.question_limesurvey_type == 'D' %}
+                        <p>
+                            <em>{% trans "The user enters a date in a date field" %}.</em>
+                        </p>
+                    {% elif data.question_limesurvey_type == '|' %}
+                        <p>
+                            <em>{% trans "The user uploads file(s)" %}.</em>
+                        </p>
+                    {% elif data.question_limesurvey_type == 'Y'%}
+                        <p>
+                            <em>{% trans 'The user answers' %}</em> yes <em>or</em> not
+                        </p>
+                    {% else %}
+                        <p>
+                            <em>{% trans "The user enters a free text" %}</em>
+                        </p>
+                    {% endif %}
+                </ul>
+            {% endfor %}
+        </section>
+    </div>
+{% else %}
+    <p>
+        {% trans "The questionnaire in this language is in invalid format, and can't be displayed" %}
+    </p>
+{% endif %}
