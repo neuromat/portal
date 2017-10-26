@@ -306,12 +306,11 @@
                     <h4>{% trans 'Questionnaires for group' %} {{ group_key }}</h4>
                     {% for q_key, q_value in group_values.items %}
                         {% if q_value.survey_metadata != 'invalid_questionnaire' %}
-                            {# TODO: maybe id is not more necessary #}
                             <div id="{{ q_key }}" class="panel panel-default nep-panel-group">
                                 <div class="questionnaire-languages">
                                     {% for lang_code in q_value.language_codes %}
                                         <ul>
-                                            <li><a href="{% url 'ajax-questionnaire_language' q_key 'pt-BR' %}" id="{{ lang_code }}">{{ lang_code }}</a></li>
+                                            <li><a href="#" onclick="ajax_questionnaire_language(event, {{ q_key }}, '{{ lang_code }}')">{{ lang_code }}</a></li>
                                         </ul>
                                     {% endfor %}
                                 </div>
@@ -483,23 +482,25 @@
     {# Script related to Questionnaires tab #}
     {##}
     <script>
-        $("a#pt-BR").click(function (e) {
-            e.preventDefault();
-            // TODO: is there a better way, instead of parent(), closest(), parent(), closest()
-            const questionnaire_id =
-                $(this).parent().closest("div").parent().closest("div").attr("id");
-            const url = $(this).attr("href");
+        function ajax_questionnaire_language (e, questionnaire_id, lang_code) {
+            e.preventDefault();  // to not request page in href element
+            let url = "/experiments/questionnaire_language/" +
+                questionnaire_id + "/" + lang_code;
             $.ajax(url, {
                 dataType: "json",
                 success: function(data) {
-                    $("div#" + questionnaire_id).html("<p>It works for " +
-                        "questionnaire_id " + data["questionnaire_id"] + " and lang_code " + data["lang_code"] + "</p>");
+                    $("div#" + data["questionnaire_id"]).html(
+                        "<p>It works for " + "questionnaire_id " +
+                        data["questionnaire_id"] + " and lang_code " +
+                        data["lang_code"] + "</p>"
+                    );
                 },
-                error: function () {
-                    console.log("Didn't work for questionnaire " +
-                        questionnaire_id);
+                error: function (jqXHR, textStatus, errorThrown) {
+                    console.log("The request to change questionnaire " +
+                        "language returned status: " + textStatus + ", " +
+                        "error: " + errorThrown);
                 }
             })
-        });
+        };
     </script>
 {% endblock %}
