@@ -2,6 +2,7 @@ import csv
 import math
 import pandas
 import tempfile
+import json
 
 from django.contrib import messages
 from django.contrib.auth.views import LoginView
@@ -322,6 +323,14 @@ def ajax_to_be_analysed(request):
     ).count()
 
     return HttpResponse(to_be_analysed, content_type='application/json')
+
+
+def ajax_questionnaire_languages(request, questionnaire_id, lang_code):
+    data = dict()
+    data['questionnaire_id'] = questionnaire_id
+    data['lang_code'] = lang_code
+
+    return HttpResponse(json.dumps(data), content_type='application/json')
 
 
 def language_change(request, language_code):

@@ -306,11 +306,12 @@
                     <h4>{% trans 'Questionnaires for group' %} {{ group_key }}</h4>
                     {% for q_key, q_value in group_values.items %}
                         {% if q_value.survey_metadata != 'invalid_questionnaire' %}
+                            {# TODO: maybe id is not more necessary #}
                             <div id="{{ q_key }}" class="panel panel-default nep-panel-group">
                                 <div class="questionnaire-languages">
                                     {% for lang_code in q_value.language_codes %}
                                         <ul>
-                                            <li><a href="#" id="lang_{{ lang_code }}">{{ lang_code }}</a></li>
+                                            <li><a href="{% url 'ajax-questionnaire_language' q_key 'pt-BR' %}" id="{{ lang_code }}">{{ lang_code }}</a></li>
                                         </ul>
                                     {% endfor %}
                                 </div>
@@ -482,18 +483,17 @@
     {# Script related to Questionnaires tab #}
     {##}
     <script>
-        $("a#lang_pt-BR").click(function () {
+        $("a#pt-BR").click(function (e) {
+            e.preventDefault();
             // TODO: is there a better way, instead of parent(), closest(), parent(), closest()
             const questionnaire_id =
                 $(this).parent().closest("div").parent().closest("div").attr("id");
-            const url = "http://experiments/questionnaire_language/";
+            const url = $(this).attr("href");
             $.ajax(url, {
-                data: {
-                    questionnaire_id: questionnaire_id,
-                    lang_code: "pt_BR"
-                },
+                dataType: "json",
                 success: function(data) {
-                    questionnaire.html("<p>It works!</p>");
+                    $("div#" + questionnaire_id).html("<p>It works for " +
+                        "questionnaire_id " + data["questionnaire_id"] + " and lang_code " + data["lang_code"] + "</p>");
                 },
                 error: function () {
                     console.log("Didn't work for questionnaire " +
