@@ -304,71 +304,16 @@
             <div role="tabpanel" class="tab-pane" id="questionnaires_tab">
                 {% for group_key, group_values in questionnaires.items %}
                     <h4>{% trans 'Questionnaires for group' %} {{ group_key }}</h4>
-                    {% for q_key, q_value in group_values.items %}
+                    {% for questionnaire_id, q_language in group_values.items %}
                         <div class="questionnaire-languages">
-                            {% for lang_code in q_value.language_codes %}
+                            {% for lang_code in q_language.language_codes %}
                                 <ul>
-                                    <li><a href="#" onclick="ajax_questionnaire_language(event, {{ q_key }}, '{{ lang_code }}')">{{ lang_code }}</a></li>
+                                    <li><a href="#" onclick="ajax_questionnaire_language(event, {{ questionnaire_id }}, '{{ lang_code }}')">{{ lang_code }}</a></li>
                                 </ul>
                             {% endfor %}
                         </div>
-                        <div id="{{ q_key }}" class="panel panel-default nep-panel-group">
-                            {# TODO: this part of template is identical (except for the variables, and the load tag) #}
-                            {# TODO: the template'experiments/questionnaires/ajax_questionnaire_language.html' #}
-                            {# TODO: that renders the questionnaire in other languages. Refactor! #}
-                            <strong>Questionnaire {{ q_value.survey_name }}</strong>
-                            {% if q_value.survey_metadata != 'invalid_questionnaire' %}
-                                <div class="pull-right">
-                                    <a href="#collapse{{ q_key }}"
-                                       role="button"
-                                       data-toggle="collapse"
-                                       data-parent="#accordion"
-                                       aria-expanded="false"
-                                       aria-controls="collapse{{ q_key }}"
-                                       class="nep-btn">
-                                        {% trans 'Details' %}
-                                    </a>
-                                </div>
-                                <div class="panel-collapse collapse"
-                                     id="collapse{{ q_key }}"
-                                     role="tabpanel"
-                                     aria-labelledby="heading{{ q_key }}">
-                                    <section id="questionnaire_title"><br>
-                                        {% for data in q_value.survey_metadata.data %}
-                                            <ul>
-                                                <li>{{ data.question_description }}</li>
-                                                {% if data.question_limesurvey_type == 'F' %}
-                                                    {% include 'experiments/questionnaires/f_type.html' %}
-                                                {% elif data.question_limesurvey_type == 'L' %}
-                                                    {% include 'experiments/questionnaires/l_type.html' %}
-                                                {% elif data.question_limesurvey_type == 'M' or data.question_limesurvey_type == 'B' or data.question_limesurvey_type == 'P' %}
-                                                    {% include 'experiments/questionnaires/m_type.html' %}
-                                                {% elif data.question_limesurvey_type == 'D' %}
-                                                    <p>
-                                                        <em>{% trans "The user enters a date in a date field" %}.</em>
-                                                    </p>
-                                                {% elif data.question_limesurvey_type == '|' %}
-                                                    <p>
-                                                        <em>{% trans "The user uploads file(s)" %}.</em>
-                                                    </p>
-                                                {% elif data.question_limesurvey_type == 'Y'%}
-                                                    <p>
-                                                        <em>{% trans 'The user answers' %}</em> yes <em>or</em> not
-                                                    </p>
-                                                {% else %}
-                                                    <p>
-                                                        <em>{% trans "The user enters a free text" %}</em>
-                                                    </p>
-                                                {% endif %}
-                                            </ul>
-                                        {% endfor %}
-                                    </section>
-                                </div>
-                            {% else %}
-                                <p>
-                                    {% trans "The questionnaire in this language is in invalid format, and can't be displayed" %}
-                                </p>
-                            {% endif %}
+                        <div id="{{ questionnaire_id }}" class="panel panel-default nep-panel-group">
+                            {% include 'experiments/questionnaires/questionnaire_language.html' %}
                         </div>
                     {% endfor %}
                 {% endfor %}

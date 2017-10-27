@@ -338,7 +338,7 @@ def ajax_questionnaire_languages(request, questionnaire_id, lang_code):
         questionnaire_language.survey_metadata)
 
     q_language_tmpl = render_to_string(
-        'experiments/questionnaires/ajax_questionnaire_language.html',
+        'experiments/questionnaires/questionnaire_language.html',
         {'q_language': q_language, 'questionnaire_id': questionnaire_id})
     return HttpResponse(q_language_tmpl)
 
