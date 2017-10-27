@@ -279,7 +279,9 @@ class ExperimentDetailTest(FunctionalTest):
     def test_can_view_group_questionnaires_and_questionnaires_titles(self):
         ##
         # We've created Questionnaire data in tests helper from a Sample
-        # of a questionnaire from NES, in csv format
+        # of a questionnaire from NES, in csv format. The Questionnaire is
+        # associated with a group of the last experiment created in tests
+        # helper.
         ##
         experiment = Experiment.objects.filter(
             status=Experiment.APPROVED
@@ -291,7 +293,6 @@ class ExperimentDetailTest(FunctionalTest):
         self.browser.find_element_by_xpath(
             "//a[@href='/experiments/" + experiment.slug + "/']"
         ).click()
-
         self.wait_for_detail_page_charge()
 
         ##
@@ -465,3 +466,43 @@ class ExperimentDetailTest(FunctionalTest):
 
         self.assertIn('This questionnaire is in invalid format, and can\'t '
                       'be displayed', questionnaires_content)
+
+    def test_can_see_all_language_links_of_questionnaires_if_available(self):
+        ##
+        # We've created two questionnaires in tests helper from a Sample
+        # of a questionnaire from NES, in csv format. The questionnaires are
+        # associated with a group of the last experiment created in tests
+        # helper. One of the questionnaires has three languages, English,
+        # French, and Brazilian Portuguese. The other has two languages,
+        # English and German.
+        ##
+        experiment = Experiment.objects.filter(
+            status=Experiment.APPROVED
+        ).last()
+
+        # The visitor clicks in the experiment with questionnaire in home page
+        self.browser.find_element_by_xpath(
+            "//a[@href='/experiments/" + experiment.slug + "/']"
+        ).click()
+        self.wait_for_detail_page_charge()
+
+        # When the new visitor clicks in the Questionnaires tab, she sees,
+        # below questionnaire titles, a sequence of buttons indicating the
+        # available languages of the questionnaires
+        self.browser.find_element_by_link_text('Questionnaires').click()
+
+        ##
+        # We get all the elements that contains button languages
+        # and your available languages
+        ##
+        lang_elements = self.browser.find_elements_by_class_name(
+            'questionnaire-languages'
+        )
+        lang_el_0 = lang_elements[0]
+        lang_el_1 = lang_elements[1]
+
+        self.assertIn('en', lang_el_0.text)
+        self.assertIn('fr', lang_el_0.text)
+        self.assertIn('pt-BR', lang_el_0.text)
+        self.assertIn('en', lang_el_1.text)
+        self.assertIn('de', lang_el_1.text)

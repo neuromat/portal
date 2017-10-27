@@ -740,15 +740,24 @@ class QuestionnaireStepSerializer(serializers.ModelSerializer):
 
 class QuestionnaireLanguageSerializer(serializers.ModelSerializer):
     questionnaire = serializers.ReadOnlyField(source='questionnaire.code')
-    is_default = serializers.SerializerMethodField()
+    is_default = serializers.BooleanField(required=False)
 
     class Meta:
         model = QuestionnaireLanguage
         fields = ('id', 'questionnaire', 'language_code', 'survey_name',
                   'survey_metadata', 'is_default')
 
-    def get_is_default(self, obj):
-        return self.context.get('is_default')
+    def create(self, validated_data):
+        validated_data.pop('is_default')
+        return super(QuestionnaireLanguageSerializer, self).create(
+            validated_data
+        )
+
+    def update(self, instance, validated_data):
+        validated_data.pop('is_default')
+        return super(QuestionnaireLanguageSerializer, self).update(
+            instance, validated_data
+        )
 
 
 class FileSerializer(serializers.ModelSerializer):
@@ -998,7 +1007,8 @@ class ExperimentViewSet(viewsets.ModelViewSet):
             owner=owner, version=exp_version.get_last_version(), nes_id=nes_id
         )
         experiment = Experiment.objects.filter(nes_id=nes_id, version=version).values('id')[0]
-        build_download_file(int(experiment['id']), template_name="")
+        # TODO: uncomment after fix error during the build
+        # build_download_file(int(experiment['id']), template_name="")
 
 
 class StudyViewSet(viewsets.ModelViewSet):
