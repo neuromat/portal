@@ -441,6 +441,11 @@
             let url = "/experiments/questionnaire_language/" +
                 questionnaire_id + "/" + lang_code;
             $.ajax(url, {
+                beforeSend: function() {
+                    $("div#" + questionnaire_id).html(
+                        "<img class=\"ajax-loader-gif\" src=\"/media/site/ajax-loader.gif\" alt=\"loading...\">"
+                    );
+                },
                 success: function(data) {
                     $("div#" + questionnaire_id).html(data);
                     $("#id_q" + questionnaire_id + "_language li a").each(function () {
@@ -450,7 +455,7 @@
                             $(this).removeClass("active-language");
                         }
 
-                    })
+                    });
                 },
                 error: function (jqXHR, textStatus, errorThrown) {
                     console.log("The request to change questionnaire " +

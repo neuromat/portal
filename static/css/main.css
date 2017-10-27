@@ -513,6 +513,11 @@ h5.match {
     margin: 0 2px;
 }
 
+.ajax-loader-gif {
+    display: block;
+    margin: auto;
+}
+
 /*
   ========================================
   Bootstrap overrides
