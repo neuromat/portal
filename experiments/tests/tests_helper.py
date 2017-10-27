@@ -682,8 +682,9 @@ def global_setup_ft():
     create_eegsetting_objects_to_test_search()
 
     # Create Questionnaire objects
-    # (requires valid files 'questionnaire1.csv', 'questionnaire2.csv' and
-    # 'questionnaire3.csv' in 'experiments/tests' subdirectory)
+    # (requires valid files 'questionnaire1.csv', 'questionnaire2.csv',
+    # 'questionnaire3.csv', and their language variations in
+    # 'experiments/tests' subdirectory)
     experiment = Experiment.objects.filter(
         status=Experiment.APPROVED
     ).last()

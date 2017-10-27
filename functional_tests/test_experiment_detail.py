@@ -512,7 +512,7 @@ class ExperimentDetailTest(FunctionalTest):
         self.assertEqual(q_lang_codes.count('pt-br'), 1)
         self.assertEqual(q_lang_codes.count('de'), 1)
 
-    def test_clicking_in_language_link_of_questionnaire_render_appropriate_language(self):
+    def test_clicking_in_pt_br_language_link_of_questionnaire_render_appropriate_language(self):
         ##
         # We've created two questionnaires in tests helper from a Sample
         # of questionnaires from NES, in csv format. The questionnaires are
@@ -546,7 +546,10 @@ class ExperimentDetailTest(FunctionalTest):
         # The visitor clicks in 'pt-br' link and the questionnaire
         # session refreshes
         self.browser.find_element_by_link_text('pt-br').click()
-        time.sleep(1)
+        ##
+        # give time for ajax to complete request
+        ##
+        time.sleep(3)
 
         # When she clicks in Detail button, she can see the questionnaire
         # with questions and answers in Portugues.
@@ -567,6 +570,69 @@ class ExperimentDetailTest(FunctionalTest):
                       'braquial. É possível marcar mais do que um evento.',
                       questionnaires_content)
         self.assertIn('Teve alguma fratura associada à lesão?',
+                      questionnaires_content)
+        self.assertIn('The user answers yes or not',
+                      questionnaires_content)
+
+    def test_clicking_in_fr_language_link_of_questionnaire_render_appropriate_language(self):
+        ##
+        # We've created two questionnaires in tests helper from a Sample
+        # of questionnaires from NES, in csv format. The questionnaires are
+        # associated with a group of the last approved experiment created in
+        # tests helper. One of the questionnaires has three languages, English,
+        # French, and Brazilian Portuguese. The other has two languages,
+        # English and German. Besides, we have a third questionnaire created
+        # in tests helper that has only the English language associated to it.
+        ##
+        experiment = Experiment.objects.filter(
+            status=Experiment.APPROVED
+        ).last()
+        ##
+        # questionnaire with code='q1' defined in tests helper
+        ##
+        questionnaire = Questionnaire.objects.get(code='q1')
+
+        # The visitor clicks in the experiment with questionnaire in home page
+        self.browser.find_element_by_xpath(
+            "//a[@href='/experiments/" + experiment.slug + "/']"
+        ).click()
+        self.wait_for_detail_page_charge()
+
+        # She clicks in Questionnaires tab
+        self.browser.find_element_by_link_text('Questionnaires').click()
+
+        #
+        # Questionnaire with code='q1' has three languages: English, French and
+        # Brazilian Portuguese.
+        ##
+        # The visitor clicks in 'pt-br' link and the questionnaire
+        # session refreshes
+        self.browser.find_element_by_link_text('fr').click()
+        ##
+        # give time for ajax to complete request
+        ##
+        time.sleep(3)
+
+        # When she clicks in Detail button, she can see the questionnaire
+        # with questions and answers in Portugues.
+        self.browser.find_element_by_xpath(
+            "//a[@href='#collapse" + str(questionnaire.id) + "']"
+        ).click()
+
+        questionnaires_content = self.browser.find_element_by_id(
+            'questionnaires_tab').text
+
+        # Sample asserts for first questionnaire, Portuguese language
+        self.assertIn('Histoire de la fracture?', questionnaires_content)
+        self.assertIn('Avez-vous déjà eu une chirurgie orthopédique?',
+                      questionnaires_content)
+        self.assertIn('Avez-vous subi une chirurgie nerveuse?',
+                      questionnaires_content)
+        self.assertIn('Identifiez l\'événement qui a conduit au traumatisme '
+                      'de votre plexus brachial. Vous pouvez marquer plus '
+                      'd\'un événement.',
+                      questionnaires_content)
+        self.assertIn('Avez-vous eu des fractures associées à la blessure?',
                       questionnaires_content)
         self.assertIn('The user answers yes or not',
                       questionnaires_content)
