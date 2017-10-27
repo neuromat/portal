@@ -198,6 +198,8 @@ def experiment_detail(request, slug):
                     _get_questionnaire_metadata(
                         questioinnaire_default.survey_metadata
                     )
+                questionnaires[group.title][q.id]['language_code'] = \
+                    questioinnaire_default.language_code
                 questionnaires[group.title][q.id]['language_codes'] = \
                     _get_available_languages(q)
 

@@ -496,7 +496,7 @@ class ExperimentDetailTest(FunctionalTest):
         # and your available languages
         ##
         lang_elements = self.browser.find_elements_by_class_name(
-            'questionnaire-languages'
+            'language'
         )
         ##
         # As in the template the order of questionnaires varies from one

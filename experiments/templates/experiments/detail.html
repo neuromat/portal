@@ -305,13 +305,19 @@
                 {% for group_key, group_values in questionnaires.items %}
                     <h4>{% trans 'Questionnaires for group' %} {{ group_key }}</h4>
                     {% for questionnaire_id, q_language in group_values.items %}
-                        <div class="questionnaire-languages">
-                            {% for lang_code in q_language.language_codes %}
-                                <ul>
-                                    <li><a href="#" onclick="ajax_questionnaire_language(event, {{ questionnaire_id }}, '{{ lang_code }}')">{{ lang_code }}</a></li>
+                        {% if q_language.language_codes %}
+                            <nav class="language">
+                                <ul id="id_q{{ questionnaire_id }}_language">
+                                    {% for lang_code in q_language.language_codes %}
+                                        <li><a id="id_{{ questionnaire_id }}_{{ lang_code }}"
+                                               class="nep-btn
+{% if q_language.language_code == lang_code %}active-language{% endif %}"
+                                               href="#"
+                                                onclick="ajax_questionnaire_language(event, {{ questionnaire_id }}, '{{ lang_code }}')">{{ lang_code }}</a></li>
+                                    {% endfor %}
                                 </ul>
-                            {% endfor %}
-                        </div>
+                            </nav>
+                        {% endif %}
                         <div id="{{ questionnaire_id }}" class="panel panel-default nep-panel-group">
                             {% include 'experiments/questionnaires/questionnaire_language.html' %}
                         </div>
@@ -437,10 +443,18 @@
             $.ajax(url, {
                 success: function(data) {
                     $("div#" + questionnaire_id).html(data);
+                    $("#id_q" + questionnaire_id + "_language li a").each(function () {
+                        if ($(this).html() === lang_code) {
+                            $(this).addClass("active-language");
+                        } else {
+                            $(this).removeClass("active-language");
+                        }
+
+                    })
                 },
                 error: function (jqXHR, textStatus, errorThrown) {
                     console.log("The request to change questionnaire " +
-                        "language returned status: " + textStatus + ", " +
+                        "language returned status: " + textStatus + ", and " +
                         "error: " + errorThrown);
                 }
             })
