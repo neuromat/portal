@@ -12,7 +12,7 @@ from django.utils.translation import ugettext as _
 from experiments.models import Experiment, Group, Participant, EEGData, EMGData, EEGSetting, EMGSetting, TMSData, \
     TMSSetting, AdditionalData, ContextTree, GenericDataCollectionData, GoalkeeperGameData, Step, \
     QuestionnaireResponse, Questionnaire, EEG, EMG, TMS, GoalkeeperGame, Stimulus, EMGElectrodeSetting, \
-    EEGElectrodePosition, ClassificationOfDiseases, EMGSurfacePlacement, EMGIntramuscularPlacement, EMGNeedlePlacement
+    EEGElectrodePosition, EMGSurfacePlacement, EMGIntramuscularPlacement, EMGNeedlePlacement, QuestionnaireLanguage
 
 DEFAULT_LANGUAGE = "pt-BR"
 
@@ -534,68 +534,73 @@ class ExportExecution:
                     # get questionnaire (survey)
                     survey = get_object_or_404(Questionnaire, pk=step_questionnaire.id)
                     questionnaire_code = survey.code
-                    questionnaire_title = "%s_%s" % (str(questionnaire_code), str(survey.survey_name))
+                    questionnaire_language_list = QuestionnaireLanguage.objects.filter(questionnaire_id=questionnaire.id)
+                    for questionnaire_language in questionnaire_language_list:
+                        survey_name = questionnaire_language.survey_name
+                        questionnaire_title = "%s_%s" % (str(questionnaire_code), str(survey_name))
+                        survey_metadata = questionnaire_language.survey_metadata
 
-                    # questionnaire response fields list
-                    questionnaire_response_fields = json.loads(questionnaire.limesurvey_response)
-                    questionnaire_response_fields_list = questionnaire_response_fields['answers']
-                    # add participant data to the questionnaire fields data
-                    participant_data_list = self.process_participant_data([questionnaire.participant.id])
-                    questionnaire_response_fields_list.extend(participant_data_list[1])
+                        # questionnaire response fields list
+                        questionnaire_response_fields = json.loads(questionnaire.limesurvey_response)
+                        questionnaire_response_fields_list = questionnaire_response_fields['answers']
+                        # add participant data to the questionnaire fields data
+                        participant_data_list = self.process_participant_data([questionnaire.participant.id])
+                        questionnaire_response_fields_list.extend(participant_data_list[1])
 
-                    # data per questionnaire_response
-                    if 'questionnaire_data' not in self.per_group_data[group_id]:
-                        self.per_group_data[group_id]['questionnaire_data'] = {}
-                    if questionnaire_code not in self.per_group_data[group_id]['questionnaire_data']:
-                        questionnaire_header_fields_list = questionnaire_response_fields['questions']
-                        questionnaire_header_fields_list.extend(participant_data_list[0])
-                        self.per_group_data[group_id]['questionnaire_data'][questionnaire_code] = {
-                            'questionnaire_title': questionnaire_title,
-                            'questionnaire_filename': "%s_%s.csv" % ("Responses", str(questionnaire_code)),
-                            'header': questionnaire_header_fields_list,
-                            'response_list': []
-                        }
-
-                    self.per_group_data[group_id]['questionnaire_data'][questionnaire_code]['response_list'].append(
-                        questionnaire_response_fields_list)
-
-                    # questionnaire data per participant
-                    directory_step_name = "STEP_" + str(step_questionnaire.numeration) + "_" + \
-                                          step_questionnaire.type.upper()
-
-                    participant_code_directory_name = "Participant_" + questionnaire.participant.code
-                    participant_code_directory = path.join(participant_directory, participant_code_directory_name)
-                    export_participant_code_directory = path.join(export_participant_directory,
-                                                                  participant_code_directory_name)
-
-                    if participant_code not in self.per_group_data[group_id]['data_per_participant']:
-                        self.per_group_data[group_id]['data_per_participant'][participant_code] = {}
-                    if 'questionnaire_data' not in self.per_group_data[group_id]['data_per_participant'][
-                        participant_code]:
-                        self.per_group_data[group_id]['data_per_participant'][participant_code]['questionnaire_data']\
-                            = []
-
-                    self.per_group_data[group_id]['data_per_participant'][participant_code][
-                        'questionnaire_data'].append({
-                            'step_identification': step_questionnaire.identification,
-                            'questionnaire_response_list': [questionnaire_header_fields_list,
-                                                            questionnaire_response_fields_list],
-                            'questionnaire_filename': "%s.csv" % questionnaire_title,
-                            'directory_step_name': directory_step_name,
-                            'directory_step': path.join(participant_code_directory, directory_step_name),
-                            'export_directory_step': path.join(export_participant_code_directory, directory_step_name),
-                        })
-
-                    if 'questionnaire_metadata' not in self.per_group_data[group_id]:
-                        self.per_group_data[group_id]['questionnaire_metadata'] = {}
-                    if questionnaire_code not in self.per_group_data[group_id]['questionnaire_metadata']:
-
-                        self.per_group_data[group_id]['questionnaire_metadata'][questionnaire_code] = \
-                            {
-                                'metadata_fields': survey.survey_metadata,
-                                'filename': "%s_%s.csv" % ("Fields", str(questionnaire_code)),
-                                'directory_name': questionnaire_title,
+                        # data per questionnaire_response
+                        if 'questionnaire_data' not in self.per_group_data[group_id]:
+                            self.per_group_data[group_id]['questionnaire_data'] = {}
+                        if questionnaire_code not in self.per_group_data[group_id]['questionnaire_data']:
+                            questionnaire_header_fields_list = questionnaire_response_fields['questions']
+                            questionnaire_header_fields_list.extend(participant_data_list[0])
+                            self.per_group_data[group_id]['questionnaire_data'][questionnaire_code] = {
+                                'questionnaire_title': questionnaire_title,
+                                'questionnaire_filename': "%s_%s.csv" % ("Responses", str(questionnaire_code)),
+                                'header': questionnaire_header_fields_list,
+                                'response_list': []
                             }
+
+                        self.per_group_data[group_id]['questionnaire_data'][questionnaire_code]['response_list'].append(
+                            questionnaire_response_fields_list)
+
+                        # questionnaire data per participant
+                        directory_step_name = "STEP_" + str(step_questionnaire.numeration) + "_" + \
+                                              step_questionnaire.type.upper()
+
+                        participant_code_directory_name = "Participant_" + questionnaire.participant.code
+                        participant_code_directory = path.join(participant_directory, participant_code_directory_name)
+                        export_participant_code_directory = path.join(export_participant_directory,
+                                                                      participant_code_directory_name)
+
+                        if participant_code not in self.per_group_data[group_id]['data_per_participant']:
+                            self.per_group_data[group_id]['data_per_participant'][participant_code] = {}
+                        if 'questionnaire_data' not in self.per_group_data[group_id]['data_per_participant'][
+                            participant_code]:
+                            self.per_group_data[group_id]['data_per_participant'][participant_code]['questionnaire_data']\
+                                = []
+
+                        self.per_group_data[group_id]['data_per_participant'][participant_code][
+                            'questionnaire_data'].append({
+                                'step_identification': step_questionnaire.identification,
+                                'questionnaire_response_list': [questionnaire_header_fields_list,
+                                                                questionnaire_response_fields_list],
+                                'questionnaire_filename': "%s.csv" % questionnaire_title,
+                                'directory_step_name': directory_step_name,
+                                'directory_step': path.join(participant_code_directory, directory_step_name),
+                                'export_directory_step': path.join(export_participant_code_directory,
+                                                                   directory_step_name),
+                            })
+
+                        if 'questionnaire_metadata' not in self.per_group_data[group_id]:
+                            self.per_group_data[group_id]['questionnaire_metadata'] = {}
+                        if questionnaire_code not in self.per_group_data[group_id]['questionnaire_metadata']:
+
+                            self.per_group_data[group_id]['questionnaire_metadata'][questionnaire_code] = \
+                                {
+                                    'metadata_fields': survey_metadata,
+                                    'filename': "%s_%s.csv" % ("Fields", str(questionnaire_code)),
+                                    'directory_name': questionnaire_title,
+                                }
 
             # participant with data collection
             eeg_participant_list = EEGData.objects.filter(participant__in=participant_group_list)
