@@ -221,16 +221,32 @@ tmsds = create_tms_device_setting(1, tms_setting, tms_device, coil_model)
 # Create TMSData to test search
 create_tmsdata_objects_to_test_search()
 
+##
 # Create questionnaires
+##
 experiment = Experiment.objects.last()
 group = experiment.groups.first()
 create_questionnaire(1, 'q1', group)
 questionnaire1 = Questionnaire.objects.last()
+# create valid questionnaire in English
 create_questionnaire_language(
     questionnaire1,
     settings.BASE_DIR + '/experiments/tests/questionnaire1.csv',
     'en'
 )
+# create valid questionnaire in Portuguese
+create_questionnaire_language(
+    questionnaire1,
+    settings.BASE_DIR + '/experiments/tests/questionnaire1_pt-br.csv',
+    'pt_br'
+)
+# create valid questionnaire in French
+create_questionnaire_language(
+    questionnaire1,
+    settings.BASE_DIR + '/experiments/tests/questionnaire1_fr.csv',
+    'fr'
+)
+
 
 # TODO: After populating models we call 'manage.py rebuild_index --noinput' to
 # TODO: rebuild haystack search index - to manually test searching.
