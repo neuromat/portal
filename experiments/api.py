@@ -23,7 +23,6 @@ from experiments.models import Experiment, Study, User, ProtocolComponent, \
     EMGElectrodePlacementSetting, \
     EMGSurfacePlacement, EMGIntramuscularPlacement, EMGNeedlePlacement, \
     QuestionnaireLanguage, QuestionnaireDefaultLanguage
-from experiments.tasks import build_download_file
 
 
 ###################

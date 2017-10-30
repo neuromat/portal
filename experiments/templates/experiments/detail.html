@@ -436,7 +436,7 @@
     {# Script related to Questionnaires tab #}
     {##}
     <script>
-        function ajax_questionnaire_language (e, questionnaire_id, lang_code) {
+        function ajax_questionnaire_language(e, questionnaire_id, lang_code) {
             e.preventDefault();  // to not request href attribute value
             // if language button clicked is the same do nothing
             if ($("#id_" + questionnaire_id + "_" + lang_code).hasClass("active-language")) {
