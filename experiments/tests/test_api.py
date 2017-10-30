@@ -949,9 +949,9 @@ class QuestionnaireLanguageAPITest(APITestCase):
         response = self.client.post(
             list_url,
             {
-                # we put a fr questionnaire language tests helper creates a
-                # pt-br questionnaire language
-                'language_code': 'fr',
+                # we put a Russian questionnaire language tests helper
+                # creates a pt-br questionnaire language
+                'language_code': 'ru',
                 'survey_name': 'Um lindo questionário',
                 'survey_metadata': 'Uma _string_ gigante representando um '
                                    'questionário que vem do NES que está em '

@@ -9,7 +9,9 @@ from haystack.query import SearchQuerySet
 from experiments import views
 from experiments.models import Experiment, Step, Questionnaire, \
     QuestionnaireDefaultLanguage, QuestionnaireLanguage
-from experiments.tests.tests_helper import apply_setup, global_setup_ut
+from experiments.tests.tests_helper import apply_setup, global_setup_ut, \
+    create_questionnaire_language
+from nep import settings
 
 
 @apply_setup(global_setup_ut)
@@ -193,15 +195,14 @@ class ExperimentDetailTest(TestCase):
         response = self.client.get('/experiments/' + slug + '/')
         self.assertTemplateUsed(response, 'experiments/detail.html')
 
-    def test_access_experiment_detail_returns_questionnaire_data(self):
-        # Last experiment approved has questionnaires. See tests helper
+    def test_access_experiment_detail_returns_questionnaire_data_for_default_or_first_language(self):
+        # Last experiment has questionnaires. See tests helper
         experiment = Experiment.objects.last()
-        response = self.client.get('/experiments/' + experiment.slug + '/')
-
-        # We've made last experiment approved contain questionnaire data in
-        # tests helper
+        # we've made last experiment contain questionnaire data in tests helper
         q_steps = Step.objects.filter(type=Step.QUESTIONNAIRE)
         groups_with_qs = experiment.groups.filter(steps__in=q_steps)
+
+        response = self.client.get('/experiments/' + experiment.slug + '/')
         if groups_with_qs.count() == 0:
             self.fail('There are no groups with questionnaires. Have you '
                       'been created the questionnaires in tests helper?')
@@ -212,10 +213,13 @@ class ExperimentDetailTest(TestCase):
             )
             for step in group.steps.filter(type=Step.QUESTIONNAIRE):
                 questionnaire = Questionnaire.objects.get(step_ptr=step)
-                # the rule is display default questionnaire language data or
+                # The rule is display default questionnaire language data or
                 # first questionnaire language data if not set default
                 # questionnaire language. So we mimic the function
                 # _get_q_default_language_or_first from views that do that.
+                # TODO: In tests helper we always create default
+                # TODO: questionnaire language as English. So we would to test
+                # TODO: only if we had first language.
                 q_language = self.get_q_default_language_or_first(
                     questionnaire
                 )
@@ -223,7 +227,9 @@ class ExperimentDetailTest(TestCase):
                     response, 'Questionnaire ' + q_language.survey_name
                 )
 
-        # Sample asserts for first questionnaire
+        # Sample asserts for first questionnaire (in Portuguese, as first
+        # questionnaire, first language, created in tests helper is in
+        # Portuguese).
         self.assertIn('História de fratura', response.content.decode())
         self.assertIn('Já fez alguma cirurgia ortopédica?',
                       response.content.decode())
@@ -238,13 +244,13 @@ class ExperimentDetailTest(TestCase):
                       response.content.decode())
 
         # Sample asserts for second questionnaire
-        self.assertIn('Qual o lado da lesão?', response.content.decode())
-        self.assertIn('Instituição do Estudo', response.content.decode())
+        self.assertIn('What side of the injury?', response.content.decode())
+        self.assertIn('Institution of the Study', response.content.decode())
         self.assertIn('The user enters a free text',
                       response.content.decode())
-        self.assertIn('Tipo(s) de lesão(ões):', response.content.decode())
-        self.assertIn('Trombose', response.content.decode())
-        self.assertIn('Anexar exames.', response.content.decode())
+        self.assertIn('Injury type (s):', response.content.decode())
+        self.assertIn('Thrombosis', response.content.decode())
+        self.assertIn('Attach exams.', response.content.decode())
         self.assertIn('The user uploads file(s)',
                       response.content.decode())
         self.assertIn('<em>The user answers</em> yes <em>or</em> not',
@@ -261,6 +267,10 @@ class ExperimentDetailTest(TestCase):
         self.assertIn('Artéria axilar', response.content.decode())
         self.assertIn('Quando foi submetido(a) à cirurgia(s) de plexo '
                       'braquial (mm/aaaa)?', response.content.decode())
+
+    def test_access_experiment_detail_returns_questionnaire_data_for_other_language(self):
+        # TODO!
+        pass
 
     def test_access_experiment_without_questionnaires_returns_null_questionnaires(self):
         # First experiment has not questionnaires. See tests helper
@@ -387,25 +397,25 @@ class SearchTest(TestCase):
 
     def test_search_questionnaire_returns_correct_number_of_objects(self):
         response = self.client.get('/search/', {
-            'q': '\"História de fratura\" \"trauma do seu plexo '
-                 'braquial\" \"Lesão por arma de fogo\" \"Qual o lado '
-                 'da lesão\" \"Extensão do Cotovelo\"'
+            'q': '\"History of fracture\" \"trauma of your '
+                 'brachial plexus\" \"Injury by firearm\" \"What side of the '
+                 'injury\" \"Elbow Extension\"'
         })
         self.assertEqual(response.status_code, 200)
         # TODO: we verify for 3 objects because test is catching invalid
         # TODO: questionnaires. See note 'Backlog' in notebook, 09/28/2017
-        self.assertContains(response, '<tr', 3)  # because in search results
+        self.assertContains(response, '<tr', 1)  # because in search results
         # templates it's '<tr class ...>'
         # TODO: needs to know if it was brought correct results
 
     def test_search_questionnaire_returns_matchings_containing_search_strings(self):
         response = self.client.get('/search/', {
-            'q': '\"História de fratura\" \"trauma do seu plexo '
-                 'braquial\" \"Lesão por arma de fogo\" \"Qual o lado '
-                 'da lesão\" \"Extensão do Cotovelo\"'
+            'q': '\"History of fracture?\" \"trauma of your '
+                 'brachial plexus\" \"Injury by firearm\" \"What side of the '
+                 'injury\" \"Elbow Extension\"'
         })
-        self.assertContains(response, 'História de fratura')
-        self.assertContains(response, 'trauma do seu plexo braquial')
-        self.assertContains(response, 'Lesão por arma de fogo')
-        self.assertContains(response, 'Qual o lado da lesão')
-        self.assertContains(response, 'Extensão do Cotovelo')
+        self.assertContains(response, 'History of fracture')
+        self.assertContains(response, 'trauma of your brachial plexus')
+        self.assertContains(response, 'Injury by firearm')
+        self.assertContains(response, 'What side of the injury')
+        self.assertContains(response, 'Elbow Extension')

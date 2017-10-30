@@ -57,7 +57,6 @@ class FunctionalTest(StaticLiveServerTestCase):
                 time.sleep(0.5)
 
 
-
 @apply_setup(global_setup_ft)
 class FunctionalTestTrustee(StaticLiveServerTestCase):
 

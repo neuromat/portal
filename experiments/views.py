@@ -8,6 +8,7 @@ from django.contrib.auth.views import LoginView
 from django.core.mail import send_mail
 from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import render
+from django.template.loader import render_to_string
 from haystack.generic_views import SearchView
 from django.utils.translation import activate, LANGUAGE_SESSION_KEY, \
     ugettext as _
@@ -16,40 +17,6 @@ from experiments.forms import NepSearchForm
 from experiments.models import Experiment, RejectJustification, Step, \
     Questionnaire, QuestionnaireDefaultLanguage, QuestionnaireLanguage
 from experiments.tasks import rebuild_haystack_index
-
-
-def home_page(request):
-    to_be_analysed_count = None  # will be None if home contains the list of
-    # normal user
-    if request.user.is_authenticated and \
-            request.user.groups.filter(name='trustees').exists():
-        all_experiments = \
-            Experiment.lastversion_objects.all()
-        # We put experiments in following order:
-        # TO_BE_ANALYSED, UNDER_ANALYSIS, NOT_APPROVED and APPROVED
-        to_be_analysed = all_experiments.filter(
-            status=Experiment.TO_BE_ANALYSED)
-        under_analysis = all_experiments.filter(
-            status=Experiment.UNDER_ANALYSIS)
-        not_approved = all_experiments.filter(status=Experiment.NOT_APPROVED)
-        approved = all_experiments.filter(status=Experiment.APPROVED)
-        experiments = to_be_analysed | under_analysis | not_approved | approved
-        to_be_analysed_count = to_be_analysed.count()
-    else:
-        experiments = Experiment.lastversion_objects.filter(
-            status=Experiment.APPROVED
-        )
-
-    for experiment in experiments:
-        experiment.total_participants = \
-            sum([len(group.participants.all())
-                 for group in experiment.groups.all()])
-
-    return render(request, 'experiments/home.html',
-                  {'experiments': experiments,
-                   'to_be_analysed_count': to_be_analysed_count,
-                   'table_title': 'List of Experiments',
-                   'search_form': NepSearchForm()})
 
 
 def _get_nested_rec(key, group):
@@ -132,7 +99,7 @@ def _get_questionnaire_metadata(metadata):
 
 def _get_q_default_language_or_first(questionnaire):
     # TODO: correct this to adapt to unique QuestionnaireDefaultLanguage
-    # TODO: model with OneToOne with Questionnaire
+    # TODO: model with OneToOne relation with Questionnaire
     qdl = QuestionnaireDefaultLanguage.objects.filter(
         questionnaire=questionnaire
     ).first()
@@ -144,9 +111,54 @@ def _get_q_default_language_or_first(questionnaire):
         ).first()
 
 
-def experiment_detail(request, slug):
+def _get_available_languages(questionnaire):
+    q_languages = QuestionnaireLanguage.objects.filter(
+        questionnaire=questionnaire
+    )
+    lang_code = []
+    for q_language in q_languages:
+        lang_code.append(q_language.language_code)
+
+    return lang_code
+
+
+def home_page(request):
     to_be_analysed_count = None  # will be None if home contains the list of
     # normal user
+    if request.user.is_authenticated and \
+            request.user.groups.filter(name='trustees').exists():
+        all_experiments = \
+            Experiment.lastversion_objects.all()
+        # We put experiments in following order:
+        # TO_BE_ANALYSED, UNDER_ANALYSIS, NOT_APPROVED and APPROVED
+        to_be_analysed = all_experiments.filter(
+            status=Experiment.TO_BE_ANALYSED)
+        under_analysis = all_experiments.filter(
+            status=Experiment.UNDER_ANALYSIS)
+        not_approved = all_experiments.filter(status=Experiment.NOT_APPROVED)
+        approved = all_experiments.filter(status=Experiment.APPROVED)
+        experiments = to_be_analysed | under_analysis | not_approved | approved
+        to_be_analysed_count = to_be_analysed.count()
+    else:
+        experiments = Experiment.lastversion_objects.filter(
+            status=Experiment.APPROVED
+        )
+
+    for experiment in experiments:
+        experiment.total_participants = \
+            sum([len(group.participants.all())
+                 for group in experiment.groups.all()])
+
+    return render(request, 'experiments/home.html',
+                  {'experiments': experiments,
+                   'to_be_analysed_count': to_be_analysed_count,
+                   'table_title': 'List of Experiments',
+                   'search_form': NepSearchForm()})
+
+
+def experiment_detail(request, slug):
+    # will be None if home contains the list for common user
+    to_be_analysed_count = None
     if request.user.is_authenticated and \
             request.user.groups.filter(name='trustees').exists():
         all_experiments = Experiment.lastversion_objects.all()
@@ -168,7 +180,7 @@ def experiment_detail(request, slug):
                 age_grouping[int(participant.age)] = 0
             age_grouping[int(participant.age)] += 1
 
-    # Get default (language) questionnaires (or first) for all groups
+    # get default (language) questionnaires (or first) for all groups
     questionnaires = {}
     for group in experiment.groups.all():
         if group.steps.filter(type=Step.QUESTIONNAIRE).count() > 0:
@@ -178,13 +190,18 @@ def experiment_detail(request, slug):
                 questionnaires[group.title][q.id] = {}
                 # get questionnaire default language data or first
                 # questionnaire language
-                questioinnaire = _get_q_default_language_or_first(q)
+                questioinnaire_default = _get_q_default_language_or_first(q)
+
                 questionnaires[group.title][q.id]['survey_name'] = \
-                    questioinnaire.survey_name
+                    questioinnaire_default.survey_name
                 questionnaires[group.title][q.id]['survey_metadata'] = \
                     _get_questionnaire_metadata(
-                        questioinnaire.survey_metadata
+                        questioinnaire_default.survey_metadata
                     )
+                questionnaires[group.title][q.id]['language_code'] = \
+                    questioinnaire_default.language_code
+                questionnaires[group.title][q.id]['language_codes'] = \
+                    _get_available_languages(q)
 
     return render(
         request, 'experiments/detail.html', {
@@ -310,6 +327,22 @@ def ajax_to_be_analysed(request):
     ).count()
 
     return HttpResponse(to_be_analysed, content_type='application/json')
+
+
+def ajax_questionnaire_languages(request, questionnaire_id, lang_code):
+    questionnaire_language = QuestionnaireLanguage.objects.get(
+        questionnaire=questionnaire_id, language_code=lang_code
+    )
+
+    q_language = dict()
+    q_language['survey_name'] = questionnaire_language.survey_name
+    q_language['survey_metadata'] = _get_questionnaire_metadata(
+        questionnaire_language.survey_metadata)
+
+    q_language_tmpl = render_to_string(
+        'experiments/questionnaires/questionnaire_language.html',
+        {'q_language': q_language, 'questionnaire_id': questionnaire_id})
+    return HttpResponse(q_language_tmpl)
 
 
 def language_change(request, language_code):
