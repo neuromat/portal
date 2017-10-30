@@ -528,6 +528,11 @@ class ExportExecution:
 
             # questionnaire data
             step_list = Step.objects.filter(group=group, type='questionnaire')
+            if step_list:
+                if 'questionnaire_metadata' not in self.per_group_data[group_id]:
+                    self.per_group_data[group_id]['questionnaire_metadata'] = {}
+                if 'questionnaire_data' not in self.per_group_data[group_id]:
+                    self.per_group_data[group_id]['questionnaire_data'] = {}
             for step_questionnaire in step_list:
                 questionnaire_list = QuestionnaireResponse.objects.filter(step_id=step_questionnaire.id)
                 for questionnaire in questionnaire_list:
@@ -548,8 +553,6 @@ class ExportExecution:
                     questionnaire_title = "%s_%s" % (str(questionnaire_code), str(survey_name))
 
                     # data per questionnaire_response
-                    if 'questionnaire_data' not in self.per_group_data[group_id]:
-                        self.per_group_data[group_id]['questionnaire_data'] = {}
                     if questionnaire_code not in self.per_group_data[group_id]['questionnaire_data']:
                         questionnaire_header_fields_list = questionnaire_response_fields['questions']
                         questionnaire_header_fields_list.extend(participant_data_list[0])
@@ -591,27 +594,24 @@ class ExportExecution:
                                                                directory_step_name),
                         })
 
-                questionnaire_language_list = QuestionnaireLanguage.objects.filter(
-                    questionnaire_id=step_questionnaire.id)
+                # fill questionnaire metadata per questionnaire
+                if questionnaire_code not in self.per_group_data[group_id]['questionnaire_metadata']:
+                    self.per_group_data[group_id]['questionnaire_metadata'][questionnaire_code] = {}
+                    questionnaire_language_list = QuestionnaireLanguage.objects.filter(
+                        questionnaire_id=step_questionnaire.id)
+                    for questionnaire_language in questionnaire_language_list:
+                        survey_name = questionnaire_language.survey_name
+                        questionnaire_code = questionnaire_language.questionnaire.code
+                        questionnaire_title = "%s_%s" % (str(questionnaire_code), str(survey_name))
+                        survey_metadata = questionnaire_language.survey_metadata
+                        language_code = questionnaire_language.language_code
 
-                for questionnaire_language in questionnaire_language_list:
-                    survey_name = questionnaire_language.survey_name
-                    questionnaire_code = questionnaire_language.questionnaire.code
-                    questionnaire_title = "%s_%s" % (str(questionnaire_code), str(survey_name))
-                    survey_metadata = questionnaire_language.survey_metadata
-
-                    if 'questionnaire_metadata' not in self.per_group_data[group_id]:
-                        self.per_group_data[group_id]['questionnaire_metadata'] = {}
-                    if questionnaire_code not in self.per_group_data[group_id]['questionnaire_metadata']:
-                        self.per_group_data[group_id]['questionnaire_metadata'][questionnaire_code] = {}
-                    if questionnaire_language.language_code not in self.per_group_data[group_id][
-                            'questionnaire_metadata'][questionnaire_code]:
-                            self.per_group_data[group_id]['questionnaire_metadata'][questionnaire_code][
-                                questionnaire_language.language_code] = \
-                                {
+                        if language_code not in self.per_group_data[group_id][
+                                'questionnaire_metadata'][questionnaire_code]:
+                                self.per_group_data[group_id]['questionnaire_metadata'][questionnaire_code][
+                                    language_code] = {
                                     'metadata_fields': survey_metadata,
-                                    'filename': "%s_%s_%s.csv" % ("Fields", str(questionnaire_code),
-                                                                  questionnaire_language.language_code),
+                                    'filename': "%s_%s_%s.csv" % ("Fields", str(questionnaire_code), language_code),
                                     'directory_name': questionnaire_title,
                                 }
 
