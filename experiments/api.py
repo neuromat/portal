@@ -3,6 +3,7 @@ from django.core.mail import send_mail
 from rest_framework import serializers, permissions, viewsets
 
 from experiments import appclasses
+from experiments.tasks import build_download_file
 from experiments.models import Experiment, Study, User, ProtocolComponent, \
     Group, ExperimentalProtocol, Researcher, Participant, Collaborator, \
     Keyword, ClassificationOfDiseases, \
@@ -1007,7 +1008,7 @@ class ExperimentViewSet(viewsets.ModelViewSet):
         )
         experiment = Experiment.objects.filter(nes_id=nes_id, version=version).values('id')[0]
         # TODO: uncomment after fix error during the build
-        # build_download_file(int(experiment['id']), template_name="")
+        build_download_file(int(experiment['id']), template_name="")
 
 
 class StudyViewSet(viewsets.ModelViewSet):

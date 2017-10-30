@@ -578,7 +578,7 @@ class ExportExecution:
                     if participant_code not in self.per_group_data[group_id]['data_per_participant']:
                         self.per_group_data[group_id]['data_per_participant'][participant_code] = {}
                     if 'questionnaire_data' not in self.per_group_data[group_id]['data_per_participant'][
-                        participant_code]:
+                            participant_code]:
                         self.per_group_data[group_id]['data_per_participant'][participant_code]['questionnaire_data'] \
                             = []
 
@@ -594,26 +594,26 @@ class ExportExecution:
                                                                directory_step_name),
                         })
 
-                # fill questionnaire metadata per questionnaire
-                if questionnaire_code not in self.per_group_data[group_id]['questionnaire_metadata']:
-                    self.per_group_data[group_id]['questionnaire_metadata'][questionnaire_code] = {}
-                    questionnaire_language_list = QuestionnaireLanguage.objects.filter(
-                        questionnaire_id=step_questionnaire.id)
-                    for questionnaire_language in questionnaire_language_list:
-                        survey_name = questionnaire_language.survey_name
-                        questionnaire_code = questionnaire_language.questionnaire.code
-                        questionnaire_title = "%s_%s" % (str(questionnaire_code), str(survey_name))
-                        survey_metadata = questionnaire_language.survey_metadata
-                        language_code = questionnaire_language.language_code
+                    # fill questionnaire metadata per questionnaire
+                    if questionnaire_code not in self.per_group_data[group_id]['questionnaire_metadata']:
+                        self.per_group_data[group_id]['questionnaire_metadata'][questionnaire_code] = {}
+                        questionnaire_language_list = QuestionnaireLanguage.objects.filter(
+                            questionnaire_id=step_questionnaire.id)
+                        for questionnaire_language in questionnaire_language_list:
+                            survey_name = questionnaire_language.survey_name
+                            questionnaire_code = questionnaire_language.questionnaire.code
+                            questionnaire_title = "%s_%s" % (str(questionnaire_code), str(survey_name))
+                            survey_metadata = questionnaire_language.survey_metadata
+                            language_code = questionnaire_language.language_code
 
-                        if language_code not in self.per_group_data[group_id][
-                                'questionnaire_metadata'][questionnaire_code]:
-                                self.per_group_data[group_id]['questionnaire_metadata'][questionnaire_code][
-                                    language_code] = {
-                                    'metadata_fields': survey_metadata,
-                                    'filename': "%s_%s_%s.csv" % ("Fields", str(questionnaire_code), language_code),
-                                    'directory_name': questionnaire_title,
-                                }
+                            if language_code not in self.per_group_data[group_id][
+                                    'questionnaire_metadata'][questionnaire_code]:
+                                    self.per_group_data[group_id]['questionnaire_metadata'][questionnaire_code][
+                                        language_code] = {
+                                        'metadata_fields': survey_metadata,
+                                        'filename': "%s_%s_%s.csv" % ("Fields", str(questionnaire_code), language_code),
+                                        'directory_name': questionnaire_title,
+                                    }
 
             # participant with data collection
             eeg_participant_list = EEGData.objects.filter(participant__in=participant_group_list)
