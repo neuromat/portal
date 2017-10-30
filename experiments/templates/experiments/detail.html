@@ -437,7 +437,14 @@
     {##}
     <script>
         function ajax_questionnaire_language (e, questionnaire_id, lang_code) {
-            e.preventDefault();  // to not request page in href element
+            e.preventDefault();  // to not request href attribute value
+            // if language button clicked is the same do nothing
+            if ($("#id_" + questionnaire_id + "_" + lang_code).hasClass("active-language")) {
+                return 0;
+            }
+            // save panel collapse/expanded state before refresh panel area
+            let panelExpanded = $("div#collapse" + questionnaire_id).attr("aria-expanded");
+
             let url = "/experiments/questionnaire_language/" +
                 questionnaire_id + "/" + lang_code;
             $.ajax(url, {
@@ -448,14 +455,22 @@
                 },
                 success: function(data) {
                     $("div#" + questionnaire_id).html(data);
+                    // mark language as selected
                     $("#id_q" + questionnaire_id + "_language li a").each(function () {
                         if ($(this).html() === lang_code) {
                             $(this).addClass("active-language");
                         } else {
                             $(this).removeClass("active-language");
                         }
-
                     });
+                    // if panel was expanded display it expanded
+                    const accordionPanel = $("div#collapse" + questionnaire_id);
+                    // highlithing apperantly innapropriate: see
+                    // https://stackoverflow.com/questions/263965/how-can-i-convert-a-string-to-boolean-in-javascript
+                    if (panelExpanded == "true") {
+                        accordionPanel.attr("aria-expanded", true);
+                        accordionPanel.addClass("in");
+                    }
                 },
                 error: function (jqXHR, textStatus, errorThrown) {
                     console.log("The request to change questionnaire " +
