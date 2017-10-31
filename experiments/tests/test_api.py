@@ -244,7 +244,7 @@ class ExperimentAPITest(APITestCase):
         )
         self.client.logout()
 
-    def test_POSTing_experiments_creates_versions_one(self):
+    def test_POSTing_experiments_creates_version_one(self):
         owner = User.objects.get(username='lab1')
         self.client.login(username=owner.username, password='nep-lab1')
         self.client.post(
@@ -261,6 +261,58 @@ class ExperimentAPITest(APITestCase):
         # Assert version of the experiment created is 1
         experiment = Experiment.objects.first()
         self.assertEqual(1, experiment.version)
+
+    def test_PATCHing_experiment_with_to_be_analysed_status_make_available_download_experiment(self):
+        # First we post a new experiment through API
+        owner = User.objects.get(username='lab1')
+        self.client.login(username=owner.username, password='nep-lab1')
+        self.client.post(
+            reverse('api_experiments-list'),
+            {
+                'title': 'New experiment',
+                'description': 'Some description',
+                'nes_id': 18,
+                'sent_date': datetime.utcnow().strftime('%Y-%m-%d'),
+                'status': 'receiving'
+            },
+        )
+        # We need also to post a study for the experiment posted, because
+        # export requires that an experiment to have a study associated
+        experiment = Experiment.objects.last()
+        url = reverse(
+            'api_experiment_studies-list',
+            kwargs={'experiment_nes_id': experiment.nes_id}
+        )
+        self.client.post(
+            url,
+            {
+                'title': 'New study',
+                'description': 'Some description',
+                'start_date': datetime.utcnow().strftime('%Y-%m-%d'),
+            }
+        )
+        # After sending the experiment data we send a "message" notifying
+        # that the experiment can be analysed
+        detail_url = reverse(
+            'api_experiments-detail',
+            kwargs={'experiment_nes_id': experiment.nes_id}
+        )
+        self.client.patch(
+            detail_url,
+            {
+                'status': experiment.TO_BE_ANALYSED,
+            },
+        )
+        self.client.logout()
+
+        # Now we can test for downloading experiment
+        url = reverse('download_view', kwargs={'experiment_id': experiment.id})
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertEquals(
+            response.get('Content-Disposition'),
+            'attachment; filename="download.zip"'
+        )
 
 
 @apply_setup(global_setup_ut)

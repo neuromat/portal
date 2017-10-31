@@ -1,8 +1,8 @@
-
 import haystack
 import sys
+import io
+import os
 
-from datetime import datetime
 from django.contrib.auth.models import User
 from django.core.management import call_command
 from django.test import TestCase, override_settings
@@ -13,6 +13,7 @@ from experiments import views
 from experiments.models import Experiment, Step, Questionnaire, \
     QuestionnaireDefaultLanguage, QuestionnaireLanguage
 from experiments.tests.tests_helper import apply_setup, global_setup_ut
+from nep import settings
 
 
 @apply_setup(global_setup_ut)
@@ -429,44 +430,34 @@ class DownloadExperimentTest(TestCase):
     def setUp(self):
         global_setup_ut()
 
-    def test_downloading_experiment_data(self):
-        # First we post a new experiment through API
-        owner = User.objects.get(username='lab1')
-        self.client.login(username=owner.username, password='nep-lab1')
-        self.client.post(
-            reverse('api_experiments-list'),
-            {
-                'title': 'New experiment',
-                'description': 'Some description',
-                'nes_id': 18,
-                'sent_date': datetime.utcnow().strftime('%Y-%m-%d')
-            },
-        )
-        self.client.logout()
-
-        # Now we can test for downloading experiment
-        experiment = Experiment.objects.last()
-        response = self.client.get(
-            '/media/download/' + str(experiment.id) + '/download.zip/'
-        )
-        self.assertEqual(response.status_code, 200)
-        self.assertEquals(response.get('Content-Type'), 'application/zip')
-
     def test_downloading_experiment_data_increases_download_counter(self):
-        # First we post a new experiment through API
-        owner = User.objects.get(username='lab1')
-        self.client.login(username=owner.username, password='nep-lab1')
-        self.client.post(
-            reverse('api_experiments-list'),
-            {
-                'title': 'New experiment',
-                'description': 'Some description',
-                'nes_id': 18,
-                'sent_date': datetime.utcnow().strftime('%Y-%m-%d')
-            },
-        )
-        self.client.logout()
+        # Create fake download.zip file
+        file = io.BytesIO()
+        file.write(b'fake_experiment_data')
+        file.name = 'download.zip'
 
-        # Now we can for increaseing download counter by 1 (0 -> 1)
-        experiment = Experiment.objects.last()
+        experiment = Experiment.objects.first()
+        experiment.download_url.save(file.name, file)
+        experiment.save()
+
+        # Request the url to download compacted file
+        url = reverse('download_view', kwargs={'experiment_id': experiment.id})
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+
+        # As the experiment Experiment instance was updated we've got it again
+        experiment = Experiment.objects.first()
+
         self.assertEqual(experiment.downloads, 1)
+
+        # Request the url do download compacted file again
+        url = reverse('download_view', kwargs={'experiment_id': experiment.id})
+        self.client.get(url)
+
+        # Get the experiment again
+        experiment = Experiment.objects.first()
+
+        self.assertEqual(experiment.downloads, 2)
+
+        # Remove fake download.zip file
+        os.remove(settings.BASE_DIR + experiment.download_url.url)

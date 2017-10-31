@@ -1,9 +1,8 @@
-
+import os
 from experiments.models import Experiment
 from django.conf import settings
 from django.contrib import messages
 from django.shortcuts import render, get_object_or_404
-from django.template import loader
 from django.http import HttpResponse, HttpResponseRedirect
 
 from .export import create_directory, ExportExecution
@@ -33,14 +32,28 @@ def create_export_instance():
 
 def download_view(request, experiment_id):
 
-    # if download file exists, return file for download (serve file for
-    # download)
+    # if download file exists, serve file immediatally for download
+    experiment = get_object_or_404(Experiment, pk=experiment_id)
+    if experiment.download_url:
+        complete_filename = os.path.join(
+            settings.MEDIA_ROOT,
+            'download/' + str(experiment.id) + '/download.zip'
+        )
+        zip_file = open(complete_filename, 'rb')
+        response = HttpResponse(zip_file, content_type='application/zip')
+        response['Content-Disposition'] = 'attachment; filename="download.zip"'
+        response['Content-Length'] = path.getsize(complete_filename)
+        response['Set-Cookie'] = 'fileDownload=true; path=/'
+
+        experiment.downloads += 1
+        experiment.save()
+
+        return response
 
     template_name = "experiments/detail.html"
-    complete_filename, error_msg = download_create(experiment_id, template_name)
-
-    experiment = get_object_or_404(Experiment, pk=experiment_id)
-    slug = experiment.slug
+    complete_filename, error_msg = download_create(
+        experiment_id, template_name
+    )
 
     if error_msg != "":
         messages.error(request, error_msg)
@@ -58,11 +71,11 @@ def download_view(request, experiment_id):
         response['Content-Disposition'] = 'attachment; filename="export.zip"'
         response['Content-Length'] = path.getsize(complete_filename)
         response['Set-Cookie'] = 'fileDownload=true; path=/'
-        response['slug'] = slug
+        response['slug'] = experiment.slug
         return response
     else:
         messages.error(request, "Download data was not generated.")
-        return HttpResponseRedirect(template_name, args=(slug,))
+        return HttpResponseRedirect(template_name, args=(experiment.slug,))
 
 
 def get_export_instance(export_id):
@@ -159,7 +172,9 @@ def download_create(experiment_id, template_name):
             update_export_instance(input_export_file, output_download_file, export_instance)
 
         # delete temporary directory: from base_directory and below
-        base_export_directory = path.join(settings.MEDIA_ROOT, path.join("temp", str(export_instance.id)))
+        base_export_directory = path.join(
+            settings.MEDIA_ROOT, path.join("temp", str(export_instance.id))
+        )
         rmtree(base_export_directory, ignore_errors=True)
 
         if template_name != "":
