@@ -33,6 +33,9 @@ def create_export_instance():
 
 def download_view(request, experiment_id):
 
+    # if download file exists, return file for download (serve file for
+    # download)
+
     template_name = "experiments/detail.html"
     complete_filename, error_msg = download_create(experiment_id, template_name)
 

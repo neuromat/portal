@@ -90,6 +90,7 @@ class Experiment(models.Model):
     sent_date = models.DateField(auto_now=True)
     project_url = models.CharField(max_length=255, blank=True, null=True)
     download_url = models.FileField(upload_to=get_data_file_dir, null=True, blank=True)
+    downloads = models.PositiveIntegerField(default=0)
     ethics_committee_url = models.CharField(max_length=255, blank=True,
                                             null=True)
     ethics_committee_file = models.FileField(
