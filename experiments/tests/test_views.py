@@ -1,17 +1,18 @@
+
 import haystack
 import sys
 
+from datetime import datetime
 from django.contrib.auth.models import User
 from django.core.management import call_command
 from django.test import TestCase, override_settings
+from django.urls import reverse
 from haystack.query import SearchQuerySet
 
 from experiments import views
 from experiments.models import Experiment, Step, Questionnaire, \
     QuestionnaireDefaultLanguage, QuestionnaireLanguage
-from experiments.tests.tests_helper import apply_setup, global_setup_ut, \
-    create_questionnaire_language
-from nep import settings
+from experiments.tests.tests_helper import apply_setup, global_setup_ut
 
 
 @apply_setup(global_setup_ut)
@@ -167,6 +168,7 @@ TEST_HAYSTACK_CONNECTIONS = {
 
 # TODO: we are testing only questionnaire view part. Complete with other
 # TODO: tests: groups, studies, settings etc
+@apply_setup(global_setup_ut)
 class ExperimentDetailTest(TestCase):
 
     def setUp(self):
@@ -419,3 +421,52 @@ class SearchTest(TestCase):
         self.assertContains(response, 'Injury by firearm')
         self.assertContains(response, 'What side of the injury')
         self.assertContains(response, 'Elbow Extension')
+
+
+@apply_setup(global_setup_ut)
+class DownloadExperimentTest(TestCase):
+
+    def setUp(self):
+        global_setup_ut()
+
+    def test_downloading_experiment_data(self):
+        # First we post a new experiment through API
+        owner = User.objects.get(username='lab1')
+        self.client.login(username=owner.username, password='nep-lab1')
+        self.client.post(
+            reverse('api_experiments-list'),
+            {
+                'title': 'New experiment',
+                'description': 'Some description',
+                'nes_id': 18,
+                'sent_date': datetime.utcnow().strftime('%Y-%m-%d')
+            },
+        )
+        self.client.logout()
+
+        # Now we can test for downloading experiment
+        experiment = Experiment.objects.last()
+        response = self.client.get(
+            '/media/download/' + str(experiment.id) + '/download.zip/'
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertEquals(response.get('Content-Type'), 'application/zip')
+
+    def test_downloading_experiment_data_increases_download_counter(self):
+        # First we post a new experiment through API
+        owner = User.objects.get(username='lab1')
+        self.client.login(username=owner.username, password='nep-lab1')
+        self.client.post(
+            reverse('api_experiments-list'),
+            {
+                'title': 'New experiment',
+                'description': 'Some description',
+                'nes_id': 18,
+                'sent_date': datetime.utcnow().strftime('%Y-%m-%d')
+            },
+        )
+        self.client.logout()
+
+        # Now we can for increaseing download counter by 1 (0 -> 1)
+        experiment = Experiment.objects.last()
+        self.assertEqual(experiment.downloads, 1)
