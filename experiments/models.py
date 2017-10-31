@@ -26,7 +26,7 @@ class CurrentExperimentManager(models.Manager):
 def get_data_file_dir(instance, filename):
     directory = "download"
     if isinstance(instance, Experiment):
-        directory = path.join(directory, instance.id)
+        directory = path.join(directory, str(instance.id))
 
     return path.join(directory, filename)
 
@@ -89,7 +89,9 @@ class Experiment(models.Model):
     data_acquisition_done = models.BooleanField(default=False)
     sent_date = models.DateField(auto_now=True)
     project_url = models.CharField(max_length=255, blank=True, null=True)
-    download_url = models.FileField(upload_to=get_data_file_dir, null=True, blank=True)
+    download_url = models.FileField(
+        upload_to=get_data_file_dir, null=True, blank=True
+    )
     downloads = models.PositiveIntegerField(default=0)
     ethics_committee_url = models.CharField(max_length=255, blank=True,
                                             null=True)
