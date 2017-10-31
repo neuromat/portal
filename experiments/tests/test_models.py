@@ -86,6 +86,7 @@ class ExperimentModelTest(TestCase):
         self.assertEqual(experiment.ethics_committee_url, None)
         self.assertEqual(experiment.ethics_committee_file, None)
         self.assertEqual(experiment.slug, '')
+        self.assertEqual(experiment.downloads, 0)
 
     def test_cannot_save_empty_attributes(self):
         owner = User.objects.first()
