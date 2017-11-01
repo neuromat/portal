@@ -18,6 +18,7 @@
             {% if questionnaires %}
                 <li role="presentation"><a href="#questionnaires_tab" role="tab" data-toggle="tab"> {% trans "Questionnaires" %}</a></li>
             {% endif %}
+            <li role="presentation"><a href="#downloads_tab" role="tab" data-toggle="tab">{% trans "Downloads" %}</a></li>
         </ul>
 
         <!-- Tab panes -->
@@ -323,6 +324,27 @@
                         </div>
                     {% endfor %}
                 {% endfor %}
+            </div>
+            <!-- Downloads tab -->
+            <div id="downloads_tab" class="tab-pane" role="tabpanel">
+                <h4>{% trans 'Select experiment data pieces to download' %}</h4>
+                <div class="panel panel-default nep-panel-group">
+                    <label for="download_options">Select options</label>
+                    <select name="download_selected" id="download_options">
+                        <option value="experiment">{% trans 'Experiment (spreadsheet)' %}</option>
+                        {% if experiment.groups.all %}
+                            {% for group in experiment.groups.all %}
+                                <option value="group_{{ group.id }}">{% trans 'Group ' %}{{ group.title }}</option>
+                                {% for participant in group.participants.all %}
+                                    <option value="participant_{{ participant.id }}">{% trans 'Participant ' %}{{ participant.code }}</option>
+                                {% endfor %}
+                                <option value="experimental_protocol">
+                                    {% trans 'Experimental Protocol (zip)' %}</option>
+                                <option value="participants">{% trans 'Participants (spreadsheet)' %} </option>
+                            {% endfor %}
+                        {% endif %}
+                    </select>
+                </div>
             </div>
         </div>
 
