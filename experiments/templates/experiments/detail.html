@@ -1,4 +1,8 @@
 {% extends 'experiments/base.html' %}
+{% block style %}
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'tree-multiselect.js/jquery.tree-multiselect.min.css' %}">
+{% endblock %}
 
 {% block header %}
     {% load i18n %}
@@ -330,17 +334,24 @@
                 <h4>{% trans 'Select experiment data pieces to download' %}</h4>
                 <div class="panel panel-default nep-panel-group">
                     <label for="download_options">Select options</label>
-                    <select name="download_selected" id="download_options">
-                        <option value="experiment">{% trans 'Experiment (spreadsheet)' %}</option>
+                    <select name="download_selected" id="download_options" multiple="multiple">
+                        <option value="experiment">
+                            {% trans 'Experiment (spreadsheet)' %}</option>
                         {% if experiment.groups.all %}
                             {% for group in experiment.groups.all %}
-                                <option value="group_{{ group.id }}">{% trans 'Group ' %}{{ group.title }}</option>
                                 {% for participant in group.participants.all %}
-                                    <option value="participant_{{ participant.id }}">{% trans 'Participant ' %}{{ participant.code }}</option>
+                                    <option value="participant_
+{{ participant.id }}" data-section="Groups/Group
+{{ group.title }}">{% trans 'Participant ' %}{{ participant.code }}</option>
                                 {% endfor %}
-                                <option value="experimental_protocol">
+                                <option value="experimental_protocol"
+                                        data-section="Groups/Group
+{{ group.title }}">
                                     {% trans 'Experimental Protocol (zip)' %}</option>
-                                <option value="participants">{% trans 'Participants (spreadsheet)' %} </option>
+                                <option value="participants"
+                                        data-section="Groups/Group
+{{ group.title }}"
+                                >{% trans 'Participants (spreadsheet)' %} </option>
                             {% endfor %}
                         {% endif %}
                     </select>
@@ -389,7 +400,6 @@
                 to_be_analysed_count + '"}</style>');
         }
     </script>
-
     {# Display protocol experiment full image #}
     <script>
         $('#protocol_image_full').on('show.bs.modal', function (event) {
@@ -454,6 +464,7 @@
             chart.draw(data, options);
         }
     </script>
+
     {##}
     {# Script related to Questionnaires tab #}
     {##}
@@ -501,5 +512,13 @@
                 }
             })
         }
+    </script>
+
+    {##}
+    {# Scripts related to Downloads tab #}
+    {##}
+{#    <script src="{% static 'tree-multiselect.js/jquery.tree-multiselect.min.js' %}"></script>#}
+    <script>
+        $("select").treeMultiselect();
     </script>
 {% endblock %}
