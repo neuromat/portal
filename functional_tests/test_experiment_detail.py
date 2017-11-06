@@ -1,5 +1,4 @@
 import time
-
 from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.common.keys import Keys
 
@@ -8,18 +7,6 @@ from functional_tests.base import FunctionalTest
 
 
 class ExperimentDetailTest(FunctionalTest):
-
-    def wait_for_detail_page_charge(self):
-        ##
-        # First we wait for the page completely charge. For this we
-        # guarantee an element of the page is there. As any of the
-        # statistics, groups, and settings tab is always there, we wait for
-        # Group tab.
-        ##
-        self.wait_for(lambda: self.assertEqual(
-            self.browser.find_element_by_link_text('Groups').text,
-            'Groups'
-        ))
 
     # TODO: break by tabs
     def test_can_view_detail_page(self):
@@ -269,7 +256,7 @@ class ExperimentDetailTest(FunctionalTest):
         self.browser.find_element_by_xpath(
             "//a[@href='/experiments/" + experiment.slug + "/']"
         ).click()
-        self.wait_for_detail_page_charge()
+        self.wait_for_detail_page_load()
 
         # As there are no questionnaires for this experiment, she can't see
         # the Questionnaires tab and Questionnaires content
@@ -293,7 +280,7 @@ class ExperimentDetailTest(FunctionalTest):
         self.browser.find_element_by_xpath(
             "//a[@href='/experiments/" + experiment.slug + "/']"
         ).click()
-        self.wait_for_detail_page_charge()
+        self.wait_for_detail_page_load()
 
         ##
         # We get groups objects with questionnaire steps
@@ -343,7 +330,7 @@ class ExperimentDetailTest(FunctionalTest):
         self.browser.find_element_by_xpath(
             "//a[@href='/experiments/" + experiment.slug + "/']"
         ).click()
-        self.wait_for_detail_page_charge()
+        self.wait_for_detail_page_load()
 
         self.browser.find_element_by_link_text('Questionnaires').click()
 
@@ -373,7 +360,7 @@ class ExperimentDetailTest(FunctionalTest):
         self.browser.find_element_by_xpath(
             "//a[@href='/experiments/" + experiment.slug + "/']"
         ).click()
-        self.wait_for_detail_page_charge()
+        self.wait_for_detail_page_load()
 
         # When the new visitor clicks in the Questionnaires tab, then click
         # in 'Details' button of the Questionnaires sections she sees
@@ -450,7 +437,7 @@ class ExperimentDetailTest(FunctionalTest):
         self.browser.find_element_by_xpath(
             "//a[@href='/experiments/" + experiment.slug + "/']"
         ).click()
-        self.wait_for_detail_page_charge()
+        self.wait_for_detail_page_load()
 
         # As there's a questionnaire from a group that has the wrong number
         # of columns, when the new visitor clicks in Questionnaires tab she
@@ -484,7 +471,7 @@ class ExperimentDetailTest(FunctionalTest):
         self.browser.find_element_by_xpath(
             "//a[@href='/experiments/" + experiment.slug + "/']"
         ).click()
-        self.wait_for_detail_page_charge()
+        self.wait_for_detail_page_load()
 
         # When the new visitor clicks in the Questionnaires tab, she sees,
         # below questionnaire titles, a sequence of buttons indicating the
@@ -534,7 +521,7 @@ class ExperimentDetailTest(FunctionalTest):
         self.browser.find_element_by_xpath(
             "//a[@href='/experiments/" + experiment.slug + "/']"
         ).click()
-        self.wait_for_detail_page_charge()
+        self.wait_for_detail_page_load()
 
         # She clicks in Questionnaires tab
         self.browser.find_element_by_link_text('Questionnaires').click()
@@ -596,7 +583,7 @@ class ExperimentDetailTest(FunctionalTest):
         self.browser.find_element_by_xpath(
             "//a[@href='/experiments/" + experiment.slug + "/']"
         ).click()
-        self.wait_for_detail_page_charge()
+        self.wait_for_detail_page_load()
 
         # She clicks in Questionnaires tab
         self.browser.find_element_by_link_text('Questionnaires').click()
@@ -636,3 +623,50 @@ class ExperimentDetailTest(FunctionalTest):
                       questionnaires_content)
         self.assertIn('The user answers yes or not',
                       questionnaires_content)
+
+
+class DownloadExperimentTest(FunctionalTest):
+
+    def test_can_see_section_content_of_downloads_tab(self):
+        experiment = Experiment.objects.filter(
+            status=Experiment.APPROVED
+        ).last()
+
+        # Josileine wants to download the experiment data.
+        self.browser.find_element_by_xpath(
+            "//a[@href='/experiments/" + experiment.slug + "/']"
+        ).click()
+        self.wait_for_detail_page_load()
+
+        # She sees that there is a "Downloads" written tab. She
+        # clicks in it, and sees a section bellow the tabs with a title
+        # "Select experiment data pieces to download"
+        self.browser.find_element_by_link_text('Downloads').click()
+        downloads_tab_content = self.browser.find_element_by_id(
+            'downloads_tab'
+        )
+        downloads_header = downloads_tab_content.find_element_by_tag_name('h4')
+        self.assertEqual(
+            'Select experiment data pieces to download', downloads_header.text
+        )
+
+        # She also see that there is a tree with experiment data divided by
+        # groups and participants, and also other files
+        download_options = self.browser.find_element_by_id('download_options')
+
+        self.assertIn('Experiment (spreadsheet)', download_options.text)
+
+        for group in experiment.groups.all():
+            # TODO: adapt below line to test against data-section option
+            # TODO: attribute
+            # self.assertIn('Group ' + group.title, download_options.text)
+            # TODO: if group has Experimental Protocol, then (below),
+            # TODO: otherwise...
+            self.assertIn('Experimental Protocol (zip)', download_options.text)
+            self.assertIn('Participants (spreadsheet)', download_options.text)
+            for participant in group.participants.all():
+                self.assertIn(
+                    'Participant ' + participant.code + ' (zip)',
+                    download_options.text
+                )
+

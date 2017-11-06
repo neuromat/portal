@@ -1,4 +1,8 @@
 {% extends 'experiments/base.html' %}
+{% block style %}
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'tree-multiselect.js/jquery.tree-multiselect.min.css' %}">
+{% endblock %}
 
 {% block header %}
     {% load i18n %}
@@ -18,6 +22,7 @@
             {% if questionnaires %}
                 <li role="presentation"><a href="#questionnaires_tab" role="tab" data-toggle="tab"> {% trans "Questionnaires" %}</a></li>
             {% endif %}
+            <li role="presentation"><a href="#downloads_tab" role="tab" data-toggle="tab">{% trans "Downloads" %}</a></li>
         </ul>
 
         <!-- Tab panes -->
@@ -324,6 +329,26 @@
                     {% endfor %}
                 {% endfor %}
             </div>
+            <!-- Downloads tab -->
+            <div id="downloads_tab" class="tab-pane" role="tabpanel">
+                <h4>{% trans 'Select experiment data pieces to download' %}</h4>
+                <div class="panel panel-default nep-panel-group">
+                    <label for="download_options">Select options</label>
+                    <select name="download_selected" id="download_options" multiple="multiple">
+                        <option value="experiment">{% trans 'Experiment (spreadsheet)' %}</option>
+                        {% if experiment.groups.all %}
+                            {% for group in experiment.groups.all %}
+                                {% for participant in group.participants.all %}
+                                    <option value="participant_{{ participant.id }}" data-section="Groups/Group {{ group.title }}">{% trans 'Participant ' %}{{ participant.code }} (zip)</option>
+                                {% endfor %}
+                                <option value="experimental_protocol" data-section="Groups/Group {{ group.title }}">
+                                    {% trans 'Experimental Protocol (zip)' %}</option>
+                                <option value="participants" data-section="Groups/Group {{ group.title }}">{% trans 'Participants (spreadsheet)' %} </option>
+                            {% endfor %}
+                        {% endif %}
+                    </select>
+                </div>
+            </div>
         </div>
 
         {# Full protocol experiment image modal #}
@@ -367,7 +392,6 @@
                 to_be_analysed_count + '"}</style>');
         }
     </script>
-
     {# Display protocol experiment full image #}
     <script>
         $('#protocol_image_full').on('show.bs.modal', function (event) {
@@ -432,6 +456,7 @@
             chart.draw(data, options);
         }
     </script>
+
     {##}
     {# Script related to Questionnaires tab #}
     {##}
@@ -479,5 +504,13 @@
                 }
             })
         }
+    </script>
+
+    {##}
+    {# Scripts related to Downloads tab #}
+    {##}
+    <script src="{% static 'tree-multiselect.js/jquery.tree-multiselect.min.js' %}"></script>
+    <script>
+        $("select").treeMultiselect();
     </script>
 {% endblock %}

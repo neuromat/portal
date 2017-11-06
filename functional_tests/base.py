@@ -56,6 +56,18 @@ class FunctionalTest(StaticLiveServerTestCase):
                     raise e
                 time.sleep(0.5)
 
+    def wait_for_detail_page_load(self):
+        ##
+        # First we wait for the page completely charge. For this we
+        # guarantee an element of the page is there. As any of the
+        # statistics, groups, and settings tab is always there, we wait for
+        # Group tab.
+        ##
+        self.wait_for(lambda: self.assertEqual(
+            self.browser.find_element_by_link_text('Groups').text,
+            'Groups'
+        ))
+
 
 @apply_setup(global_setup_ft)
 class FunctionalTestTrustee(StaticLiveServerTestCase):
