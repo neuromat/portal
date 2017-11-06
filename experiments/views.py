@@ -123,8 +123,8 @@ def _get_available_languages(questionnaire):
 
 
 def home_page(request):
-    to_be_analysed_count = None  # will be None if home contains the list of
-    # normal user
+    # will be None if home contains the list of normal user
+    to_be_analysed_count = None
     if request.user.is_authenticated and \
             request.user.groups.filter(name='trustees').exists():
         all_experiments = \
@@ -226,39 +226,43 @@ def change_status(request, experiment_id):
 
     # If status postted is NOT_APPROVED verify if a justification message
     # was postted too. If not redirect to home page with warning message.
-    if status == Experiment.NOT_APPROVED:
-        if not justification:
-            messages.warning(
-                request, _(
-                    'Please provide a reason justifying the change of the status of the experiment ') +
-                         experiment.title + _('to "Not approved". '))
+    if status == Experiment.NOT_APPROVED and not justification:
+        messages.warning(
+            request, _(
+                'Please provide a reason justifying the change of the status of the experiment ') +
+                     experiment.title + _('to "Not approved". '))
+        return HttpResponseRedirect('/')
 
-            return HttpResponseRedirect('/')
-        else:
-            # if has justification send email to researcher
-            subject = _('Your experiment was rejected')
-            message = _(
-                'We regret to inform you that your experiment, ') + experiment.title + \
-                      _(
-                          ', has not been acceptted to be published in the NeuroMat Open Database. Please check the '
-                          'reasons providing by the Neuromat Open Database Evaluation Committee:') + justification + \
-                      _(
-                          '.\nWith best regards,\n The Neuromat Open Database Evaluation Committee')
+    if status == Experiment.NOT_APPROVED and justification:
+        experiment.status = status
+        experiment.save()
+        # if has justification send email to researcher
+        subject = _('Your experiment was rejected')
+        message = _(
+            'We regret to inform you that your experiment, ') + experiment.title + \
+                  _(
+                      ', has not been acceptted to be published in the NeuroMat Open Database. Please check the '
+                      'reasons providing by the Neuromat Open Database Evaluation Committee:') + justification + \
+                  _(
+                      '.\nWith best regards,\n The Neuromat Open Database Evaluation Committee')
 
-            send_mail(subject, message, from_email,
-                      [experiment.study.researcher.email])
-            messages.success(
-                request,
-                _('An email was sent to ') + experiment.study.researcher.name +
-                _(' warning that the experiment was rejected.')
-            )
-            # Save the justification message
-            RejectJustification.objects.create(message=justification,
-                                               experiment=experiment)
+        send_mail(subject, message, from_email,
+                  [experiment.study.researcher.email])
+        messages.success(
+            request,
+            _('An email was sent to ') + experiment.study.researcher.name +
+            _(' warning that the experiment was rejected.')
+        )
+        # Save the justification message
+        RejectJustification.objects.create(
+            message=justification, experiment=experiment
+        )
 
-    # if status changed to UNDER_ANALYSIS or APPROVED, send email
+    # If status changed to UNDER_ANALYSIS or APPROVED, send email
     # to experiment study researcher
     if status == Experiment.APPROVED:
+        experiment.status = status
+        experiment.save()
         subject = _('Your experiment was approved')
         message = _(
             'We are pleased to inform you that your experiment ') + experiment.title + \
@@ -277,7 +281,14 @@ def change_status(request, experiment_id):
             _('An email was sent to ') + experiment.study.researcher.name +
             _(' warning that the experiment changed status to Approved.')
         )
+        rebuild_haystack_index.delay()
+        # build_download_file(experiment.id).delay()
+
     if status == Experiment.UNDER_ANALYSIS:
+        experiment.status = status
+        # associate experiment with trustee
+        experiment.trustee = request.user
+        experiment.save()
         subject = _('Your experiment is now under analysis')
         message = _(
             'Thank you for submitting your experiment ') + experiment.title + \
@@ -292,31 +303,20 @@ def change_status(request, experiment_id):
             _('An email was sent to ') + experiment.study.researcher.name +
             _(' warning that the experiment is under analysis.')
         )
-        # Associate experiment with trustee
-        experiment.trustee = request.user
 
     # If status posted is TO_BE_ANALYSED and current experiment status is
     # UNDER_ANALYSIS disassociate trustee from experiment and warning
     # trustee that the experiment is going to be free for other trustee
-    # analysis
-    if status == Experiment.TO_BE_ANALYSED:
-        if experiment.status == Experiment.UNDER_ANALYSIS:
+    # analyse it
+    if status == Experiment.TO_BE_ANALYSED and \
+            experiment.status == Experiment.UNDER_ANALYSIS:
             experiment.trustee = None
+            experiment.save()
             messages.warning(
                 request,
                 _('The experiment data ') + experiment.title + _(
                     ' was made available to be analysed by other trustee.')
             )
-
-    # TODO: wrong order. Save first, before send message to user that the
-    # TODO: status was changed. Does not make sense tell user that the
-    # TODO: status was changed, before save the change.
-    experiment.status = status
-    experiment.save()
-
-    if experiment.status == Experiment.APPROVED:
-        rebuild_haystack_index.delay()
-        # build_download_file(experiment.id).delay()
 
     return HttpResponseRedirect('/')
 
