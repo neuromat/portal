@@ -666,6 +666,7 @@ class DownloadExperimentTest(FunctionalTest):
             self.assertIn('Participants (spreadsheet)', download_options.text)
             for participant in group.participants.all():
                 self.assertIn(
-                    'Participant ' + participant.code, download_options.text
+                    'Participant ' + participant.code + ' (zip)',
+                    download_options.text
                 )
 

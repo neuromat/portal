@@ -335,23 +335,15 @@
                 <div class="panel panel-default nep-panel-group">
                     <label for="download_options">Select options</label>
                     <select name="download_selected" id="download_options" multiple="multiple">
-                        <option value="experiment">
-                            {% trans 'Experiment (spreadsheet)' %}</option>
+                        <option value="experiment">{% trans 'Experiment (spreadsheet)' %}</option>
                         {% if experiment.groups.all %}
                             {% for group in experiment.groups.all %}
                                 {% for participant in group.participants.all %}
-                                    <option value="participant_
-{{ participant.id }}" data-section="Groups/Group
-{{ group.title }}">{% trans 'Participant ' %}{{ participant.code }}</option>
+                                    <option value="participant_{{ participant.id }}" data-section="Groups/Group {{ group.title }}">{% trans 'Participant ' %}{{ participant.code }} (zip)</option>
                                 {% endfor %}
-                                <option value="experimental_protocol"
-                                        data-section="Groups/Group
-{{ group.title }}">
+                                <option value="experimental_protocol" data-section="Groups/Group {{ group.title }}">
                                     {% trans 'Experimental Protocol (zip)' %}</option>
-                                <option value="participants"
-                                        data-section="Groups/Group
-{{ group.title }}"
-                                >{% trans 'Participants (spreadsheet)' %} </option>
+                                <option value="participants" data-section="Groups/Group {{ group.title }}">{% trans 'Participants (spreadsheet)' %} </option>
                             {% endfor %}
                         {% endif %}
                     </select>
@@ -517,7 +509,7 @@
     {##}
     {# Scripts related to Downloads tab #}
     {##}
-{#    <script src="{% static 'tree-multiselect.js/jquery.tree-multiselect.min.js' %}"></script>#}
+    <script src="{% static 'tree-multiselect.js/jquery.tree-multiselect.min.js' %}"></script>
     <script>
         $("select").treeMultiselect();
     </script>
