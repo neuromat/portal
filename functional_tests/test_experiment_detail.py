@@ -655,9 +655,7 @@ class DownloadExperimentTest(FunctionalTest):
         self.assertIn('Experiment (spreadsheet)', downloads_tab_content.text)
 
         for group in experiment.groups.all():
-            # TODO: adapt below line to test against data-section option
-            # TODO: attribute
-            # self.assertIn('Group ' + group.title, downloads_tab_content.text)
+            self.assertIn('Group ' + group.title, downloads_tab_content.text)
             # TODO: if group has Experimental Protocol, then (below),
             # TODO: otherwise...
             self.assertIn(
