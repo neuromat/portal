@@ -107,6 +107,11 @@ def download_create(experiment_id, template_name):
         base_directory, path_to_create = path.split(export.get_directory_base())
         # create directory base ex. /Users/.../portal/media/temp/path_create
         error_msg, base_directory_name = create_directory(base_directory, path_to_create)
+        # create media experiment directory
+        directory_download_base = path.join(settings.MEDIA_ROOT, "download")
+        download_experiment_directory = path.join(directory_download_base, str(experiment_id))
+        if not path.exists(download_experiment_directory):
+            error_msg, download_experiment_directory = create_directory(directory_download_base, str(experiment_id))
 
         # ex. /Users/.../portal/media/temp/export_instance.id/json_export.json
         input_export_file = path.join("export", path.join(path.join(str(export_instance.id), str(input_filename))))
@@ -128,21 +133,15 @@ def download_create(experiment_id, template_name):
         error_msg = export.process_experiment_data(experiment_id)
 
         # process the data per participant
-        error_msg = export.download_data_per_participant()
+        error_msg = export.download_data_per_participant(experiment_id)
 
         # process the data per questionnaire
         error_msg = export.download_data_per_questionnaire()
 
         # create zip file and include files
-        export_complete_filename = ""
         if export.files_to_zip_list:
             export_filename = export.get_input_data("export_filename")  # 'download.zip'
-
             export_complete_filename = path.join(base_directory_name, export_filename)
-            directory_download_base = path.join(settings.MEDIA_ROOT, "download")
-
-            download_experiment_directory = path.join(directory_download_base, str(experiment_id))
-
             if not path.exists(download_experiment_directory):
                 error_msg, download_experiment_directory = create_directory(directory_download_base, str(experiment_id))
 
