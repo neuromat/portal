@@ -341,9 +341,9 @@
                                 {% for participant in group.participants.all %}
                                     <option value="participant_{{ participant.id }}" data-section="Groups/Group {{ group.title }}">{% trans 'Participant ' %}{{ participant.code }} (zip)</option>
                                 {% endfor %}
-                                <option value="experimental_protocol" data-section="Groups/Group {{ group.title }}">
-                                    {% trans 'Experimental Protocol (zip)' %}</option>
+                                <option value="experimental_protocol" data-section="Groups/Group {{ group.title }}">{% trans 'Experimental Protocol (zip)' %}</option>
                                 <option value="participants" data-section="Groups/Group {{ group.title }}">{% trans 'Participants (spreadsheet)' %} </option>
+                                <option value="questionnaires" data-section="Groups/Group {{ group.title }}">{% trans 'Questionnaires data (zip)' %}</option>
                             {% endfor %}
                         {% endif %}
                     </select>
