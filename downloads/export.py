@@ -101,11 +101,11 @@ class ExportExecution:
 
         # questionnaire_id = 0
         self.files_to_zip_list = []
-        self.participant_to_zip_list = []
-        self.experimental_protocol_to_zip_list = []
+        # self.participant_to_zip_list = []
+        # self.experimental_protocol_to_zip_list = []
         # self.fields = []
         self.directory_base = ''
-        self.base_directory_name = path.join(settings.MEDIA_ROOT, "temp")
+        self.base_directory_name = path.join(settings.MEDIA_ROOT, "download")
         # self.directory_base = self.base_directory_name
         self.set_directory_base(export_id)
         self.base_export_directory = ""
@@ -160,8 +160,8 @@ class ExportExecution:
         return ""
 
     def get_export_directory(self):
-
-        return self.base_export_directory   # MEDIA_ROOT/download/username_id/export_id/NES_EXPORT
+        return self.directory_base # Users/.../MEDIA_ROOT/download/experiment_id/
+        # return self.base_export_directory
 
     # Dados gerais do experimento
     def process_experiment_data(self, experiment_id):
@@ -180,9 +180,9 @@ class ExportExecution:
         # path ex. /EXPERIMENT_DOWNLOAD/
         export_experiment_data = self.get_input_data("base_directory")
 
-        # # path ex. UserS/.../qdc/media/.../EXPERIMENT_DOWNLOAD/
+        # # path ex. UserS/.../qdc/media/download/experiment_id/
         experiment_resume_directory = self.get_export_directory()
-        # Users/.../qdc/media/.../EXPERIMENT_DOWNLOAD/Experiment.csv
+        # Users/.../qdc/media/download/experiment_id/Experiment.csv
         complete_filename_experiment_resume = path.join(experiment_resume_directory, filename_experiment_resume)
 
         experiment_description_fields = []
@@ -190,11 +190,7 @@ class ExportExecution:
         experiment_description_fields.insert(1, experiment_resume)
         save_to_csv(complete_filename_experiment_resume, experiment_description_fields)
 
-        self.files_to_zip_list.append([complete_filename_experiment_resume, export_experiment_data])
-
-        # media export experiment directory
-        directory_download_base = path.join(settings.MEDIA_ROOT, "download")
-        download_experiment_directory = path.join(directory_download_base, str(experiment_id))
+        # self.files_to_zip_list.append([complete_filename_experiment_resume, export_experiment_data])
 
         # process data for each group
         group_list = Group.objects.filter(experiment=experiment)
@@ -202,28 +198,26 @@ class ExportExecution:
             group_resume = "Group name: " + group.title + "\n" + "Group description: " + group.description + "\n"
             group_directory_name = 'Group_' + group.title
 
-            # group_directory = Users/.../qdc/media/.../EXPERIMENT_DOWNLOAD/Group_group.title
+            # group_directory = Users/.../qdc/media/download/experiment_id/Group_group.title
             error_msg, group_directory = create_directory(experiment_resume_directory, group_directory_name)
             if error_msg != "":
                 return error_msg
             # export_directory_group = EXPERIMENT_DOWNLOAD/Group_group.title
             export_directory_group = path.join(export_experiment_data, group_directory_name)
 
-            # files to experimental protocol zip file
-            self.experimental_protocol_to_zip_list = []
             if hasattr(group, 'experimental_protocol'):
                 # build diseases inclusion criteria
                 if group.inclusion_criteria.all():
                     group_inclusion_criteria_list = self.process_group_inclusion_disease(group.inclusion_criteria.all())
 
                     group_inclusion_disease_filename = "%s.csv" % "Group_inclusion_criteria_disease"
-                    # ex. ex. Users/..../EXPERIMENT_DOWNLOAD/Group_xxx/Group_inclusion_disease.csv
+                    # ex. ex. Users/..../download/experiment_id/Group_xxx/Group_inclusion_disease.csv
                     complete_inclusion_disease_filename = path.join(group_directory, group_inclusion_disease_filename)
                     # save personal_data_list to csv file
                     save_to_csv(complete_inclusion_disease_filename, group_inclusion_criteria_list)
                     self.files_to_zip_list.append([complete_inclusion_disease_filename, export_directory_group])
 
-                # ex. Users/..../EXPERIMENT_DOWNLOAD/Group_xxx/Experimental_protocol
+                # ex. Users/.../download/experiment_id/Group_xxx/Experimental_protocol
                 error_msg, directory_experimental_protocol = create_directory(group_directory, "Experimental_protocol")
                 if error_msg != "":
                     return error_msg
@@ -240,10 +234,8 @@ class ExportExecution:
                     complete_filename_experimental_protocol = path.join(directory_experimental_protocol,
                                                                         filename_experimental_protocol)
 
-                    self.files_to_zip_list.append([complete_filename_experimental_protocol,
-                                                   export_directory_experimental_protocol])
-                    self.experimental_protocol_to_zip_list.append([complete_filename_experimental_protocol,
-                                                                   export_directory_experimental_protocol])
+                    # self.files_to_zip_list.append([complete_filename_experimental_protocol,
+                    #                                export_directory_experimental_protocol])
 
                     with open(complete_filename_experimental_protocol.encode('utf-8'), 'w', newline='',
                               encoding='UTF-8') as txt_file:
@@ -256,10 +248,8 @@ class ExportExecution:
                     filename_protocol_image = "Experimental_protocol_image.png"
                     complete_protocol_image_filename = path.join(directory_experimental_protocol,
                                                                  filename_protocol_image)
-                    self.files_to_zip_list.append([complete_protocol_image_filename,
-                                                   export_directory_experimental_protocol])
-                    self.experimental_protocol_to_zip_list.append([complete_protocol_image_filename,
-                                                                   export_directory_experimental_protocol])
+                    # self.files_to_zip_list.append([complete_protocol_image_filename,
+                    #                                export_directory_experimental_protocol])
 
                     image_protocol = path.join(path.join(settings.BASE_DIR,"media/"), experimental_protocol_image.name)
                     with open(image_protocol, 'rb') as f:
@@ -288,9 +278,7 @@ class ExportExecution:
                                 eeg_setting_filename = "%s.json" % "eeg_default_setting"
                                 complete_filename_eeg_setting = path.join(directory_eeg_step, eeg_setting_filename)
 
-                                self.files_to_zip_list.append([complete_filename_eeg_setting, export_directory_eeg_step])
-                                self.experimental_protocol_to_zip_list.append(
-                                    [complete_filename_eeg_setting, export_directory_eeg_step])
+                                # self.files_to_zip_list.append([complete_filename_eeg_setting, export_directory_eeg_step])
 
                                 with open(complete_filename_eeg_setting.encode('utf-8'), 'w', newline='',
                                           encoding='UTF-8') as outfile:
@@ -316,9 +304,7 @@ class ExportExecution:
                                 emg_setting_filename = "%s.json" % "emg_default_setting"
                                 complete_filename_emg_setting = path.join(directory_emg_step, emg_setting_filename)
 
-                                self.files_to_zip_list.append([complete_filename_emg_setting, export_directory_emg_step])
-                                self.experimental_protocol_to_zip_list.append(
-                                    [complete_filename_emg_setting, export_directory_emg_step])
+                                # self.files_to_zip_list.append([complete_filename_emg_setting, export_directory_emg_step])
 
                                 with open(complete_filename_emg_setting.encode('utf-8'), 'w', newline='',
                                           encoding='UTF-8') as outfile:
@@ -344,9 +330,7 @@ class ExportExecution:
                                 tms_setting_filename = "%s.json" % "tms_default_setting"
                                 complete_filename_tms_setting = path.join(directory_tms_step, tms_setting_filename)
 
-                                self.files_to_zip_list.append([complete_filename_tms_setting, export_directory_tms_step])
-                                self.experimental_protocol_to_zip_list.append(
-                                    [complete_filename_tms_setting, export_directory_tms_step])
+                                # self.files_to_zip_list.append([complete_filename_tms_setting, export_directory_tms_step])
 
                                 with open(complete_filename_tms_setting.encode('utf-8'), 'w', newline='',
                                           encoding='UTF-8') as outfile:
@@ -379,10 +363,8 @@ class ExportExecution:
                             complete_filename_goalkeeper_game_setting = path.join(directory_goalkeeper_game_step,
                                                                                   goalkeeper_game_setting_filename)
 
-                            self.files_to_zip_list.append([complete_filename_goalkeeper_game_setting,
-                                                           export_directory_goalkeeper_game_step])
-                            self.experimental_protocol_to_zip_list.append([complete_filename_goalkeeper_game_setting,
-                                                                           export_directory_goalkeeper_game_step])
+                            # self.files_to_zip_list.append([complete_filename_goalkeeper_game_setting,
+                            #                                export_directory_goalkeeper_game_step])
 
                             with open(complete_filename_goalkeeper_game_setting.encode('utf-8'), 'w', newline='',
                                       encoding='UTF-8') as outfile:
@@ -405,10 +387,8 @@ class ExportExecution:
                                     with open(complete_context_tree_filename, "wb") as f:
                                         f.write(data)
 
-                                    self.files_to_zip_list.append([complete_context_tree_filename,
-                                                                   export_directory_goalkeeper_game_step])
-                                    self.experimental_protocol_to_zip_list.append(
-                                        [complete_context_tree_filename, export_directory_goalkeeper_game_step])
+                                    # self.files_to_zip_list.append([complete_context_tree_filename,
+                                    #                                export_directory_goalkeeper_game_step])
 
                 stimulus_list = Step.objects.filter(group=group, type='stimulus')
                 if stimulus_list:
@@ -423,8 +403,8 @@ class ExportExecution:
                                 if error_msg != "":
                                     return error_msg
 
-                            export_directory_stimulus_data = path.join(export_directory_experimental_protocol,
-                                                                       stimulus_step_name)
+                            # export_directory_stimulus_data = path.join(export_directory_experimental_protocol,
+                            #                                            stimulus_step_name)
 
                             stimulus_setting_filename = stimulus.media_file.name.split('/')[-1]
                             complete_stimulus_filename = path.join(directory_experimental_protocol,
@@ -436,21 +416,7 @@ class ExportExecution:
                             with open(complete_stimulus_filename, "wb") as f:
                                 f.write(data)
 
-                            self.files_to_zip_list.append([complete_stimulus_filename, export_directory_stimulus_data])
-                            self.experimental_protocol_to_zip_list.append([complete_stimulus_filename,
-                                                                           export_directory_stimulus_data])
-
-                # create zip file for experimental protocol
-                if download_experiment_directory:
-                    zip_experimental_protocol_filename = "%s.zip" % "Experimental_protocol"
-                    complete_zip_filename = path.join(download_experiment_directory, zip_experimental_protocol_filename)
-                    with ZipFile(complete_zip_filename, 'w') as zip_file:
-                        for filename, directory in self.experimental_protocol_to_zip_list:
-                            fdir, fname = path.split(filename)
-
-                            zip_file.write(filename.encode('utf-8'), path.join(directory, fname))
-
-                    zip_file.close()
+                            # self.files_to_zip_list.append([complete_stimulus_filename, export_directory_stimulus_data])
 
             # Export data per Participant
             participant_list = Participant.objects.filter(group=group)
@@ -463,16 +429,7 @@ class ExportExecution:
                 complete_participant_filename = path.join(group_directory, export_participant_filename)
                 # save personal_data_list to csv file
                 save_to_csv(complete_participant_filename, participant_data_list)
-                self.files_to_zip_list.append([complete_participant_filename, export_directory_group])
-
-                # save in media/download/experiment_id
-                if download_experiment_directory:
-                    complete_media_participant_filename = path.join(download_experiment_directory,
-                                                                    export_participant_filename)
-                    with open(complete_participant_filename, "rb") as f:
-                        data = f.read()
-                    with open(complete_media_participant_filename, "wb") as f:
-                        f.write(data)
+                # self.files_to_zip_list.append([complete_participant_filename, export_directory_group])
 
         return error_msg
 
@@ -828,7 +785,7 @@ class ExportExecution:
 
         return error_msg
 
-    def download_data_per_participant(self, experiment_id):
+    def download_data_per_participant(self):
         error_msg = ""
         per_participant_data = self.input_data['participant_data_directory']
         for group_id in self.per_group_data:
@@ -839,10 +796,6 @@ class ExportExecution:
                 error_msg, group_participants_directory = create_directory(group_directory, per_participant_data)
                 if error_msg != "":
                     return error_msg
-
-                # create media experiment directory
-                directory_download_base = path.join(settings.MEDIA_ROOT, "download")
-                download_experiment_directory = path.join(directory_download_base, str(experiment_id))
 
                 for participant_code in self.per_group_data[group_id]['data_per_participant']:
                     participant_code_directory_name = "Participant_" + participant_code
@@ -878,9 +831,6 @@ class ExportExecution:
 
                             self.files_to_zip_list.append([complete_filename_questionnaire,
                                                            export_questionnaire_directory])
-
-                            self.participant_to_zip_list.append([complete_filename_questionnaire,
-                                                                 export_questionnaire_directory])
 
                     if 'eeg_data_list' in self.per_group_data[group_id]['data_per_participant'][participant_code]:
                         eeg_data_list = self.per_group_data[group_id]['data_per_participant'][participant_code][
@@ -928,8 +878,6 @@ class ExportExecution:
                                     f.write(data)
 
                                 self.files_to_zip_list.append([complete_eeg_data_filename, export_eeg_data_directory])
-                                self.participant_to_zip_list.append([complete_eeg_data_filename,
-                                                                     export_eeg_data_directory])
 
                             # create eeg_setting_description
                             eeg_setting_description = get_eeg_setting_description(eeg_data.eeg_setting_id)
@@ -942,8 +890,6 @@ class ExportExecution:
                                 complete_setting_filename = path.join(path_per_eeg_data, eeg_setting_filename)
 
                                 self.files_to_zip_list.append([complete_setting_filename, export_eeg_data_directory])
-                                self.participant_to_zip_list.append([complete_setting_filename,
-                                                                     export_eeg_data_directory])
 
                                 with open(complete_setting_filename.encode('utf-8'), 'w', newline='',
                                           encoding='UTF-8') as outfile:
@@ -968,8 +914,6 @@ class ExportExecution:
 
                                     self.files_to_zip_list.append([complete_sensor_position_filename,
                                                                    export_eeg_data_directory])
-                                    self.participant_to_zip_list.append([complete_sensor_position_filename,
-                                                                         export_eeg_data_directory])
 
                     if 'emg_data_list' in self.per_group_data[group_id]['data_per_participant'][participant_code]:
                         emg_data_list = self.per_group_data[group_id]['data_per_participant'][participant_code][
@@ -1017,8 +961,6 @@ class ExportExecution:
                                     f.write(data)
 
                                 self.files_to_zip_list.append([complete_emg_data_filename, export_emg_data_directory])
-                                self.participant_to_zip_list.append([complete_emg_data_filename,
-                                                                     export_emg_data_directory])
 
                             # download emg_setting_description
                             emg_setting_description = get_emg_setting_description(emg_data.emg_setting_id)
@@ -1031,8 +973,6 @@ class ExportExecution:
                                 complete_setting_filename = path.join(path_per_emg_data, emg_setting_filename)
 
                                 self.files_to_zip_list.append([complete_setting_filename, export_emg_data_directory])
-                                self.participant_to_zip_list.append([complete_setting_filename,
-                                                                     export_emg_data_directory])
 
                                 with open(complete_setting_filename.encode('utf-8'), 'w', newline='',
                                           encoding='UTF-8') as outfile:
@@ -1060,7 +1000,6 @@ class ExportExecution:
                                 complete_data_filename = path.join(tms_directory, tms_data_filename)
 
                                 self.files_to_zip_list.append([complete_data_filename, export_tms_directory])
-                                self.participant_to_zip_list.append([complete_data_filename, export_tms_directory])
 
                                 with open(complete_data_filename.encode('utf-8'), 'w', newline='', encoding='UTF-8') as \
                                         outfile:
@@ -1084,8 +1023,6 @@ class ExportExecution:
                                         f.write(data)
 
                                     self.files_to_zip_list.append([complete_hotspot_filename, export_tms_directory])
-                                    self.participant_to_zip_list.append([complete_hotspot_filename,
-                                                                         export_tms_directory])
 
                     if 'additional_data_list' in self.per_group_data[group_id]['data_per_participant'][
                         participant_code]:
@@ -1136,8 +1073,6 @@ class ExportExecution:
 
                                 self.files_to_zip_list.append([complete_additional_data_filename,
                                                                export_additional_data_directory])
-                                self.participant_to_zip_list.append([complete_additional_data_filename,
-                                                                     export_additional_data_directory])
 
                     if 'goalkeeper_data_list' in self.per_group_data[group_id]['data_per_participant'][
                             participant_code]:
@@ -1191,8 +1126,6 @@ class ExportExecution:
 
                                     self.files_to_zip_list.append([complete_context_tree_filename,
                                                                    export_goalkeeper_data_directory])
-                                    self.participant_to_zip_list.append([complete_context_tree_filename,
-                                                                         export_goalkeeper_data_directory])
 
                     if 'generic_data_list' in self.per_group_data[group_id]['data_per_participant'][
                         participant_code]:
@@ -1245,26 +1178,6 @@ class ExportExecution:
 
                                     self.files_to_zip_list.append([complete_generic_filename,
                                                                    export_generic_data_directory])
-                                    self.participant_to_zip_list.append([complete_generic_filename,
-                                                                         export_generic_data_directory])
-                    # create participant zip file
-                    participant_code_filename = "%s.zip" % participant_code_directory_name
-                    export_complete_filename = path.join(participant_directory, participant_code_filename)
-                    with ZipFile(export_complete_filename, 'w') as zip_file:
-                        for filename, directory in self.participant_to_zip_list:
-                            fdir, fname = path.split(filename)
-
-                            zip_file.write(filename.encode('utf-8'), path.join(directory, fname))
-
-                    zip_file.close()
-
-                    if path.exists(download_experiment_directory):
-                        download_complete_filename = path.join(download_experiment_directory, participant_code_filename)
-                        with open(export_complete_filename, 'rb') as f:
-                            data = f.read()
-
-                        with open(download_complete_filename, 'wb') as f:
-                            f.write(data)
 
         return error_msg
 
