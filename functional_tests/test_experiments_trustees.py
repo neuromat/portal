@@ -38,13 +38,15 @@ class TrusteeTest(FunctionalTestTrustee):
         # in the column Status in the table.
         table = self.browser.find_element_by_id('id_experiments_table')
         row_headers = table.find_element_by_tag_name(
-            'thead').find_element_by_tag_name('tr')
+            'thead'
+        ).find_element_by_tag_name('tr')
         col_headers = row_headers.find_elements_by_tag_name('th')
-        self.assertTrue(col_headers[4].text == 'Status')
-        rows = table.find_element_by_tag_name('tbody') \
-            .find_elements_by_tag_name('tr')
+        self.assertTrue(col_headers[5].text == 'Status')
+        rows = table.find_element_by_tag_name(
+            'tbody'
+        ).find_elements_by_tag_name('tr')
         self.assertTrue(
-            any(row.find_elements_by_tag_name('td')[4].text ==
+            any(row.find_elements_by_tag_name('td')[5].text ==
                 experiment.get_status_display() for row in rows)
         )
         # She verifies that the first experiment is to be analysed,
@@ -57,25 +59,48 @@ class TrusteeTest(FunctionalTestTrustee):
         for row in rows:
             if i < 2:
                 self.assertTrue(
-                    row.find_elements_by_tag_name('td')[4].text ==
+                    row.find_elements_by_tag_name('td')[5].text ==
                     Experiment.STATUS_OPTIONS[1][1])  # 'To be analysed'
             if i == 2:
                 self.assertTrue(
-                    row.find_elements_by_tag_name('td')[4].text ==
+                    row.find_elements_by_tag_name('td')[5].text ==
                     Experiment.STATUS_OPTIONS[2][1])  # 'Under analysis'
             if i == 3:
                 self.assertTrue(
-                    row.find_elements_by_tag_name('td')[4].text ==
+                    row.find_elements_by_tag_name('td')[5].text ==
                     Experiment.STATUS_OPTIONS[2][1])  # 'Under analysis'
             if i == 4:
                 self.assertTrue(
-                    row.find_elements_by_tag_name('td')[4].text ==
+                    row.find_elements_by_tag_name('td')[5].text ==
                     Experiment.STATUS_OPTIONS[4][1])  # 'Not approved'
             if i == 5:
                 self.assertTrue(
-                    row.find_elements_by_tag_name('td')[4].text ==
+                    row.find_elements_by_tag_name('td')[5].text ==
                     Experiment.STATUS_OPTIONS[3][1])  # 'Approved'
             i = i + 1
+
+    def test_trustee_can_see_experiment_downloads_column(self):
+        # She sees that fourth column is "Downloads". These column
+        # displays the number of downloads of the last version of the
+        # experiments.
+        table = self.browser.find_element_by_id('id_experiments_table')
+        row_headers = table.find_element_by_tag_name(
+            'thead'
+        ).find_element_by_tag_name('tr')
+        col_headers = row_headers.find_elements_by_tag_name('th')
+        self.assertTrue(col_headers[4].text == 'Downloads')
+
+        # She sees that all entries in "Downloads" column is zero, that is,
+        # nobody has made any downloads yet. After all, no experiments has
+        # been even approved yet.
+        row_entries = table.find_element_by_tag_name(
+            'tbody'
+        ).find_elements_by_tag_name('tr')
+
+        self.assertTrue(
+            any(row.find_elements_by_tag_name('td')[4].text == '0'
+                for row in row_entries)
+        )
 
     def test_trustee_when_viewing_stauses_to_change_can_see_only_status_allowed_to_change(self):
 
@@ -435,6 +460,7 @@ class TrusteeTest(FunctionalTestTrustee):
         # Waiting for modal pops up
         ##
         time.sleep(0.5)
+
         # The modal to change experiment status pop up, and she chooses
         # TO_BE_ANALYSED to liberate the experiment to be analysed by other
         # trustee.
@@ -572,7 +598,7 @@ class TrusteeTest(FunctionalTestTrustee):
         ).text
         self.assertIn('Experiment analysed by Claudia', experiment_text)
 
-    def test_hover_mouse_over_notification_bel_display_tooltip(self):
+    def test_hover_mouse_over_notification_bell_display_tooltip(self):
         ##
         # First we get the total of experiments to be analysed
         ##
