@@ -652,21 +652,23 @@ class DownloadExperimentTest(FunctionalTest):
 
         # She also see that there is a tree with experiment data divided by
         # groups and participants, and also other files
-        download_options = self.browser.find_element_by_id('download_options')
-
-        self.assertIn('Experiment (spreadsheet)', download_options.text)
+        self.assertIn('Experiment (spreadsheet)', downloads_tab_content.text)
 
         for group in experiment.groups.all():
             # TODO: adapt below line to test against data-section option
             # TODO: attribute
-            # self.assertIn('Group ' + group.title, download_options.text)
+            # self.assertIn('Group ' + group.title, downloads_tab_content.text)
             # TODO: if group has Experimental Protocol, then (below),
             # TODO: otherwise...
-            self.assertIn('Experimental Protocol (zip)', download_options.text)
-            self.assertIn('Participants (spreadsheet)', download_options.text)
+            self.assertIn(
+                'Experimental Protocol (zip)', downloads_tab_content.text
+            )
+            self.assertIn(
+                'Participants (spreadsheet)', downloads_tab_content.text
+            )
             for participant in group.participants.all():
                 self.assertIn(
                     'Participant ' + participant.code + ' (zip)',
-                    download_options.text
+                    downloads_tab_content.text
                 )
 

@@ -310,6 +310,7 @@ def change_status(request, experiment_id):
     # analyse it
     if status == Experiment.TO_BE_ANALYSED and \
             experiment.status == Experiment.UNDER_ANALYSIS:
+            experiment.status = Experiment.TO_BE_ANALYSED
             experiment.trustee = None
             experiment.save()
             messages.warning(
