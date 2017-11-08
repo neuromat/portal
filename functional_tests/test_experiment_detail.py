@@ -5,7 +5,7 @@ from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.common.keys import Keys
 
 from experiments.models import Experiment, Questionnaire, Step
-from experiments.tests.tests_helper import create_experiment
+from experiments.tests.tests_helper import create_experiment, create_group
 from functional_tests.base import FunctionalTest
 
 
@@ -630,17 +630,12 @@ class ExperimentDetailTest(FunctionalTest):
 
 class DownloadExperimentTest(FunctionalTest):
 
-    def test_can_see_section_content_of_downloads_tab(self):
-        experiment = Experiment.objects.filter(
-            status=Experiment.APPROVED
-        ).last()
-
+    def access_downloads_tab_content(self, experiment):
         # Josileine wants to download the experiment data.
         self.browser.find_element_by_xpath(
             "//a[@href='/experiments/" + experiment.slug + "/']"
         ).click()
         self.wait_for_detail_page_load()
-
         # She sees that there is a "Downloads" written tab. She
         # clicks in it, and sees a section bellow the tabs with a title
         # "Select experiment data pieces to download"
@@ -648,13 +643,23 @@ class DownloadExperimentTest(FunctionalTest):
         downloads_tab_content = self.browser.find_element_by_id(
             'downloads_tab'
         )
+        return downloads_tab_content
+
+    def test_can_see_section_content_of_downloads_tab(self):
+        experiment = Experiment.objects.filter(
+            status=Experiment.APPROVED
+        ).last()
+
+        downloads_tab_content = self.access_downloads_tab_content(experiment)
+
         downloads_header = downloads_tab_content.find_element_by_tag_name('h4')
         self.assertEqual(
             'Select experiment data pieces to download', downloads_header.text
         )
 
-        # She also sees that there is a tree with experiment data divided by
-        # groups and participants, and also other files
+        # She also sees that there is a tree with a top "All data" option (
+        # supposed to download all files), the experiment data in csv
+        # format, and the rest of the data divided by experiment groups
         self.assertIn('Experiment (spreadsheet)', downloads_tab_content.text)
         for group in experiment.groups.all():
             self.assertIn('Group ' + group.title, downloads_tab_content.text)
@@ -689,22 +694,11 @@ class DownloadExperimentTest(FunctionalTest):
         ##
         self.browser.refresh()
 
-        # Josileine wants to download the experiment data.
-        self.browser.find_element_by_xpath(
-            "//a[@href='/experiments/" + experiment.slug + "/']"
-        ).click()
-        self.wait_for_detail_page_load()
-
-        # She sees that there is a "Downloads" written tab. She
-        # clicks in it, and sees a section bellow the tabs with a title
-        # "Select experiment data pieces to download"
-        self.browser.find_element_by_link_text('Downloads').click()
-        downloads_tab_content = self.browser.find_element_by_id(
-            'downloads_tab'
-        )
+        downloads_tab_content = self.access_downloads_tab_content(experiment)
 
         # Now, as there're no data for groups, she sees only the "Experiment
         # (spreadsheet)" option to download
+        # TODO: first strike
         self.assertIn('Experiment (spreadsheet)', downloads_tab_content.text)
         self.assertNotIn('Groups', downloads_tab_content.text)
         self.assertNotIn(
@@ -715,3 +709,52 @@ class DownloadExperimentTest(FunctionalTest):
         )
         self.assertNotIn('Questionnaires data', downloads_tab_content.text)
         self.assertNotIn('Participant_', downloads_tab_content.text)
+
+    def test_can_see_groups_items_in_downloads_tab_content_only_if_they_exist(self):
+        ##
+        # Let's create an experiment with Experiment and Groups data. With
+        # it, we simulate that Portal received an
+        # experiment, only with Experiment and Group data.
+        ##
+        owner = User.objects.get(username='lab1')
+        create_experiment(1, owner, Experiment.APPROVED)
+        experiment = Experiment.objects.last()
+        create_group(1, experiment)
+
+        ##
+        # We have to refresh page to include this new experiment in
+        # Experiments List
+        ##
+        self.browser.refresh()
+
+        downloads_tab_content = self.access_downloads_tab_content(experiment)
+
+        # As there're no data for the group created Joseleine can't see the
+        # Groups section in Downloads tab content
+        # TODO: second strike
+        self.assertIn('Experiment (spreadsheet)', downloads_tab_content.text)
+        self.assertNotIn('Groups', downloads_tab_content.text)
+        self.assertNotIn(
+            'Experimental Protocol (zip)', downloads_tab_content.text
+        )
+        self.assertNotIn(
+            'Participants (spreadsheet)', downloads_tab_content.text
+        )
+        self.assertNotIn('Questionnaires data', downloads_tab_content.text)
+        self.assertNotIn('Participant_', downloads_tab_content.text)
+
+        # Obs.: the tests for having one of experimental protocol,
+        # participants, and questionnaires, for all groups are not beeing made
+        # because they are been tested indirectly by negation in this test
+
+    def test_can_see_download_experiment_data_form_submit_button(self):
+        experiment = Experiment.objects.filter(
+            status=Experiment.APPROVED
+        ).first()
+
+        self.access_downloads_tab_content(experiment)
+
+        # Josileine sees the button to download experiment data options that
+        # she've just selected.
+        button = self.browser.find_element_by_id('download_button')
+        self.assertEqual('Download', button.get_attribute('value'))

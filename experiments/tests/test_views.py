@@ -461,3 +461,6 @@ class DownloadExperimentTest(TestCase):
 
         # Remove fake download.zip file
         os.remove(settings.BASE_DIR + experiment.download_url.url)
+
+    def test_POSTing_download_experiment_data_with_selection_returns_correct_files(self):
+        pass

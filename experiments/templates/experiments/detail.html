@@ -314,11 +314,8 @@
                             <nav class="language">
                                 <ul id="id_q{{ questionnaire_id }}_language">
                                     {% for lang_code in q_language.language_codes %}
-                                        <li><a id="id_{{ questionnaire_id }}_{{ lang_code }}"
-                                               class="nep-btn
-{% if q_language.language_code == lang_code %}active-language{% endif %}"
-                                               href="#"
-                                                onclick="ajax_questionnaire_language(event, {{ questionnaire_id }}, '{{ lang_code }}')">{{ lang_code }}</a></li>
+                                        <li><a id="id_{{ questionnaire_id }}_{{ lang_code }}" class="nep-btn {% if q_language.language_code == lang_code %}active-language{% endif %}"
+                                               href="#" onclick="ajax_questionnaire_language(event, {{ questionnaire_id }}, '{{ lang_code }}')">{{ lang_code }}</a></li>
                                     {% endfor %}
                                 </ul>
                             </nav>
@@ -333,20 +330,32 @@
             <div id="downloads_tab" class="tab-pane" role="tabpanel">
                 <h4>{% trans 'Select experiment data pieces to download' %}</h4>
                 <div class="panel panel-default nep-panel-group">
-                    <label for="download_options">Select options</label>
-                    <select name="download_selected" id="download_options" multiple="multiple">
-                        <option value="experiment">{% trans 'Experiment (spreadsheet)' %}</option>
-                        {% if experiment.groups.all %}
-                            {% for group in experiment.groups.all %}
-                                {% for participant in group.participants.all %}
-                                    <option value="participant_{{ participant.id }}" data-section="Groups/Group {{ group.title }}">{% trans 'Participant ' %}{{ participant.code }} (zip)</option>
+                    <form action="" method="post">
+                        <div class="form-group">
+                            <label for="download_options">Select options</label>
+                            <select name="download_selected" id="download_options" multiple>
+                                <option value="experiment">{% trans 'Experiment (spreadsheet)' %}</option>
+                                {% for group in experiment.groups.all %}
+                                    {% for participant in group.participants.all %}
+                                        <option value="participant_{{ participant.id }}" data-section="Groups/Group {{ group.title }}">{% trans 'Participant ' %}{{ participant.code }} (zip)</option>
+                                    {% endfor %}
+                                    {% if group.experimental_protocol %}
+                                        <option value="experimental_protocol" data-section="Groups/Group {{ group.title }}">{% trans 'Experimental Protocol (zip)' %}</option>
+                                    {% endif %}
+                                    {% if group.participants.all %}
+                                        <option value="participants" data-section="Groups/Group {{ group.title }}">{% trans 'Participants (spreadsheet)' %} </option>
+                                    {% endif %}
+                                    {% if questionnaires %}
+                                        <option value="questionnaires" data-section="Groups/Group {{ group.title }}">{% trans 'Questionnaires data (zip)' %}</option>
+                                    {% endif %}
                                 {% endfor %}
-                                <option value="experimental_protocol" data-section="Groups/Group {{ group.title }}">{% trans 'Experimental Protocol (zip)' %}</option>
-                                <option value="participants" data-section="Groups/Group {{ group.title }}">{% trans 'Participants (spreadsheet)' %} </option>
-                                <option value="questionnaires" data-section="Groups/Group {{ group.title }}">{% trans 'Questionnaires data (zip)' %}</option>
-                            {% endfor %}
-                        {% endif %}
-                    </select>
+                            </select>
+                        </div>
+                        <div class="form-group text-right">
+                            <input type="submit" id="download_button"
+                                   class="btn btn-primary" value="{% trans 'Download' %}">
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>
@@ -358,8 +367,7 @@
                 <div class="modal-content">
                     <div class="modal-header">
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                        <h4 id="modal_protocol_title" class="modal-title"
-                        >{% trans "Graphical representation" %}</h4>
+                        <h4 id="modal_protocol_title" class="modal-title">{% trans "Graphical representation" %}</h4>
                     </div>
                     <div class="modal-body">
                         {# see script bellow #}
