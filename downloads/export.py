@@ -15,6 +15,8 @@ from experiments.models import Experiment, Group, Participant, EEGData, EMGData,
     EEGElectrodePosition, EMGSurfacePlacement, EMGIntramuscularPlacement, EMGNeedlePlacement, QuestionnaireLanguage, \
     QuestionnaireDefaultLanguage
 
+from zipfile import ZipFile
+
 DEFAULT_LANGUAGE = "pt-BR"
 
 input_data_keys = [
@@ -99,10 +101,11 @@ class ExportExecution:
 
         # questionnaire_id = 0
         self.files_to_zip_list = []
-        # self.headers = []
+        # self.participant_to_zip_list = []
+        # self.experimental_protocol_to_zip_list = []
         # self.fields = []
         self.directory_base = ''
-        self.base_directory_name = path.join(settings.MEDIA_ROOT, "temp")
+        self.base_directory_name = path.join(settings.MEDIA_ROOT, "download")
         # self.directory_base = self.base_directory_name
         self.set_directory_base(export_id)
         self.base_export_directory = ""
@@ -157,15 +160,13 @@ class ExportExecution:
         return ""
 
     def get_export_directory(self):
-
-        return self.base_export_directory   # MEDIA_ROOT/download/username_id/export_id/NES_EXPORT
+        return self.directory_base # Users/.../MEDIA_ROOT/download/experiment_id/
+        # return self.base_export_directory
 
     # Dados gerais do experimento
     def process_experiment_data(self, experiment_id):
         error_msg = ""
         experiment = get_object_or_404(Experiment, pk=experiment_id)
-        # group_list = Group.objects.filter(experiment=experiment)
-        # process of experiment description
 
         study = experiment.study
         experiment_resume_header = ['Study', 'Study description', 'Start date', 'End date', 'Experiment Title',
@@ -179,9 +180,9 @@ class ExportExecution:
         # path ex. /EXPERIMENT_DOWNLOAD/
         export_experiment_data = self.get_input_data("base_directory")
 
-        # # path ex. UserS/.../qdc/media/.../EXPERIMENT_DOWNLOAD/
+        # # path ex. UserS/.../qdc/media/download/experiment_id/
         experiment_resume_directory = self.get_export_directory()
-        # Users/.../qdc/media/.../EXPERIMENT_DOWNLOAD/Experiment.csv
+        # Users/.../qdc/media/download/experiment_id/Experiment.csv
         complete_filename_experiment_resume = path.join(experiment_resume_directory, filename_experiment_resume)
 
         experiment_description_fields = []
@@ -189,7 +190,7 @@ class ExportExecution:
         experiment_description_fields.insert(1, experiment_resume)
         save_to_csv(complete_filename_experiment_resume, experiment_description_fields)
 
-        self.files_to_zip_list.append([complete_filename_experiment_resume, export_experiment_data])
+        # self.files_to_zip_list.append([complete_filename_experiment_resume, export_experiment_data])
 
         # process data for each group
         group_list = Group.objects.filter(experiment=experiment)
@@ -197,26 +198,26 @@ class ExportExecution:
             group_resume = "Group name: " + group.title + "\n" + "Group description: " + group.description + "\n"
             group_directory_name = 'Group_' + group.title
 
-            # group_directory = Users/.../qdc/media/.../EXPERIMENT_DOWNLOAD/Group_group.title
+            # group_directory = Users/.../qdc/media/download/experiment_id/Group_group.title
             error_msg, group_directory = create_directory(experiment_resume_directory, group_directory_name)
             if error_msg != "":
                 return error_msg
             # export_directory_group = EXPERIMENT_DOWNLOAD/Group_group.title
             export_directory_group = path.join(export_experiment_data, group_directory_name)
+
             if hasattr(group, 'experimental_protocol'):
                 # build diseases inclusion criteria
                 if group.inclusion_criteria.all():
                     group_inclusion_criteria_list = self.process_group_inclusion_disease(group.inclusion_criteria.all())
 
                     group_inclusion_disease_filename = "%s.csv" % "Group_inclusion_criteria_disease"
-                    # ex. ex. Users/..../EXPERIMENT_DOWNLOAD/Group_xxx/Group_inclusion_disease.csv
+                    # ex. ex. Users/..../download/experiment_id/Group_xxx/Group_inclusion_disease.csv
                     complete_inclusion_disease_filename = path.join(group_directory, group_inclusion_disease_filename)
                     # save personal_data_list to csv file
                     save_to_csv(complete_inclusion_disease_filename, group_inclusion_criteria_list)
                     self.files_to_zip_list.append([complete_inclusion_disease_filename, export_directory_group])
 
-
-                # ex. Users/..../EXPERIMENT_DOWNLOAD/Group_xxx/Experimental_protocol
+                # ex. Users/.../download/experiment_id/Group_xxx/Experimental_protocol
                 error_msg, directory_experimental_protocol = create_directory(group_directory, "Experimental_protocol")
                 if error_msg != "":
                     return error_msg
@@ -233,8 +234,8 @@ class ExportExecution:
                     complete_filename_experimental_protocol = path.join(directory_experimental_protocol,
                                                                         filename_experimental_protocol)
 
-                    self.files_to_zip_list.append([complete_filename_experimental_protocol,
-                                                   export_directory_experimental_protocol])
+                    # self.files_to_zip_list.append([complete_filename_experimental_protocol,
+                    #                                export_directory_experimental_protocol])
 
                     with open(complete_filename_experimental_protocol.encode('utf-8'), 'w', newline='',
                               encoding='UTF-8') as txt_file:
@@ -247,8 +248,8 @@ class ExportExecution:
                     filename_protocol_image = "Experimental_protocol_image.png"
                     complete_protocol_image_filename = path.join(directory_experimental_protocol,
                                                                  filename_protocol_image)
-                    self.files_to_zip_list.append([complete_protocol_image_filename,
-                                                   export_directory_experimental_protocol])
+                    # self.files_to_zip_list.append([complete_protocol_image_filename,
+                    #                                export_directory_experimental_protocol])
 
                     image_protocol = path.join(path.join(settings.BASE_DIR,"media/"), experimental_protocol_image.name)
                     with open(image_protocol, 'rb') as f:
@@ -277,7 +278,7 @@ class ExportExecution:
                                 eeg_setting_filename = "%s.json" % "eeg_default_setting"
                                 complete_filename_eeg_setting = path.join(directory_eeg_step, eeg_setting_filename)
 
-                                self.files_to_zip_list.append([complete_filename_eeg_setting, export_directory_eeg_step])
+                                # self.files_to_zip_list.append([complete_filename_eeg_setting, export_directory_eeg_step])
 
                                 with open(complete_filename_eeg_setting.encode('utf-8'), 'w', newline='',
                                           encoding='UTF-8') as outfile:
@@ -303,7 +304,7 @@ class ExportExecution:
                                 emg_setting_filename = "%s.json" % "emg_default_setting"
                                 complete_filename_emg_setting = path.join(directory_emg_step, emg_setting_filename)
 
-                                self.files_to_zip_list.append([complete_filename_emg_setting, export_directory_emg_step])
+                                # self.files_to_zip_list.append([complete_filename_emg_setting, export_directory_emg_step])
 
                                 with open(complete_filename_emg_setting.encode('utf-8'), 'w', newline='',
                                           encoding='UTF-8') as outfile:
@@ -329,7 +330,7 @@ class ExportExecution:
                                 tms_setting_filename = "%s.json" % "tms_default_setting"
                                 complete_filename_tms_setting = path.join(directory_tms_step, tms_setting_filename)
 
-                                self.files_to_zip_list.append([complete_filename_tms_setting, export_directory_tms_step])
+                                # self.files_to_zip_list.append([complete_filename_tms_setting, export_directory_tms_step])
 
                                 with open(complete_filename_tms_setting.encode('utf-8'), 'w', newline='',
                                           encoding='UTF-8') as outfile:
@@ -362,8 +363,8 @@ class ExportExecution:
                             complete_filename_goalkeeper_game_setting = path.join(directory_goalkeeper_game_step,
                                                                                   goalkeeper_game_setting_filename)
 
-                            self.files_to_zip_list.append([complete_filename_goalkeeper_game_setting,
-                                                           export_directory_goalkeeper_game_step])
+                            # self.files_to_zip_list.append([complete_filename_goalkeeper_game_setting,
+                            #                                export_directory_goalkeeper_game_step])
 
                             with open(complete_filename_goalkeeper_game_setting.encode('utf-8'), 'w', newline='',
                                       encoding='UTF-8') as outfile:
@@ -386,8 +387,8 @@ class ExportExecution:
                                     with open(complete_context_tree_filename, "wb") as f:
                                         f.write(data)
 
-                                    self.files_to_zip_list.append([complete_context_tree_filename,
-                                                                   export_directory_goalkeeper_game_step])
+                                    # self.files_to_zip_list.append([complete_context_tree_filename,
+                                    #                                export_directory_goalkeeper_game_step])
 
                 stimulus_list = Step.objects.filter(group=group, type='stimulus')
                 if stimulus_list:
@@ -402,8 +403,8 @@ class ExportExecution:
                                 if error_msg != "":
                                     return error_msg
 
-                            export_directory_stimulus_data = path.join(export_directory_experimental_protocol,
-                                                                       stimulus_step_name)
+                            # export_directory_stimulus_data = path.join(export_directory_experimental_protocol,
+                            #                                            stimulus_step_name)
 
                             stimulus_setting_filename = stimulus.media_file.name.split('/')[-1]
                             complete_stimulus_filename = path.join(directory_experimental_protocol,
@@ -415,7 +416,7 @@ class ExportExecution:
                             with open(complete_stimulus_filename, "wb") as f:
                                 f.write(data)
 
-                            self.files_to_zip_list.append([complete_stimulus_filename, export_directory_stimulus_data])
+                            # self.files_to_zip_list.append([complete_stimulus_filename, export_directory_stimulus_data])
 
             # Export data per Participant
             participant_list = Participant.objects.filter(group=group)
@@ -428,7 +429,7 @@ class ExportExecution:
                 complete_participant_filename = path.join(group_directory, export_participant_filename)
                 # save personal_data_list to csv file
                 save_to_csv(complete_participant_filename, participant_data_list)
-                self.files_to_zip_list.append([complete_participant_filename, export_directory_group])
+                # self.files_to_zip_list.append([complete_participant_filename, export_directory_group])
 
         return error_msg
 
@@ -803,6 +804,7 @@ class ExportExecution:
                                                                         participant_code_directory_name)
                     if error_msg != "":
                         return error_msg
+
                     # data from questionnaire
                     if 'questionnaire_data' in self.per_group_data[group_id]['data_per_participant'][participant_code]:
                         questionnaire_list = self.per_group_data[group_id]['data_per_participant'][participant_code][
