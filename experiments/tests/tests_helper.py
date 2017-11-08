@@ -17,6 +17,7 @@ from nep import settings
 
 
 def create_group(qtty, experiment):
+    # TODO: refactor to accept more than one experiment (insert qtty parameter)
     """
     :param qtty: Number of groups
     :param experiment: Experiment model instance
@@ -32,6 +33,7 @@ def create_group(qtty, experiment):
 
 
 def create_study(experiment):
+    # TODO: refactor to accept more than one experiment (insert qtty parameter)
     """
     :param experiment: Experiment to be associated with Study
     """
@@ -63,8 +65,6 @@ def create_experiment(qtty, owner, status):
             status=status,
             data_acquisition_done=choice([True, False]),
         )
-        create_study(experiment)
-        create_group(randint(2, 3), experiment)
 
 
 def create_trustee_users():
@@ -436,24 +436,59 @@ def global_setup_ft():
 
     # Create 5 experiments for 2 owners, randomly, and studies (groups are
     # created inside create_experiment_and_study)
-    create_experiment(2, choice([owner1, owner2]),
+    create_experiment(1, choice([owner1, owner2]),
                       Experiment.TO_BE_ANALYSED)
-    # To test search
     experiment = Experiment.objects.last()
+    create_study(experiment)
+    create_group(randint(2, 3), experiment)
+
+    create_experiment(1, choice([owner1, owner2]),
+                      Experiment.TO_BE_ANALYSED)
+    experiment = Experiment.objects.last()
+    create_study(experiment)
+    create_group(randint(2, 3), experiment)
+    # To test search
     experiment.title = 'Brachial Plexus'
     experiment.save()
 
-    create_experiment(2, choice([owner1, owner2]),
+    create_experiment(1, choice([owner1, owner2]),
                       Experiment.UNDER_ANALYSIS)
-    # To test search
     experiment = Experiment.objects.last()
+    create_study(experiment)
+    create_group(randint(2, 3), experiment)
+    create_experiment(1, choice([owner1, owner2]),
+                      Experiment.UNDER_ANALYSIS)
+    experiment = Experiment.objects.last()
+    create_study(experiment)
+    create_group(randint(2, 3), experiment)
+    # To test search
     experiment.title = 'Brachial Plexus'
     experiment.save()
 
-    create_experiment(4, choice([owner1, owner2]),
+    # TODO: refactor to create the 4 experiments at once (how it was
+    # TODO: before)
+    # TODO: see TODO's in create_study and create_group methods
+    create_experiment(1, choice([owner1, owner2]),
                       Experiment.APPROVED)
-    # Put some non-random strings in one approved experiment to test search
     experiment = Experiment.objects.last()
+    create_study(experiment)
+    create_group(randint(2, 3), experiment)
+    create_experiment(1, choice([owner1, owner2]),
+                      Experiment.APPROVED)
+    experiment = Experiment.objects.last()
+    create_study(experiment)
+    create_group(randint(2, 3), experiment)
+    create_experiment(1, choice([owner1, owner2]),
+                      Experiment.APPROVED)
+    experiment = Experiment.objects.last()
+    create_study(experiment)
+    create_group(randint(2, 3), experiment)
+    create_experiment(1, choice([owner1, owner2]),
+                      Experiment.APPROVED)
+    experiment = Experiment.objects.last()
+    create_study(experiment)
+    create_group(randint(2, 3), experiment)
+    # Put some non-random strings in one approved experiment to test search
     experiment.title = 'Brachial Plexus'
     experiment.description = 'Ein Beschreibung.'
     experiment.save()
@@ -474,6 +509,8 @@ def global_setup_ft():
     create_experiment(1, choice([owner1, owner2]),
                       Experiment.APPROVED)
     experiment = Experiment.objects.last()
+    create_study(experiment)
+    create_group(randint(2, 3), experiment)
     experiment.title = 'Brachial Plexus (with EMG Setting)'
     experiment.description = 'Ein Beschreibung. Brachial plexus repair by ' \
                              'peripheral nerve ' \
@@ -538,6 +575,9 @@ def global_setup_ft():
     create_ethics_committee_info(Experiment.objects.last())
     create_experiment(1, choice([owner1, owner2]),
                       Experiment.NOT_APPROVED)
+    experiment = Experiment.objects.last()
+    create_study(experiment)
+    create_group(randint(2, 3), experiment)
 
     # Associate trustee to experiments under analysis (requires create
     # experiments before)

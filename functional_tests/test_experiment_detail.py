@@ -1,8 +1,11 @@
 import time
+
+from django.contrib.auth.models import User
 from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.common.keys import Keys
 
 from experiments.models import Experiment, Questionnaire, Step
+from experiments.tests.tests_helper import create_experiment
 from functional_tests.base import FunctionalTest
 
 
@@ -650,10 +653,9 @@ class DownloadExperimentTest(FunctionalTest):
             'Select experiment data pieces to download', downloads_header.text
         )
 
-        # She also see that there is a tree with experiment data divided by
+        # She also sees that there is a tree with experiment data divided by
         # groups and participants, and also other files
         self.assertIn('Experiment (spreadsheet)', downloads_tab_content.text)
-
         for group in experiment.groups.all():
             self.assertIn('Group ' + group.title, downloads_tab_content.text)
             # TODO: if group has Experimental Protocol, then (below),
@@ -671,3 +673,45 @@ class DownloadExperimentTest(FunctionalTest):
                     downloads_tab_content.text
                 )
 
+    def test_can_see_groups_data_in_downloads_tab_content_only_if_there_are_groups(self):
+        ##
+        # Let's create an experiment only with Experiment data, without
+        # groups data. With it, we simulate that Portal received an
+        # experiment, only with Experiment data.
+        ##
+        owner = User.objects.get(username='lab1')
+        create_experiment(1, owner, Experiment.APPROVED)
+        experiment = Experiment.objects.last()
+
+        ##
+        # We have to refresh page to include this new experiment in
+        # Experiments List
+        ##
+        self.browser.refresh()
+
+        # Josileine wants to download the experiment data.
+        self.browser.find_element_by_xpath(
+            "//a[@href='/experiments/" + experiment.slug + "/']"
+        ).click()
+        self.wait_for_detail_page_load()
+
+        # She sees that there is a "Downloads" written tab. She
+        # clicks in it, and sees a section bellow the tabs with a title
+        # "Select experiment data pieces to download"
+        self.browser.find_element_by_link_text('Downloads').click()
+        downloads_tab_content = self.browser.find_element_by_id(
+            'downloads_tab'
+        )
+
+        # Now, as there're no data for groups, she sees only the "Experiment
+        # (spreadsheet)" option to download
+        self.assertIn('Experiment (spreadsheet)', downloads_tab_content.text)
+        self.assertNotIn('Groups', downloads_tab_content.text)
+        self.assertNotIn(
+            'Experimental Protocol (zip)', downloads_tab_content.text
+        )
+        self.assertNotIn(
+            'Participants (spreadsheet)', downloads_tab_content.text
+        )
+        self.assertNotIn('Questionnaires data', downloads_tab_content.text)
+        self.assertNotIn('Participant_', downloads_tab_content.text)
