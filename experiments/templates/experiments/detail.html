@@ -1,4 +1,8 @@
 {% extends 'experiments/base.html' %}
+{% block style %}
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'tree-multiselect.js/jquery.tree-multiselect.min.css' %}">
+{% endblock %}
 
 {% block header %}
     {% load i18n %}
@@ -18,6 +22,7 @@
             {% if questionnaires %}
                 <li role="presentation"><a href="#questionnaires_tab" role="tab" data-toggle="tab"> {% trans "Questionnaires" %}</a></li>
             {% endif %}
+            <li role="presentation"><a href="#downloads_tab" role="tab" data-toggle="tab">{% trans "Downloads" %}</a></li>
         </ul>
 
         <!-- Tab panes -->
@@ -303,66 +308,46 @@
             <!-- Questionnaires tab -->
             <div role="tabpanel" class="tab-pane" id="questionnaires_tab">
                 {% for group_key, group_values in questionnaires.items %}
-                    <h6>Questionnaires for group {{ group_key }}</h6>
-                    {% for q_key, q_value in group_values.items %}
-                        {% if q_value.survey_metadata != 'invalid_questionnaire' %}
-                            <div class="panel panel-default nep-panel-group">
-                                <strong>Questionnaire {{ q_value.survey_name }}</strong>
-                                <div class="pull-right">
-                                    <a href="#collapse{{ q_key }}"
-                                       role="button"
-                                       data-toggle="collapse"
-                                       data-parent="#accordion"
-                                       aria-expanded="false"
-                                       aria-controls="collapse{{ q_key }}"
-                                       class="nep-btn">
-                                        {% trans 'Details' %}
-                                    </a>
-                                </div>
-                                <div class="questionnaire-languages"></div>
-                                <div class="panel-collapse collapse"
-                                     id="collapse{{ q_key }}"
-                                     role="tabpanel"
-                                     aria-labelledby="heading{{ q_key }}">
-                                    <section id="questionnaire_title"><br>
-                                        {% for data in q_value.survey_metadata.data %}
-                                            <ul>
-                                                <li>{{ data.question_description }}</li>
-                                                {% if data.question_limesurvey_type == 'F' %}
-                                                    {% include 'experiments/questionnaires/f_type.html' %}
-                                                {% elif data.question_limesurvey_type == 'L' %}
-                                                    {% include 'experiments/questionnaires/l_type.html' %}
-                                                {% elif data.question_limesurvey_type == 'M' or data.question_limesurvey_type == 'B' or data.question_limesurvey_type == 'P' %}
-                                                    {% include 'experiments/questionnaires/m_type.html' %}
-                                                {% elif data.question_limesurvey_type == 'D' %}
-                                                    <p>
-                                                        <em>{% trans "The user enters a date in a date field" %}.</em>
-                                                    </p>
-                                                {% elif data.question_limesurvey_type == '|' %}
-                                                    <p>
-                                                        <em>{% trans "The user uploads file(s)" %}.</em>
-                                                    </p>
-                                                {% elif data.question_limesurvey_type == 'Y'%}
-                                                    <p>
-                                                        <em>{% trans 'The user answers' %}</em> yes <em>or</em> not
-                                                    </p>
-                                                {% else %}
-                                                    <p>
-                                                        <em>{% trans "The user enters a free text" %}</em>
-                                                    </p>
-                                                {% endif %}
-                                            </ul>
-                                        {% endfor %}
-                                    </section>
-                                </div>
-                            </div>
-                        {% else %}
-                            <p>
-                                {% trans "This questionnaire is in invalid format, and can't be displayed" %}
-                            </p>
+                    <h4>{% trans 'Questionnaires for group' %} {{ group_key }}</h4>
+                    {% for questionnaire_id, q_language in group_values.items %}
+                        {% if q_language.language_codes %}
+                            <nav class="language">
+                                <ul id="id_q{{ questionnaire_id }}_language">
+                                    {% for lang_code in q_language.language_codes %}
+                                        <li><a id="id_{{ questionnaire_id }}_{{ lang_code }}"
+                                               class="nep-btn
+{% if q_language.language_code == lang_code %}active-language{% endif %}"
+                                               href="#"
+                                                onclick="ajax_questionnaire_language(event, {{ questionnaire_id }}, '{{ lang_code }}')">{{ lang_code }}</a></li>
+                                    {% endfor %}
+                                </ul>
+                            </nav>
                         {% endif %}
+                        <div id="{{ questionnaire_id }}" class="panel panel-default nep-panel-group">
+                            {% include 'experiments/questionnaires/questionnaire_language.html' %}
+                        </div>
                     {% endfor %}
                 {% endfor %}
+            </div>
+            <!-- Downloads tab -->
+            <div id="downloads_tab" class="tab-pane" role="tabpanel">
+                <h4>{% trans 'Select experiment data pieces to download' %}</h4>
+                <div class="panel panel-default nep-panel-group">
+                    <label for="download_options">Select options</label>
+                    <select name="download_selected" id="download_options" multiple="multiple">
+                        <option value="experiment">{% trans 'Experiment (spreadsheet)' %}</option>
+                        {% if experiment.groups.all %}
+                            {% for group in experiment.groups.all %}
+                                {% for participant in group.participants.all %}
+                                    <option value="participant_{{ participant.id }}" data-section="Groups/Group {{ group.title }}">{% trans 'Participant ' %}{{ participant.code }} (zip)</option>
+                                {% endfor %}
+                                <option value="experimental_protocol" data-section="Groups/Group {{ group.title }}">{% trans 'Experimental Protocol (zip)' %}</option>
+                                <option value="participants" data-section="Groups/Group {{ group.title }}">{% trans 'Participants (spreadsheet)' %} </option>
+                                <option value="questionnaires" data-section="Groups/Group {{ group.title }}">{% trans 'Questionnaires data (zip)' %}</option>
+                            {% endfor %}
+                        {% endif %}
+                    </select>
+                </div>
             </div>
         </div>
 
@@ -407,7 +392,6 @@
                 to_be_analysed_count + '"}</style>');
         }
     </script>
-
     {# Display protocol experiment full image #}
     <script>
         $('#protocol_image_full').on('show.bs.modal', function (event) {
@@ -471,5 +455,62 @@
             let chart = new google.visualization.ColumnChart(document.getElementById('age-chart'));
             chart.draw(data, options);
         }
+    </script>
+
+    {##}
+    {# Script related to Questionnaires tab #}
+    {##}
+    <script>
+        function ajax_questionnaire_language(e, questionnaire_id, lang_code) {
+            e.preventDefault();  // to not request href attribute value
+            // if language button clicked is the same do nothing
+            if ($("#id_" + questionnaire_id + "_" + lang_code).hasClass("active-language")) {
+                return 0;
+            }
+            // save panel collapse/expanded state before refresh panel area
+            let panelExpanded = $("div#collapse" + questionnaire_id).attr("aria-expanded");
+
+            let url = "/experiments/questionnaire_language/" +
+                questionnaire_id + "/" + lang_code;
+            $.ajax(url, {
+                beforeSend: function() {
+                    $("div#" + questionnaire_id).html(
+                        "<img class=\"ajax-loader-gif\" src=\"/media/site/ajax-loader.gif\" alt=\"loading...\">"
+                    );
+                },
+                success: function(data) {
+                    $("div#" + questionnaire_id).html(data);
+                    // mark language as selected
+                    $("#id_q" + questionnaire_id + "_language li a").each(function () {
+                        if ($(this).html() === lang_code) {
+                            $(this).addClass("active-language");
+                        } else {
+                            $(this).removeClass("active-language");
+                        }
+                    });
+                    // if panel was expanded display it expanded
+                    const accordionPanel = $("div#collapse" + questionnaire_id);
+                    // highlithing apperantly innapropriate: see
+                    // https://stackoverflow.com/questions/263965/how-can-i-convert-a-string-to-boolean-in-javascript
+                    if (panelExpanded == "true") {
+                        accordionPanel.attr("aria-expanded", true);
+                        accordionPanel.addClass("in");
+                    }
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    console.log("The request to change questionnaire " +
+                        "language returned status: " + textStatus + ", and " +
+                        "error: " + errorThrown);
+                }
+            })
+        }
+    </script>
+
+    {##}
+    {# Scripts related to Downloads tab #}
+    {##}
+    <script src="{% static 'tree-multiselect.js/jquery.tree-multiselect.min.js' %}"></script>
+    <script>
+        $("select").treeMultiselect();
     </script>
 {% endblock %}

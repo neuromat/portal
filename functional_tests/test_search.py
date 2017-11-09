@@ -546,7 +546,7 @@ class SearchTest(FunctionalTest):
     def test_search_questionnaire_data_returns_correct_objects_1(self):
         # Joselina wants to search for experiments that contains some
         # questionnaire data
-        self.search_for('\"História de fratura\"')
+        self.search_for('\"History of fracture?\"')
 
         # As there are two questionnaires with terms searched by Joselina,
         # they are displayed in search results
@@ -567,12 +567,12 @@ class SearchTest(FunctionalTest):
         questionnaire_text = self.browser.find_element_by_class_name(
             'questionnaire-matches'
         ).text
-        self.assertIn('História de fratura', questionnaire_text)
+        self.assertIn('History of fracture', questionnaire_text)
 
     def test_search_questionnaire_data_returns_correct_objects_2(self):
         # Joselina wants to search for experiments that contains some
         # questionnaire data
-        self.search_for('\"trauma do seu plexo\"')
+        self.search_for('\"trauma of your brachial plexus\"')
 
         # As there are two questionnaires with terms searched by Joselina,
         # they are displayed in search results
@@ -593,17 +593,17 @@ class SearchTest(FunctionalTest):
         questionnaire_text = self.browser.find_element_by_class_name(
             'questionnaire-matches'
         ).text
-        self.assertIn('trauma do seu plexo', questionnaire_text)
+        self.assertIn('trauma of your brachial plexus', questionnaire_text)
 
     def test_search_questionnaire_data_returns_correct_objects_3(self):
         # Joselina wants to search for experiments that contains a phrase
-        self.search_for('\"Lesão por arma de fogo\"')
+        self.search_for('\"Injury by firearm\"')
 
-        # As there are two questionnaires with terms searched by Joselina,
-        # they are displayed in search results
+        # As there are one questionnaire with terms searched by Joselina,
+        # it is displayed in search results
         # TODO: we verify for 3 objects because test is catching invalid
         # TODO: questionnaires. See note 'Backlog' in notebook, 09/28/2017
-        self.verify_n_objects_in_table_rows(2, 'questionnaire-matches')
+        self.verify_n_objects_in_table_rows(1, 'questionnaire-matches')
         self.verify_n_objects_in_table_rows(0, 'eegsetting-matches')
         self.verify_n_objects_in_table_rows(0, 'tmsdata-matches')
         self.verify_n_objects_in_table_rows(0, 'coilmodel-matches')
@@ -619,13 +619,13 @@ class SearchTest(FunctionalTest):
         questionnaire_text = self.browser.find_element_by_class_name(
             'questionnaire-matches'
         ).text
-        self.assertIn('Lesão por arma de fogo', questionnaire_text)
+        self.assertIn('Injury by firearm', questionnaire_text)
 
     def test_search_questionnaire_data_returns_correct_objects_4(self):
 
         # Joselina wants to search for experiments that contains some
         # questionnaire data
-        self.search_for('\"História de fratura\" \"Qual o lado da lesão\"')
+        self.search_for('\"History of fracture\" \"What side of the injury\"')
 
         # As there are two questionnaires with terms searched by Joselina,
         # they are displayed in search results
@@ -646,8 +646,8 @@ class SearchTest(FunctionalTest):
         questionnaire_rows = self.browser.find_element_by_id(
             'search_table'
         ).text
-        self.assertIn('História de fratura', questionnaire_rows)
-        self.assertIn('Qual o lado da lesão', questionnaire_rows)
+        self.assertIn('History of fracture', questionnaire_rows)
+        self.assertIn('What side of the injury', questionnaire_rows)
 
     def test_click_in_a_search_result_display_experiment_detail_page(self):
         # TODO: the test tests for some match types not all. Wold be better

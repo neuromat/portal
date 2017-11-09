@@ -3,6 +3,7 @@ from django.core.mail import send_mail
 from rest_framework import serializers, permissions, viewsets
 
 from experiments import appclasses
+from experiments.tasks import build_download_file
 from experiments.models import Experiment, Study, User, ProtocolComponent, \
     Group, ExperimentalProtocol, Researcher, Participant, Collaborator, \
     Keyword, ClassificationOfDiseases, \
@@ -23,7 +24,6 @@ from experiments.models import Experiment, Study, User, ProtocolComponent, \
     EMGElectrodePlacementSetting, \
     EMGSurfacePlacement, EMGIntramuscularPlacement, EMGNeedlePlacement, \
     QuestionnaireLanguage, QuestionnaireDefaultLanguage
-from experiments.tasks import build_download_file
 
 
 ###################
@@ -1006,9 +1006,17 @@ class ExperimentViewSet(viewsets.ModelViewSet):
         serializer.save(
             owner=owner, version=exp_version.get_last_version(), nes_id=nes_id
         )
-        experiment = Experiment.objects.filter(nes_id=nes_id, version=version).values('id')[0]
-        # TODO: uncomment after fix error during the build
-        # build_download_file(int(experiment['id']), template_name="")
+        experiment = Experiment.objects.filter(
+            nes_id=nes_id, version=version
+        ).values('id')[0]
+        # TODO: the download file building is been made whenever an
+        # TODO: experiment is updated. We want to build it only when the
+        # TODO: experiment status change from "Receiving" to "To be
+        # TODO: analysed", other attributes remaining the same.
+        # TODO: Ok by now, as the only situation where the experiment is
+        # TODO: updated by NES API client is precisily when the NES change
+        # TODO: status from "Receiving" to "To be analysed"
+        build_download_file(int(experiment['id']), template_name="")
 
 
 class StudyViewSet(viewsets.ModelViewSet):

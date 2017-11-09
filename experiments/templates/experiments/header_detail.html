@@ -54,7 +54,7 @@
 
         <div class="align-right">
             {% if experiment.download_url %}
-                <a id="button_download" href="{{ experiment.download_url.url }}" class="nep-btn-secondary"
+                <a id="button_download" href="{% url 'download_view' experiment_id=experiment.id %}" class="nep-btn-secondary"
                     data-toggle="tooltip" data-placement="top"
                    title="{% trans "Experiment data and metadata. zip file size: " %}{{ experiment.download_url.file.size | filesizeformat }}"> <span class="glyphicon glyphicon-download-alt"> </span>
                     {% trans "Download experiment data" %}</a>

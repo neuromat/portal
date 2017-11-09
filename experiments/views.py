@@ -8,6 +8,7 @@ from django.contrib.auth.views import LoginView
 from django.core.mail import send_mail
 from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import render
+from django.template.loader import render_to_string
 from haystack.generic_views import SearchView
 from django.utils.translation import activate, LANGUAGE_SESSION_KEY, \
     ugettext as _
@@ -16,40 +17,6 @@ from experiments.forms import NepSearchForm
 from experiments.models import Experiment, RejectJustification, Step, \
     Questionnaire, QuestionnaireDefaultLanguage, QuestionnaireLanguage
 from experiments.tasks import rebuild_haystack_index
-
-
-def home_page(request):
-    to_be_analysed_count = None  # will be None if home contains the list of
-    # normal user
-    if request.user.is_authenticated and \
-            request.user.groups.filter(name='trustees').exists():
-        all_experiments = \
-            Experiment.lastversion_objects.all()
-        # We put experiments in following order:
-        # TO_BE_ANALYSED, UNDER_ANALYSIS, NOT_APPROVED and APPROVED
-        to_be_analysed = all_experiments.filter(
-            status=Experiment.TO_BE_ANALYSED)
-        under_analysis = all_experiments.filter(
-            status=Experiment.UNDER_ANALYSIS)
-        not_approved = all_experiments.filter(status=Experiment.NOT_APPROVED)
-        approved = all_experiments.filter(status=Experiment.APPROVED)
-        experiments = to_be_analysed | under_analysis | not_approved | approved
-        to_be_analysed_count = to_be_analysed.count()
-    else:
-        experiments = Experiment.lastversion_objects.filter(
-            status=Experiment.APPROVED
-        )
-
-    for experiment in experiments:
-        experiment.total_participants = \
-            sum([len(group.participants.all())
-                 for group in experiment.groups.all()])
-
-    return render(request, 'experiments/home.html',
-                  {'experiments': experiments,
-                   'to_be_analysed_count': to_be_analysed_count,
-                   'table_title': 'List of Experiments',
-                   'search_form': NepSearchForm()})
 
 
 def _get_nested_rec(key, group):
@@ -132,7 +99,7 @@ def _get_questionnaire_metadata(metadata):
 
 def _get_q_default_language_or_first(questionnaire):
     # TODO: correct this to adapt to unique QuestionnaireDefaultLanguage
-    # TODO: model with OneToOne with Questionnaire
+    # TODO: model with OneToOne relation with Questionnaire
     qdl = QuestionnaireDefaultLanguage.objects.filter(
         questionnaire=questionnaire
     ).first()
@@ -144,9 +111,54 @@ def _get_q_default_language_or_first(questionnaire):
         ).first()
 
 
+def _get_available_languages(questionnaire):
+    q_languages = QuestionnaireLanguage.objects.filter(
+        questionnaire=questionnaire
+    )
+    lang_code = []
+    for q_language in q_languages:
+        lang_code.append(q_language.language_code)
+
+    return lang_code
+
+
+def home_page(request):
+    # will be None if home contains the list of normal user
+    to_be_analysed_count = None
+    if request.user.is_authenticated and \
+            request.user.groups.filter(name='trustees').exists():
+        all_experiments = \
+            Experiment.lastversion_objects.all()
+        # We put experiments in following order:
+        # TO_BE_ANALYSED, UNDER_ANALYSIS, NOT_APPROVED and APPROVED
+        to_be_analysed = all_experiments.filter(
+            status=Experiment.TO_BE_ANALYSED)
+        under_analysis = all_experiments.filter(
+            status=Experiment.UNDER_ANALYSIS)
+        not_approved = all_experiments.filter(status=Experiment.NOT_APPROVED)
+        approved = all_experiments.filter(status=Experiment.APPROVED)
+        experiments = to_be_analysed | under_analysis | not_approved | approved
+        to_be_analysed_count = to_be_analysed.count()
+    else:
+        experiments = Experiment.lastversion_objects.filter(
+            status=Experiment.APPROVED
+        )
+
+    for experiment in experiments:
+        experiment.total_participants = \
+            sum([len(group.participants.all())
+                 for group in experiment.groups.all()])
+
+    return render(request, 'experiments/home.html',
+                  {'experiments': experiments,
+                   'to_be_analysed_count': to_be_analysed_count,
+                   'table_title': 'List of Experiments',
+                   'search_form': NepSearchForm()})
+
+
 def experiment_detail(request, slug):
-    to_be_analysed_count = None  # will be None if home contains the list of
-    # normal user
+    # will be None if home contains the list for common user
+    to_be_analysed_count = None
     if request.user.is_authenticated and \
             request.user.groups.filter(name='trustees').exists():
         all_experiments = Experiment.lastversion_objects.all()
@@ -168,7 +180,7 @@ def experiment_detail(request, slug):
                 age_grouping[int(participant.age)] = 0
             age_grouping[int(participant.age)] += 1
 
-    # Get default (language) questionnaires (or first) for all groups
+    # get default (language) questionnaires (or first) for all groups
     questionnaires = {}
     for group in experiment.groups.all():
         if group.steps.filter(type=Step.QUESTIONNAIRE).count() > 0:
@@ -178,13 +190,18 @@ def experiment_detail(request, slug):
                 questionnaires[group.title][q.id] = {}
                 # get questionnaire default language data or first
                 # questionnaire language
-                questioinnaire = _get_q_default_language_or_first(q)
+                questioinnaire_default = _get_q_default_language_or_first(q)
+
                 questionnaires[group.title][q.id]['survey_name'] = \
-                    questioinnaire.survey_name
+                    questioinnaire_default.survey_name
                 questionnaires[group.title][q.id]['survey_metadata'] = \
                     _get_questionnaire_metadata(
-                        questioinnaire.survey_metadata
+                        questioinnaire_default.survey_metadata
                     )
+                questionnaires[group.title][q.id]['language_code'] = \
+                    questioinnaire_default.language_code
+                questionnaires[group.title][q.id]['language_codes'] = \
+                    _get_available_languages(q)
 
     return render(
         request, 'experiments/detail.html', {
@@ -209,39 +226,43 @@ def change_status(request, experiment_id):
 
     # If status postted is NOT_APPROVED verify if a justification message
     # was postted too. If not redirect to home page with warning message.
-    if status == Experiment.NOT_APPROVED:
-        if not justification:
-            messages.warning(
-                request, _(
-                    'Please provide a reason justifying the change of the status of the experiment ') +
-                         experiment.title + _('to "Not approved". '))
+    if status == Experiment.NOT_APPROVED and not justification:
+        messages.warning(
+            request, _(
+                'Please provide a reason justifying the change of the status of the experiment ') +
+                     experiment.title + _('to "Not approved". '))
+        return HttpResponseRedirect('/')
 
-            return HttpResponseRedirect('/')
-        else:
-            # if has justification send email to researcher
-            subject = _('Your experiment was rejected')
-            message = _(
-                'We regret to inform you that your experiment, ') + experiment.title + \
-                      _(
-                          ', has not been acceptted to be published in the NeuroMat Open Database. Please check the '
-                          'reasons providing by the Neuromat Open Database Evaluation Committee:') + justification + \
-                      _(
-                          '.\nWith best regards,\n The Neuromat Open Database Evaluation Committee')
+    if status == Experiment.NOT_APPROVED and justification:
+        experiment.status = status
+        experiment.save()
+        # if has justification send email to researcher
+        subject = _('Your experiment was rejected')
+        message = _(
+            'We regret to inform you that your experiment, ') + experiment.title + \
+                  _(
+                      ', has not been acceptted to be published in the NeuroMat Open Database. Please check the '
+                      'reasons providing by the Neuromat Open Database Evaluation Committee:') + justification + \
+                  _(
+                      '.\nWith best regards,\n The Neuromat Open Database Evaluation Committee')
 
-            send_mail(subject, message, from_email,
-                      [experiment.study.researcher.email])
-            messages.success(
-                request,
-                _('An email was sent to ') + experiment.study.researcher.name +
-                _(' warning that the experiment was rejected.')
-            )
-            # Save the justification message
-            RejectJustification.objects.create(message=justification,
-                                               experiment=experiment)
+        send_mail(subject, message, from_email,
+                  [experiment.study.researcher.email])
+        messages.success(
+            request,
+            _('An email was sent to ') + experiment.study.researcher.name +
+            _(' warning that the experiment was rejected.')
+        )
+        # Save the justification message
+        RejectJustification.objects.create(
+            message=justification, experiment=experiment
+        )
 
-    # if status changed to UNDER_ANALYSIS or APPROVED, send email
+    # If status changed to UNDER_ANALYSIS or APPROVED, send email
     # to experiment study researcher
     if status == Experiment.APPROVED:
+        experiment.status = status
+        experiment.save()
         subject = _('Your experiment was approved')
         message = _(
             'We are pleased to inform you that your experiment ') + experiment.title + \
@@ -260,7 +281,14 @@ def change_status(request, experiment_id):
             _('An email was sent to ') + experiment.study.researcher.name +
             _(' warning that the experiment changed status to Approved.')
         )
+        rebuild_haystack_index.delay()
+        # build_download_file(experiment.id).delay()
+
     if status == Experiment.UNDER_ANALYSIS:
+        experiment.status = status
+        # associate experiment with trustee
+        experiment.trustee = request.user
+        experiment.save()
         subject = _('Your experiment is now under analysis')
         message = _(
             'Thank you for submitting your experiment ') + experiment.title + \
@@ -275,31 +303,21 @@ def change_status(request, experiment_id):
             _('An email was sent to ') + experiment.study.researcher.name +
             _(' warning that the experiment is under analysis.')
         )
-        # Associate experiment with trustee
-        experiment.trustee = request.user
 
     # If status posted is TO_BE_ANALYSED and current experiment status is
     # UNDER_ANALYSIS disassociate trustee from experiment and warning
     # trustee that the experiment is going to be free for other trustee
-    # analysis
-    if status == Experiment.TO_BE_ANALYSED:
-        if experiment.status == Experiment.UNDER_ANALYSIS:
+    # analyse it
+    if status == Experiment.TO_BE_ANALYSED and \
+            experiment.status == Experiment.UNDER_ANALYSIS:
+            experiment.status = Experiment.TO_BE_ANALYSED
             experiment.trustee = None
+            experiment.save()
             messages.warning(
                 request,
                 _('The experiment data ') + experiment.title + _(
                     ' was made available to be analysed by other trustee.')
             )
-
-    # TODO: wrong order. Save first, before send message to user that the
-    # TODO: status was changed. Does not make sense tell user that the
-    # TODO: status was changed, before save the change.
-    experiment.status = status
-    experiment.save()
-
-    if experiment.status == Experiment.APPROVED:
-        rebuild_haystack_index.delay()
-        # build_download_file(experiment.id).delay()
 
     return HttpResponseRedirect('/')
 
@@ -310,6 +328,22 @@ def ajax_to_be_analysed(request):
     ).count()
 
     return HttpResponse(to_be_analysed, content_type='application/json')
+
+
+def ajax_questionnaire_languages(request, questionnaire_id, lang_code):
+    questionnaire_language = QuestionnaireLanguage.objects.get(
+        questionnaire=questionnaire_id, language_code=lang_code
+    )
+
+    q_language = dict()
+    q_language['survey_name'] = questionnaire_language.survey_name
+    q_language['survey_metadata'] = _get_questionnaire_metadata(
+        questionnaire_language.survey_metadata)
+
+    q_language_tmpl = render_to_string(
+        'experiments/questionnaires/questionnaire_language.html',
+        {'q_language': q_language, 'questionnaire_id': questionnaire_id})
+    return HttpResponse(q_language_tmpl)
 
 
 def language_change(request, language_code):

@@ -1,12 +1,12 @@
 {% load i18n %}
-<table id="id_experiments_table" class="table table-hover
-        experiment-table">
+<table id="id_experiments_table" class="table table-hover experiment-table">
     <thead>
     <tr class="titulo">
         <th>{% trans "Title" %}</th>
         <th>{% trans "Description" %}</th>
         <th>{% trans "Participants" %}</th>
         <th>{% trans "Version" %}</th>
+        <th>{% trans "Downloads" %}</th>
         <th>{% trans "Status" %}</th>
         <th></th>
     </tr>
@@ -19,6 +19,7 @@
             <td>{{ experiment.description }}</td>
             <td>{{ experiment.total_participants }} {% trans "in" %} {{ experiment.groups.count }} {% trans "groups" %} </td>
             <td>{{ experiment.version }}</td>
+            <td>{{ experiment.downloads }}</td>
             <td><a id="link_modal" href="#"
                    data-toggle="modal"
                    data-target="#status_modal"
