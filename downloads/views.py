@@ -111,6 +111,8 @@ def download_create(experiment_id, template_name):
         base_directory, path_to_create = path.split(export.get_directory_base())
         # ex. /Users/.../portal/media/download/experiment_id
         error_msg, base_directory_name = create_directory(base_directory, path_to_create)
+        if error_msg != "":
+            return error_msg
 
         # # ex. /Users/.../portal/media/temp/export_instance.id/json_export.json
         # input_export_file = path.join("export", path.join(path.join(str(export_instance.id), str(input_filename))))
@@ -120,16 +122,24 @@ def download_create(experiment_id, template_name):
 
         if not export.is_input_data_consistent() or not input_data:
             error_msg = "Inconsistent data read from json file"
+        if error_msg != "":
+            return error_msg
 
         # load information of the data collection per participant in a dictionnary
         error_msg = export.include_data_from_group(experiment_id)
+        if error_msg != "":
+            return error_msg
 
         # Create arquivos para exportação
         # create files of experimental protocol and diagnosis/participant csv file for each group
         error_msg = export.process_experiment_data(experiment_id)
+        if error_msg != "":
+            return error_msg
 
         # process the data per participant
         error_msg = export.download_data_per_participant()
+        if error_msg != "":
+            return error_msg
 
         # process the data per questionnaire
         error_msg = export.download_data_per_questionnaire()
