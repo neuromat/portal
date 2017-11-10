@@ -771,12 +771,7 @@ class DownloadExperimentTest(FunctionalTest):
 
         # As she's not selected any item to download, she's redirected to
         # experiment detail page with a message alerting her
-        self.wait_for_detail_page_load()
-        self.assertEqual(
-            self.browser.current_url, self.live_server_url +
-            '/experiments/' + experiment.slug + '/'
-        )
-        self.assertIn(
+        self.wait_for(lambda: self.assertIn(
             'Please select item(s) to download',
-            self.browser.find_element_by_id('downloads_tab').text
-        )
+            self.browser.find_element_by_class_name('alert-warning').text
+        ))

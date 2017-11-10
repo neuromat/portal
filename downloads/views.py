@@ -7,7 +7,7 @@ from django.conf import settings
 from django.contrib import messages
 from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponse, HttpResponseRedirect
-
+from django.utils.translation import ugettext as _
 from .export import create_directory, ExportExecution
 from .input_export import build_complete_export_structure
 from .models import Export
@@ -38,8 +38,11 @@ def download_view(request, experiment_id):
 
     # if user selected nothing, just redirect to experiment detail view with
     # warning message.
-    if 'download_selected' in request.POST and \
-            not request.POST.get('download_selected'):
+    if 'download_selected' not in request.POST:
+        messages.warning(
+            request,
+            _('Please select item(s) to download')
+        )
         return HttpResponseRedirect(
             reverse('experiment-detail', kwargs={'slug': experiment.slug})
         )

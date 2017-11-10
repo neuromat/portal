@@ -620,10 +620,11 @@ class DownloadExperimentTest(TestCase):
             status=Experiment.APPROVED
         ).last()
 
-        url = reverse('download_view', kwargs={'experiment_id': experiment.id})
-        response = self.client.post(url, {'download_selected': ''})
+        url = reverse('download-view', kwargs={'experiment_id': experiment.id})
+        # POST without data, as when nothing is selected, the request do not
+        # even send the variable in "name" attribute of the select tag
+        response = self.client.post(url)
         self.assertRedirects(
-            response, reverse('experiment-detail',
-                              kwargs={'slug': experiment.slug}
-                              )
+            response,
+            reverse('experiment-detail', kwargs={'slug': experiment.slug})
         )
