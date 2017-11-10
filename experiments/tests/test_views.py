@@ -596,7 +596,15 @@ class DownloadExperimentTest(TestCase):
         self.create_download_dir_structure_and_files(experiment)
 
         url = reverse('download_view', kwargs={'experiment_id': experiment.id})
-        response = self.client.post(url, data={'download[0]': 'selected'})
+        response = self.client.post(
+            url, data={
+                'download_selected': [
+                    'random selected 1',
+                    'random selected 2',
+                    'random selected 3',
+                ]
+            }
+        )
         self.assertEqual(response.status_code, 200)
         self.assertEquals(
             response.get('Content-Disposition'),
@@ -605,7 +613,7 @@ class DownloadExperimentTest(TestCase):
 
         self.fail('Finish this test!')
 
-    def test_POSTing_download_experiment_data_without_choice_redirects_to_experiment_detail_view(self):
+    def test_POSTing_download_experiment_data_without_choices_redirects_to_experiment_detail_view(self):
         # Last approved experiment created in tests helper has all
         # possible experiment data to download
         experiment = Experiment.objects.filter(
@@ -613,7 +621,7 @@ class DownloadExperimentTest(TestCase):
         ).last()
 
         url = reverse('download_view', kwargs={'experiment_id': experiment.id})
-        response = self.client.post(url, data={})
+        response = self.client.post(url, {'download_selected': ''})
         self.assertRedirects(
             response, reverse('experiment-detail',
                               kwargs={'slug': experiment.slug}

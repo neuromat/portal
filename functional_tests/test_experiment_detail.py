@@ -759,7 +759,7 @@ class DownloadExperimentTest(FunctionalTest):
         button = self.browser.find_element_by_id('download_button')
         self.assertEqual('Download', button.get_attribute('value'))
 
-    def test_try_to_download_without_selections_redirects_to_experiment_detail_view(self):
+    def test_try_to_download_without_selections_redirects_to_experiment_detail_view_with_message(self):
         experiment = Experiment.objects.filter(
             status=Experiment.APPROVED
         ).first()

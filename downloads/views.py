@@ -37,9 +37,9 @@ def download_view(request, experiment_id):
     experiment = Experiment.objects.get(pk=experiment_id)
 
     # if user selected nothing, just redirect to experiment detail view with
-    # warning message
-    download_options = request.POST.get('download')
-    if not download_options:
+    # warning message.
+    if 'download_selected' in request.POST and \
+            not request.POST.get('download_selected'):
         return HttpResponseRedirect(
             reverse('experiment-detail', kwargs={'slug': experiment.slug})
         )
