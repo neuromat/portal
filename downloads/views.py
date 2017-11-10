@@ -1,4 +1,7 @@
 import os
+
+from django.urls import reverse
+
 from experiments.models import Experiment
 from django.conf import settings
 from django.contrib import messages
@@ -31,6 +34,15 @@ def create_export_instance():
 
 
 def download_view(request, experiment_id):
+    experiment = Experiment.objects.get(pk=experiment_id)
+
+    # if user selected nothing, just redirect to experiment detail view with
+    # warning message
+    download_options = request.POST.get('download')
+    if not download_options:
+        return HttpResponseRedirect(
+            reverse('experiment-detail', kwargs={'slug': experiment.slug})
+        )
 
     # if download file exists, serve file immediatally for download
     experiment = get_object_or_404(Experiment, pk=experiment_id)
@@ -47,6 +59,8 @@ def download_view(request, experiment_id):
 
         experiment.downloads += 1
         experiment.save()
+
+        zip_file.close()
 
         return response
 

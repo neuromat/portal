@@ -825,12 +825,12 @@ def global_setup_ut():
         version=1, sent_date=datetime.utcnow(),
         status=Experiment.TO_BE_ANALYSED,
     )
-    Experiment.objects.create(
+    experiment4 = Experiment.objects.create(
         title='Experiment 4', nes_id=3, owner=owner1,
         version=1, sent_date=datetime.utcnow(),
         status=Experiment.APPROVED,
     )
-    Experiment.objects.create(
+    experiment5 = Experiment.objects.create(
         title='Experiment 5', nes_id=4, owner=owner2,
         version=1, sent_date=datetime.utcnow(),
         status=Experiment.APPROVED,
@@ -840,6 +840,7 @@ def global_setup_ut():
     create_group(2, experiment1)
     create_group(1, experiment2)
 
+    # TODO: create with the method already existing. Same for below
     study1 = Study.objects.create(start_date=datetime.utcnow(),
                                   experiment=experiment1)
     study2 = Study.objects.create(start_date=datetime.utcnow(),
@@ -879,11 +880,8 @@ def global_setup_ut():
     # Create valid Questionnaire objects
     # (requires the files 'questionnaire1.csv', 'questionnaire2.csv' and
     # 'questionnaire3.csv' being generated in 'experiments/tests' subdirectory)
-    experiment = Experiment.objects.filter(
-        status=Experiment.APPROVED
-    ).last()
-    create_group(2, experiment)
-    group_first = experiment.groups.first()
+    create_group(2, experiment5)
+    group_first = experiment5.groups.first()
     create_questionnaire(1, 'q1', group_first)
     questionnaire1 = Questionnaire.objects.last()
     # create questionnaire language data pt-br for questionnaire1
@@ -914,8 +912,7 @@ def global_setup_ut():
     questionnaire2 = Questionnaire.objects.last()
     create_questionnaire_language(
         questionnaire2,
-        settings.BASE_DIR + '/experiments/tests/questionnaire2.csv',
-        'en'
+        settings.BASE_DIR + '/experiments/tests/questionnaire2.csv', 'en'
     )
     # create questionnaire language data de for questionnaire2
     questionnaire2 = Questionnaire.objects.last()
@@ -925,7 +922,7 @@ def global_setup_ut():
         'de'
     )
 
-    group_last = experiment.groups.last()
+    group_last = experiment5.groups.last()
     create_questionnaire(1, 'q3', group_last)
     questionnaire3 = Questionnaire.objects.last()
     # create questionnaire language data default for questionnaire3
@@ -938,11 +935,8 @@ def global_setup_ut():
     # Create invalid Questionnaire object
     # (requires file 'questionnaire4.csv', being generated in
     # 'experiments/tests' subdirectory)
-    experiment = Experiment.objects.filter(
-        status=Experiment.APPROVED
-    ).first()
-    create_group(1, experiment)
-    group = experiment.groups.last()
+    create_group(1, experiment4)
+    group = experiment4.groups.last()
     create_questionnaire(1, 'q4', group)
     # create questionnaire language data default for questionnaire4
     questionnaire4 = Questionnaire.objects.last()
@@ -955,11 +949,8 @@ def global_setup_ut():
     # Create an invalid and a valid Questionnaire objects
     # (requires the files 'questionnaire5.csv' and 'questionnaire6.csv,
     # being generated in 'experiments/tests' subdirectory)
-    experiment = Experiment.objects.filter(
-        status=Experiment.TO_BE_ANALYSED
-    ).last()
-    create_group(2, experiment)
-    group = experiment.groups.first()
+    create_group(2, experiment3)
+    group = experiment3.groups.first()
     create_questionnaire(1, 'q5', group)
     questionnaire5 = Questionnaire.objects.last()
     # create questionnaire language data default for questionnaire5
@@ -968,7 +959,7 @@ def global_setup_ut():
         settings.BASE_DIR + '/experiments/tests/questionnaire5.csv',
         'en'
     )
-    group = experiment.groups.last()
+    group = experiment3.groups.last()
     create_questionnaire(1, 'q6', group)
     questionnaire6 = Questionnaire.objects.last()
     create_questionnaire_language(
@@ -994,6 +985,18 @@ def global_setup_ut():
     cd = ClassificationOfDiseases.objects.last()
     cd.code = 'A74'
     cd.save()
+
+    # Create experiment related objects to test download experiment data
+    # pieces selected by the user.
+    # experiment5 has some related stuff created; create what is missing
+    create_study(experiment5)
+    gender1 = Gender.objects.create(name='male')
+    gender2 = Gender.objects.create(name='female')
+    for group in experiment5.groups.all():
+        create_participant(
+            randint(1, 6), group, gender1 if randint(1, 2) == 1 else gender2
+        )
+        create_experiment_protocol(group)
 
 
 def apply_setup(setup_func):

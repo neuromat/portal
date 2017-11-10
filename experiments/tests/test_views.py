@@ -3,6 +3,7 @@ import sys
 import io
 import os
 
+import shutil
 from django.contrib.auth.models import User
 from django.core.management import call_command
 from django.test import TestCase, override_settings
@@ -13,6 +14,7 @@ from experiments import views
 from experiments.models import Experiment, Step, Questionnaire, \
     QuestionnaireDefaultLanguage, QuestionnaireLanguage
 from experiments.tests.tests_helper import apply_setup, global_setup_ut
+from experiments.views import _get_q_default_language_or_first
 from nep import settings
 
 
@@ -39,6 +41,7 @@ class HomePageTest(TestCase):
             )
         # Is it redirecting?
         self.assertEqual(response.status_code, 302)
+        # TODO: is it using correct template after redirecting
         # experiment has changed status to UNDER_ANALYSIS?
         experiment = Experiment.objects.get(pk=experiment.id)
         self.assertEqual(experiment.status, Experiment.UNDER_ANALYSIS)
@@ -430,6 +433,124 @@ class DownloadExperimentTest(TestCase):
     def setUp(self):
         global_setup_ut()
 
+    def create_q_language_dir(self, q, questionnaire_metadata_dir):
+        q_default = _get_q_default_language_or_first(q)
+        q_language_dir = os.path.join(
+            questionnaire_metadata_dir,
+            q.code + '_' + q_default.survey_name
+        )
+        return q_language_dir
+
+    def create_q_language_responses_dir_and_file(
+            self, q, per_questionnaire_data_dir
+    ):
+        q_language_dir = self.create_q_language_dir(
+            q, per_questionnaire_data_dir
+        )
+        os.mkdir(q_language_dir)
+        file_path = os.path.join(
+            q_language_dir, 'Responses_' + q.code + '.csv'
+        )
+        self.create_text_file(file_path, 'a, b, c\nd, e, f')
+
+    def create_q_language_metadata_dir_and_files(
+            self, q, questionnaire_metadata_dir
+    ):
+        q_language_dir = self.create_q_language_dir(
+            q, questionnaire_metadata_dir
+        )
+        os.mkdir(q_language_dir)
+        for q_language in q.q_languages.all():
+            file_path = os.path.join(
+                q_language_dir,
+                'Fields_' + q.code + '_' +
+                q_language.language_code + '.csv'
+            )
+            self.create_text_file(file_path, 'a, b, c\nd, e, f')
+
+    def create_group_subdir(self, group_dir, name):
+        subdir = os.path.join(
+            group_dir, name
+        )
+        os.makedirs(subdir)
+        return subdir
+
+    def create_text_file(self, file_path, text):
+        file = open(file_path, 'w')
+        file.write(text)
+        file.close()
+
+    def create_download_dir_structure_and_files(self, experiment):
+        # create download experiment data root
+        experiment_download_dir = os.path.join(
+            settings.MEDIA_ROOT, 'download', str(experiment.pk)
+        )
+
+        # remove subdir if exists before creating that
+        shutil.rmtree(experiment_download_dir)
+        os.mkdir(experiment_download_dir)
+
+        # create Experiment.csv file
+        self.create_text_file(
+            os.path.join(experiment_download_dir, 'Experiment.csv'),
+            'a, b, c\nd, e, f'
+        )
+
+        for group in experiment.groups.all():
+            group_dir = os.path.join(
+                experiment_download_dir, 'Group_' + group.title
+            )
+            questionnaire_metadata_dir = self.create_group_subdir(
+                group_dir, 'Questionnaire_metadata'
+            )
+            per_questionnaire_data_dir = self.create_group_subdir(
+                group_dir, 'Per_questionnaire_data'
+            )
+            per_participant_data_dir = self.create_group_subdir(
+                group_dir, 'Per_participant_data'
+            )
+            experimental_protocol_dir = self.create_group_subdir(
+                group_dir, 'Experimental_protocol'
+            )
+
+            # create questionnaire stuff
+            for questionnaire_step in group.steps.filter(
+                    type=Step.QUESTIONNAIRE
+            ):
+                # TODO: see if using step_ptr is ok
+                q = Questionnaire.objects.get(step_ptr=questionnaire_step)
+
+                # create Questionnaire_metadata dir and files
+                self.create_q_language_metadata_dir_and_files(
+                    q, questionnaire_metadata_dir
+                )
+                # create Per_questionnaire_data dir and file
+                self.create_q_language_responses_dir_and_file(
+                    q, per_questionnaire_data_dir
+                )
+            # create Per_participant_data subdirs
+            # TODO: inside that subdirs could be other dirs and files. By
+            # TODO: now we are creating only the first subdirs levels
+            for participant in group.participants.all():
+                os.mkdir(os.path.join(
+                    per_participant_data_dir, 'Participant_' + participant.code
+                ))
+
+            # create Experimental_protocol subdirs
+            # TODO: inside Experimental_protocol dir there are files,
+            # TODO: as well as in that subdirs. By now we are creating only
+            # TODO: the first subdirs levels
+            for i in range(2):
+                os.mkdir(os.path.join(
+                    experimental_protocol_dir, 'STEP_' + str(i)
+                ))
+
+            # create Participants.csv file
+            self.create_text_file(
+                os.path.join(group_dir, 'Participants.csv'),
+                'a, b, c\nd, e, f'
+            )
+
     def test_downloading_experiment_data_increases_download_counter(self):
         # Create fake download.zip file
         file = io.BytesIO()
@@ -462,5 +583,39 @@ class DownloadExperimentTest(TestCase):
         # Remove fake download.zip file
         os.remove(settings.BASE_DIR + experiment.download_url.url)
 
-    def test_POSTing_download_experiment_data_with_selection_returns_correct_files(self):
-        pass
+    def test_POSTing_download_experiment_data_returns_correct_content(self):
+        # Last approved experiment created in tests helper has all
+        # possible experiment data to download
+        experiment = Experiment.objects.filter(
+            status=Experiment.APPROVED
+        ).last()
+
+        # Create a complete directory tree with all possible experiment data
+        # directories/files that reproduces the directory/file structure
+        # created when Portal receives the experiment data through Rest API.
+        self.create_download_dir_structure_and_files(experiment)
+
+        url = reverse('download_view', kwargs={'experiment_id': experiment.id})
+        response = self.client.post(url, data={'download[0]': 'selected'})
+        self.assertEqual(response.status_code, 200)
+        self.assertEquals(
+            response.get('Content-Disposition'),
+            'attachment; filename="download.zip"'
+        )
+
+        self.fail('Finish this test!')
+
+    def test_POSTing_download_experiment_data_without_choice_redirects_to_experiment_detail_view(self):
+        # Last approved experiment created in tests helper has all
+        # possible experiment data to download
+        experiment = Experiment.objects.filter(
+            status=Experiment.APPROVED
+        ).last()
+
+        url = reverse('download_view', kwargs={'experiment_id': experiment.id})
+        response = self.client.post(url, data={})
+        self.assertRedirects(
+            response, reverse('experiment-detail',
+                              kwargs={'slug': experiment.slug}
+                              )
+        )

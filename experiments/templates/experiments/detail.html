@@ -331,6 +331,7 @@
                 <h4>{% trans 'Select experiment data pieces to download' %}</h4>
                 <div class="panel panel-default nep-panel-group">
                     <form action="" method="post">
+                        {% csrf_token %}
                         <div class="form-group">
                             <label for="download_options">Select options</label>
                             <select name="download_selected" id="download_options" multiple>

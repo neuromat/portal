@@ -755,6 +755,28 @@ class DownloadExperimentTest(FunctionalTest):
         self.access_downloads_tab_content(experiment)
 
         # Josileine sees the button to download experiment data options that
-        # she've just selected.
+        # she's just selected.
         button = self.browser.find_element_by_id('download_button')
         self.assertEqual('Download', button.get_attribute('value'))
+
+    def test_try_to_download_without_selections_redirects_to_experiment_detail_view(self):
+        experiment = Experiment.objects.filter(
+            status=Experiment.APPROVED
+        ).first()
+
+        self.access_downloads_tab_content(experiment)
+
+        # Josileine goes directly to Download button and click on it.
+        self.browser.find_element_by_id('download_button').click()
+
+        # As she's not selected any item to download, she's redirected to
+        # experiment detail page with a message alerting her
+        self.wait_for_detail_page_load()
+        self.assertEqual(
+            self.browser.current_url, self.live_server_url +
+            '/experiments/' + experiment.slug + '/'
+        )
+        self.assertIn(
+            'Please select item(s) to download',
+            self.browser.find_element_by_id('downloads_tab').text
+        )
