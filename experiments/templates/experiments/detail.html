@@ -333,28 +333,36 @@
                     <form action="{% url 'download-view' experiment.id %}" method="post">
                         {% csrf_token %}
                         <div class="form-group">
-                            <label for="download_options">Select options</label>
-                            <select name="download_selected" id="download_options" multiple>
-                                <option value="experiment">{% trans 'Experiment (spreadsheet)' %}</option>
-                                {% for group in experiment.groups.all %}
-                                    {% for participant in group.participants.all %}
-                                        <option value="participant_{{ participant.id }}" data-section="Groups/Group {{ group.title }}">{% trans 'Participant ' %}{{ participant.code }} (zip)</option>
+                            {% if experiment.groups.all %}
+                                <label for="download_options">Select options</label>
+                                <select name="download_selected" id="download_options" multiple>
+                                    {% for group in experiment.groups.all %}
+                                        {% if group.experimental_protocol %}
+                                            <option value="experimental_protocol" data-section="Groups/Group {{ group.title }}">{% trans 'Experimental Protocol Data' %}</option>
+                                        {% endif %}
+                                        {% if questionnaires %}
+                                            <option value="questionnaires" data-section="Groups/Group {{ group.title }}">{% trans 'Per Questionnaire Data' %}</option>
+                                        {% endif %}
+                                        {% for participant in group.participants.all %}
+                                            <option value="participant_{{ participant.id }}" data-section="Groups/Group {{ group.title }}/Per Participant Data">{% trans 'Participant ' %}{{ participant.code }}</option>
+                                        {% endfor %}
                                     {% endfor %}
-                                    {% if group.experimental_protocol %}
-                                        <option value="experimental_protocol" data-section="Groups/Group {{ group.title }}">{% trans 'Experimental Protocol (zip)' %}</option>
-                                    {% endif %}
-                                    {% if group.participants.all %}
-                                        <option value="participants" data-section="Groups/Group {{ group.title }}">{% trans 'Participants (spreadsheet)' %} </option>
-                                    {% endif %}
-                                    {% if questionnaires %}
-                                        <option value="questionnaires" data-section="Groups/Group {{ group.title }}">{% trans 'Questionnaires data (zip)' %}</option>
+                                </select>
+                                {% for group in experiment.groups.all %}
+                                    {% if not group.experimental_protocol and not questionnaires and not group.participants.all %}
+                                        <p><em>
+                                            {% trans 'There are not data for group' %} {{ group.title }}. {% trans "But there\'s still basic Experiment data. Click in 'Download' button to download it." %}
+                                        </em></p>
                                     {% endif %}
                                 {% endfor %}
-                            </select>
+                            {% else %}
+                                <p><em>
+                                    {% trans 'There are not experiment groups data for this experiment. Click in "Download" button to download basic experiment data' %}
+                                </em></p>
+                            {% endif %}
                         </div>
                         <div class="form-group text-right">
-                            <input type="submit" id="download_button"
-                                   class="btn btn-primary" value="{% trans 'Download' %}">
+                            <input type="submit" id="download_button" class="btn btn-primary" value="{% trans 'Download' %}">
                         </div>
                     </form>
                 </div>

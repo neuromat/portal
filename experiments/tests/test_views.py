@@ -13,7 +13,8 @@ from haystack.query import SearchQuerySet
 from experiments import views
 from experiments.models import Experiment, Step, Questionnaire, \
     QuestionnaireDefaultLanguage, QuestionnaireLanguage
-from experiments.tests.tests_helper import apply_setup, global_setup_ut
+from experiments.tests.tests_helper import apply_setup, global_setup_ut, \
+    create_experiment_related_objects
 from experiments.views import _get_q_default_language_or_first
 from nep import settings
 
@@ -562,7 +563,7 @@ class DownloadExperimentTest(TestCase):
         experiment.save()
 
         # Request the url to download compacted file
-        url = reverse('download_view', kwargs={'experiment_id': experiment.id})
+        url = reverse('download-view', kwargs={'experiment_id': experiment.id})
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
 
@@ -572,7 +573,7 @@ class DownloadExperimentTest(TestCase):
         self.assertEqual(experiment.downloads, 1)
 
         # Request the url do download compacted file again
-        url = reverse('download_view', kwargs={'experiment_id': experiment.id})
+        url = reverse('download-view', kwargs={'experiment_id': experiment.id})
         self.client.get(url)
 
         # Get the experiment again
@@ -589,15 +590,16 @@ class DownloadExperimentTest(TestCase):
         experiment = Experiment.objects.filter(
             status=Experiment.APPROVED
         ).last()
+        create_experiment_related_objects(experiment)
 
         # Create a complete directory tree with all possible experiment data
         # directories/files that reproduces the directory/file structure
         # created when Portal receives the experiment data through Rest API.
         self.create_download_dir_structure_and_files(experiment)
 
-        url = reverse('download_view', kwargs={'experiment_id': experiment.id})
+        url = reverse('download-view', kwargs={'experiment_id': experiment.id})
         response = self.client.post(
-            url, data={
+            url, {
                 'download_selected': [
                     'random selected 1',
                     'random selected 2',

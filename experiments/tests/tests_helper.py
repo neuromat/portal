@@ -420,6 +420,29 @@ def create_questionnaire(qtty, code, group):
         )
 
 
+def create_experiment_related_objects(experiment):
+    """
+    Create experiment related objects to test download experiment data
+    pieces selected by the user.
+    :param experiment: Experiment model instance
+    """
+    create_study(experiment)
+    study = Study.objects.last()
+    # necessary creating researcher for study. See comment in
+    # search_indexes.StudyIndex class
+    Researcher.objects.create(
+        name='Negro Belchior', email='belchior@example.com', study=study
+    )
+    gender1 = Gender.objects.create(name='male')
+    gender2 = Gender.objects.create(name='female')
+    for group in experiment.groups.all():
+        create_participant(
+            randint(1, 6), group,
+            gender1 if randint(1, 2) == 1 else gender2
+        )
+        create_experiment_protocol(group)
+
+
 def global_setup_ft():
     """
     This global setup creates basic object models that are used in 
@@ -846,7 +869,7 @@ def global_setup_ut():
     study2 = Study.objects.create(start_date=datetime.utcnow(),
                                   experiment=experiment2)
     # Create a study and doesn't associate it with researcher bellow.
-    # This is to testing creating research associate it with a study in
+    # This is to testing creating researcher associate it with a study in
     # test_models.py
     Study.objects.create(start_date=datetime.utcnow(),
                          experiment=experiment3)
@@ -985,18 +1008,6 @@ def global_setup_ut():
     cd = ClassificationOfDiseases.objects.last()
     cd.code = 'A74'
     cd.save()
-
-    # Create experiment related objects to test download experiment data
-    # pieces selected by the user.
-    # experiment5 has some related stuff created; create what is missing
-    create_study(experiment5)
-    gender1 = Gender.objects.create(name='male')
-    gender2 = Gender.objects.create(name='female')
-    for group in experiment5.groups.all():
-        create_participant(
-            randint(1, 6), group, gender1 if randint(1, 2) == 1 else gender2
-        )
-        create_experiment_protocol(group)
 
 
 def apply_setup(setup_func):

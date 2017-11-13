@@ -4,8 +4,9 @@ from django.contrib.auth.models import User
 from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.common.keys import Keys
 
-from experiments.models import Experiment, Questionnaire, Step
-from experiments.tests.tests_helper import create_experiment, create_group
+from experiments.models import Experiment, Questionnaire, Step, Group, Gender
+from experiments.tests.tests_helper import create_experiment, create_group, \
+    create_participant
 from functional_tests.base import FunctionalTest
 
 
@@ -660,23 +661,25 @@ class DownloadExperimentTest(FunctionalTest):
         # She also sees that there is a tree with a top "All data" option (
         # supposed to download all files), the experiment data in csv
         # format, and the rest of the data divided by experiment groups
-        self.assertIn('Experiment (spreadsheet)', downloads_tab_content.text)
+        self.assertIn('Groups', downloads_tab_content.text)
         for group in experiment.groups.all():
             self.assertIn('Group ' + group.title, downloads_tab_content.text)
             # TODO: if group has Experimental Protocol, then (below),
             # TODO: otherwise...
             self.assertIn(
-                'Experimental Protocol (zip)', downloads_tab_content.text
+                'Experimental Protocol Data', downloads_tab_content.text
             )
             self.assertIn(
-                'Participants (spreadsheet)', downloads_tab_content.text
+                'Per Participant Data', downloads_tab_content.text
             )
-            self.assertIn('Questionnaires data', downloads_tab_content.text)
             for participant in group.participants.all():
                 self.assertIn(
-                    'Participant ' + participant.code + ' (zip)',
+                    'Participant ' + participant.code,
                     downloads_tab_content.text
                 )
+            self.assertIn(
+                'Per Questionnaire Data', downloads_tab_content.text
+            )
 
     def test_can_see_groups_data_in_downloads_tab_content_only_if_there_are_groups(self):
         ##
@@ -698,28 +701,36 @@ class DownloadExperimentTest(FunctionalTest):
 
         # Now, as there're no data for groups, she sees only the "Experiment
         # (spreadsheet)" option to download
-        # TODO: first strike
-        self.assertIn('Experiment (spreadsheet)', downloads_tab_content.text)
+        self.assertIn(
+            'There are not experiment groups data for this experiment. Click '
+            'in "Download" button to download basic experiment data',
+            downloads_tab_content.text
+        )
         self.assertNotIn('Groups', downloads_tab_content.text)
         self.assertNotIn(
-            'Experimental Protocol (zip)', downloads_tab_content.text
+            'Experimental Protocol Data', downloads_tab_content.text
         )
         self.assertNotIn(
-            'Participants (spreadsheet)', downloads_tab_content.text
+            'Per Participant Data', downloads_tab_content.text
         )
-        self.assertNotIn('Questionnaires data', downloads_tab_content.text)
-        self.assertNotIn('Participant_', downloads_tab_content.text)
+        self.assertNotIn('Per Questionnaire data', downloads_tab_content.text)
+        self.assertNotIn('Participant ', downloads_tab_content.text)
 
-    def test_can_see_groups_items_in_downloads_tab_content_only_if_they_exist(self):
+    def test_can_see_groups_items_in_downloads_tab_content_only_if_they_exist(
+            self):
         ##
         # Let's create an experiment with Experiment and Groups data. With
-        # it, we simulate that Portal received an
-        # experiment, only with Experiment and Group data.
+        # it, we simulate that Portal received an experiment, only with
+        # Experiment and Group data. One group created has no data besides
+        # Group data, the other has 1 participant associated
         ##
         owner = User.objects.get(username='lab1')
         create_experiment(1, owner, Experiment.APPROVED)
         experiment = Experiment.objects.last()
         create_group(1, experiment)
+        group_with_nothing = Group.objects.last()
+        create_group(1, experiment)
+        create_participant(1, Group.objects.last(), Gender.objects.last())
 
         ##
         # We have to refresh page to include this new experiment in
@@ -729,19 +740,27 @@ class DownloadExperimentTest(FunctionalTest):
 
         downloads_tab_content = self.access_downloads_tab_content(experiment)
 
-        # As there're no data for the group created Joseleine can't see the
+        # As there're no data for one group, and one participant for the
+        # other group, Joseleine sees a message for one group and the
+        # corresponding patient data download option for the other group in
         # Groups section in Downloads tab content
-        # TODO: second strike
-        self.assertIn('Experiment (spreadsheet)', downloads_tab_content.text)
-        self.assertNotIn('Groups', downloads_tab_content.text)
-        self.assertNotIn(
-            'Experimental Protocol (zip)', downloads_tab_content.text
+        self.assertIn('Groups', downloads_tab_content.text)
+        self.assertIn(
+            'Group ' + experiment.groups.last().title,
+            downloads_tab_content.text
         )
-        self.assertNotIn(
-            'Participants (spreadsheet)', downloads_tab_content.text
+        self.assertIn(
+            'There are not data for group ' +
+            group_with_nothing.title +
+            ". But there's still basic Experiment data. Click in 'Download' "
+            "button to download it.",
+            downloads_tab_content.text
         )
-        self.assertNotIn('Questionnaires data', downloads_tab_content.text)
-        self.assertNotIn('Participant_', downloads_tab_content.text)
+        self.assertIn(
+            'Per Participant Data', downloads_tab_content.text
+        )
+        self.assertNotIn('Per Questionnaire Data', downloads_tab_content.text)
+        self.assertIn('Participant ', downloads_tab_content.text)
 
         # Obs.: the tests for having one of experimental protocol,
         # participants, and questionnaires, for all groups are not beeing made

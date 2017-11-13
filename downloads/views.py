@@ -34,22 +34,11 @@ def create_export_instance():
 
 
 def download_view(request, experiment_id):
-    experiment = Experiment.objects.get(pk=experiment_id)
-
-    # if user selected nothing, just redirect to experiment detail view with
-    # warning message.
-    if 'download_selected' not in request.POST:
-        messages.warning(
-            request,
-            _('Please select item(s) to download')
-        )
-        return HttpResponseRedirect(
-            reverse('experiment-detail', kwargs={'slug': experiment.slug})
-        )
-
-    # if download file exists, serve file immediatally for download
     experiment = get_object_or_404(Experiment, pk=experiment_id)
-    if experiment.download_url:
+
+    # if it's a get request, serve file with all experiment data immediatally
+    # for download
+    if request.method == 'GET':
         complete_filename = os.path.join(
             settings.MEDIA_ROOT,
             'download/' + str(experiment.id) + '/download.zip'
@@ -66,6 +55,17 @@ def download_view(request, experiment_id):
         zip_file.close()
 
         return response
+
+    # if user selected nothing, just redirect to experiment detail view with
+    # warning message.
+    if 'download_selected' not in request.POST:
+        messages.warning(
+            request,
+            _('Please select item(s) to download')
+        )
+        return HttpResponseRedirect(
+            reverse('experiment-detail', kwargs={'slug': experiment.slug})
+        )
 
     template_name = "experiments/detail.html"
     complete_filename, error_msg = download_create(
