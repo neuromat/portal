@@ -1,9 +1,10 @@
+import zipfile
 import haystack
 import sys
 import io
 import os
-
 import shutil
+
 from django.contrib.auth.models import User
 from django.core.management import call_command
 from django.test import TestCase, override_settings
@@ -585,25 +586,35 @@ class DownloadExperimentTest(TestCase):
         os.remove(settings.BASE_DIR + experiment.download_url.url)
 
     def test_POSTing_download_experiment_data_returns_correct_content(self):
-        # Last approved experiment created in tests helper has all
-        # possible experiment data to download
+        # Last approved experiment has 2 groups and questionnaire steps (
+        # with questionnaires data) created in tests helper
         experiment = Experiment.objects.filter(
             status=Experiment.APPROVED
         ).last()
+        # Create study and participants and experimental protocol for
+        # experiment
         create_experiment_related_objects(experiment)
 
         # Create a complete directory tree with all possible experiment data
         # directories/files that reproduces the directory/file structure
         # created when Portal receives the experiment data through Rest API.
         self.create_download_dir_structure_and_files(experiment)
+        # get groups and participants for tests below
+        g1 = experiment.groups.order_by('?').first()
+        g2 = experiment.groups.order_by('?').first()  # yes, can be equal to g1
+        p1 = experiment.groups.first().participants.order_by('?').first()
+        p2 = experiment.groups.last().participants.order_by('?').first()
 
         url = reverse('download-view', kwargs={'experiment_id': experiment.id})
         response = self.client.post(
             url, {
                 'download_selected': [
-                    'random selected 1',
-                    'random selected 2',
-                    'random selected 3',
+                    'experimental_protocol_g' + str(g1.id),
+                    'questionnaires_g' + str(g2.id),
+                    'participant_p' + str(p1.id) + '_g' + str(
+                        experiment.groups.first().id),
+                    'participant_p' + str(p2.id) + '_g' + str(
+                        experiment.groups.last().id),
                 ]
             }
         )
@@ -612,6 +623,18 @@ class DownloadExperimentTest(TestCase):
             response.get('Content-Disposition'),
             'attachment; filename="download.zip"'
         )
+
+        # Get the zipped file to test against its content
+        file = io.BytesIO(response.content)
+        zipped_file = zipfile.ZipFile(file, 'r')
+        self.assertIsNone(zipped_file.testzip())
+
+        # Test for ziped folders
+        self.assertTrue('Group_' + g1.title, any(zipped_file.namelist()))
+        self.assertTrue('Group_' + g2.title, any(zipped_file.namelist()))
+        self.assertTrue('Experimental_protocol', any(zipped_file.namelist()))
+        self.assertTrue('Per_participant_data', any(zipped_file.namelist()))
+        self.assertTrue('Questionnaire_metadata', any(zipped_file.namelist()))
 
         self.fail('Finish this test!')
 
