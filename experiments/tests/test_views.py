@@ -635,6 +635,8 @@ class DownloadExperimentTest(TestCase):
         self.assertTrue('Experimental_protocol', any(zipped_file.namelist()))
         self.assertTrue('Per_participant_data', any(zipped_file.namelist()))
         self.assertTrue('Questionnaire_metadata', any(zipped_file.namelist()))
+        self.assertTrue('Partcipant_' + p1.code, any(zipped_file.namelist()))
+        self.assertTrue('Partcipant_' + p2.code, any(zipped_file.namelist()))
 
         self.fail('Finish this test!')
 
