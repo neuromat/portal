@@ -93,7 +93,8 @@ def download_view(request, experiment_id):
         pattern_questionnaires = re.compile("questionnaires_g[0-9]+$")
         pattern_participant = re.compile("participant_p[0-9]+_g[0-9]+$")
         if pattern_exp_protocol.match(item):
-            # add experimental protocol for the specific group in temp subdir
+            # add Experimental_protocol subdir for the specific group in temp
+            # dir
             shutil.copytree(os.path.join(
                 settings.MEDIA_ROOT, 'download', str(experiment.id),
                 'Group_' + group_title, 'Experimental_protocol'
@@ -101,7 +102,8 @@ def download_view(request, experiment_id):
                             'Experimental_protocol')
             )
         if pattern_questionnaires.match(item):
-            # add questionnaires for the specific group in temp subdir
+            # add Per_questionnaire_data subdir for the specific group in temp
+            # dir
             shutil.copytree(os.path.join(
                 settings.MEDIA_ROOT, 'download', str(experiment.id),
                 'Group_' + group_title, 'Per_questionnaire_data'
@@ -115,13 +117,20 @@ def download_view(request, experiment_id):
                             'Questionnaire_metadata')
             )
         if pattern_participant.match(item):
-            # add participant for the specific group in temp subdir
-            shutil.copytree(os.path.join(
-                settings.MEDIA_ROOT, 'download', str(experiment.id),
-                'Group_' + group_title, 'Per_participant_data'
-            ), os.path.join(temp_dir, 'Group_' + group_title,
-                            'Per_participant_data')
-            )
+            # add Per_participant_data subdir for the specific group in temp
+            # dir
+            # if user chose more than one participant from one group the
+            # subdir has already being created
+            if not os.path.exists(
+                    os.path.join(temp_dir, 'Group_' + group_title,
+                                 'Per_participant_data')
+            ):
+                shutil.copytree(os.path.join(
+                    settings.MEDIA_ROOT, 'download', str(experiment.id),
+                    'Group_' + group_title, 'Per_participant_data'
+                ), os.path.join(temp_dir, 'Group_' + group_title,
+                                'Per_participant_data')
+                )
     # make compressed file and return response to client
     compressed_file_name = shutil.make_archive(os.path.join(
         temp_dir, 'download'), 'zip', temp_dir

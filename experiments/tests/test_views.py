@@ -1,3 +1,5 @@
+import random
+import re
 import zipfile
 import haystack
 import sys
@@ -432,8 +434,155 @@ class SearchTest(TestCase):
 @apply_setup(global_setup_ut)
 class DownloadExperimentTest(TestCase):
 
+    TEMP_MEDIA_ROOT = '/tmp/media'
+
     def setUp(self):
         global_setup_ut()
+
+    def asserts_experimental_protocol(self, ep_value, group1, group2,
+                                      zipped_file):
+        ep_group_str = re.search(
+            "experimental_protocol_g([0-9]+)", ep_value
+        )
+        ep_group_id = int(ep_group_str.group(1))
+        if group1.id == ep_group_id:
+            self.assertTrue(
+                any('Group_' + group1.title in element for element in
+                    zipped_file.namelist())
+            )
+            self.assertTrue(
+                any('Group_' + group1.title + '/Experimental_protocol'
+                    in element for element in zipped_file.namelist())
+            )
+            if group1 != group2:
+                self.assertFalse(
+                    any('Group_' + group2.title + '/Experimental_protocol'
+                        in element for element in zipped_file.namelist())
+                )
+        else:  # group2.id == ep_group_id
+            self.assertTrue(
+                any('Group_' + group2.title in element for element in
+                    zipped_file.namelist())
+            )
+            self.assertTrue(
+                any('Group_' + group2.title + '/Experimental_protocol'
+                    in element for element in zipped_file.namelist())
+            )
+            if group1 != group2:
+                self.assertFalse(
+                    any('Group_' + group1.title + '/Experimental_protocol'
+                        in element for element in zipped_file.namelist())
+                )
+
+    def asserts_questionnaires(self, q_value, group1, group2,
+                               zipped_file):
+        q_group_str = re.search("questionnaires_g([0-9]+)", q_value)
+        q_group_id = int(q_group_str.group(1))
+        if group1.id == q_group_id:
+            self.assertTrue(
+                any('Group_' + group1.title + '/Questionnaire_metadata'
+                    in element for element in zipped_file.namelist())
+            )
+            self.assertTrue(
+                any('Group_' + group1.title + '/Per_questionnaire_data'
+                    in element for element in zipped_file.namelist())
+            )
+            if group1 != group2:
+                self.assertFalse(
+                    any('Group_' + group2.title + '/Questionnaire_metadata'
+                        in element for element in zipped_file.namelist())
+                )
+                self.assertFalse(
+                    any('Group_' + group2.title + '/Per_questionnaire_data'
+                        in element for element in zipped_file.namelist())
+                )
+        else:  # group2.id == ep_group_id
+            self.assertTrue(
+                any('Group_' + group2.title + '/Questionnaire_metadata'
+                    in element for element in zipped_file.namelist())
+            )
+            self.assertTrue(
+                any('Group_' + group2.title + '/Per_questionnaire_data'
+                    in element for element in zipped_file.namelist())
+            )
+            if group1 != group2:
+                self.assertFalse(
+                    any('Group_' + group1.title + '/Questionnaire_metadata'
+                        in element for element in zipped_file.namelist())
+                )
+                self.assertFalse(
+                    any('Group_' + group1.title + '/Per_questionnaire_data'
+                        in element for element in zipped_file.namelist())
+                )
+
+    def assert_participants(self, group, participant, zipped_file):
+        self.assertTrue(
+            any('Group_' + group.title + '/Per_participant_data'
+                in element for element in zipped_file.namelist())
+        )
+        self.assertTrue(
+            any('Group_' + group.title + '/Per_participant_data/Participant_' +
+                participant.code
+                in element for element in zipped_file.namelist())
+        )
+
+    def user_choices_based_asserts(self, selected_items, group1, group2,
+                                   participant1, participant2, zipped_file):
+        """
+        There are a combination without repetition of three in four selection
+        possibilities that are:
+            - experimental protocol, questionnaires, participant of group1,
+            participant of group2
+        This results in four possibilites: C(4, 3) = 4.
+        But for questionnaires and experimental protocol we can have two
+        other possibilities, and it's precisely the case when group1 !=
+        group2. So at the end, we are left with a combination of 3 elements
+        in 6 possibilites: C(6, 3) = 20
+        :param selected_items: dictionnary
+        :param group1: Group model instance
+        :param group2: Group model instance
+        :param participant1: Participant model instance (always perteining
+        to a different group of participant2. Obs.: it could be equal to
+        participant2 because group is a foreign key for participant, but in
+        the function calling the participant1 != participant2)
+        :param participant2: participant model instance
+        :param zipped_file:
+        """
+        if {'ep', 'q', 'p_g1'}.issubset(selected_items.keys()):
+            # experimental protocol
+            self.asserts_experimental_protocol(selected_items['ep'], group1,
+                                               group2, zipped_file)
+            # questionnaires
+            self.asserts_questionnaires(selected_items['q'], group1, group2,
+                                        zipped_file)
+            # participants
+            self.assert_participants(group1, participant1, zipped_file)
+
+        if {'ep', 'q', 'p_g2'}.issubset(selected_items.keys()):
+            # experimental protocol
+            self.asserts_experimental_protocol(selected_items['ep'], group1,
+                                               group2, zipped_file)
+            # questionnaires
+            self.asserts_questionnaires(selected_items['q'], group1, group2,
+                                        zipped_file)
+            # participants
+            self.assert_participants(group2, participant2, zipped_file)
+
+        if {'ep', 'p_g1', 'p_g2'}.issubset(selected_items.keys()):
+            # experimental protocol
+            self.asserts_experimental_protocol(selected_items['ep'], group1,
+                                               group2, zipped_file)
+            # participants
+            self.assert_participants(group1, participant1, zipped_file)
+            self.assert_participants(group2, participant2, zipped_file)
+
+        if {'q', 'p_g1', 'p_g2'}.issubset(selected_items.keys()):
+            # questionnaires
+            self.asserts_questionnaires(selected_items['q'], group1, group2,
+                                        zipped_file)
+            # participants
+            self.assert_participants(group1, participant1, zipped_file)
+            self.assert_participants(group2, participant2, zipped_file)
 
     def create_q_language_dir(self, q, questionnaire_metadata_dir):
         q_default = _get_q_default_language_or_first(q)
@@ -485,12 +634,13 @@ class DownloadExperimentTest(TestCase):
     def create_download_dir_structure_and_files(self, experiment):
         # create download experiment data root
         experiment_download_dir = os.path.join(
-            settings.MEDIA_ROOT, 'download', str(experiment.pk)
+            self.TEMP_MEDIA_ROOT, 'download', str(experiment.pk)
         )
 
         # remove subdir if exists before creating that
-        shutil.rmtree(experiment_download_dir)
-        os.mkdir(experiment_download_dir)
+        if os.path.exists(experiment_download_dir):
+            shutil.rmtree(experiment_download_dir)
+        os.makedirs(experiment_download_dir)
 
         # create Experiment.csv file
         self.create_text_file(
@@ -585,6 +735,7 @@ class DownloadExperimentTest(TestCase):
         # Remove fake download.zip file
         os.remove(settings.BASE_DIR + experiment.download_url.url)
 
+    @override_settings(MEDIA_ROOT=TEMP_MEDIA_ROOT)
     def test_POSTing_download_experiment_data_returns_correct_content(self):
         # Last approved experiment has 2 groups and questionnaire steps (
         # with questionnaires data) created in tests helper
@@ -595,29 +746,37 @@ class DownloadExperimentTest(TestCase):
         # experiment
         create_experiment_related_objects(experiment)
 
-        # Create a complete directory tree with all possible experiment data
+        # Create a complete directory tree with possible experiment data
         # directories/files that reproduces the directory/file structure
         # created when Portal receives the experiment data through Rest API.
         self.create_download_dir_structure_and_files(experiment)
+
         # get groups and participants for tests below
         g1 = experiment.groups.order_by('?').first()
-        g2 = experiment.groups.order_by('?').first()  # yes, can be equal to g1
-        p1 = experiment.groups.first().participants.order_by('?').first()
-        p2 = experiment.groups.last().participants.order_by('?').first()
+        g2 = experiment.groups.order_by('?').first()  # can be equal to g1
+        p1 = g1.participants.order_by('?').first()
+        p2 = g2.participants.order_by('?').first()  # can be equal to p1
 
         url = reverse('download-view', kwargs={'experiment_id': experiment.id})
+
+        # random select items, simulating user posting items to download
+        all_items = {
+            'ep': 'experimental_protocol_g' + str(g1.id),
+            'q': 'questionnaires_g' + str(g2.id),
+            'p_g1': 'participant_p' + str(p1.id) + '_g' + str(g1.id),
+            'p_g2': 'participant_p' + str(p2.id) + '_g' + str(g2.id)
+        }
+        selected_items = {}
+        for i in range(3):
+            random_choice = random.choice(list(all_items.keys()))
+            selected_items[random_choice] = all_items[random_choice]
+            all_items.pop(random_choice, 0)
         response = self.client.post(
             url, {
-                'download_selected': [
-                    'experimental_protocol_g' + str(g1.id),
-                    'questionnaires_g' + str(g2.id),
-                    'participant_p' + str(p1.id) + '_g' + str(
-                        experiment.groups.first().id),
-                    'participant_p' + str(p2.id) + '_g' + str(
-                        experiment.groups.last().id),
-                ]
+                'download_selected': selected_items.values()
             }
         )
+
         self.assertEqual(response.status_code, 200)
         self.assertEquals(
             response.get('Content-Disposition'),
@@ -629,16 +788,11 @@ class DownloadExperimentTest(TestCase):
         zipped_file = zipfile.ZipFile(file, 'r')
         self.assertIsNone(zipped_file.testzip())
 
-        # Test for ziped folders
-        self.assertTrue('Group_' + g1.title, any(zipped_file.namelist()))
-        self.assertTrue('Group_' + g2.title, any(zipped_file.namelist()))
-        self.assertTrue('Experimental_protocol', any(zipped_file.namelist()))
-        self.assertTrue('Per_participant_data', any(zipped_file.namelist()))
-        self.assertTrue('Questionnaire_metadata', any(zipped_file.namelist()))
-        self.assertTrue('Partcipant_' + p1.code, any(zipped_file.namelist()))
-        self.assertTrue('Partcipant_' + p2.code, any(zipped_file.namelist()))
-
-        self.fail('Finish this test!')
+        # Test for zipped folders based on items selected by user
+        # print(zipped_file.namelist())  # DEBUG
+        self.user_choices_based_asserts(
+            selected_items, g1, g2, p1, p2, zipped_file
+        )
 
     def test_POSTing_download_experiment_data_without_choices_redirects_to_experiment_detail_view(self):
         # Last approved experiment created in tests helper has all
