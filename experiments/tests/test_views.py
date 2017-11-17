@@ -488,10 +488,13 @@ class DownloadExperimentTest(TestCase):
                     in element for element in zipped_file.namelist())
             )
             if group1 != group2:
-                self.assertFalse(
-                    any('Group_' + group2.title + '/Questionnaire_metadata'
-                        in element for element in zipped_file.namelist())
-                )
+                # Questionnaire_metadata subdir exists if group2 has
+                # questionnaire(s).
+                if group2.steps.filter(type=Step.QUESTIONNAIRE).count() == 0:
+                    self.assertFalse(
+                        any('Group_' + group2.title + '/Questionnaire_metadata'
+                            in element for element in zipped_file.namelist())
+                    )
                 self.assertFalse(
                     any('Group_' + group2.title + '/Per_questionnaire_data'
                         in element for element in zipped_file.namelist())
@@ -506,10 +509,13 @@ class DownloadExperimentTest(TestCase):
                     in element for element in zipped_file.namelist())
             )
             if group1 != group2:
-                self.assertFalse(
-                    any('Group_' + group1.title + '/Questionnaire_metadata'
-                        in element for element in zipped_file.namelist())
-                )
+                # Questionnaire_metadata subdir exists if group2 has
+                # questionnaire(s).
+                if group2.steps.filter(type=Step.QUESTIONNAIRE).count() == 0:
+                    self.assertFalse(
+                        any('Group_' + group1.title + '/Questionnaire_metadata'
+                            in element for element in zipped_file.namelist())
+                    )
                 self.assertFalse(
                     any('Group_' + group1.title + '/Per_questionnaire_data'
                         in element for element in zipped_file.namelist())
@@ -783,16 +789,35 @@ class DownloadExperimentTest(TestCase):
             'attachment; filename="download.zip"'
         )
 
-        # Get the zipped file to test against its content
+        # get the zipped file to test against its content
         file = io.BytesIO(response.content)
         zipped_file = zipfile.ZipFile(file, 'r')
         self.assertIsNone(zipped_file.testzip())
 
-        # Test for zipped folders based on items selected by user
-        # print(zipped_file.namelist())  # DEBUG
+        # compressed file must always contain Experiments.csv
+        self.assertTrue(
+            any('Experiment.csv'
+                in element for element in zipped_file.namelist()),
+            'Experiment.csv not in ' + str(zipped_file.namelist())
+        )
+
+        # test for compressed folders based on items selected by user
         self.user_choices_based_asserts(
             selected_items, g1, g2, p1, p2, zipped_file
         )
+
+        # For each group, if it has questionnaire(s) in its experimental
+        # protocol, it must contain questionnaire(s) metadata in group
+        # subdir of the compressed file.
+        for group in [g1, g2]:
+            if group.steps.filter(type=Step.QUESTIONNAIRE).count() > 0:
+                self.assertTrue(
+                    any('Group_' + group.title + '/Questionnaire_metadata'
+                        in element for element in zipped_file.namelist()),
+                    '"Group_' + group.title +
+                    '/Questionnaire_metadata" subdir not in: ' +
+                    str(zipped_file.namelist())
+                )
 
     def test_POSTing_download_experiment_data_without_choices_redirects_to_experiment_detail_view(self):
         # Last approved experiment created in tests helper has all

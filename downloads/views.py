@@ -16,8 +16,7 @@ from django.utils.translation import ugettext as _
 from .export import create_directory, ExportExecution
 from .input_export import build_complete_export_structure
 from .models import Export
-from experiments.models import Experiment, Group
-
+from experiments.models import Experiment, Group, Step
 
 JSON_FILENAME = "json_export.json"
 JSON_EXPERIMENT_FILENAME = "json_experiment_export.json"
@@ -74,19 +73,18 @@ def download_view(request, experiment_id):
     # create temporary dir to aggregate subdirs/files for further
     # incorporate in compacted file
     temp_dir = tempfile.mkdtemp()
-    # see if there are data for groups
-    for group in experiment.groups.all():
-        if group.experimental_protocol or group.participants.all():
-            # create temp group's directory
-            os.mkdir(os.path.join(temp_dir, 'Group_' + group.title))
-
+    # Experiment.csv always will be in compressed file
+    shutil.copyfile(os.path.join(
+        settings.MEDIA_ROOT, 'download', str(experiment.id), 'Experiment.csv'
+    ), os.path.join(temp_dir, 'Experiment.csv')
+    )
     # Copy experiment data from media/download/<experiment.id> based on user
     # selection, to temp dir.
     for item in request.POST.getlist('download_selected'):
         # take the group title to copy subdirs/files to temp location
         group_str = re.search("g[0-9]+", item)
         group_id = int(group_str.group(0)[1:])
-        group_title = Group.objects.get(pk=group_id).title
+        group = Group.objects.get(pk=group_id)
         # Options values in templates has group and/or participants id's as
         # substrings, so use regex to determine if they were selected.
         pattern_exp_protocol = re.compile("experimental_protocol_g[0-9]+$")
@@ -97,8 +95,8 @@ def download_view(request, experiment_id):
             # dir
             shutil.copytree(os.path.join(
                 settings.MEDIA_ROOT, 'download', str(experiment.id),
-                'Group_' + group_title, 'Experimental_protocol'
-            ), os.path.join(temp_dir, 'Group_' + group_title,
+                'Group_' + group.title, 'Experimental_protocol'
+            ), os.path.join(temp_dir, 'Group_' + group.title,
                             'Experimental_protocol')
             )
         if pattern_questionnaires.match(item):
@@ -106,31 +104,55 @@ def download_view(request, experiment_id):
             # dir
             shutil.copytree(os.path.join(
                 settings.MEDIA_ROOT, 'download', str(experiment.id),
-                'Group_' + group_title, 'Per_questionnaire_data'
-            ), os.path.join(temp_dir, 'Group_' + group_title,
+                'Group_' + group.title, 'Per_questionnaire_data'
+            ), os.path.join(temp_dir, 'Group_' + group.title,
                             'Per_questionnaire_data')
             )
-            shutil.copytree(os.path.join(
-                settings.MEDIA_ROOT, 'download', str(experiment.id),
-                'Group_' + group_title, 'Questionnaire_metadata'
-            ), os.path.join(temp_dir, 'Group_' + group_title,
-                            'Questionnaire_metadata')
-            )
+            # add Questionnaire_metadata subdir for the specific group in temp
+            # dir, if it's not being created yet (see below)
+            if not os.path.exists(
+                    os.path.join(temp_dir, 'Group_' + group.title,
+                                 'Questionnaire_metadata')
+            ):
+                shutil.copytree(os.path.join(
+                    settings.MEDIA_ROOT, 'download', str(experiment.id),
+                    'Group_' + group.title, 'Questionnaire_metadata'
+                ), os.path.join(temp_dir, 'Group_' + group.title,
+                                'Questionnaire_metadata')
+                )
         if pattern_participant.match(item):
             # add Per_participant_data subdir for the specific group in temp
             # dir
             # if user chose more than one participant from one group the
             # subdir has already being created
             if not os.path.exists(
-                    os.path.join(temp_dir, 'Group_' + group_title,
+                    os.path.join(temp_dir, 'Group_' + group.title,
                                  'Per_participant_data')
             ):
                 shutil.copytree(os.path.join(
                     settings.MEDIA_ROOT, 'download', str(experiment.id),
-                    'Group_' + group_title, 'Per_participant_data'
-                ), os.path.join(temp_dir, 'Group_' + group_title,
+                    'Group_' + group.title, 'Per_participant_data'
+                ), os.path.join(temp_dir, 'Group_' + group.title,
                                 'Per_participant_data')
                 )
+        # If user has chosen some item perteining to a group that has
+        # questionnaire(s) in experimental protocol put
+        # Questionnaire_metadata subdir of the corresponding group now.
+        if group.steps.filter(type=Step.QUESTIONNAIRE).count() > 0:
+            # Add Questionnaire_metadata subdir for the specific group in temp
+            # dir. We test for subdir existence, because it could be created
+            # above.
+            if not os.path.exists(
+                    os.path.join(temp_dir, 'Group_' + group.title,
+                                 'Questionnaire_metadata')
+            ):
+                shutil.copytree(os.path.join(
+                    settings.MEDIA_ROOT, 'download', str(experiment.id),
+                    'Group_' + group.title, 'Questionnaire_metadata'
+                ), os.path.join(temp_dir, 'Group_' + group.title,
+                                'Questionnaire_metadata')
+                )
+
     # make compressed file and return response to client
     compressed_file_name = shutil.make_archive(os.path.join(
         temp_dir, 'download'), 'zip', temp_dir
