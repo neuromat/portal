@@ -769,7 +769,6 @@ class DownloadExperimentTest(TestCase):
         all_items = {
             'ep': 'experimental_protocol_g' + str(g1.id),
             'q': 'questionnaires_g' + str(g2.id),
-            'q_meta': 'questionnaire_metadata_g' + str(g2.id),
             'p_g1': 'participant_p' + str(p1.id) + '_g' + str(g1.id),
             'p_g2': 'participant_p' + str(p2.id) + '_g' + str(g2.id)
         }
