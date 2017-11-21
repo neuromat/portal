@@ -743,13 +743,13 @@ class DownloadExperimentTest(TestCase):
 
     @override_settings(MEDIA_ROOT=TEMP_MEDIA_ROOT)
     def test_POSTing_download_experiment_data_returns_correct_content(self):
-        # Last approved experiment has 2 groups and questionnaire steps (
-        # with questionnaires data) created in tests helper
+        # Last approved experiment has 2 groups and questionnaire steps (with
+        # questionnaires data) created in tests helper
         experiment = Experiment.objects.filter(
             status=Experiment.APPROVED
         ).last()
         # Create study and participants and experimental protocol for
-        # experiment
+        # this experiment. That's what it's missing.
         create_experiment_related_objects(experiment)
 
         # Create a complete directory tree with possible experiment data
@@ -769,6 +769,7 @@ class DownloadExperimentTest(TestCase):
         all_items = {
             'ep': 'experimental_protocol_g' + str(g1.id),
             'q': 'questionnaires_g' + str(g2.id),
+            # 'q_meta': 'questionnaire_metadata_g' + str(g2.id),
             'p_g1': 'participant_p' + str(p1.id) + '_g' + str(g1.id),
             'p_g2': 'participant_p' + str(p2.id) + '_g' + str(g2.id)
         }

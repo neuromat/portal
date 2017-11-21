@@ -55,7 +55,7 @@ def create_experiment(qtty, owner, status):
     fake = Factory.create()
 
     for i in range(qtty):
-        experiment = Experiment.objects.create(
+        Experiment.objects.create(
             title=fake.text(max_nb_chars=15),
             description=fake.text(max_nb_chars=200),
             nes_id=randint(1, 10000),  # TODO: guarantee that this won't
@@ -409,7 +409,6 @@ def create_questionnaire(qtty, code, group):
     testing)
     :param group: Group model instance
     """
-    faker = Factory.create()
 
     for i in range(qtty):
         Questionnaire.objects.create(
@@ -457,8 +456,7 @@ def global_setup_ft():
     # Create group Trustees
     create_trustee_users()
 
-    # Create 5 experiments for 2 owners, randomly, and studies (groups are
-    # created inside create_experiment_and_study)
+    # Create experiments for 2 owners, randomly
     create_experiment(1, choice([owner1, owner2]),
                       Experiment.TO_BE_ANALYSED)
     experiment = Experiment.objects.last()
@@ -669,7 +667,7 @@ def global_setup_ft():
     cd.save()
 
     # Create randint(3, 7) participants for each group (requires create
-    # groups before)
+    # groups before), and experimental protocols
     for group in Group.objects.all():
         create_experiment_protocol(group)
         create_participant(

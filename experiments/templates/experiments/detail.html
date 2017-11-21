@@ -340,7 +340,7 @@
                                         {% if group.experimental_protocol %}
                                             <option value="experimental_protocol_g{{ group.id }}" data-section="Groups/Group {{ group.title }}">{% trans 'Experimental Protocol Data' %}</option>
                                         {% endif %}
-                                        {% if questionnaires %}
+                                        {% if group.title in questionnaires %}
                                             <option value="questionnaires_g{{ group.id }}" data-section="Groups/Group {{ group.title }}">{% trans 'Per Questionnaire Data' %}</option>
                                         {% endif %}
                                         {% for participant in group.participants.all %}
@@ -349,7 +349,7 @@
                                     {% endfor %}
                                 </select>
                                 {% for group in experiment.groups.all %}
-                                    {% if not group.experimental_protocol and not questionnaires and not group.participants.all %}
+                                    {% if not group.experimental_protocol and not group.title in questionnaires and not group.participants.all %}
                                         <p><em>
                                             {% trans 'There are not data for group' %} {{ group.title }}. {% trans "But there\'s still basic Experiment data. Click in 'Download' button to download it." %}
                                         </em></p>

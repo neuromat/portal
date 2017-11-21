@@ -647,39 +647,79 @@ class DownloadExperimentTest(FunctionalTest):
         return downloads_tab_content
 
     def test_can_see_section_content_of_downloads_tab(self):
+        ##
+        # Last approved experiment created has the objects that we need for
+        # all groups, besides questionnaires and experimental protocols for
+        # some groups.
+        ##
         experiment = Experiment.objects.filter(
             status=Experiment.APPROVED
         ).last()
 
         downloads_tab_content = self.access_downloads_tab_content(experiment)
+        # wait for tree-multiselect plugin to render multiselection
+        time.sleep(0.5)
 
         downloads_header = downloads_tab_content.find_element_by_tag_name('h4')
         self.assertEqual(
             'Select experiment data pieces to download', downloads_header.text
         )
 
-        # She also sees that there is a tree with a top "All data" option (
+        # She also sees that there is a tree with a top "Groups" option (
         # supposed to download all files), the experiment data in csv
         # format, and the rest of the data divided by experiment groups
         self.assertIn('Groups', downloads_tab_content.text)
+        ##
+        # Variable to count how many groups has experimental protocol that
+        # will be tested below.
+        ##
+        experimental_protocol_counter = 0
+        ##
+        # Variable to count how many groups has questionnaires that
+        # will be tested below.
+        ##
+        per_questionnaire_counter = 0
         for group in experiment.groups.all():
-            self.assertIn('Group ' + group.title, downloads_tab_content.text)
-            # TODO: if group has Experimental Protocol, then (below),
-            # TODO: otherwise...
-            self.assertIn(
-                'Experimental Protocol Data', downloads_tab_content.text
-            )
-            self.assertIn(
-                'Per Participant Data', downloads_tab_content.text
-            )
-            for participant in group.participants.all():
+            # We test download selection by user, only for efective data in a
+            # group. If not, test for warning message
+            if not hasattr(group, 'experimental_protocol') \
+                    and not group.steps.filter(type=Step.QUESTIONNAIRE).count() > 0 \
+                    and not group.participants.all():
                 self.assertIn(
-                    'Participant ' + participant.code,
+                    'There are not data for group ' + group.title,
                     downloads_tab_content.text
                 )
-            self.assertIn(
-                'Per Questionnaire Data', downloads_tab_content.text
-            )
+            else:
+                self.assertIn('Group ' + group.title, downloads_tab_content.text)
+                if hasattr(group, 'experimental_protocol'):
+                    experimental_protocol_counter += 1
+                for participant in group.participants.all():
+                    self.assertIn(
+                        'Participant ' + participant.code,
+                        ##
+                        # Can assertIn downloads_tab_content because we've
+                        # created different participants for each group.
+                        ##
+                        downloads_tab_content.text
+                    )
+                if group.steps.filter(type=Step.QUESTIONNAIRE).count() > 0:
+                    per_questionnaire_counter += 1
+
+        ##
+        # test for correct number of Experimental Protocol Data options
+        ##
+        self.assertEqual(
+            experimental_protocol_counter,
+            downloads_tab_content.text.count('Experimental Protocol Data')
+        )
+
+        ##
+        # test for correct number of Per Questionnaire Data options
+        ##
+        self.assertEqual(
+            per_questionnaire_counter,
+            downloads_tab_content.text.count('Per Questionnaire Data')
+        )
 
     def test_can_see_groups_data_in_downloads_tab_content_only_if_there_are_groups(self):
         ##
