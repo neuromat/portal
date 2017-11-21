@@ -108,6 +108,13 @@ def download_view(request, experiment_id):
             ), os.path.join(temp_dir, 'Group_' + group.title,
                             'Per_questionnaire_data')
             )
+            # add Participants.csv file for the specific group in temp dir.
+            shutil.copyfile(os.path.join(
+                settings.MEDIA_ROOT, 'download', str(experiment.id),
+                'Group_' + group.title, 'Participants.csv'
+            ), os.path.join(temp_dir, 'Group_' + group.title,
+                            'Participants.csv')
+            )
         if pattern_participant.match(item):
             # Add Per_participant_data subdir for the specific group in temp
             # dir.

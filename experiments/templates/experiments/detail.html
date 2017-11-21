@@ -338,13 +338,13 @@
                                 <select name="download_selected" id="download_options" multiple>
                                     {% for group in experiment.groups.all %}
                                         {% if group.experimental_protocol %}
-                                            <option value="experimental_protocol_g{{ group.id }}" data-section="Groups/Group {{ group.title }}">{% trans 'Experimental Protocol Data' %}</option>
+                                            <option value="experimental_protocol_g{{ group.id }}" data-section="Group {{ group.title }}">{% trans 'Experimental Protocol Data' %}</option>
                                         {% endif %}
                                         {% if group.title in questionnaires %}
-                                            <option value="questionnaires_g{{ group.id }}" data-section="Groups/Group {{ group.title }}">{% trans 'Per Questionnaire Data' %}</option>
+                                            <option value="questionnaires_g{{ group.id }}" data-section="Group {{ group.title }}">{% trans 'Per Questionnaire Data' %}</option>
                                         {% endif %}
                                         {% for participant in group.participants.all %}
-                                            <option value="participant_p{{ participant.id }}_g{{ group.id }}" data-section="Groups/Group {{ group.title }}/Per Participant Data">{% trans 'Participant ' %}{{ participant.code }}</option>
+                                            <option value="participant_p{{ participant.id }}_g{{ group.id }}" data-section="Group {{ group.title }}/Per Participant Data">{% trans 'Participant ' %}{{ participant.code }}</option>
                                         {% endfor %}
                                     {% endfor %}
                                 </select>
@@ -528,6 +528,22 @@
     {##}
     <script src="{% static 'tree-multiselect.js/jquery.tree-multiselect.min.js' %}"></script>
     <script>
-        $("select").treeMultiselect();
+        $("select").treeMultiselect({
+            enableSelectAll: true,
+        });
+        // Prevent default on submit options download button if not/all was
+        // selected. If all was selected redirect to GET to 'download_view'
+        $("#download_button").click(function(e) {
+            const options = $("select#download_options option").length;
+            const selected = $("select#download_options :selected").length;
+            if (selected === 0) {
+                e.preventDefault();
+            }
+            if (selected == options) {  // PyCharm highlight not necessary
+                e.preventDefault();
+                const url = "{% url 'download-view' experiment.id %}";
+                $(location).attr('href', url)
+            }
+        })
     </script>
 {% endblock %}

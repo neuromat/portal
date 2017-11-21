@@ -1,4 +1,5 @@
 import time
+from unittest import skip
 
 from django.contrib.auth.models import User
 from selenium.common.exceptions import NoSuchElementException
@@ -665,10 +666,6 @@ class DownloadExperimentTest(FunctionalTest):
             'Select experiment data pieces to download', downloads_header.text
         )
 
-        # She also sees that there is a tree with a top "Groups" option (
-        # supposed to download all files), the experiment data in csv
-        # format, and the rest of the data divided by experiment groups
-        self.assertIn('Groups', downloads_tab_content.text)
         ##
         # Variable to count how many groups has experimental protocol that
         # will be tested below.
@@ -680,8 +677,10 @@ class DownloadExperimentTest(FunctionalTest):
         ##
         per_questionnaire_counter = 0
         for group in experiment.groups.all():
+            ##
             # We test download selection by user, only for efective data in a
             # group. If not, test for warning message
+            ##
             if not hasattr(group, 'experimental_protocol') \
                     and not group.steps.filter(type=Step.QUESTIONNAIRE).count() > 0 \
                     and not group.participants.all():
@@ -784,7 +783,6 @@ class DownloadExperimentTest(FunctionalTest):
         # other group, Joseleine sees a message for one group and the
         # corresponding patient data download option for the other group in
         # Groups section in Downloads tab content
-        self.assertIn('Groups', downloads_tab_content.text)
         self.assertIn(
             'Group ' + experiment.groups.last().title,
             downloads_tab_content.text
@@ -818,7 +816,17 @@ class DownloadExperimentTest(FunctionalTest):
         button = self.browser.find_element_by_id('download_button')
         self.assertEqual('Download', button.get_attribute('value'))
 
+    @skip
     def test_try_to_download_without_selections_redirects_to_experiment_detail_view_with_message(self):
+        ##
+        # This test must be ran with javascript deactivated. When we made it
+        # there was not a jQuery script to prevent form submit if there's
+        # not options selected to download. After we made this script.
+        # So, to run this test we'd have to deactivate javascript to run it.
+        # But if we deactivate javascript we can't even click in Downloads
+        # tab. So we're skipping this test. See
+        # https://stackoverflow.com/questions/13655486/how-can-i-disable-javascript-in-firefox-with-selenium
+        ##
         experiment = Experiment.objects.filter(
             status=Experiment.APPROVED
         ).first()

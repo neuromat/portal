@@ -1,6 +1,8 @@
 import random
 import re
 import zipfile
+from unittest import skip
+
 import haystack
 import sys
 import io
@@ -15,7 +17,7 @@ from haystack.query import SearchQuerySet
 
 from experiments import views
 from experiments.models import Experiment, Step, Questionnaire, \
-    QuestionnaireDefaultLanguage, QuestionnaireLanguage
+    QuestionnaireDefaultLanguage, QuestionnaireLanguage, Group
 from experiments.tests.tests_helper import apply_setup, global_setup_ut, \
     create_experiment_related_objects
 from experiments.views import _get_q_default_language_or_first
@@ -450,6 +452,8 @@ class DownloadExperimentTest(TestCase):
                 any('Group_' + group1.title in element for element in
                     zipped_file.namelist())
             )
+            # TODO: maybe it's necessary to construct the string representing
+            # TODO: the path with file system specific separator ('/' or '\')
             self.assertTrue(
                 any('Group_' + group1.title + '/Experimental_protocol'
                     in element for element in zipped_file.namelist())
@@ -520,6 +524,17 @@ class DownloadExperimentTest(TestCase):
                     any('Group_' + group1.title + '/Per_questionnaire_data'
                         in element for element in zipped_file.namelist())
                 )
+
+        # when user select "Per Questionnaire Data" option the file
+        # Participants.csv has to be in compressed file
+        questionnaire_group = Group.objects.get(pk=q_group_id)
+        self.assertTrue(
+            any('Group_' + questionnaire_group.title + '/Participants.csv'
+                in element for element in zipped_file.namelist()
+                ), 'Group_' + questionnaire_group.title + '/Participants.csv '
+                                                          'not in ' +
+                   str(zipped_file.namelist())
+        )
 
     def assert_participants(self, group, participant, zipped_file):
         self.assertTrue(
@@ -834,3 +849,9 @@ class DownloadExperimentTest(TestCase):
             response,
             reverse('experiment-detail', kwargs={'slug': experiment.slug})
         )
+
+    @skip
+    def test_POSTing_all_options_redirects_to_view_with_GET_request(self):
+        # we are prevent submit data in detail.html with JQuery by now
+        # TODO: possible implementation without javascript
+        pass
