@@ -283,7 +283,6 @@ def change_status(request, experiment_id):
             _(' warning that the experiment changed status to Approved.')
         )
         rebuild_haystack_index.delay()
-        # build_download_file(experiment.id).delay()
 
     if status == Experiment.UNDER_ANALYSIS:
         experiment.status = status
