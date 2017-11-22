@@ -16,7 +16,7 @@ from django.utils.translation import ugettext as _
 from .export import create_directory, ExportExecution
 from .input_export import build_complete_export_structure
 from .models import Export
-from experiments.models import Experiment, Group, Step
+from experiments.models import Experiment, Group, Step, Participant
 
 JSON_FILENAME = "json_export.json"
 JSON_EXPERIMENT_FILENAME = "json_experiment_export.json"
@@ -118,18 +118,17 @@ def download_view(request, experiment_id):
         if pattern_participant.match(item):
             # Add Per_participant_data subdir for the specific group in temp
             # dir.
-            # If user choose more than one participant from one group the
-            # subdir has already being created.
-            if not os.path.exists(
-                    os.path.join(temp_dir, 'Group_' + group.title,
-                                 'Per_participant_data')
-            ):
-                shutil.copytree(os.path.join(
-                    settings.MEDIA_ROOT, 'download', str(experiment.id),
-                    'Group_' + group.title, 'Per_participant_data'
-                ), os.path.join(temp_dir, 'Group_' + group.title,
-                                'Per_participant_data')
-                )
+            participant_str = re.search("p[0-9]+", item)
+            participant_id = int(participant_str.group(0)[1:])
+            participant = Participant.objects.get(pk=participant_id)
+            shutil.copytree(os.path.join(
+                settings.MEDIA_ROOT, 'download', str(experiment.id),
+                'Group_' + group.title, 'Per_participant_data', 'Participant_'
+                                        + participant.code
+            ), os.path.join(temp_dir, 'Group_' + group.title,
+                            'Per_participant_data', 'Participant_' +
+                            participant.code)
+            )
 
     # Put Questionnaire_metadata subdir in temp dir for all groups that have
     # questionnaires.
@@ -144,7 +143,7 @@ def download_view(request, experiment_id):
 
     # make compressed file and return response to client
     compressed_file_name = shutil.make_archive(os.path.join(
-        temp_dir, 'download'), 'zip', temp_dir
+        tempfile.mkdtemp(), 'download'), 'zip', temp_dir
     )
     compressed_file = open(os.path.join(temp_dir, compressed_file_name), 'rb')
     response = HttpResponse(compressed_file, content_type='application/zip')

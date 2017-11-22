@@ -536,16 +536,36 @@ class DownloadExperimentTest(TestCase):
                    str(zipped_file.namelist())
         )
 
-    def assert_participants(self, group, participant, zipped_file):
+    def assert_participants(self, group1, group2, participant1, participant2,
+                            zipped_file, both):
         self.assertTrue(
-            any('Group_' + group.title + '/Per_participant_data'
+            any('Group_' + group1.title + '/Per_participant_data'
                 in element for element in zipped_file.namelist())
         )
         self.assertTrue(
-            any('Group_' + group.title + '/Per_participant_data/Participant_' +
-                participant.code
+            any('Group_' + group1.title + '/Per_participant_data/Participant_' +
+                participant1.code
                 in element for element in zipped_file.namelist())
         )
+        if not both:
+            self.assertFalse(
+                any('Group_' + group2.title +
+                    '/Per_participant_data/Participant_' + participant2.code
+                    in element for element in zipped_file.namelist()),
+                'Group_' + group2.title +
+                '/Per_participant_data/Participant_' +
+                participant2.code + ' is in ' + str(zipped_file.namelist())
+            )
+        else:
+            self.assertTrue(
+                any(
+                    'Group_' + group2.title +
+                    '/Per_participant_data/Participant_' + participant2.code
+                    in element for element in zipped_file.namelist()),
+                'Group_' + group2.title +
+                '/Per_participant_data/Participant_' +
+                participant2.code + ' is not in ' + str(zipped_file.namelist())
+            )
 
     def user_choices_based_asserts(self, selected_items, group1, group2,
                                    participant1, participant2, zipped_file):
@@ -577,7 +597,9 @@ class DownloadExperimentTest(TestCase):
             self.asserts_questionnaires(selected_items['q'], group1, group2,
                                         zipped_file)
             # participants
-            self.assert_participants(group1, participant1, zipped_file)
+            self.assert_participants(group1, group2, participant1,
+                                     participant2,
+                                     zipped_file, False)
 
         if {'ep', 'q', 'p_g2'}.issubset(selected_items.keys()):
             # experimental protocol
@@ -587,23 +609,27 @@ class DownloadExperimentTest(TestCase):
             self.asserts_questionnaires(selected_items['q'], group1, group2,
                                         zipped_file)
             # participants
-            self.assert_participants(group2, participant2, zipped_file)
+            self.assert_participants(group2, group1, participant2,
+                                     participant1,
+                                     zipped_file, False)
 
         if {'ep', 'p_g1', 'p_g2'}.issubset(selected_items.keys()):
             # experimental protocol
             self.asserts_experimental_protocol(selected_items['ep'], group1,
                                                group2, zipped_file)
             # participants
-            self.assert_participants(group1, participant1, zipped_file)
-            self.assert_participants(group2, participant2, zipped_file)
+            self.assert_participants(group1, group2, participant1,
+                                     participant2,
+                                     zipped_file, True)
 
         if {'q', 'p_g1', 'p_g2'}.issubset(selected_items.keys()):
             # questionnaires
             self.asserts_questionnaires(selected_items['q'], group1, group2,
                                         zipped_file)
             # participants
-            self.assert_participants(group1, participant1, zipped_file)
-            self.assert_participants(group2, participant2, zipped_file)
+            self.assert_participants(group1, group2, participant1,
+                                     participant2,
+                                     zipped_file, True)
 
     def create_q_language_dir(self, q, questionnaire_metadata_dir):
         q_default = _get_q_default_language_or_first(q)
