@@ -314,11 +314,8 @@
                             <nav class="language">
                                 <ul id="id_q{{ questionnaire_id }}_language">
                                     {% for lang_code in q_language.language_codes %}
-                                        <li><a id="id_{{ questionnaire_id }}_{{ lang_code }}"
-                                               class="nep-btn
-{% if q_language.language_code == lang_code %}active-language{% endif %}"
-                                               href="#"
-                                                onclick="ajax_questionnaire_language(event, {{ questionnaire_id }}, '{{ lang_code }}')">{{ lang_code }}</a></li>
+                                        <li><a id="id_{{ questionnaire_id }}_{{ lang_code }}" class="nep-btn {% if q_language.language_code == lang_code %}active-language{% endif %}"
+                                               href="#" onclick="ajax_questionnaire_language(event, {{ questionnaire_id }}, '{{ lang_code }}')">{{ lang_code }}</a></li>
                                     {% endfor %}
                                 </ul>
                             </nav>
@@ -333,20 +330,41 @@
             <div id="downloads_tab" class="tab-pane" role="tabpanel">
                 <h4>{% trans 'Select experiment data pieces to download' %}</h4>
                 <div class="panel panel-default nep-panel-group">
-                    <label for="download_options">Select options</label>
-                    <select name="download_selected" id="download_options" multiple="multiple">
-                        <option value="experiment">{% trans 'Experiment (spreadsheet)' %}</option>
-                        {% if experiment.groups.all %}
-                            {% for group in experiment.groups.all %}
-                                {% for participant in group.participants.all %}
-                                    <option value="participant_{{ participant.id }}" data-section="Groups/Group {{ group.title }}">{% trans 'Participant ' %}{{ participant.code }} (zip)</option>
+                    <form action="{% url 'download-view' experiment.id %}" method="post">
+                        {% csrf_token %}
+                        <div class="form-group">
+                            {% if experiment.groups.all %}
+                                <label for="download_options">Select options</label>
+                                <select name="download_selected" id="download_options" multiple>
+                                    {% for group in experiment.groups.all %}
+                                        {% if group.experimental_protocol %}
+                                            <option value="experimental_protocol_g{{ group.id }}" data-section="Group {{ group.title }}">{% trans 'Experimental Protocol Data' %}</option>
+                                        {% endif %}
+                                        {% if group.title in questionnaires %}
+                                            <option value="questionnaires_g{{ group.id }}" data-section="Group {{ group.title }}">{% trans 'Per Questionnaire Data' %}</option>
+                                        {% endif %}
+                                        {% for participant in group.participants.all %}
+                                            <option value="participant_p{{ participant.id }}_g{{ group.id }}" data-section="Group {{ group.title }}/Per Participant Data">{% trans 'Participant ' %}{{ participant.code }}</option>
+                                        {% endfor %}
+                                    {% endfor %}
+                                </select>
+                                {% for group in experiment.groups.all %}
+                                    {% if not group.experimental_protocol and not group.title in questionnaires and not group.participants.all %}
+                                        <p><em>
+                                            {% trans 'There are not data for group' %} {{ group.title }}. {% trans "But there\'s still basic Experiment data. Click in 'Download' button to download it." %}
+                                        </em></p>
+                                    {% endif %}
                                 {% endfor %}
-                                <option value="experimental_protocol" data-section="Groups/Group {{ group.title }}">{% trans 'Experimental Protocol (zip)' %}</option>
-                                <option value="participants" data-section="Groups/Group {{ group.title }}">{% trans 'Participants (spreadsheet)' %} </option>
-                                <option value="questionnaires" data-section="Groups/Group {{ group.title }}">{% trans 'Questionnaires data (zip)' %}</option>
-                            {% endfor %}
-                        {% endif %}
-                    </select>
+                            {% else %}
+                                <p><em>
+                                    {% trans 'There are not experiment groups data for this experiment. Click in "Download" button to download basic experiment data' %}
+                                </em></p>
+                            {% endif %}
+                        </div>
+                        <div class="form-group text-right">
+                            <input type="submit" id="download_button" class="btn btn-primary" value="{% trans 'Download' %}">
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>
@@ -358,8 +376,7 @@
                 <div class="modal-content">
                     <div class="modal-header">
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                        <h4 id="modal_protocol_title" class="modal-title"
-                        >{% trans "Graphical representation" %}</h4>
+                        <h4 id="modal_protocol_title" class="modal-title">{% trans "Graphical representation" %}</h4>
                     </div>
                     <div class="modal-body">
                         {# see script bellow #}
@@ -511,6 +528,22 @@
     {##}
     <script src="{% static 'tree-multiselect.js/jquery.tree-multiselect.min.js' %}"></script>
     <script>
-        $("select").treeMultiselect();
+        $("select").treeMultiselect({
+            enableSelectAll: true,
+        });
+        // Prevent default on submit options download button if not/all was
+        // selected. If all was selected redirect to GET to 'download_view'
+        $("#download_button").click(function(e) {
+            const options = $("select#download_options option").length;
+            const selected = $("select#download_options :selected").length;
+            if (selected === 0) {
+                e.preventDefault();
+            }
+            if (selected == options) {  // PyCharm highlight not necessary
+                e.preventDefault();
+                const url = "{% url 'download-view' experiment.id %}";
+                $(location).attr('href', url)
+            }
+        })
     </script>
 {% endblock %}
