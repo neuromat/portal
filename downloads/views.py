@@ -1,17 +1,22 @@
 import os
-from experiments.models import Experiment
-from django.conf import settings
-from django.contrib import messages
-from django.shortcuts import render, get_object_or_404
-from django.http import HttpResponse, HttpResponseRedirect
-
-from .export import create_directory, ExportExecution
-from .input_export import build_complete_export_structure
-from .models import Export
+import re
+import tempfile
+import shutil
 
 from os import path
 from shutil import rmtree
 from zipfile import ZipFile
+from django.urls import reverse
+from django.conf import settings
+from django.contrib import messages
+from django.shortcuts import render, get_object_or_404
+from django.http import HttpResponse, HttpResponseRedirect
+from django.utils.translation import ugettext as _
+
+from .export import create_directory, ExportExecution
+from .input_export import build_complete_export_structure
+from .models import Export
+from experiments.models import Experiment, Group, Step, Participant
 
 JSON_FILENAME = "json_export.json"
 JSON_EXPERIMENT_FILENAME = "json_experiment_export.json"
@@ -31,13 +36,13 @@ def create_export_instance():
 
 
 def download_view(request, experiment_id):
-
-    # if download file exists, serve file immediatally for download
     experiment = get_object_or_404(Experiment, pk=experiment_id)
-    if experiment.download_url:
+
+    # If it's a get request, serve file with all experiment data immediatally
+    # for download.
+    if request.method == 'GET':
         complete_filename = os.path.join(
-            settings.MEDIA_ROOT,
-            'download/' + str(experiment.id) + '/download.zip'
+            settings.MEDIA_ROOT, 'download', str(experiment.id), 'download.zip'
         )
         zip_file = open(complete_filename, 'rb')
         response = HttpResponse(zip_file, content_type='application/zip')
@@ -48,7 +53,107 @@ def download_view(request, experiment_id):
         experiment.downloads += 1
         experiment.save()
 
+        zip_file.close()
+
         return response
+
+    # If user selected nothing, just redirect to experiment detail view with
+    # warning message.
+    if 'download_selected' not in request.POST:
+        messages.warning(request, _('Please select item(s) to download'))
+        return HttpResponseRedirect(
+            reverse('experiment-detail', kwargs={'slug': experiment.slug})
+        )
+
+    ##
+    # Create compressed file with elements chosen by user
+    # ---------------------------------------------------
+    # TODO: if experiment has no groups return response with only
+    # TODO: experiments.csv
+    # create temporary dir to aggregate subdirs/files for further
+    # incorporate in compacted file
+    temp_dir = tempfile.mkdtemp()
+    # Experiment.csv always will be in compressed file
+    shutil.copyfile(os.path.join(
+        settings.MEDIA_ROOT, 'download', str(experiment.id), 'Experiment.csv'
+    ), os.path.join(temp_dir, 'Experiment.csv')
+    )
+    # Copy experiment data from media/download/<experiment.id> based on user
+    # selection, to temp dir.
+    for item in request.POST.getlist('download_selected'):
+        # take the group title to copy subdirs/files to temp location
+        group_str = re.search("g[0-9]+", item)
+        group_id = int(group_str.group(0)[1:])
+        group = Group.objects.get(pk=group_id)
+        # Options values in templates has group and/or participants id's as
+        # substrings, so use regex to determine if they were selected.
+        pattern_exp_protocol = re.compile("experimental_protocol_g[0-9]+$")
+        pattern_questionnaires = re.compile("questionnaires_g[0-9]+$")
+        pattern_participant = re.compile("participant_p[0-9]+_g[0-9]+$")
+        if pattern_exp_protocol.match(item):
+            # add Experimental_protocol subdir for the specific group in temp
+            # dir
+            shutil.copytree(os.path.join(
+                settings.MEDIA_ROOT, 'download', str(experiment.id),
+                'Group_' + group.title, 'Experimental_protocol'
+            ), os.path.join(temp_dir, 'Group_' + group.title,
+                            'Experimental_protocol')
+            )
+        if pattern_questionnaires.match(item):
+            # Add Per_questionnaire_data subdir for the specific group in temp
+            # dir.
+            shutil.copytree(os.path.join(
+                settings.MEDIA_ROOT, 'download', str(experiment.id),
+                'Group_' + group.title, 'Per_questionnaire_data'
+            ), os.path.join(temp_dir, 'Group_' + group.title,
+                            'Per_questionnaire_data')
+            )
+            # add Participants.csv file for the specific group in temp dir.
+            shutil.copyfile(os.path.join(
+                settings.MEDIA_ROOT, 'download', str(experiment.id),
+                'Group_' + group.title, 'Participants.csv'
+            ), os.path.join(temp_dir, 'Group_' + group.title,
+                            'Participants.csv')
+            )
+        if pattern_participant.match(item):
+            # Add Per_participant_data subdir for the specific group in temp
+            # dir.
+            participant_str = re.search("p[0-9]+", item)
+            participant_id = int(participant_str.group(0)[1:])
+            participant = Participant.objects.get(pk=participant_id)
+            shutil.copytree(os.path.join(
+                settings.MEDIA_ROOT, 'download', str(experiment.id),
+                'Group_' + group.title, 'Per_participant_data', 'Participant_'
+                                        + participant.code
+            ), os.path.join(temp_dir, 'Group_' + group.title,
+                            'Per_participant_data', 'Participant_' +
+                            participant.code)
+            )
+
+    # Put Questionnaire_metadata subdir in temp dir for all groups that have
+    # questionnaires.
+    for group in experiment.groups.all():
+        if group.steps.filter(type=Step.QUESTIONNAIRE).count() > 0:
+            shutil.copytree(os.path.join(
+                settings.MEDIA_ROOT, 'download', str(experiment.id),
+                'Group_' + group.title, 'Questionnaire_metadata'
+            ), os.path.join(temp_dir, 'Group_' + group.title,
+                            'Questionnaire_metadata')
+            )
+
+    # make compressed file and return response to client
+    compressed_file_name = shutil.make_archive(os.path.join(
+        tempfile.mkdtemp(), 'download'), 'zip', temp_dir
+    )
+    compressed_file = open(os.path.join(temp_dir, compressed_file_name), 'rb')
+    response = HttpResponse(compressed_file, content_type='application/zip')
+    response['Content-Disposition'] = 'attachment; filename="download.zip"'
+    response['Set-Cookie'] = 'fileDownload=true; path=/'
+    # increment downloads made
+    experiment.downloads += 1
+    experiment.save()
+    return response
+
 
     template_name = "experiments/detail.html"
     error_msg = download_create(experiment_id, template_name)
