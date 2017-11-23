@@ -328,6 +328,15 @@
             </div>
             <!-- Downloads tab -->
             <div id="downloads_tab" class="tab-pane" role="tabpanel">
+                <div class="align-right">
+                    <a id="button_download"
+                       href="{% url 'download-view' experiment_id=experiment.id %}"
+                       class="nep-btn-secondary"
+                       data-toggle="tooltip" data-placement="top"
+                       title="{% trans "Download zip file with all experiment data and metadata" %}"> <span
+                            class="glyphicon glyphicon-download-alt"> </span>
+                        {% trans "Download all experiment data" %}</a>
+                </div>
                 <h4>{% trans 'Select experiment data pieces to download' %}</h4>
                 <div class="panel panel-default nep-panel-group">
                     <form action="{% url 'download-view' experiment.id %}" method="post">

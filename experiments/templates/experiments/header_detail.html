@@ -44,42 +44,10 @@
             {% endif %}
         </aside>
     {% endif %}
-
     <hr class="detail-header-hr">
     <div id="id_detail_study" class="detail-study">{% trans "From study" %}: <a
             href="#" data-toggle="modal" data-target="#study_modal">{{ experiment.study.title }}</a>
     </div>
-    {# this is for downloads app #}
-    <div><input id="experimentId" type="hidden" value="{{ experiment.slug }}"></div>
-
-        <div class="align-right">
-            {% if experiment.download_url %}
-                <a id="button_download" href="{% url 'download-view' experiment_id=experiment.id %}" class="nep-btn-secondary"
-                    data-toggle="tooltip" data-placement="top"
-                   title="{% trans "Experiment data and metadata. zip file size: " %}{{ experiment.download_url.file.size | filesizeformat }}"> <span class="glyphicon glyphicon-download-alt"> </span>
-                    {% trans "Download experiment data" %}</a>
-            {% else %}
-                <a id="button_download"
-                   href="{% url 'download-view' experiment_id=experiment.id %}"
-                   class="fileDownloadCustomRichExperience nep-btn-secondary"
-                    data-toggle="tooltip" data-placement="top"
-                   title="{% trans "Generate download zip file with experiment data and metadata" %}"> <span class="glyphicon glyphicon-download-alt"> </span>
-                    {% trans "Download experiment data" %}</a>
-            {% endif %}
-        </div>
-
-    <div id="preparing-file-modal" title="Preparing download..." style="display: none">
-        {% trans "We are preparing your download, please wait..." %}
-
-        <!--Throw what you'd like for a progress indicator below-->
-        <div class="ui-progressbar-value ui-corner-left ui-corner-right" style="width: 100%; height:22px; margin-top: 20px;"></div>
-    </div>
-
-    <div id="error-modal" title="Error" style="display: none;">
-        {% trans "There was a problem generating your download, please try again." %}
-    </div>
-
-
     <br><br>
 
     {# Study modal #}
