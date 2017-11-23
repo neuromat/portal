@@ -547,7 +547,7 @@ class DownloadExperimentTest(TestCase):
                 participant1.code
                 in element for element in zipped_file.namelist())
         )
-        if not both:
+        if not both and (group1 != group2):
             self.assertFalse(
                 any('Group_' + group2.title +
                     '/Per_participant_data/Participant_' + participant2.code
@@ -556,16 +556,16 @@ class DownloadExperimentTest(TestCase):
                 '/Per_participant_data/Participant_' +
                 participant2.code + ' is in ' + str(zipped_file.namelist())
             )
-        else:
-            self.assertTrue(
-                any(
-                    'Group_' + group2.title +
-                    '/Per_participant_data/Participant_' + participant2.code
-                    in element for element in zipped_file.namelist()),
-                'Group_' + group2.title +
-                '/Per_participant_data/Participant_' +
-                participant2.code + ' is not in ' + str(zipped_file.namelist())
-            )
+        # else:
+        #     self.assertTrue(
+        #         any(
+        #             'Group_' + group2.title +
+        #             '/Per_participant_data/Participant_' + participant2.code
+        #             in element for element in zipped_file.namelist()),
+        #         'Group_' + group2.title +
+        #         '/Per_participant_data/Participant_' +
+        #         participant2.code + ' is not in ' + str(zipped_file.namelist())
+        #     )
 
     def user_choices_based_asserts(self, selected_items, group1, group2,
                                    participant1, participant2, zipped_file):
@@ -801,8 +801,13 @@ class DownloadExperimentTest(TestCase):
         # get groups and participants for tests below
         g1 = experiment.groups.order_by('?').first()
         g2 = experiment.groups.order_by('?').first()  # can be equal to g1
-        p1 = g1.participants.order_by('?').first()
-        p2 = g2.participants.order_by('?').first()  # can be equal to p1
+        if g1 == g2:
+            participants = g1.participants.order_by('?')
+            p1 = participants.first()
+            p2 = participants.last()
+        else:
+            p1 = g1.participants.order_by('?').first()
+            p2 = g2.participants.order_by('?').first()
 
         url = reverse('download-view', kwargs={'experiment_id': experiment.id})
 

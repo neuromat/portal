@@ -1,3 +1,4 @@
+import time
 from django.contrib.auth.models import AnonymousUser
 from django.core.mail import send_mail
 from rest_framework import serializers, permissions, viewsets
@@ -1016,7 +1017,7 @@ class ExperimentViewSet(viewsets.ModelViewSet):
         # TODO: Ok by now, as the only situation where the experiment is
         # TODO: updated by NES API client is precisily when the NES change
         # TODO: status from "Receiving" to "To be analysed"
-        build_download_file(int(experiment['id']), template_name="")
+        build_download_file.delay(int(experiment['id']), template_name="")
 
 
 class StudyViewSet(viewsets.ModelViewSet):
