@@ -121,6 +121,11 @@ def download_view(request, experiment_id):
             participant_str = re.search("p[0-9]+", item)
             participant_id = int(participant_str.group(0)[1:])
             participant = Participant.objects.get(pk=participant_id)
+            # If g1 == g2 in test_views, this subtree may already has been
+            # created.
+            # TODO: fix test. Probably chosing participants from
+            # TODO: diferent groups, as it's the case when selecting
+            # TODO: participants to download in UI.
             shutil.copytree(os.path.join(
                 settings.MEDIA_ROOT, 'download', str(experiment.id),
                 'Group_' + group.title, 'Per_participant_data', 'Participant_'
