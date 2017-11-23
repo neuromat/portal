@@ -154,7 +154,6 @@ def download_view(request, experiment_id):
     experiment.save()
     return response
 
-
     template_name = "experiments/detail.html"
     error_msg = download_create(experiment_id, template_name)
 
