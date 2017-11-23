@@ -17,6 +17,7 @@ from nep import settings
 
 
 def create_group(qtty, experiment):
+    # TODO: refactor to accept more than one experiment (insert qtty parameter)
     """
     :param qtty: Number of groups
     :param experiment: Experiment model instance
@@ -32,6 +33,7 @@ def create_group(qtty, experiment):
 
 
 def create_study(experiment):
+    # TODO: refactor to accept more than one experiment (insert qtty parameter)
     """
     :param experiment: Experiment to be associated with Study
     """
@@ -53,7 +55,7 @@ def create_experiment(qtty, owner, status):
     fake = Factory.create()
 
     for i in range(qtty):
-        experiment = Experiment.objects.create(
+        Experiment.objects.create(
             title=fake.text(max_nb_chars=15),
             description=fake.text(max_nb_chars=200),
             nes_id=randint(1, 10000),  # TODO: guarantee that this won't
@@ -63,8 +65,6 @@ def create_experiment(qtty, owner, status):
             status=status,
             data_acquisition_done=choice([True, False]),
         )
-        create_study(experiment)
-        create_group(randint(2, 3), experiment)
 
 
 def create_trustee_users():
@@ -409,7 +409,6 @@ def create_questionnaire(qtty, code, group):
     testing)
     :param group: Group model instance
     """
-    faker = Factory.create()
 
     for i in range(qtty):
         Questionnaire.objects.create(
@@ -418,6 +417,29 @@ def create_questionnaire(qtty, code, group):
             identification='questionnaire',
             type=Step.QUESTIONNAIRE,
         )
+
+
+def create_experiment_related_objects(experiment):
+    """
+    Create experiment related objects to test download experiment data
+    pieces selected by the user.
+    :param experiment: Experiment model instance
+    """
+    create_study(experiment)
+    study = Study.objects.last()
+    # necessary creating researcher for study. See comment in
+    # search_indexes.StudyIndex class
+    Researcher.objects.create(
+        name='Negro Belchior', email='belchior@example.com', study=study
+    )
+    gender1 = Gender.objects.create(name='male')
+    gender2 = Gender.objects.create(name='female')
+    for group in experiment.groups.all():
+        create_participant(
+            randint(1, 6), group,
+            gender1 if randint(1, 2) == 1 else gender2
+        )
+        create_experiment_protocol(group)
 
 
 def global_setup_ft():
@@ -434,26 +456,60 @@ def global_setup_ft():
     # Create group Trustees
     create_trustee_users()
 
-    # Create 5 experiments for 2 owners, randomly, and studies (groups are
-    # created inside create_experiment_and_study)
-    create_experiment(2, choice([owner1, owner2]),
+    # Create experiments for 2 owners, randomly
+    create_experiment(1, choice([owner1, owner2]),
                       Experiment.TO_BE_ANALYSED)
-    # To test search
     experiment = Experiment.objects.last()
+    create_study(experiment)
+    create_group(randint(2, 3), experiment)
+
+    create_experiment(1, choice([owner1, owner2]),
+                      Experiment.TO_BE_ANALYSED)
+    experiment = Experiment.objects.last()
+    create_study(experiment)
+    create_group(randint(2, 3), experiment)
+    # To test search
     experiment.title = 'Brachial Plexus'
     experiment.save()
 
-    create_experiment(2, choice([owner1, owner2]),
+    create_experiment(1, choice([owner1, owner2]),
                       Experiment.UNDER_ANALYSIS)
-    # To test search
     experiment = Experiment.objects.last()
+    create_study(experiment)
+    create_group(randint(2, 3), experiment)
+    create_experiment(1, choice([owner1, owner2]),
+                      Experiment.UNDER_ANALYSIS)
+    experiment = Experiment.objects.last()
+    create_study(experiment)
+    create_group(randint(2, 3), experiment)
+    # To test search
     experiment.title = 'Brachial Plexus'
     experiment.save()
 
-    create_experiment(4, choice([owner1, owner2]),
+    # TODO: refactor to create the 4 experiments at once (how it was
+    # TODO: before)
+    # TODO: see TODO's in create_study and create_group methods
+    create_experiment(1, choice([owner1, owner2]),
                       Experiment.APPROVED)
-    # Put some non-random strings in one approved experiment to test search
     experiment = Experiment.objects.last()
+    create_study(experiment)
+    create_group(randint(2, 3), experiment)
+    create_experiment(1, choice([owner1, owner2]),
+                      Experiment.APPROVED)
+    experiment = Experiment.objects.last()
+    create_study(experiment)
+    create_group(randint(2, 3), experiment)
+    create_experiment(1, choice([owner1, owner2]),
+                      Experiment.APPROVED)
+    experiment = Experiment.objects.last()
+    create_study(experiment)
+    create_group(randint(2, 3), experiment)
+    create_experiment(1, choice([owner1, owner2]),
+                      Experiment.APPROVED)
+    experiment = Experiment.objects.last()
+    create_study(experiment)
+    create_group(randint(2, 3), experiment)
+    # Put some non-random strings in one approved experiment to test search
     experiment.title = 'Brachial Plexus'
     experiment.description = 'Ein Beschreibung.'
     experiment.save()
@@ -474,6 +530,8 @@ def global_setup_ft():
     create_experiment(1, choice([owner1, owner2]),
                       Experiment.APPROVED)
     experiment = Experiment.objects.last()
+    create_study(experiment)
+    create_group(randint(2, 3), experiment)
     experiment.title = 'Brachial Plexus (with EMG Setting)'
     experiment.description = 'Ein Beschreibung. Brachial plexus repair by ' \
                              'peripheral nerve ' \
@@ -538,6 +596,9 @@ def global_setup_ft():
     create_ethics_committee_info(Experiment.objects.last())
     create_experiment(1, choice([owner1, owner2]),
                       Experiment.NOT_APPROVED)
+    experiment = Experiment.objects.last()
+    create_study(experiment)
+    create_group(randint(2, 3), experiment)
 
     # Associate trustee to experiments under analysis (requires create
     # experiments before)
@@ -606,7 +667,7 @@ def global_setup_ft():
     cd.save()
 
     # Create randint(3, 7) participants for each group (requires create
-    # groups before)
+    # groups before), and experimental protocols
     for group in Group.objects.all():
         create_experiment_protocol(group)
         create_participant(
@@ -785,12 +846,12 @@ def global_setup_ut():
         version=1, sent_date=datetime.utcnow(),
         status=Experiment.TO_BE_ANALYSED,
     )
-    Experiment.objects.create(
+    experiment4 = Experiment.objects.create(
         title='Experiment 4', nes_id=3, owner=owner1,
         version=1, sent_date=datetime.utcnow(),
         status=Experiment.APPROVED,
     )
-    Experiment.objects.create(
+    experiment5 = Experiment.objects.create(
         title='Experiment 5', nes_id=4, owner=owner2,
         version=1, sent_date=datetime.utcnow(),
         status=Experiment.APPROVED,
@@ -800,12 +861,13 @@ def global_setup_ut():
     create_group(2, experiment1)
     create_group(1, experiment2)
 
+    # TODO: create with the method already existing. Same for below
     study1 = Study.objects.create(start_date=datetime.utcnow(),
                                   experiment=experiment1)
     study2 = Study.objects.create(start_date=datetime.utcnow(),
                                   experiment=experiment2)
     # Create a study and doesn't associate it with researcher bellow.
-    # This is to testing creating research associate it with a study in
+    # This is to testing creating researcher associate it with a study in
     # test_models.py
     Study.objects.create(start_date=datetime.utcnow(),
                          experiment=experiment3)
@@ -839,11 +901,8 @@ def global_setup_ut():
     # Create valid Questionnaire objects
     # (requires the files 'questionnaire1.csv', 'questionnaire2.csv' and
     # 'questionnaire3.csv' being generated in 'experiments/tests' subdirectory)
-    experiment = Experiment.objects.filter(
-        status=Experiment.APPROVED
-    ).last()
-    create_group(2, experiment)
-    group_first = experiment.groups.first()
+    create_group(2, experiment5)
+    group_first = experiment5.groups.first()
     create_questionnaire(1, 'q1', group_first)
     questionnaire1 = Questionnaire.objects.last()
     # create questionnaire language data pt-br for questionnaire1
@@ -874,8 +933,7 @@ def global_setup_ut():
     questionnaire2 = Questionnaire.objects.last()
     create_questionnaire_language(
         questionnaire2,
-        settings.BASE_DIR + '/experiments/tests/questionnaire2.csv',
-        'en'
+        settings.BASE_DIR + '/experiments/tests/questionnaire2.csv', 'en'
     )
     # create questionnaire language data de for questionnaire2
     questionnaire2 = Questionnaire.objects.last()
@@ -885,7 +943,7 @@ def global_setup_ut():
         'de'
     )
 
-    group_last = experiment.groups.last()
+    group_last = experiment5.groups.last()
     create_questionnaire(1, 'q3', group_last)
     questionnaire3 = Questionnaire.objects.last()
     # create questionnaire language data default for questionnaire3
@@ -898,11 +956,8 @@ def global_setup_ut():
     # Create invalid Questionnaire object
     # (requires file 'questionnaire4.csv', being generated in
     # 'experiments/tests' subdirectory)
-    experiment = Experiment.objects.filter(
-        status=Experiment.APPROVED
-    ).first()
-    create_group(1, experiment)
-    group = experiment.groups.last()
+    create_group(1, experiment4)
+    group = experiment4.groups.last()
     create_questionnaire(1, 'q4', group)
     # create questionnaire language data default for questionnaire4
     questionnaire4 = Questionnaire.objects.last()
@@ -915,11 +970,8 @@ def global_setup_ut():
     # Create an invalid and a valid Questionnaire objects
     # (requires the files 'questionnaire5.csv' and 'questionnaire6.csv,
     # being generated in 'experiments/tests' subdirectory)
-    experiment = Experiment.objects.filter(
-        status=Experiment.TO_BE_ANALYSED
-    ).last()
-    create_group(2, experiment)
-    group = experiment.groups.first()
+    create_group(2, experiment3)
+    group = experiment3.groups.first()
     create_questionnaire(1, 'q5', group)
     questionnaire5 = Questionnaire.objects.last()
     # create questionnaire language data default for questionnaire5
@@ -928,7 +980,7 @@ def global_setup_ut():
         settings.BASE_DIR + '/experiments/tests/questionnaire5.csv',
         'en'
     )
-    group = experiment.groups.last()
+    group = experiment3.groups.last()
     create_questionnaire(1, 'q6', group)
     questionnaire6 = Questionnaire.objects.last()
     create_questionnaire_language(

@@ -228,9 +228,10 @@ def change_status(request, experiment_id):
     # was postted too. If not redirect to home page with warning message.
     if status == Experiment.NOT_APPROVED and not justification:
         messages.warning(
-            request, _(
-                'Please provide a reason justifying the change of the status of the experiment ') +
-                     experiment.title + _('to "Not approved". '))
+            request,
+            _('Please provide a reason justifying the change of the status '
+              'of the experiment ') +
+            experiment.title + _('to "Not approved". '))
         return HttpResponseRedirect('/')
 
     if status == Experiment.NOT_APPROVED and justification:
@@ -282,7 +283,6 @@ def change_status(request, experiment_id):
             _(' warning that the experiment changed status to Approved.')
         )
         rebuild_haystack_index.delay()
-        # build_download_file(experiment.id).delay()
 
     if status == Experiment.UNDER_ANALYSIS:
         experiment.status = status

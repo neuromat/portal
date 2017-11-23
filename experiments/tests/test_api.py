@@ -306,7 +306,7 @@ class ExperimentAPITest(APITestCase):
         self.client.logout()
 
         # Now we can test for downloading experiment
-        url = reverse('download_view', kwargs={'experiment_id': experiment.id})
+        url = reverse('download-view', kwargs={'experiment_id': experiment.id})
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
         self.assertEquals(

@@ -23,7 +23,7 @@ class StudyIndex(indexes.SearchIndex, indexes.Indexable):
     experiment = indexes.CharField(model_attr='experiment__id')
     keywords = indexes.CharField(model_attr='keywords__name')
     # Requires exist researcher associated with the study. Otherwise
-    # haystack will complain about researcher not being a modell_attr of Study
+    # haystack will complain about researcher not being a model_attr of Study
     researcher = indexes.CharField(model_attr='researcher__id')
     collaborators = indexes.CharField(model_attr='collaborators__name')
 
