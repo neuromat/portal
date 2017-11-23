@@ -72,15 +72,6 @@ class ExperimentDetailTest(FunctionalTest):
         study_text = self.browser.find_element_by_id('id_detail_study').text
         self.assertIn('From study: ' + experiment.study.title, study_text)
 
-        # In right side bellow the data acquisition alert, she sees a button
-        # to download of data
-        button_download = self.browser.find_element_by_id(
-            'button_download')
-        self.assertEqual(
-            'Download experiment data',
-            button_download.text
-        )
-
         # She clicks in Related study link and see a modal with Study data
         self.browser.find_element_by_link_text(experiment.study.title).click()
 
@@ -114,6 +105,7 @@ class ExperimentDetailTest(FunctionalTest):
                           study_end_date)
         else:
             self.assertIn(str(None), study_end_date)
+
         # Right below there is a relation of contributors of the study,
         # the contributor's team and coordinator
         study_contributors = self.browser.find_element_by_id(
@@ -128,6 +120,7 @@ class ExperimentDetailTest(FunctionalTest):
         self.assertTrue(col_headers_contrib[0].text == 'Person')
         self.assertTrue(col_headers_contrib[1].text == 'Team')
         self.assertTrue(col_headers_contrib[2].text == 'Coordinator')
+
         # She sees the content of contributors list
         rows = table_contributors.find_element_by_tag_name(
             'tbody').find_elements_by_tag_name('tr')
@@ -646,6 +639,21 @@ class DownloadExperimentTest(FunctionalTest):
             'downloads_tab'
         )
         return downloads_tab_content
+
+    def test_can_see_link_to_download_all_experiment_data_at_once(self):
+        experiment = Experiment.objects.filter(
+            status=Experiment.APPROVED
+        ).last()
+        self.access_downloads_tab_content(experiment)
+
+        # In right side of the Download tab content, she sees a button
+        # to download all data at once
+        button_download = self.browser.find_element_by_id(
+            'button_download')
+        self.assertEqual(
+            'Download all experiment data',
+            button_download.text
+        )
 
     def test_can_see_section_content_of_downloads_tab(self):
         ##
