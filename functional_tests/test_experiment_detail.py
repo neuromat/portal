@@ -4,6 +4,7 @@ from random import choice
 from unittest import skip
 
 import os
+
 from django.contrib.auth.models import User
 from django.test import override_settings
 from selenium.common.exceptions import NoSuchElementException
@@ -754,8 +755,8 @@ class DownloadExperimentTest(FunctionalTest):
 
         downloads_tab_content = self.access_downloads_tab_content(experiment)
 
-        # Now, as there're no data for groups, she sees only the "Experiment
-        # (spreadsheet)" option to download
+        # Now, as there're no data for groups, she sees a message telling
+        # her that there is only basic experiment data available to download
         self.assertIn(
             'There are not experiment groups data for this experiment. Click '
             'in "Download" button to download basic experiment data',
@@ -832,9 +833,40 @@ class DownloadExperimentTest(FunctionalTest):
         button = self.browser.find_element_by_id('download_button')
         self.assertEqual('Download', button.get_attribute('value'))
 
+    @override_settings(MEDIA_ROOT=TEMP_MEDIA_ROOT)
+    def test_clicking_in_download_all_experiment_data_without_compressed_file_returns_error_message(self):
+        experiment = Experiment.objects.filter(
+            status=Experiment.APPROVED
+        ).last()
+
+        # create temporary experiment download subdir
+        os.makedirs(
+            os.path.join(self.TEMP_MEDIA_ROOT, 'download', str(experiment.pk))
+        )
+
+        # Josileine accesses Experiment Detail Downloads tab
+        self.access_downloads_tab_content(experiment)
+
+        # wait for tree-multiselect plugin to render multiselection
+        time.sleep(0.5)
+
+        # She clicks in download all experiment data button
+        self.browser.find_element_by_link_text(
+            'Download all experiment data'
+        ).click()
+
+        # She's redirected to experiment detail page with a message alerting
+        # her that there was a problem with download (the download.zip file
+        # is not in the file system)
+        self.wait_for(lambda: self.assertIn(
+            DOWNLOAD_ERROR_MESSAGE,
+            self.browser.find_element_by_class_name('alert-danger').text
+        ))
+
     @skip
     def test_try_to_download_without_selections_redirects_to_experiment_detail_view_with_message(self):
         ##
+        # TODO:
         # This test must be ran with javascript deactivated. When we made it
         # there was not a jQuery script to prevent form submit if there's
         # not options selected to download. After we made this script.
@@ -884,7 +916,7 @@ class DownloadExperimentTest(FunctionalTest):
                 break
 
         # Josileine accesses Experiment Detail Downloads tab
-        downloads_tab_content = self.access_downloads_tab_content(experiment)
+        self.access_downloads_tab_content(experiment)
         # wait for tree-multiselect plugin to render multiselection
         time.sleep(0.5)
 

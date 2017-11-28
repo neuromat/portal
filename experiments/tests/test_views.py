@@ -758,7 +758,7 @@ class DownloadExperimentTest(TestCase):
         pass
 
     @override_settings(MEDIA_ROOT=TEMP_MEDIA_ROOT)
-    def test_POSTing_option_data_has_not_correspondent_subdir_returns_redirects_to_experiment_detail_view(self):
+    def test_POSTing_option_data_has_not_correspondent_subdir_redirects_to_experiment_detail_view(self):
         experiment = Experiment.objects.filter(
             status=Experiment.APPROVED
         ).last()
@@ -793,6 +793,27 @@ class DownloadExperimentTest(TestCase):
             }
         )
 
+        self.assertRedirects(
+            response,
+            reverse('experiment-detail', kwargs={'slug': experiment.slug})
+        )
+
+    @override_settings(MEDIA_ROOT=TEMP_MEDIA_ROOT)
+    def test_GETing_download_experiment_view_without_compressed_file_redirects_to_experiment_detail_view(self):
+        experiment = Experiment.objects.filter(
+            status=Experiment.APPROVED
+        ).last()
+
+        # create temp 'media/download/<experiment.id>' subdir
+        os.makedirs(
+            os.path.join(self.TEMP_MEDIA_ROOT, 'download', str(experiment.id))
+        )
+
+        url = reverse('download-view', kwargs={'experiment_id': experiment.id})
+        response = self.client.get(url)
+
+        # As we have nothing in 'media/download/<experiment.id>' the system
+        # should redirects to experiment detail page
         self.assertRedirects(
             response,
             reverse('experiment-detail', kwargs={'slug': experiment.slug})

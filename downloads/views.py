@@ -45,16 +45,21 @@ def download_view(request, experiment_id):
         complete_filename = os.path.join(
             settings.MEDIA_ROOT, 'download', str(experiment.id), 'download.zip'
         )
-        zip_file = open(complete_filename, 'rb')
+        try:
+            zip_file = open(complete_filename, 'rb')
+        except FileNotFoundError:
+            messages.error(request, DOWNLOAD_ERROR_MESSAGE)
+            return HttpResponseRedirect(
+                reverse('experiment-detail', kwargs={'slug': experiment.slug})
+            )
         response = HttpResponse(zip_file, content_type='application/zip')
         response['Content-Disposition'] = 'attachment; filename="download.zip"'
         response['Content-Length'] = path.getsize(complete_filename)
         response['Set-Cookie'] = 'fileDownload=true; path=/'
+        zip_file.close()
 
         experiment.downloads += 1
         experiment.save()
-
-        zip_file.close()
 
         return response
 
