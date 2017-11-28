@@ -1,5 +1,6 @@
 import random
 import re
+import tempfile
 import zipfile
 from unittest import skip
 
@@ -7,7 +8,6 @@ import haystack
 import sys
 import io
 import os
-import shutil
 
 from django.contrib.auth.models import User
 from django.core.management import call_command
@@ -19,8 +19,8 @@ from experiments import views
 from experiments.models import Experiment, Step, Questionnaire, \
     QuestionnaireDefaultLanguage, QuestionnaireLanguage, Group
 from experiments.tests.tests_helper import apply_setup, global_setup_ut, \
-    create_experiment_related_objects
-from experiments.views import _get_q_default_language_or_first
+    create_experiment_related_objects, create_download_dir_structure_and_files, \
+    remove_selected_subdir
 from nep import settings
 
 
@@ -390,7 +390,6 @@ class SearchTest(TestCase):
         # Tests helper creates an experiment UNDER_ANALYSIS with 'Experiment
         # 2' as experiment title
         results = SearchQuerySet().filter(content='Experiment 2')
-        # results = SearchQuerySet().all()  # DEBUG
         # TODO: by now we have 4 models been indexed
         self.assertEqual(results.count(), 1)
         self.assertEqual(results[0].model_name, 'experiment')
@@ -436,7 +435,7 @@ class SearchTest(TestCase):
 @apply_setup(global_setup_ut)
 class DownloadExperimentTest(TestCase):
 
-    TEMP_MEDIA_ROOT = '/tmp/media'
+    TEMP_MEDIA_ROOT = os.path.join(tempfile.mkdtemp(), 'media')
 
     def setUp(self):
         global_setup_ut()
@@ -556,16 +555,6 @@ class DownloadExperimentTest(TestCase):
                 '/Per_participant_data/Participant_' +
                 participant2.code + ' is in ' + str(zipped_file.namelist())
             )
-        # else:
-        #     self.assertTrue(
-        #         any(
-        #             'Group_' + group2.title +
-        #             '/Per_participant_data/Participant_' + participant2.code
-        #             in element for element in zipped_file.namelist()),
-        #         'Group_' + group2.title +
-        #         '/Per_participant_data/Participant_' +
-        #         participant2.code + ' is not in ' + str(zipped_file.namelist())
-        #     )
 
     def user_choices_based_asserts(self, selected_items, group1, group2,
                                    participant1, participant2, zipped_file):
@@ -631,125 +620,6 @@ class DownloadExperimentTest(TestCase):
                                      participant2,
                                      zipped_file, True)
 
-    def create_q_language_dir(self, q, questionnaire_metadata_dir):
-        q_default = _get_q_default_language_or_first(q)
-        q_language_dir = os.path.join(
-            questionnaire_metadata_dir,
-            q.code + '_' + q_default.survey_name
-        )
-        return q_language_dir
-
-    def create_q_language_responses_dir_and_file(
-            self, q, per_questionnaire_data_dir
-    ):
-        q_language_dir = self.create_q_language_dir(
-            q, per_questionnaire_data_dir
-        )
-        os.mkdir(q_language_dir)
-        file_path = os.path.join(
-            q_language_dir, 'Responses_' + q.code + '.csv'
-        )
-        self.create_text_file(file_path, 'a, b, c\nd, e, f')
-
-    def create_q_language_metadata_dir_and_files(
-            self, q, questionnaire_metadata_dir
-    ):
-        q_language_dir = self.create_q_language_dir(
-            q, questionnaire_metadata_dir
-        )
-        os.mkdir(q_language_dir)
-        for q_language in q.q_languages.all():
-            file_path = os.path.join(
-                q_language_dir,
-                'Fields_' + q.code + '_' +
-                q_language.language_code + '.csv'
-            )
-            self.create_text_file(file_path, 'a, b, c\nd, e, f')
-
-    def create_group_subdir(self, group_dir, name):
-        subdir = os.path.join(
-            group_dir, name
-        )
-        os.makedirs(subdir)
-        return subdir
-
-    def create_text_file(self, file_path, text):
-        file = open(file_path, 'w')
-        file.write(text)
-        file.close()
-
-    def create_download_dir_structure_and_files(self, experiment):
-        # create download experiment data root
-        experiment_download_dir = os.path.join(
-            self.TEMP_MEDIA_ROOT, 'download', str(experiment.pk)
-        )
-
-        # remove subdir if exists before creating that
-        if os.path.exists(experiment_download_dir):
-            shutil.rmtree(experiment_download_dir)
-        os.makedirs(experiment_download_dir)
-
-        # create Experiment.csv file
-        self.create_text_file(
-            os.path.join(experiment_download_dir, 'Experiment.csv'),
-            'a, b, c\nd, e, f'
-        )
-
-        for group in experiment.groups.all():
-            group_dir = os.path.join(
-                experiment_download_dir, 'Group_' + group.title
-            )
-            questionnaire_metadata_dir = self.create_group_subdir(
-                group_dir, 'Questionnaire_metadata'
-            )
-            per_questionnaire_data_dir = self.create_group_subdir(
-                group_dir, 'Per_questionnaire_data'
-            )
-            per_participant_data_dir = self.create_group_subdir(
-                group_dir, 'Per_participant_data'
-            )
-            experimental_protocol_dir = self.create_group_subdir(
-                group_dir, 'Experimental_protocol'
-            )
-
-            # create questionnaire stuff
-            for questionnaire_step in group.steps.filter(
-                    type=Step.QUESTIONNAIRE
-            ):
-                # TODO: see if using step_ptr is ok
-                q = Questionnaire.objects.get(step_ptr=questionnaire_step)
-
-                # create Questionnaire_metadata dir and files
-                self.create_q_language_metadata_dir_and_files(
-                    q, questionnaire_metadata_dir
-                )
-                # create Per_questionnaire_data dir and file
-                self.create_q_language_responses_dir_and_file(
-                    q, per_questionnaire_data_dir
-                )
-            # create Per_participant_data subdirs
-            # TODO: inside that subdirs could be other dirs and files. By
-            # TODO: now we are creating only the first subdirs levels
-            for participant in group.participants.all():
-                os.mkdir(os.path.join(
-                    per_participant_data_dir, 'Participant_' + participant.code
-                ))
-
-            # create Experimental_protocol subdirs
-            # TODO: inside Experimental_protocol dir there are files,
-            # TODO: as well as in that subdirs. By now we are creating only
-            # TODO: the first subdirs levels
-            for i in range(2):
-                os.mkdir(os.path.join(
-                    experimental_protocol_dir, 'STEP_' + str(i)
-                ))
-
-            # create Participants.csv file
-            self.create_text_file(
-                os.path.join(group_dir, 'Participants.csv'),
-                'a, b, c\nd, e, f'
-            )
-
     def test_downloading_experiment_data_increases_download_counter(self):
         # Create fake download.zip file
         file = io.BytesIO()
@@ -796,15 +666,17 @@ class DownloadExperimentTest(TestCase):
         # Create a complete directory tree with possible experiment data
         # directories/files that reproduces the directory/file structure
         # created when Portal receives the experiment data through Rest API.
-        self.create_download_dir_structure_and_files(experiment)
+        create_download_dir_structure_and_files(
+            experiment, self.TEMP_MEDIA_ROOT
+        )
 
         # get groups and participants for tests below
         g1 = experiment.groups.order_by('?').first()
         g2 = experiment.groups.order_by('?').first()  # can be equal to g1
         if g1 == g2:
-            participants = g1.participants.order_by('?')
-            p1 = participants.first()
-            p2 = participants.last()
+            participants = list(g1.participants.order_by('?'))
+            p1 = participants[0]
+            p2 = participants[len(participants) - 1]
         else:
             p1 = g1.participants.order_by('?').first()
             p2 = g2.participants.order_by('?').first()
@@ -866,8 +738,6 @@ class DownloadExperimentTest(TestCase):
                 )
 
     def test_POSTing_download_experiment_data_without_choices_redirects_to_experiment_detail_view(self):
-        # Last approved experiment created in tests helper has all
-        # possible experiment data to download
         experiment = Experiment.objects.filter(
             status=Experiment.APPROVED
         ).last()
@@ -886,3 +756,65 @@ class DownloadExperimentTest(TestCase):
         # we are prevent submit data in detail.html with JQuery by now
         # TODO: possible implementation without javascript
         pass
+
+    @override_settings(MEDIA_ROOT=TEMP_MEDIA_ROOT)
+    def test_POSTing_option_data_has_not_correspondent_subdir_redirects_to_experiment_detail_view(self):
+        experiment = Experiment.objects.filter(
+            status=Experiment.APPROVED
+        ).last()
+
+        # Create other objects required for this experiment to test POSTing
+        # data and download dir structure
+        create_experiment_related_objects(experiment)
+        create_download_dir_structure_and_files(
+            experiment, self.TEMP_MEDIA_ROOT
+        )
+
+        group = experiment.groups.order_by('?').first()
+        participant = group.participants.order_by('?').first()
+
+        options = [
+            'experimental_protocol_g' + str(group.id),
+            'questionnaires_g' + str(group.id),
+            'participant_p' + str(participant.id) + '_g' + str(group.id)
+        ]
+
+        selected = random.choice(options)
+        # Remove the selected option corresponded subdir simulated that the
+        # subdir does not exist.
+        remove_selected_subdir(
+            selected, experiment, participant, group, self.TEMP_MEDIA_ROOT
+        )
+
+        url = reverse('download-view', kwargs={'experiment_id': experiment.id})
+        response = self.client.post(
+            url, {
+                'download_selected': selected
+            }
+        )
+
+        self.assertRedirects(
+            response,
+            reverse('experiment-detail', kwargs={'slug': experiment.slug})
+        )
+
+    @override_settings(MEDIA_ROOT=TEMP_MEDIA_ROOT)
+    def test_GETing_download_experiment_view_without_compressed_file_redirects_to_experiment_detail_view(self):
+        experiment = Experiment.objects.filter(
+            status=Experiment.APPROVED
+        ).last()
+
+        # create temp 'media/download/<experiment.id>' subdir
+        os.makedirs(
+            os.path.join(self.TEMP_MEDIA_ROOT, 'download', str(experiment.id))
+        )
+
+        url = reverse('download-view', kwargs={'experiment_id': experiment.id})
+        response = self.client.get(url)
+
+        # As we have nothing in 'media/download/<experiment.id>' the system
+        # should redirects to experiment detail page
+        self.assertRedirects(
+            response,
+            reverse('experiment-detail', kwargs={'slug': experiment.slug})
+        )
