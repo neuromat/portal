@@ -1,19 +1,19 @@
+import os
+import random
+import shutil
 from datetime import datetime
 from random import randint, choice
-
-from django.contrib.auth import models
 from faker import Factory
+from django.contrib.auth import models
 
+from nep import settings
 from experiments.helpers import generate_image_file
 from experiments.models import Experiment, Study, Group, Researcher, \
     Collaborator, Participant, Gender, ExperimentalProtocol, \
     ClassificationOfDiseases, Keyword, Step, TMSSetting, TMSDevice, CoilModel, \
     TMSDeviceSetting, TMSData, EEGSetting, Questionnaire, \
     QuestionnaireLanguage, QuestionnaireDefaultLanguage
-
-import random
-
-from nep import settings
+from experiments.views import _get_q_default_language_or_first
 
 
 def create_group(qtty, experiment):
@@ -436,10 +436,182 @@ def create_experiment_related_objects(experiment):
     gender2 = Gender.objects.create(name='female')
     for group in experiment.groups.all():
         create_participant(
-            randint(1, 6), group,
+            randint(2, 6), group,
             gender1 if randint(1, 2) == 1 else gender2
         )
         create_experiment_protocol(group)
+
+
+def create_q_language_dir(q, questionnaire_metadata_dir):
+    q_default = _get_q_default_language_or_first(q)
+    q_language_dir = os.path.join(
+        questionnaire_metadata_dir,
+        q.code + '_' + q_default.survey_name
+    )
+    return q_language_dir
+
+
+def create_q_language_responses_dir_and_file(
+        q, per_questionnaire_data_dir
+):
+    q_language_dir = create_q_language_dir(
+        q, per_questionnaire_data_dir
+    )
+    os.mkdir(q_language_dir)
+    file_path = os.path.join(
+        q_language_dir, 'Responses_' + q.code + '.csv'
+    )
+    create_text_file(file_path, 'a, b, c\nd, e, f')
+
+
+def create_q_language_metadata_dir_and_files(
+        q, questionnaire_metadata_dir
+):
+    q_language_dir = create_q_language_dir(
+        q, questionnaire_metadata_dir
+    )
+    os.mkdir(q_language_dir)
+    for q_language in q.q_languages.all():
+        file_path = os.path.join(
+            q_language_dir,
+            'Fields_' + q.code + '_' +
+            q_language.language_code + '.csv'
+        )
+        create_text_file(file_path, 'a, b, c\nd, e, f')
+
+
+def create_group_subdir(group_dir, name):
+    subdir = os.path.join(
+        group_dir, name
+    )
+    os.makedirs(subdir)
+    return subdir
+
+
+def create_text_file(file_path, text):
+    file = open(file_path, 'w')
+    file.write(text)
+    file.close()
+
+
+def create_download_dir_structure_and_files(experiment, temp_media_root):
+    # define download experiment data root
+    experiment_download_dir = os.path.join(
+        temp_media_root, 'download', str(experiment.pk)
+    )
+
+    # remove subdir if exists before creating that
+    if os.path.exists(experiment_download_dir):
+        shutil.rmtree(experiment_download_dir)
+    os.makedirs(experiment_download_dir)
+
+    # create Experiment.csv file
+    create_text_file(
+        os.path.join(experiment_download_dir, 'Experiment.csv'),
+        'a, b, c\nd, e, f'
+    )
+
+    for group in experiment.groups.all():
+        group_dir = os.path.join(
+            experiment_download_dir, 'Group_' + group.title
+        )
+        # TODO: sometimes on creating this subdir, test fails claiming that
+        # TODO: that 'Questionnaire_metadata' already exists. It seems that
+        # TODO: some group title is repeating. Verify!
+        questionnaire_metadata_dir = create_group_subdir(
+            group_dir, 'Questionnaire_metadata'
+        )
+        per_questionnaire_data_dir = create_group_subdir(
+            group_dir, 'Per_questionnaire_data'
+        )
+        per_participant_data_dir = create_group_subdir(
+            group_dir, 'Per_participant_data'
+        )
+        experimental_protocol_dir = create_group_subdir(
+            group_dir, 'Experimental_protocol'
+        )
+
+        # create questionnaire stuff
+        for questionnaire_step in group.steps.filter(
+                type=Step.QUESTIONNAIRE
+        ):
+            # TODO: see if using step_ptr is ok
+            q = Questionnaire.objects.get(step_ptr=questionnaire_step)
+
+            # create Questionnaire_metadata dir and files
+            create_q_language_metadata_dir_and_files(
+                q, questionnaire_metadata_dir
+            )
+            # create Per_questionnaire_data dir and file
+            create_q_language_responses_dir_and_file(
+                q, per_questionnaire_data_dir
+            )
+        # create Per_participant_data subdirs
+        # TODO: inside that subdirs could be other dirs and files. By
+        # TODO: now we are creating only the first subdirs levels
+        for participant in group.participants.all():
+            os.mkdir(os.path.join(
+                per_participant_data_dir, 'Participant_' + participant.code
+            ))
+
+        # create Experimental_protocol subdirs
+        # TODO: inside Experimental_protocol dir there are files,
+        # TODO: as well as in that subdirs. By now we are creating only
+        # TODO: the first subdirs levels
+        for i in range(2):
+            os.mkdir(os.path.join(
+                experimental_protocol_dir, 'STEP_' + str(i)
+            ))
+
+        # create Participants.csv file
+        create_text_file(
+            os.path.join(group_dir, 'Participants.csv'),
+            'a, b, c\nd, e, f'
+        )
+
+
+def remove_selected_subdir(selected, experiment, participant, group,
+                           temp_media_root):
+    # Define download experiment data root. This and subdirs created
+    # below has to be the same as defined in
+    # create_download_dir_structure_and_files.
+    experiment_download_dir = os.path.join(
+        temp_media_root, 'download', str(experiment.pk)
+    )
+    if 'experimental_protocol_g' in selected:
+        shutil.rmtree(os.path.join(
+            experiment_download_dir, 'Group_' + group.title,
+            'Experimental_protocol'
+        ))
+    if 'questionnaires_g' in selected:
+        shutil.rmtree(os.path.join(
+            experiment_download_dir, 'Group_' + group.title,
+            'Per_questionnaire_data'
+        ))
+    if 'participant_p' in selected:
+        shutil.rmtree(os.path.join(
+            experiment_download_dir, 'Group_' + group.title,
+            'Per_participant_data', 'Participant_' + participant.code
+        ))
+    # If group has questionnaires remove 'Questionnaire_metadata' subdir
+    # randomly.
+    if group.steps.filter(type=Step.QUESTIONNAIRE).count() > 0:
+        if randint(0, 1) == 1:
+            shutil.rmtree(os.path.join(
+                experiment_download_dir, 'Group_' + group.title,
+                'Questionnaire_metadata'
+            ))
+
+    # Remove Experiments.csv and Participants.csv randomly
+    if randint(0, 1) == 1:
+        os.remove(os.path.join(
+            experiment_download_dir, 'Experiment.csv'
+        ))
+    if randint(0, 1) == 1:
+        os.remove(os.path.join(
+            experiment_download_dir, 'Group_' + group.title,
+            'Participants.csv'
+        ))
 
 
 def global_setup_ft():
