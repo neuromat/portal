@@ -1,13 +1,19 @@
+import tempfile
 import time
+from random import choice
 from unittest import skip
 
+import os
 from django.contrib.auth.models import User
+from django.test import override_settings
 from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.common.keys import Keys
 
+from downloads.views import DOWNLOAD_ERROR_MESSAGE
 from experiments.models import Experiment, Questionnaire, Step, Group, Gender
 from experiments.tests.tests_helper import create_experiment, create_group, \
-    create_participant
+    create_participant, create_download_dir_structure_and_files, \
+    remove_selected_subdir
 from functional_tests.base import FunctionalTest
 
 
@@ -625,6 +631,8 @@ class ExperimentDetailTest(FunctionalTest):
 
 class DownloadExperimentTest(FunctionalTest):
 
+    TEMP_MEDIA_ROOT = os.path.join(tempfile.mkdtemp(), 'media')
+
     def access_downloads_tab_content(self, experiment):
         # Josileine wants to download the experiment data.
         self.browser.find_element_by_xpath(
@@ -849,4 +857,60 @@ class DownloadExperimentTest(FunctionalTest):
         self.wait_for(lambda: self.assertIn(
             'Please select item(s) to download',
             self.browser.find_element_by_class_name('alert-warning').text
+        ))
+
+    @override_settings(MEDIA_ROOT=TEMP_MEDIA_ROOT)
+    def test_if_there_is_not_a_subdir_in_temp_download_dir_structure_return_message(self):
+        ##
+        # Last approved experiment created in tests helper has the objects that
+        # we need for all groups, besides questionnaires and experimental
+        # protocols for some groups.
+        ##
+        experiment = Experiment.objects.filter(
+            status=Experiment.APPROVED
+        ).last()
+        create_download_dir_structure_and_files(
+            experiment, self.TEMP_MEDIA_ROOT
+        )
+
+        ##
+        # Get the variables that we will need below
+        ##
+        group = experiment.groups.order_by('?').first()
+        # there's a group that has no participants
+        while True:
+            participant = group.participants.order_by('?').first()
+            if participant:
+                break
+
+        # Josileine accesses Experiment Detail Downloads tab
+        downloads_tab_content = self.access_downloads_tab_content(experiment)
+        # wait for tree-multiselect plugin to render multiselection
+        time.sleep(0.5)
+
+        options = [
+            'experimental_protocol_g' + str(group.id),
+            'questionnaires_g' + str(group.id),
+            'participant_p' + str(participant.id) + '_g' + str(group.id)
+        ]
+        selected = choice(options)
+        ##
+        # Remove the subdir correspondent to the option she selected to
+        # simulate that subdir was not created when creating the download dir
+        # structure after experiment is ready to be analysed.
+        ##
+        remove_selected_subdir(
+            selected, experiment, participant, group, self.TEMP_MEDIA_ROOT
+        )
+
+        # She selects one option to download and click in Download button
+        self.browser.find_element_by_xpath(
+            "//div[@data-value='" + selected + "']"
+        ).find_element_by_tag_name('input').click()
+        self.browser.find_element_by_id('download_button').click()
+
+        # She sees an error message telling her that some problem ocurred
+        self.wait_for(lambda: self.assertIn(
+            DOWNLOAD_ERROR_MESSAGE,
+            self.browser.find_element_by_class_name('alert-danger').text
         ))

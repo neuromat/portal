@@ -24,12 +24,13 @@ EXPORT_DIRECTORY = "temp"
 DOWNLOAD_DIRECTORY = "download"
 EXPORT_FILENAME = "download.zip"
 EXPORT_EXPERIMENT_FILENAME = "download_experiment.zip"
+DOWNLOAD_ERROR_MESSAGE = _('There was a problem downloading your experiment '
+                           'data')
 
 
 # Create your views here.
 def create_export_instance():
     export_instance = Export()
-
     export_instance.save()
 
     return export_instance
@@ -69,17 +70,25 @@ def download_view(request, experiment_id):
     # Create compressed file with elements chosen by user
     # ---------------------------------------------------
     # TODO: if experiment has no groups return response with only
-    # TODO: experiments.csv
+    # TODO: Experiments.csv
     # create temporary dir to aggregate subdirs/files for further
     # incorporate in compacted file
     temp_dir = tempfile.mkdtemp()
     # Experiment.csv always will be in compressed file
-    shutil.copyfile(os.path.join(
-        settings.MEDIA_ROOT, 'download', str(experiment.id), 'Experiment.csv'
-    ), os.path.join(temp_dir, 'Experiment.csv')
-    )
-    # Copy experiment data from media/download/<experiment.id> based on user
-    # selection, to temp dir.
+    try:
+        shutil.copyfile(os.path.join(
+            settings.MEDIA_ROOT, 'download', str(experiment.id),
+            'Experiment.csv'
+        ), os.path.join(temp_dir, 'Experiment.csv')
+        )
+    except FileNotFoundError:
+        messages.error(request, DOWNLOAD_ERROR_MESSAGE)
+        return HttpResponseRedirect(
+            reverse('experiment-detail', kwargs={'slug': experiment.slug})
+        )
+
+    # Copy experiment data from settings.MEDIA_ROOT/download/<experiment.id>
+    # based on user selection, to temp dir.
     for item in request.POST.getlist('download_selected'):
         # take the group title to copy subdirs/files to temp location
         group_str = re.search("g[0-9]+", item)
@@ -93,28 +102,49 @@ def download_view(request, experiment_id):
         if pattern_exp_protocol.match(item):
             # add Experimental_protocol subdir for the specific group in temp
             # dir
-            shutil.copytree(os.path.join(
-                settings.MEDIA_ROOT, 'download', str(experiment.id),
-                'Group_' + group.title, 'Experimental_protocol'
-            ), os.path.join(temp_dir, 'Group_' + group.title,
-                            'Experimental_protocol')
-            )
+            try:
+                shutil.copytree(os.path.join(
+                    settings.MEDIA_ROOT, 'download', str(experiment.id),
+                    'Group_' + group.title, 'Experimental_protocol'
+                ), os.path.join(temp_dir, 'Group_' + group.title,
+                                'Experimental_protocol')
+                )
+            except FileNotFoundError:
+                messages.error(request, DOWNLOAD_ERROR_MESSAGE)
+                return HttpResponseRedirect(
+                    reverse('experiment-detail',
+                            kwargs={'slug': experiment.slug})
+                )
         if pattern_questionnaires.match(item):
             # Add Per_questionnaire_data subdir for the specific group in temp
             # dir.
-            shutil.copytree(os.path.join(
-                settings.MEDIA_ROOT, 'download', str(experiment.id),
-                'Group_' + group.title, 'Per_questionnaire_data'
-            ), os.path.join(temp_dir, 'Group_' + group.title,
-                            'Per_questionnaire_data')
-            )
+            try:
+                shutil.copytree(os.path.join(
+                    settings.MEDIA_ROOT, 'download', str(experiment.id),
+                    'Group_' + group.title, 'Per_questionnaire_data'
+                ), os.path.join(temp_dir, 'Group_' + group.title,
+                                'Per_questionnaire_data')
+                )
+            except FileNotFoundError:
+                messages.error(request, DOWNLOAD_ERROR_MESSAGE)
+                return HttpResponseRedirect(
+                    reverse('experiment-detail',
+                            kwargs={'slug': experiment.slug})
+                )
             # add Participants.csv file for the specific group in temp dir.
-            shutil.copyfile(os.path.join(
-                settings.MEDIA_ROOT, 'download', str(experiment.id),
-                'Group_' + group.title, 'Participants.csv'
-            ), os.path.join(temp_dir, 'Group_' + group.title,
-                            'Participants.csv')
-            )
+            try:
+                shutil.copyfile(os.path.join(
+                    settings.MEDIA_ROOT, 'download', str(experiment.id),
+                    'Group_' + group.title, 'Participants.csv'
+                ), os.path.join(temp_dir, 'Group_' + group.title,
+                                'Participants.csv')
+                )
+            except FileNotFoundError:
+                messages.error(request, DOWNLOAD_ERROR_MESSAGE)
+                return HttpResponseRedirect(
+                    reverse('experiment-detail',
+                            kwargs={'slug': experiment.slug})
+                )
         if pattern_participant.match(item):
             # Add Per_participant_data subdir for the specific group in temp
             # dir.
@@ -126,25 +156,39 @@ def download_view(request, experiment_id):
             # TODO: fix test. Probably chosing participants from
             # TODO: diferent groups, as it's the case when selecting
             # TODO: participants to download in UI.
-            shutil.copytree(os.path.join(
-                settings.MEDIA_ROOT, 'download', str(experiment.id),
-                'Group_' + group.title, 'Per_participant_data', 'Participant_'
-                                        + participant.code
-            ), os.path.join(temp_dir, 'Group_' + group.title,
-                            'Per_participant_data', 'Participant_' +
-                            participant.code)
-            )
+            try:
+                shutil.copytree(os.path.join(
+                    settings.MEDIA_ROOT, 'download', str(experiment.id),
+                    'Group_' + group.title, 'Per_participant_data', 
+                    'Participant_' + participant.code
+                ), os.path.join(temp_dir, 'Group_' + group.title,
+                                'Per_participant_data', 'Participant_' +
+                                participant.code)
+                )
+            except FileNotFoundError:
+                messages.error(request, DOWNLOAD_ERROR_MESSAGE)
+                return HttpResponseRedirect(
+                    reverse('experiment-detail',
+                            kwargs={'slug': experiment.slug})
+                )
 
     # Put Questionnaire_metadata subdir in temp dir for all groups that have
     # questionnaires.
     for group in experiment.groups.all():
         if group.steps.filter(type=Step.QUESTIONNAIRE).count() > 0:
-            shutil.copytree(os.path.join(
-                settings.MEDIA_ROOT, 'download', str(experiment.id),
-                'Group_' + group.title, 'Questionnaire_metadata'
-            ), os.path.join(temp_dir, 'Group_' + group.title,
-                            'Questionnaire_metadata')
-            )
+            try:
+                shutil.copytree(os.path.join(
+                    settings.MEDIA_ROOT, 'download', str(experiment.id),
+                    'Group_' + group.title, 'Questionnaire_metadata'
+                ), os.path.join(temp_dir, 'Group_' + group.title,
+                                'Questionnaire_metadata')
+                )
+            except FileNotFoundError:
+                messages.error(request, DOWNLOAD_ERROR_MESSAGE)
+                return HttpResponseRedirect(
+                    reverse('experiment-detail',
+                            kwargs={'slug': experiment.slug})
+                )
 
     # make compressed file and return response to client
     compressed_file_name = shutil.make_archive(os.path.join(
