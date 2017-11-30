@@ -549,6 +549,13 @@ h5.match {
     border-color: #4a9c7f;
 }
 
+.btn-disabled, .btn-disabled:hover, .btn-disabled:focus {
+    color: #fff;
+    background-color: #598f88;
+    border-color: #598f88;
+    margin: 4px;
+}
+
 .form-group .btn-primary-right {
     float: right;
     margin: 0;

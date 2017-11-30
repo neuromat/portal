@@ -276,6 +276,9 @@ class ExportExecution:
                             eeg_default_setting_description = get_eeg_setting_description(default_eeg.eeg_setting.id)
                             if eeg_default_setting_description:
                                 eeg_setting_filename = "%s.json" % "eeg_default_setting"
+                                # TODO:
+                                # bug: fails if path exists. See "if not
+                                # path.exists" above
                                 complete_filename_eeg_setting = path.join(directory_eeg_step, eeg_setting_filename)
 
                                 self.files_to_zip_list.append([complete_filename_eeg_setting, export_directory_eeg_step])
