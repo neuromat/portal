@@ -371,7 +371,9 @@
                             {% endif %}
                         </div>
                         <div class="form-group text-right">
-                            <input type="submit" id="download_button" class="btn btn-primary" value="{% trans 'Download' %}">
+                            <input type="submit" id="download_button"
+                                   class="btn btn-disabled"
+                                   value="{% trans 'Download' %}">
                         </div>
                     </form>
                 </div>
@@ -545,7 +547,7 @@
         $("#download_button").click(function(e) {
             const options = $("select#download_options option").length;
             const selected = $("select#download_options :selected").length;
-            if (selected === 0) {
+            if (!selected) {
                 e.preventDefault();
             }
             if (selected == options) {  // PyCharm highlight not necessary
@@ -553,6 +555,19 @@
                 const url = "{% url 'download-view' experiment.id %}";
                 $(location).attr('href', url)
             }
-        })
+        });
+        // Change Download submit button class while user doesn't select at least one option
+        $("select#download_options").change(function () {
+            const selected = $("select#download_options :selected").length;
+            if (selected) {
+                $("#download_button")
+                .removeClass("btn-disabled")
+                .addClass("btn-primary");
+            } else {
+                $("#download_button")
+                .removeClass("btn-primary")
+                .addClass("btn-disabled");
+            }
+        });
     </script>
 {% endblock %}

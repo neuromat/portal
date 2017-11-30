@@ -42,19 +42,21 @@ def download_view(request, experiment_id):
     # If it's a get request, serve file with all experiment data immediatally
     # for download.
     if request.method == 'GET':
-        complete_filename = os.path.join(
+        compressed_file = os.path.join(
             settings.MEDIA_ROOT, 'download', str(experiment.id), 'download.zip'
         )
         try:
-            zip_file = open(complete_filename, 'rb')
+            zip_file = open(compressed_file, 'rb')
         except FileNotFoundError:
             messages.error(request, DOWNLOAD_ERROR_MESSAGE)
             return HttpResponseRedirect(
                 reverse('experiment-detail', kwargs={'slug': experiment.slug})
             )
-        response = HttpResponse(zip_file, content_type='application/zip')
+        response = HttpResponse(
+            zip_file, content_type='application/force-download'
+        )
         response['Content-Disposition'] = 'attachment; filename="download.zip"'
-        response['Content-Length'] = path.getsize(complete_filename)
+        response['Content-Length'] = path.getsize(compressed_file)
         response['Set-Cookie'] = 'fileDownload=true; path=/'
         zip_file.close()
 
@@ -207,7 +209,6 @@ def download_view(request, experiment_id):
     experiment.downloads += 1
     experiment.save()
     return response
-
 
     template_name = "experiments/detail.html"
     error_msg = download_create(experiment_id, template_name)
