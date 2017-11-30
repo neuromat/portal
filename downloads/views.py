@@ -11,6 +11,7 @@ from django.conf import settings
 from django.contrib import messages
 from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponse, HttpResponseRedirect
+from django.utils.encoding import smart_str
 from django.utils.translation import ugettext as _
 
 from .export import create_directory, ExportExecution
@@ -52,10 +53,10 @@ def download_view(request, experiment_id):
             return HttpResponseRedirect(
                 reverse('experiment-detail', kwargs={'slug': experiment.slug})
             )
-        response = HttpResponse(
-            zip_file, content_type='application/force-download'
-        )
-        response['Content-Disposition'] = 'attachment; filename="download.zip"'
+        response = HttpResponse(content_type='application/force-download')
+        response['Content-Disposition'] = \
+            'attachment; filename=%s' % smart_str('download.zip')
+        response['X-Sendfile'] = smart_str(compressed_file)
         response['Content-Length'] = path.getsize(compressed_file)
         response['Set-Cookie'] = 'fileDownload=true; path=/'
         zip_file.close()
