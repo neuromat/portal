@@ -4,6 +4,7 @@ from unittest import skip
 
 from django.contrib.auth.models import User
 from django.urls import reverse
+from django.utils.encoding import smart_str
 from rest_framework import status
 from rest_framework.test import APITestCase
 
@@ -311,7 +312,7 @@ class ExperimentAPITest(APITestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEquals(
             response.get('Content-Disposition'),
-            'attachment; filename="download.zip"'
+            'attachment; filename=%s' % smart_str('download.zip')
         )
 
 
