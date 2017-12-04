@@ -8,7 +8,7 @@ from datetime import datetime
 from faker import Factory
 
 from experiments.models import Experiment, Study, Group, Researcher, \
-    Collaborator, RejectJustification
+    Collaborator, RejectJustification, Publication
 from experiments.tests.tests_helper import global_setup_ut, apply_setup
 
 
@@ -34,7 +34,7 @@ class ResearcherModelTest(TestCase):
         with self.assertRaises(ValidationError):
             researcher.full_clean()
 
-    # TODO: cannot save researcher without study
+    # TODO: test cannot save researcher without study
 
 
 @apply_setup(global_setup_ut)
@@ -345,3 +345,35 @@ class RejectJustificationModel(TestCase):
         )
         justification.save()
         self.assertEqual(justification, experiment.justification)
+
+
+@apply_setup(global_setup_ut)
+class PublicationModel(TestCase):
+
+    def setUp(self):
+        global_setup_ut()
+
+    def test_default_attributes(self):
+        publication = Publication()
+        self.assertEqual(publication.title, '')
+        self.assertEqual(publication.citation, '')
+        self.assertEqual(publication.url, None)
+
+    def test_publication_is_related_to_experiment(self):
+        experiment = Experiment.objects.filter(
+            status=Experiment.TO_BE_ANALYSED
+        ).first()
+        publication = Publication(
+            title='Ein Titel', citation='Ein Zitat', experiment=experiment
+        )
+        publication.save()
+        self.assertIn(publication, experiment.publications.all())
+
+    def test_cannot_save_empty_attributes(self):
+        experiment = Experiment.objects.filter(
+            status=Experiment.TO_BE_ANALYSED
+        ).first()
+        publication = Publication(title='', citation='', experiment=experiment)
+        with self.assertRaises(ValidationError):
+            publication.save()
+            publication.full_clean()
