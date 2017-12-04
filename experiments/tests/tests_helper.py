@@ -419,6 +419,20 @@ def create_questionnaire(qtty, code, group):
         )
 
 
+def create_data_collection(group, type):
+    """
+    Requires Experimental P1rotocol for group
+    :param group: group model instance
+    :param type: type of data collection
+    """
+    # TODO: implement it!
+    # Create data_collection(s) to test
+    # test_views.test_POSTing_download_experiment_data_returns_correct_content
+    participant = group.participants.first()
+    if type == 'eeg':
+        pass
+
+
 def create_experiment_related_objects(experiment):
     """
     Create experiment related objects to test download experiment data
@@ -440,6 +454,12 @@ def create_experiment_related_objects(experiment):
             gender1 if randint(1, 2) == 1 else gender2
         )
         create_experiment_protocol(group)
+
+    # create data collection
+    # TODO: implement it!
+    # Create data_collection(s) to test
+    # test_views.test_POSTing_download_experiment_data_returns_correct_content
+    create_data_collection(experiment.groups.first(), 'eeg')
 
 
 def create_q_language_dir(q, questionnaire_metadata_dir):

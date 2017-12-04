@@ -215,6 +215,17 @@ class Participant(models.Model):
     class Meta:
         unique_together = ('group', 'code')
 
+    def has_data_collection(self):
+        if self.eegdata_set.all() or self.emgdata_set.all() or \
+                self.tmsdata_set.all() or \
+                self.additionaldata_set.all() or \
+                self.genericdatacollectiondata_set.all() or \
+                self.goalkeepergamedata_set.all() or \
+                self.questionnaireresponse_set.all():
+            return True
+        else:
+            return False
+
 
 class Equipment(models.Model):
     EQUIPMENT_TYPES = (
@@ -226,7 +237,8 @@ class Equipment(models.Model):
         ("tms_device", "TMS device")
     )
     manufacturer_name = models.CharField(max_length=150)
-    equipment_type = models.CharField(null=True, blank=True, max_length=50, choices=EQUIPMENT_TYPES)
+    equipment_type = models.CharField(null=True, blank=True, max_length=50,
+                                      choices=EQUIPMENT_TYPES)
     identification = models.CharField(max_length=150)
     description = models.TextField(null=True, blank=True)
     serial_number = models.CharField(max_length=50, null=True, blank=True)

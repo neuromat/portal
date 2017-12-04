@@ -6,10 +6,12 @@ import shutil
 from os import path
 from shutil import rmtree
 from zipfile import ZipFile
+
+import sys
 from django.urls import reverse
 from django.conf import settings
 from django.contrib import messages
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import get_object_or_404
 from django.http import HttpResponse, HttpResponseRedirect
 from django.utils.encoding import smart_str
 from django.utils.translation import ugettext as _
@@ -47,19 +49,29 @@ def download_view(request, experiment_id):
             settings.MEDIA_ROOT, 'download', str(experiment.id), 'download.zip'
         )
         try:
-            zip_file = open(compressed_file, 'rb')
+            file = open(compressed_file, 'rb')
         except FileNotFoundError:
             messages.error(request, DOWNLOAD_ERROR_MESSAGE)
             return HttpResponseRedirect(
                 reverse('experiment-detail', kwargs={'slug': experiment.slug})
             )
-        response = HttpResponse(content_type='application/force-download')
+
+        # Workaround to test serving compressed file. We are using Apache
+        # module to serve file imediatally by Apache instead of streaming it
+        # through Django.
+        if 'test' or 'runserver' in sys.argv:
+            response = HttpResponse(file, content_type='application/zip')
+            response['Content-Length'] = path.getsize(compressed_file)
+        else:
+            response = HttpResponse(content_type='application/force-download')
+            response['X-Sendfile'] = smart_str(compressed_file)
+            response['Content-Length'] = path.getsize(compressed_file)
+            response['Set-Cookie'] = 'fileDownload=true; path=/'
+
         response['Content-Disposition'] = \
             'attachment; filename=%s' % smart_str('download.zip')
-        response['X-Sendfile'] = smart_str(compressed_file)
-        response['Content-Length'] = path.getsize(compressed_file)
-        response['Set-Cookie'] = 'fileDownload=true; path=/'
-        zip_file.close()
+
+        file.close()
 
         experiment.downloads += 1
         experiment.save()
@@ -202,46 +214,24 @@ def download_view(request, experiment_id):
     compressed_file = shutil.make_archive(os.path.join(
         tempfile.mkdtemp(), 'download'), 'zip', temp_dir
     )
-    response = HttpResponse(content_type='application/force-download')
+    # workaround to test serving compressed file
+    if 'test' or 'runserver' in sys.argv:
+        file = open(os.path.join(temp_dir, compressed_file), 'rb')
+        response = HttpResponse(file, content_type='application/zip')
+        response['Content-Length'] = path.getsize(compressed_file)
+    else:
+        response = HttpResponse(content_type='application/force-download')
+        response['X-Sendfile'] = smart_str(compressed_file)
+        response['Content-Length'] = path.getsize(compressed_file)
+        response['Set-Cookie'] = 'fileDownload=true; path=/'
+
     response['Content-Disposition'] = \
         'attachment; filename=%s' % smart_str('download.zip')
-    response['X-Sendfile'] = smart_str(compressed_file)
-    response['Content-Length'] = path.getsize(compressed_file)
-    response['Set-Cookie'] = 'fileDownload=true; path=/'
 
     experiment.downloads += 1
     experiment.save()
 
     return response
-
-    template_name = "experiments/detail.html"
-    error_msg = download_create(experiment_id, template_name)
-
-    if error_msg != "":
-        messages.error(request, error_msg)
-        return render(request, template_name)
-    else:
-        messages.success(request, "Download was finished correctly")
-        return render(request, template_name)
-
-
-    # if complete_filename:
-    #
-    #     messages.success(request, "Download was finished correctly")
-    #
-    #     # print("antes do fim: httpResponse")
-    #     #
-    #     zip_file = open(complete_filename, 'rb')
-    #
-    #     response = HttpResponse(zip_file, content_type='application/zip')
-    #     response['Content-Disposition'] = 'attachment; filename="export.zip"'
-    #     response['Content-Length'] = path.getsize(complete_filename)
-    #     response['Set-Cookie'] = 'fileDownload=true; path=/'
-    #     response['slug'] = experiment.slug
-    #     return response
-    #     else:
-        #     messages.error(request, "Download data was not generated.")
-        #     return HttpResponseRedirect(template_name, args=(experiment.slug,))
 
 
 def get_export_instance(export_id):
