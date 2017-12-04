@@ -1,9 +1,8 @@
+import os
 import tempfile
 import time
 from random import choice
 from unittest import skip
-
-import os
 
 from django.contrib.auth.models import User
 from django.test import override_settings
@@ -597,7 +596,7 @@ class ExperimentDetailTest(FunctionalTest):
         # Questionnaire with code='q1' has three languages: English, French and
         # Brazilian Portuguese.
         ##
-        # The visitor clicks in 'pt-br' link and the questionnaire
+        # The visitor clicks in 'fr' link and the questionnaire
         # session refreshes
         self.browser.find_element_by_link_text('fr').click()
         ##
@@ -699,25 +698,36 @@ class DownloadExperimentTest(FunctionalTest):
             # group. If not, test for warning message
             ##
             if not hasattr(group, 'experimental_protocol') \
-                    and not group.steps.filter(type=Step.QUESTIONNAIRE).count() > 0 \
-                    and not group.participants.all():
+                    and not group.steps.filter(
+                type=Step.QUESTIONNAIRE
+            ).count() > 0 and not group.participants.all():
                 self.assertIn(
                     'There are not data for group ' + group.title,
                     downloads_tab_content.text
                 )
             else:
-                self.assertIn('Group ' + group.title, downloads_tab_content.text)
+                self.assertIn(
+                    'Group ' + group.title, downloads_tab_content.text
+                )
                 if hasattr(group, 'experimental_protocol'):
                     experimental_protocol_counter += 1
                 for participant in group.participants.all():
-                    self.assertIn(
-                        'Participant ' + participant.code,
-                        ##
-                        # Can assertIn downloads_tab_content because we've
-                        # created different participants for each group.
-                        ##
-                        downloads_tab_content.text
-                    )
+                    ##
+                    # List participants only if they have data collection.
+                    # Can test against downloads_tab_content because we've
+                    # created different participants for each group in the
+                    # tests.
+                    ##
+                    if participant.has_data_collection():
+                        self.assertIn(
+                            'Participant ' + participant.code,
+                            downloads_tab_content.text
+                        )
+                    else:
+                        self.assertNotIn(
+                            'Participant ' + participant.code,
+                            downloads_tab_content.text
+                        )
                 if group.steps.filter(type=Step.QUESTIONNAIRE).count() > 0:
                     per_questionnaire_counter += 1
 
@@ -796,11 +806,9 @@ class DownloadExperimentTest(FunctionalTest):
 
         downloads_tab_content = self.access_downloads_tab_content(experiment)
 
-        # As there're no data for one group, and one participant for the
-        # other group, Joseleine sees a message for one group and the
-        # corresponding patient data download option for the other group in
-        # Groups section in Downloads tab content
-        self.assertIn(
+        # As the last group created has only basic participant information (
+        # without data collection for it), that group is not listed.
+        self.assertNotIn(
             'Group ' + experiment.groups.last().title,
             downloads_tab_content.text
         )
@@ -811,11 +819,7 @@ class DownloadExperimentTest(FunctionalTest):
             "button to download it.",
             downloads_tab_content.text
         )
-        self.assertIn(
-            'Per Participant Data', downloads_tab_content.text
-        )
         self.assertNotIn('Per Questionnaire Data', downloads_tab_content.text)
-        self.assertIn('Participant ', downloads_tab_content.text)
 
         # Obs.: the tests for having one of experimental protocol,
         # participants, and questionnaires, for all groups are not beeing made
