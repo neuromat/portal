@@ -353,9 +353,9 @@
                                             <option value="questionnaires_g{{ group.id }}" data-section="Group {{ group.title }}">{% trans 'Per Questionnaire Data' %}</option>
                                         {% endif %}
                                         {% for participant in group.participants.all %}
-                                            {% if participant.has_collection_data %}
+{#                                            {% if participant.has_collection_data %}#}
                                                 <option value="participant_p{{ participant.id }}_g{{ group.id }}" data-section="Group {{ group.title }}/Per Participant Data">{% trans 'Participant ' %}{{ participant.code }}</option>
-                                            {% endif %}
+{#                                            {% endif %}#}
                                         {% endfor %}
                                     {% endfor %}
                                 </select>
