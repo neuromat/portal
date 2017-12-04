@@ -59,7 +59,7 @@ def download_view(request, experiment_id):
         # Workaround to test serving compressed file. We are using Apache
         # module to serve file imediatally by Apache instead of streaming it
         # through Django.
-        if 'test' or 'runserver' in sys.argv:
+        if 'test' in sys.argv or 'runserver' in sys.argv:
             response = HttpResponse(file, content_type='application/zip')
             response['Content-Length'] = path.getsize(compressed_file)
         else:
@@ -215,7 +215,7 @@ def download_view(request, experiment_id):
         tempfile.mkdtemp(), 'download'), 'zip', temp_dir
     )
     # workaround to test serving compressed file
-    if 'test' or 'runserver' in sys.argv:
+    if 'test' in sys.argv or 'runserver' in sys.argv:
         file = open(os.path.join(temp_dir, compressed_file), 'rb')
         response = HttpResponse(file, content_type='application/zip')
         response['Content-Length'] = path.getsize(compressed_file)
