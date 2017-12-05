@@ -12,7 +12,7 @@ from experiments import api
 from experiments.helpers import generate_image_file
 from experiments.models import Experiment, Study, Group, Researcher, \
     Collaborator, ClassificationOfDiseases, Questionnaire, Step, \
-    QuestionnaireLanguage, QuestionnaireDefaultLanguage
+    QuestionnaireLanguage, QuestionnaireDefaultLanguage, Publication
 from experiments.tests.tests_helper import global_setup_ut, apply_setup
 
 
@@ -902,7 +902,7 @@ class GroupAPITest(APITestCase):
                                  code=inclusion_criteria.code))
         self.client.logout()
 
-    def test_POSTing_new_group_with_non_existing_cod_saves_not_recognized_code(self):
+    def test_POSTing_new_group_with_non_existing_code_saves_not_recognized_code(self):
         # cod = classification of diseases
         owner = User.objects.get(username='lab1')
         experiment = Experiment.objects.get(nes_id=1, owner=owner)
@@ -938,6 +938,104 @@ class GroupAPITest(APITestCase):
                 'Code not recognized'
             )
         self.client.logout()
+
+
+@apply_setup(global_setup_ut)
+class PublicationsAPITest(APITestCase):
+
+    def setUp(self):
+        global_setup_ut()
+        Experiment.objects.create(
+            title='Ein Experiment', nes_id=10,
+            owner=User.objects.get(username='lab1'),
+            version=1, sent_date=datetime.utcnow(),
+            status=Experiment.RECEIVING,
+            trustee=User.objects.get(username='claudia')
+        )
+
+    def test_GET_returns_all_publications_short_url(self):
+        p_list = list()
+        for publication in Publication.objects.all():
+            p_list.append({
+                'id': publication.id,
+                'title': publication.title,
+                'citation': publication.citation,
+                'url': publication.url,
+                'experiment': publication.experiment.title
+            })
+
+        list_url = reverse('api_publications-list')
+        response = self.client.get(list_url)
+        self.assertEqual(json.loads(response.content.decode('utf8')), p_list)
+
+    def test_GET_returns_all_publications_long_url(self):
+        p_list = list()
+        for publication in Publication.objects.all():
+            p_list.append({
+                'id': publication.id,
+                'title': publication.title,
+                'citation': publication.citation,
+                'url': publication.url,
+                'experiment': publication.experiment.title
+            })
+
+        # last experiment approved has publications created in tests helper
+        experiment = Experiment.objects.filter(
+            status=Experiment.APPROVED
+        ).last()
+
+        list_url = reverse(
+            'api_experiment_publications-list',
+            kwargs={'experiment_nes_id': experiment.nes_id}
+        )
+        response = self.client.get(list_url)
+        self.assertEqual(json.loads(response.content.decode('utf8')), p_list)
+
+    def test_POSTing_a_new_publication(self):
+        # we've created an experiment in setUp method
+        experiment = Experiment.objects.last()
+        self.client.login(username=experiment.owner, password='nep-lab1')
+        list_url = reverse(
+            'api_experiment_publications-list',
+            kwargs={'experiment_nes_id': experiment.nes_id}
+        )
+        response = self.client.post(
+            list_url,
+            {
+                'title': 'Ein Titel',
+                'citation': 'Ein Zitat',
+                'url': 'http://brasil247.com'
+            }
+        )
+        self.client.logout()
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        new_publication = Publication.objects.last()
+        self.assertEqual(new_publication.title, 'Ein Titel')
+
+    def test_POSTing_new_publication_associates_with_last_experiment_version(
+            self):
+        # we've created an experiment in setUp method
+        experiment_v1 = Experiment.objects.last()
+        experiment_v2 = Experiment.objects.create(
+            nes_id=experiment_v1.nes_id, version=2,
+            sent_date=datetime.utcnow(), owner=experiment_v1.owner
+        )
+        self.client.login(
+            username=experiment_v1.owner.username, password='nep-lab1'
+        )
+        list_url = reverse('api_experiment_publications-list', kwargs={
+            'experiment_nes_id': experiment_v2.nes_id})
+        self.client.post(
+            list_url,
+            {
+                'title': 'Ein Titel Version zwei',
+                'citation': 'Ein Zitat Version zwei',
+                'url': 'http://diariodocentrodomundo.com.br'
+            }
+        )
+        self.client.logout()
+        new_publication = Publication.objects.last()
+        self.assertEqual(new_publication.experiment.id, experiment_v2.id)
 
 
 class QuestionnaireStepAPITest(APITestCase):

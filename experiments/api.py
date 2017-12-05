@@ -24,7 +24,7 @@ from experiments.models import Experiment, Study, User, ProtocolComponent, \
     EMGAnalogFilterSetting, \
     EMGElectrodePlacementSetting, \
     EMGSurfacePlacement, EMGIntramuscularPlacement, EMGNeedlePlacement, \
-    QuestionnaireLanguage, QuestionnaireDefaultLanguage
+    QuestionnaireLanguage, QuestionnaireDefaultLanguage, Publication
 
 
 ###################
@@ -530,6 +530,14 @@ class GroupSerializer(serializers.ModelSerializer):
                         )
                     group.inclusion_criteria.add(cod)
         return group
+
+
+class PublicationSerializer(serializers.ModelSerializer):
+    experiment = serializers.ReadOnlyField(source='experiment.title')
+
+    class Meta:
+        model = Publication
+        fields = ('id', 'title', 'citation', 'url', 'experiment')
 
 
 class ExperimentalProtocolSerializer(serializers.ModelSerializer):
@@ -1111,6 +1119,23 @@ class GroupViewSet(viewsets.ModelViewSet):
         # TODO: created yet"
         experiment = Experiment.objects.get(
             nes_id=exp_nes_id, owner=owner, version=last_version
+        )
+        serializer.save(experiment=experiment)
+
+
+class PublicationViewSet(viewsets.ModelViewSet):
+    lookup_field = 'experiment_nes_id'
+    serializer_class = PublicationSerializer
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
+
+    def get_queryset(self):
+        return Publication.objects.all()
+
+    def perform_create(self, serializer):
+        exp_nes_id = self.kwargs['experiment_nes_id']
+        owner = self.request.user
+        experiment = Experiment.lastversion_objects.get(
+            nes_id=exp_nes_id, owner=owner
         )
         serializer.save(experiment=experiment)
 
