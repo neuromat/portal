@@ -7,12 +7,12 @@
     </div>
     <div id="id_detail_description" class="detail-description">{{ experiment.description }}</div>
     {% if experiment.data_acquisition_done %}
-        <div id="id_detail_acquisition" class="align-right">
+        <div id="id_detail_acquisition" class="pull-right">
             <span class="label label-success">
                 {% trans "Data acquisition was completed" %}</span>
         </div>
     {% else %}
-        <div id="id_detail_acquisition" class="align-right">
+        <div id="id_detail_acquisition" class="pull-right">
             <span class="label label-warning">
                 {% trans "Data acquisition was not completed" %}
             </span>
@@ -45,9 +45,14 @@
         </aside>
     {% endif %}
     <hr class="detail-header-hr">
-    <div id="id_detail_study" class="detail-study">{% trans "From study" %}: <a
+    <div id="id_detail_study" class="pull-left">{% trans "From study" %}: <a
             href="#" data-toggle="modal" data-target="#study_modal">{{ experiment.study.title }}</a>
     </div>
+    {% if experiment.publications.all %}
+        <div class="pull-right">
+            <a href="#" data-toggle="modal" data-target="#publications_modal">{% trans "Publications" %}</a>
+        </div>
+    {% endif %}
     <br><br>
 
     {# Study modal #}
@@ -57,7 +62,8 @@
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
                     <h3 id="modal_study_title" class="modal-title">
-                        {{ experiment.study.title }}</h3>
+                        {{ experiment.study.title }}
+                    </h3>
                 </div>
                 <div class="modal-body">
                     <p id="study_description">{{ experiment.study.description }}</p>
@@ -100,12 +106,40 @@
                         </div>
                     </section>
                 </div>
-
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default" data-dismiss="modal">{% trans "Close" %}</button>
                 </div>
             </div><!-- /.modal-content -->
         </div><!-- /.modal-dialog -->
     </div><!-- /.modal -->
-    {# End Study Model #}
+    {# End Study modal #}
+
+    {# Publications modal #}
+    <div id="publications_modal" class="modal fade" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h3 id="modal_publications_title" class="modal-title">
+                        {% trans 'Publications' %}
+                    </h3>
+                </div>
+                <div class="modal-body">
+                    <ul>
+                        {% for publication in experiment.publications.all %}
+                            <li><strong>{{ publication.title }}</strong></li>
+                            <p><strong>{% trans 'Citation:' %}</strong></p>
+                            <p>{{ publication.citation }}</p>
+                            <p><strong>{% trans 'URI:' %}</strong></p>
+                            <p>{{ publication.url }}</p>
+                        {% endfor %}
+                    </ul>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">{% trans 'Close' %}</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    {# End Publications modal #}
 </header>
