@@ -257,7 +257,7 @@ class ExperimentDetailTest(FunctionalTest):
             "//a[@href='/experiments/" + str(experiment.slug) + "/']"
         ).click()
 
-        # As last approved experiment has a publication associated with it,
+        # As last approved experiment has publications associated with it,
         # she sees a link to publications below the experiment description
         # area, at right. She clicks in it
         self.wait_for(lambda: self.browser.find_element_by_link_text(
@@ -295,6 +295,34 @@ class ExperimentDetailTest(FunctionalTest):
             publications.last().url,
             self.browser.find_element_by_id('publications_modal').text,
         ))
+
+    def test_publications_urls_are_links(self):
+        experiment = Experiment.objects.filter(
+            status=Experiment.APPROVED
+        ).last()
+
+        # The new visitor is in home page and sees the list of experiments.
+        # She clicks in the "View" link of last approved experiment and is
+        # redirected to experimentdetail page
+        self.browser.find_element_by_xpath(
+            "//a[@href='/experiments/" + str(experiment.slug) + "/']"
+        ).click()
+
+        # As last approved experiment has publications associated with it,
+        # she sees a link to publications below the experiment description
+        # area, at right. She clicks in it
+        self.wait_for(lambda: self.browser.find_element_by_link_text(
+            'Publications'
+        ).click())
+
+        for publication in experiment.publications.all():
+            try:
+                self.wait_for(
+                    lambda:
+                    self.browser.find_element_by_link_text(publication.url)
+                )
+            except NoSuchElementException:
+                self.fail(publication.url + ' is not a link')
 
     def test_can_view_questionaire_tab(self):
         experiment = Experiment.objects.filter(

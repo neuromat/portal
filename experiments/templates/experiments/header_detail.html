@@ -128,10 +128,14 @@
                     <ul>
                         {% for publication in experiment.publications.all %}
                             <li><strong>{{ publication.title }}</strong></li>
-                            <p><strong>{% trans 'Citation:' %}</strong></p>
-                            <p>{{ publication.citation }}</p>
-                            <p><strong>{% trans 'URI:' %}</strong></p>
-                            <p>{{ publication.url }}</p>
+                            <p><strong><em>{% trans 'Citation:' %}</em></strong>
+                                <br>
+                                {{ publication.citation }}
+                            </p>
+                            <p><strong><em>{% trans 'URI:' %}</em></strong>
+                                <br>
+                                <a href="{{ publication.url }}" target="_blank">{{ publication.url }}</a>
+                            </p>
                         {% endfor %}
                     </ul>
                 </div>
