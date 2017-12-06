@@ -1163,6 +1163,8 @@ def global_setup_ut():
         'en'
     )
 
+    # create two publications for experiment4
+    create_publication(2, experiment4)
     # create one publication for experiment5
     create_publication(1, experiment5)
 
@@ -1179,8 +1181,6 @@ def global_setup_ut():
         settings.BASE_DIR + '/experiments/tests/questionnaire4.csv',
         'en'
     )
-    # create two publications for experiment4
-    create_publication(2, experiment4)
 
     # Create an invalid and a valid Questionnaire objects
     # (requires the files 'questionnaire5.csv' and 'questionnaire6.csv,

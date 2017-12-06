@@ -400,8 +400,8 @@ class SearchTest(TestCase):
     def test_search_eegsetting_returns_correct_number_of_objects(self):
         response = self.client.get('/search/', {'q': 'eegsettingname'})
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, '<tr', 3)  # because in search results
-        # templates it's '<tr class ...>'
+        # because in search results templates it's '<tr class ...>'
+        self.assertContains(response, '<tr', 3)
 
     def test_search_eegsetting_returns_matchings_containing_search_strings(self):
         pass
@@ -416,8 +416,8 @@ class SearchTest(TestCase):
         self.assertEqual(response.status_code, 200)
         # TODO: we verify for 3 objects because test is catching invalid
         # TODO: questionnaires. See note 'Backlog' in notebook, 09/28/2017
-        self.assertContains(response, '<tr', 1)  # because in search results
-        # templates it's '<tr class ...>'
+        # because in search results templates it's '<tr class ...>'
+        self.assertContains(response, '<tr', 1)
         # TODO: needs to know if it was brought correct results
 
     def test_search_questionnaire_returns_matchings_containing_search_strings(self):
@@ -431,6 +431,34 @@ class SearchTest(TestCase):
         self.assertContains(response, 'Injury by firearm')
         self.assertContains(response, 'What side of the injury')
         self.assertContains(response, 'Elbow Extension')
+
+    def test_search_publications_resturns_correct_number_of_objects(self):
+        ##
+        # It was created two publications for last experiment created in
+        # tests helper
+        ##
+        experiment = Experiment.objects.filter(
+            status=Experiment.APPROVED
+        ).last()
+        ##
+        # As publications created have fields filled with lorem ipsum stuff,
+        # we change some of that fields to further search form them
+        ##
+        publication = experiment.publications.first()
+        publication.title = 'Vargas, Claudia Verletzung des Plexus Brachialis'
+        publication.save()
+
+        ##
+        # Rebuid index to incorporate experiment publication change
+        ##
+        self.haystack_index('rebuild_index')
+
+        response = self.client.get('/search/', {
+            'q': '\"Verletzung des Plexus Brachialis\"'
+        })
+        self.assertEqual(response.status_code, 200)
+        # because in search results templates it's '<tr class ...>'
+        self.assertContains(response, '<tr', 1)
 
 
 @apply_setup(global_setup_ut)

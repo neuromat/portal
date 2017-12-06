@@ -650,6 +650,54 @@ class SearchTest(FunctionalTest):
         self.assertIn('History of fracture', questionnaire_rows)
         self.assertIn('What side of the injury', questionnaire_rows)
 
+    def test_search_publications_returns_correct_objects(self):
+        ##
+        # It was created two publications for last experiment created in
+        # tests helper
+        ##
+        experiment = Experiment.objects.filter(
+            status=Experiment.APPROVED
+        ).last()
+        ##
+        # As publications created have fields filled with lorem ipsum stuff,
+        # we change some of that fields to further search form them
+        ##
+        publication = experiment.publications.first()
+        publication.title = 'Vargas, Claudia Verletzung des Plexus Brachialis'
+        publication.save()
+
+        ##
+        # Rebuid index to incorporate experiment publication change
+        ##
+        self.haystack_index('rebuild_index')
+
+        # Joselina wants to search for experiments that are associated with
+        # scientific publications
+        self.search_for('\"Verletzung des Plexus Brachialis\"')
+
+        # As there is one publication with that string in it's title,
+        # Joselina sees one search result displaying the experiment that
+        # publication belongs to, and any other search result of other
+        # possible objects
+        self.verify_n_objects_in_table_rows(1, 'publication-matches')
+        self.verify_n_objects_in_table_rows(0, 'questionnaire-matches')
+        self.verify_n_objects_in_table_rows(0, 'eegsetting-matches')
+        self.verify_n_objects_in_table_rows(0, 'tmsdata-matches')
+        self.verify_n_objects_in_table_rows(0, 'coilmodel-matches')
+        self.verify_n_objects_in_table_rows(0, 'tmsdevice-matches')
+        self.verify_n_objects_in_table_rows(0, 'tmsdevicesetting-matches')
+        self.verify_n_objects_in_table_rows(0, 'tmssetting-matches')
+        self.verify_n_objects_in_table_rows(0, 'experiment-matches')
+        self.verify_n_objects_in_table_rows(0, 'study-matches')
+        self.verify_n_objects_in_table_rows(0, 'group-matches')
+        self.verify_n_objects_in_table_rows(0, 'experimentalprotocol-matches')
+
+        publication_text = self.browser.find_element_by_class_name(
+            'publication-matches'
+        ).text
+        self.assertIn('Verletzung des Plexus Brachialis', publication_text)
+
+
     def test_click_in_a_search_result_display_experiment_detail_page(self):
         # TODO: the test tests for some match types not all. Wold be better
         # TODO: to test for each and all match types.

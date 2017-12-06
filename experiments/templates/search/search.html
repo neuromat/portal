@@ -61,6 +61,9 @@
                 {% if result.model_name == 'questionnairelanguage' %}
                     {% include 'search/questionnaires_languages.html' %}
                 {% endif %}
+                {% if result.model_name == 'publication' %}
+                    {% include 'search/publications.html' %}
+                {% endif %}
             {% empty %}
                 <p>{% trans "No results found" %}.</p>
             {% endfor %}
