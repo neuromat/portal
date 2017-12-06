@@ -225,15 +225,113 @@ class ExperimentDetailTest(FunctionalTest):
             protocol_image_path
         )
 
+    def test_can_see_publications_link(self):
+        experiment = Experiment.objects.filter(
+            status=Experiment.APPROVED
+        ).last()
+
+        # The new visitor is in home page and sees the list of experiments.
+        # She clicks in the "View" link of last approved experiment and is
+        # redirected to experimentdetail page
+        self.browser.find_element_by_xpath(
+            "//a[@href='/experiments/" + str(experiment.slug) + "/']"
+        ).click()
+
+        # As last approved experiment has a publication associated with it,
+        # she sees a link to publications below the experiment description
+        # area, at right
+        self.wait_for(lambda: self.assertEqual(
+            self.browser.find_element_by_link_text('Publications').text,
+            'Publications'
+        ))
+
+    def test_can_see_publications_modal_with_correct_content(self):
+        experiment = Experiment.objects.filter(
+            status=Experiment.APPROVED
+        ).last()
+
+        # The new visitor is in home page and sees the list of experiments.
+        # She clicks in the "View" link of last approved experiment and is
+        # redirected to experimentdetail page
+        self.browser.find_element_by_xpath(
+            "//a[@href='/experiments/" + str(experiment.slug) + "/']"
+        ).click()
+
+        # As last approved experiment has publications associated with it,
+        # she sees a link to publications below the experiment description
+        # area, at right. She clicks in it
+        self.wait_for(lambda: self.browser.find_element_by_link_text(
+            'Publications'
+        ).click())
+
+        self.wait_for(lambda: self.assertIn(
+            self.browser.find_element_by_id(
+                'publications_modal'
+            ).find_element_by_tag_name('h3').text,
+            'Publications'
+        ))
+        publications = experiment.publications.all()
+        self.wait_for(lambda: self.assertIn(
+            publications.first().title,
+            self.browser.find_element_by_id('publications_modal').text
+        ))
+        self.wait_for(lambda: self.assertIn(
+            publications.first().citation,
+            self.browser.find_element_by_id('publications_modal').text,
+        ))
+        self.wait_for(lambda: self.assertIn(
+            publications.first().url,
+            self.browser.find_element_by_id('publications_modal').text,
+        ))
+        self.wait_for(lambda: self.assertIn(
+            publications.last().title,
+            self.browser.find_element_by_id('publications_modal').text,
+        ))
+        self.wait_for(lambda: self.assertIn(
+            publications.last().citation,
+            self.browser.find_element_by_id('publications_modal').text,
+        ))
+        self.wait_for(lambda: self.assertIn(
+            publications.last().url,
+            self.browser.find_element_by_id('publications_modal').text,
+        ))
+
+    def test_publications_urls_are_links(self):
+        experiment = Experiment.objects.filter(
+            status=Experiment.APPROVED
+        ).last()
+
+        # The new visitor is in home page and sees the list of experiments.
+        # She clicks in the "View" link of last approved experiment and is
+        # redirected to experimentdetail page
+        self.browser.find_element_by_xpath(
+            "//a[@href='/experiments/" + str(experiment.slug) + "/']"
+        ).click()
+
+        # As last approved experiment has publications associated with it,
+        # she sees a link to publications below the experiment description
+        # area, at right. She clicks in it
+        self.wait_for(lambda: self.browser.find_element_by_link_text(
+            'Publications'
+        ).click())
+
+        for publication in experiment.publications.all():
+            try:
+                self.wait_for(
+                    lambda:
+                    self.browser.find_element_by_link_text(publication.url)
+                )
+            except NoSuchElementException:
+                self.fail(publication.url + ' is not a link')
+
     def test_can_view_questionaire_tab(self):
         experiment = Experiment.objects.filter(
             status=Experiment.APPROVED
         ).last()
 
         # The new visitor is in home page and sees the list of experiments.
-        # She clicks in second "View" link and is redirected to experiment
+        # She clicks in a "View" link and is redirected to experiment
         # detail page
-        # TODO: frequently fails to catch second link
         self.browser.find_element_by_xpath(
             "//a[@href='/experiments/" + str(experiment.slug) + "/']"
         ).click()

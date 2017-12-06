@@ -417,7 +417,8 @@ class SearchTest(FunctionalTest):
 
         # Joselina is back homepage
         table_title = self.browser.find_element_by_id(
-            'id_table_title').find_element_by_tag_name('h2').text
+            'id_table_title'
+        ).find_element_by_tag_name('h2').text
         self.assertEqual('List of Experiments', table_title)
 
     def test_search_tmssetting_returns_correct_objects(self):
