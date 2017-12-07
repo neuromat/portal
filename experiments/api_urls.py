@@ -18,6 +18,15 @@ api_groups_list = api.GroupViewSet.as_view({
     'get': 'list',
 })
 
+# Publications
+api_experiment_publications_list = api.PublicationViewSet.as_view({
+    'get': 'list',
+    'post': 'create'
+})
+api_publications_list = api.PublicationViewSet.as_view({
+    'get': 'list',
+})
+
 # Studies
 api_experiment_studies_list = api.StudyViewSet.as_view({
     'get': 'list',
@@ -440,6 +449,12 @@ urlpatterns = [
     url(r'^groups/$', api_groups_list, name='api_groups-list'),
     url(r'^experiments/(?P<experiment_nes_id>[0-9]+)/groups/$',
         api_experiment_groups_list, name='api_experiment_groups-list'),
+    # Publications
+    url(r'^publications/$', api_publications_list,
+        name='api_publications-list'),
+    url(r'^experiments/(?P<experiment_nes_id>[0-9]+)/publications/$',
+        api_experiment_publications_list,
+        name='api_experiment_publications-list'),
     # Experimental protocols
     url(r'^groups/(?P<pk>[0-9]+)/experimental_protocol/$',
         api_group_experimental_protocol_list,

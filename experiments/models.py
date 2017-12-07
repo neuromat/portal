@@ -208,7 +208,6 @@ class Gender(models.Model):
 class Participant(models.Model):
     group = models.ForeignKey(Group, related_name='participants')
     code = models.CharField(max_length=150)
-
     gender = models.ForeignKey(Gender)
     age = models.DecimalField(decimal_places=4, max_digits=8)
 
@@ -225,6 +224,13 @@ class Participant(models.Model):
             return True
         else:
             return False
+
+
+class Publication(models.Model):
+    title = models.CharField(max_length=255)
+    citation = models.TextField()
+    url = models.URLField(null=True, blank=True)
+    experiment = models.ForeignKey(Experiment, related_name='publications')
 
 
 class Equipment(models.Model):

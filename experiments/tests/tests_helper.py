@@ -12,7 +12,7 @@ from experiments.models import Experiment, Study, Group, Researcher, \
     Collaborator, Participant, Gender, ExperimentalProtocol, \
     ClassificationOfDiseases, Keyword, Step, TMSSetting, TMSDevice, CoilModel, \
     TMSDeviceSetting, TMSData, EEGSetting, Questionnaire, \
-    QuestionnaireLanguage, QuestionnaireDefaultLanguage
+    QuestionnaireLanguage, QuestionnaireDefaultLanguage, Publication
 from experiments.views import _get_q_default_language_or_first
 
 
@@ -433,6 +433,22 @@ def create_data_collection(group, type):
         pass
 
 
+def create_publication(qtty, experiment):
+    """
+    Create publications for experiment
+    :param qtty: number of Publication's to be created
+    :param experiment: Experiment model instance
+    """
+    faker = Factory.create()
+
+    for i in range(qtty):
+        Publication.objects.create(
+            title=faker.sentence(nb_words=6), citation=faker.text(),
+            url=faker.uri(),
+            experiment=experiment
+        )
+
+
 def create_experiment_related_objects(experiment):
     """
     Create experiment related objects to test download experiment data
@@ -732,6 +748,8 @@ def global_setup_ft():
                              'functional recovery. The EEG text.'
     experiment.save()
     create_step(1, experiment.groups.first(), Step.EMG)
+    # Associate publications with experiment to test publications
+    create_publication(2, experiment)
 
     # We change first experiment study approved to contain 'brachial' in
     # study description, so it have to be found by search test
@@ -1144,6 +1162,11 @@ def global_setup_ut():
         settings.BASE_DIR + '/experiments/tests/questionnaire3.csv',
         'en'
     )
+
+    # create two publications for experiment4
+    create_publication(2, experiment4)
+    # create one publication for experiment5
+    create_publication(1, experiment5)
 
     # Create invalid Questionnaire object
     # (requires file 'questionnaire4.csv', being generated in
