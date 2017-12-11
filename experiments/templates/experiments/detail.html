@@ -434,60 +434,6 @@
     </script>
 
     {##}
-    {# Charts in Statistics tab #}
-    {##}
-    <script src="https://www.gstatic.com/charts/loader.js"></script>
-    <script>
-        google.charts.load('current', {packages: ['corechart', 'bar']});
-        google.charts.setOnLoadCallback(drawPieChart);
-        google.charts.setOnLoadCallback(drawColumnChart);
-
-        function drawPieChart() {
-            let data_array = [['Gender', 'Number of participants']];
-            let django_data = {{ gender_grouping|safe }};
-            for (let item in django_data) {
-                /* Define translation of 'male'/'female' here as we've got
-                   problems trying to traslate with django-modeltranlation.
-                   See comments (and TODOs) in translation.py */
-                {% get_current_language as LANGUAGE_CODE %}
-                {% if LANGUAGE_CODE == 'pt-br' %}
-                    let item_lang = (item === 'male' ? 'homens' : 'mulheres');
-                {% else %}
-                    let item_lang = item;
-                {% endif %}
-                data_array.push([item_lang, django_data[item]])
-            }
-            let data = google.visualization.arrayToDataTable(data_array);
-            let options = {
-                title: "{% trans 'Gender of the participants' %}",
-                pieHole: 0.3
-            };
-            let chart = new google.visualization.PieChart(document.getElementById('gender-chart'));
-            chart.draw(data, options);
-        }
-        function drawColumnChart() {
-            let data_array = [['Age', "{% trans 'total' %}" ]];
-            let django_data = {{ age_grouping|safe }};
-            for (let item in django_data){
-                data_array.push([item, django_data[item]])
-            }
-            let data = google.visualization.arrayToDataTable(data_array);
-            let options = {
-                title: "{% trans 'Age of the participants' %}",
-                legend: { position: 'none' },
-                hAxis: {
-                    title: "{% trans 'Age (years)' %}"
-                },
-                vAxis: {
-                    title: "{% trans 'Total' %}"
-                }
-            };
-            let chart = new google.visualization.ColumnChart(document.getElementById('age-chart'));
-            chart.draw(data, options);
-        }
-    </script>
-
-    {##}
     {# Script related to Questionnaires tab #}
     {##}
     <script>
@@ -571,5 +517,59 @@
                 .addClass("btn-disabled");
             }
         });
+    </script>
+
+    {##}
+    {# Charts in Statistics tab #}
+    {##}
+    <script src="https://www.gstatic.com/charts/loader.js"></script>
+    <script>
+        google.charts.load('current', {packages: ['corechart', 'bar']});
+        google.charts.setOnLoadCallback(drawPieChart);
+        google.charts.setOnLoadCallback(drawColumnChart);
+
+        function drawPieChart() {
+            let data_array = [['Gender', 'Number of participants']];
+            let django_data = {{ gender_grouping|safe }};
+            for (let item in django_data) {
+                /* Define translation of 'male'/'female' here as we've got
+                   problems trying to traslate with django-modeltranlation.
+                   See comments (and TODOs) in translation.py */
+                {% get_current_language as LANGUAGE_CODE %}
+                {% if LANGUAGE_CODE == 'pt-br' %}
+                    let item_lang = (item === 'male' ? 'homens' : 'mulheres');
+                {% else %}
+                    let item_lang = item;
+                {% endif %}
+                data_array.push([item_lang, django_data[item]])
+            }
+            let data = google.visualization.arrayToDataTable(data_array);
+            let options = {
+                title: "{% trans 'Gender of the participants' %}",
+                pieHole: 0.3
+            };
+            let chart = new google.visualization.PieChart(document.getElementById('gender-chart'));
+            chart.draw(data, options);
+        }
+        function drawColumnChart() {
+            let data_array = [['Age', "{% trans 'total' %}" ]];
+            let django_data = {{ age_grouping|safe }};
+            for (let item in django_data){
+                data_array.push([item, django_data[item]])
+            }
+            let data = google.visualization.arrayToDataTable(data_array);
+            let options = {
+                title: "{% trans 'Age of the participants' %}",
+                legend: { position: 'none' },
+                hAxis: {
+                    title: "{% trans 'Age (years)' %}"
+                },
+                vAxis: {
+                    title: "{% trans 'Total' %}"
+                }
+            };
+            let chart = new google.visualization.ColumnChart(document.getElementById('age-chart'));
+            chart.draw(data, options);
+        }
     </script>
 {% endblock %}

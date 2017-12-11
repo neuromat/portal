@@ -5,6 +5,7 @@ from random import choice
 from unittest import skip
 
 from django.contrib.auth.models import User
+from django.core.exceptions import ObjectDoesNotExist
 from django.test import override_settings
 from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.common.keys import Keys
@@ -13,8 +14,11 @@ from downloads.views import DOWNLOAD_ERROR_MESSAGE
 from experiments.models import Experiment, Questionnaire, Step, Group, Gender
 from experiments.tests.tests_helper import create_experiment, create_group, \
     create_participant, create_download_dir_structure_and_files, \
-    remove_selected_subdir
+    remove_selected_subdir, create_data_collection, \
+    create_experiment_protocol, \
+    create_questionnaire, create_questionnaire_language
 from functional_tests.base import FunctionalTest
+from nep import settings
 
 
 class ExperimentDetailTest(FunctionalTest):
@@ -256,6 +260,11 @@ class ExperimentDetailTest(FunctionalTest):
         self.browser.find_element_by_xpath(
             "//a[@href='/experiments/" + str(experiment.slug) + "/']"
         ).click()
+        ##
+        # TODO: are waiting some time to load external google charts stuff
+        # TODO: would be best to solves this by other way
+        ##
+        time.sleep(2)
 
         # As last approved experiment has publications associated with it,
         # she sees a link to publications below the experiment description
@@ -1002,7 +1011,31 @@ class DownloadExperimentTest(FunctionalTest):
         ##
         experiment = Experiment.objects.filter(
             status=Experiment.APPROVED
-        ).last()
+        ).last()  # experiment9 in tests helper
+        for group in experiment.groups.all():
+            try:
+                group.experimental_protocol
+            except ObjectDoesNotExist:
+                create_experiment_protocol(group)
+            if not group.steps.filter(type=Step.QUESTIONNAIRE):
+                create_questionnaire(1, 'code', group)
+                q = Questionnaire.objects.last()
+                create_questionnaire_language(
+                    q,
+                    settings.BASE_DIR +
+                    '/experiments/tests/questionnaire1.csv',
+                    'en'
+                )
+
+        ##
+        # Create participants data collection
+        ##
+        for group in experiment.groups.all():
+            for participant in group.participants.all():
+                create_data_collection(
+                    participant, 'eeg', self.TEMP_MEDIA_ROOT
+                )
+
         create_download_dir_structure_and_files(
             experiment, self.TEMP_MEDIA_ROOT
         )
@@ -1011,13 +1044,14 @@ class DownloadExperimentTest(FunctionalTest):
         # Get the variables that we will need below
         ##
         group = experiment.groups.order_by('?').first()
+        participant = group.participants.order_by('?').first()
         # there's a group that has no participants
         while True:
-            participant = group.participants.order_by('?').first()
             if participant:
                 break
             else:
                 group = experiment.groups.order_by('?').first()
+                participant = group.participants.order_by('?').first()
 
         # Josileine accesses Experiment Detail Downloads tab
         self.access_downloads_tab_content(experiment)
@@ -1030,6 +1064,7 @@ class DownloadExperimentTest(FunctionalTest):
             'participant_p' + str(participant.id) + '_g' + str(group.id)
         ]
         selected = choice(options)
+
         ##
         # Remove the subdir correspondent to the option she selected to
         # simulate that subdir was not created when creating the download dir
@@ -1040,9 +1075,12 @@ class DownloadExperimentTest(FunctionalTest):
         )
 
         # She selects one option to download and click in Download button
-        self.browser.find_element_by_xpath(
-            "//div[@data-value='" + selected + "']"
-        ).find_element_by_tag_name('input').click()
+        self.wait_for(
+            lambda: self.browser.find_element_by_xpath(
+                "//div[@data-value='" + selected + "']"
+            ).find_element_by_tag_name('input').click()
+        )
+
         self.browser.find_element_by_id('download_button').click()
 
         # She sees an error message telling her that some problem ocurred
