@@ -253,6 +253,7 @@ class ExperimentDetailTest(FunctionalTest):
         experiment = Experiment.objects.filter(
             status=Experiment.APPROVED
         ).last()
+        publications = experiment.publications.all()
 
         # The new visitor is in home page and sees the list of experiments.
         # She clicks in the "View" link of last approved experiment and is
@@ -260,49 +261,44 @@ class ExperimentDetailTest(FunctionalTest):
         self.browser.find_element_by_xpath(
             "//a[@href='/experiments/" + str(experiment.slug) + "/']"
         ).click()
+
         ##
-        # TODO: are waiting some time to load external google charts stuff
-        # TODO: would be best to solves this by other way
+        # IMPORTANT: it's important to wait until 'publications_modal' div
+        # is visible by selenium driver before clicking in it. This is
+        # because the google chart stuff in Statistics tab can delay that
+        # div for some time
         ##
-        time.sleep(2)
+        self.wait_for(lambda: self.browser.find_element_by_id(
+            'publications_modal'))
+        publications_modal = self.browser.find_element_by_id(
+            'publications_modal')
 
         # As last approved experiment has publications associated with it,
         # she sees a link to publications below the experiment description
         # area, at right. She clicks in it
-        self.wait_for(lambda: self.browser.find_element_by_link_text(
-            'Publications'
-        ).click())
+        self.browser.find_element_by_link_text('Publications').send_keys(
+            Keys.ENTER)
 
         self.wait_for(lambda: self.assertIn(
-            self.browser.find_element_by_id(
-                'publications_modal'
-            ).find_element_by_tag_name('h3').text,
-            'Publications'
-        ))
-        publications = experiment.publications.all()
-        self.wait_for(lambda: self.assertIn(
-            publications.first().title,
-            self.browser.find_element_by_id('publications_modal').text
+            'Publications', publications_modal.text
         ))
         self.wait_for(lambda: self.assertIn(
-            publications.first().citation,
-            self.browser.find_element_by_id('publications_modal').text,
+            publications.first().title, publications_modal.text
         ))
         self.wait_for(lambda: self.assertIn(
-            publications.first().url,
-            self.browser.find_element_by_id('publications_modal').text,
+            publications.first().citation, publications_modal.text,
         ))
         self.wait_for(lambda: self.assertIn(
-            publications.last().title,
-            self.browser.find_element_by_id('publications_modal').text,
+            publications.first().url, publications_modal.text,
         ))
         self.wait_for(lambda: self.assertIn(
-            publications.last().citation,
-            self.browser.find_element_by_id('publications_modal').text,
+            publications.last().title, publications_modal.text,
         ))
         self.wait_for(lambda: self.assertIn(
-            publications.last().url,
-            self.browser.find_element_by_id('publications_modal').text,
+            publications.last().citation, publications_modal.text,
+        ))
+        self.wait_for(lambda: self.assertIn(
+            publications.last().url, publications_modal.text,
         ))
 
     def test_publications_urls_are_links(self):
@@ -384,6 +380,11 @@ class ExperimentDetailTest(FunctionalTest):
         experiment = Experiment.objects.filter(
             status=Experiment.APPROVED
         ).last()
+        ##
+        # We get groups objects with questionnaire steps
+        ##
+        q_steps = Step.objects.filter(type=Step.QUESTIONNAIRE)
+        groups_with_qs = experiment.groups.filter(steps__in=q_steps)
 
         # The new visitor is in home page and sees the list of experiments.
         # She clicks in a "View" link and is redirected to experiment
@@ -393,16 +394,12 @@ class ExperimentDetailTest(FunctionalTest):
         ).click()
         self.wait_for_detail_page_load()
 
-        ##
-        # We get groups objects with questionnaire steps
-        ##
-        q_steps = Step.objects.filter(type=Step.QUESTIONNAIRE)
-        groups_with_qs = experiment.groups.filter(steps__in=q_steps)
-
         # When the new visitor clicks in the Questionnaires tab, she sees
         # the groups questionnaires and the questionnaires' titles as
         # headers of the questionnaires contents
-        self.browser.find_element_by_link_text('Questionnaires').click()
+        self.browser.find_element_by_link_text('Questionnaires').send_keys(
+            Keys.ENTER
+        )
         questionnaires_content = self.browser.find_element_by_id(
             'questionnaires_tab'
         ).text
@@ -633,9 +630,17 @@ class ExperimentDetailTest(FunctionalTest):
             "//a[@href='/experiments/" + experiment.slug + "/']"
         ).click()
         self.wait_for_detail_page_load()
+        ##
+        # give some time to google chart cdn to load
+        # TODO: make this better without time.sleep
+        ##
+        time.sleep(0.5)
 
         # She clicks in Questionnaires tab
-        self.browser.find_element_by_link_text('Questionnaires').click()
+        self.wait_for(
+            lambda:
+            self.browser.find_element_by_link_text('Questionnaires').click()
+        )
 
         #
         # Questionnaire with code='q1' has three languages: English, French and
@@ -644,6 +649,7 @@ class ExperimentDetailTest(FunctionalTest):
         # The visitor clicks in 'pt-br' link and the questionnaire
         # session refreshes
         self.browser.find_element_by_link_text('pt-br').click()
+
         ##
         # give time for ajax to complete request
         ##
