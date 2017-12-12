@@ -700,7 +700,9 @@ class DataFile(models.Model):
 
 class EEGData(DataCollection, DataFile):
     eeg_setting = models.ForeignKey(EEGSetting)
-    eeg_setting_reason_for_change = models.TextField(null=True, blank=True, default='')
+    eeg_setting_reason_for_change = models.TextField(
+        null=True, blank=True, default=''
+    )
     eeg_cap_size = models.CharField(max_length=30, null=True, blank=True)
     files = models.ManyToManyField(File, related_name='eeg_data_list')
 

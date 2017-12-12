@@ -169,7 +169,9 @@ class TrusteeTest(FunctionalTestTrustee):
         # rejected trustee can't change its status, clicking on it has no
         # effect, the modal doesn't pop up.
         status_choices_form.send_keys(Keys.ESCAPE)
-        self.browser.find_element_by_link_text('Approved').click()
+        self.wait_for(
+            lambda: self.browser.find_element_by_link_text('Approved').click()
+        )
         self.wait_for(lambda: self.assertEqual(
             self.browser.find_element_by_id('status_body').text,
             ''
@@ -230,9 +232,10 @@ class TrusteeTest(FunctionalTestTrustee):
             self.browser.find_element_by_tag_name('body').text
         ))
 
-        # The work is done. She is satisfied and decides to log out from system
-        self.browser.find_element_by_link_text('Log Out').click()
-        # time.sleep(1)
+        ##
+        # Take some sleep to guarantie mail.outbox[0]
+        ##
+        time.sleep(0.5)
 
         # The email was sent to the researcher. The guy checks her email and
         # finds a message
