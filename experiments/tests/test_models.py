@@ -8,8 +8,9 @@ from datetime import datetime
 from faker import Factory
 
 from experiments.models import Experiment, Study, Group, Researcher, \
-    Collaborator, RejectJustification, Publication
-from experiments.tests.tests_helper import global_setup_ut, apply_setup
+    Collaborator, RejectJustification, Publication, ExperimentalProtocol
+from experiments.tests.tests_helper import global_setup_ut, apply_setup, \
+    create_experiment, create_group
 
 
 @apply_setup(global_setup_ut)
@@ -377,3 +378,24 @@ class PublicationModel(TestCase):
         with self.assertRaises(ValidationError):
             publication.save()
             publication.full_clean()
+
+
+@apply_setup(global_setup_ut)
+class ExperimentalProtocolModel(TestCase):
+
+    def setUp(self):
+        global_setup_ut()
+
+    def test_cannot_save_empty_attributes(self):
+        owner = User.objects.create_user(
+            username='labor',
+            password='nep-labor'
+        )
+        experiment = create_experiment(
+            1, owner=owner, status=Experiment.TO_BE_ANALYSED
+        )
+        group = create_group(1, experiment)
+        experimental_protocol = ExperimentalProtocol(group=group)
+        with self.assertRaises(ValidationError):
+            experimental_protocol.save()
+            experimental_protocol.full_clean()

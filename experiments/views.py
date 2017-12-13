@@ -282,6 +282,9 @@ def change_status(request, experiment_id):
             _('An email was sent to ') + experiment.study.researcher.name +
             _(' warning that the experiment changed status to Approved.')
         )
+
+        # After experiment has been approved reindex data base including
+        # this new experiment.
         rebuild_haystack_index.delay()
 
     if status == Experiment.UNDER_ANALYSIS:

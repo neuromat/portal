@@ -72,11 +72,7 @@ def create_directory(basedir, path_to_create):
 
     complete_path = path.join(basedir, path_to_create)
 
-    # print("encode: ", sys.getfilesystemencoding(), sys.getdefaultencoding())
-    # print("create_directory-encode:", complete_path.encode('utf-8'))
     if not path.exists(complete_path.encode('utf-8')):
-        # print("create_directory:", basedir, path_to_create)
-        # print("create_directory:", complete_path)
         makedirs(complete_path.encode('utf-8'))
 
     return "", complete_path
@@ -97,16 +93,9 @@ class ExportExecution:
         return self.directory_base  # MEDIA_ROOT/temp/export_id
 
     def __init__(self, export_id):
-        # self.get_session_key()
-
-        # questionnaire_id = 0
         self.files_to_zip_list = []
-        # self.participant_to_zip_list = []
-        # self.experimental_protocol_to_zip_list = []
-        # self.fields = []
         self.directory_base = ''
         self.base_directory_name = path.join(settings.MEDIA_ROOT, "download")
-        # self.directory_base = self.base_directory_name
         self.set_directory_base(export_id)
         self.base_export_directory = ""
         self.user_name = None
@@ -206,6 +195,12 @@ class ExportExecution:
             export_directory_group = path.join(export_experiment_data, group_directory_name)
 
             if hasattr(group, 'experimental_protocol'):
+                # If there's no minimal data in ExperimentalProtocol model
+                # do not create Experimental Protocol subdir
+                if not group.experimental_protocol.textual_description\
+                        and not group.experimental_protocol.image:
+                    continue
+
                 # build diseases inclusion criteria
                 if group.inclusion_criteria.all():
                     group_inclusion_criteria_list = self.process_group_inclusion_disease(group.inclusion_criteria.all())
@@ -222,7 +217,6 @@ class ExportExecution:
                 if error_msg != "":
                     return error_msg
 
-                # export_directory_experimental_protocol = EXPERIMENT_DOWNLOAD/Group_group.title/Experimental_protocol
                 export_directory_experimental_protocol = path.join(export_directory_group, "Experimental_protocol")
 
                 # save experimental protocol description

@@ -12,7 +12,8 @@ from experiments.models import Experiment, Study, Group, Researcher, \
     Collaborator, Participant, Gender, ExperimentalProtocol, \
     ClassificationOfDiseases, Keyword, Step, TMSSetting, TMSDevice, CoilModel, \
     TMSDeviceSetting, TMSData, EEGSetting, Questionnaire, \
-    QuestionnaireLanguage, QuestionnaireDefaultLanguage, Publication
+    QuestionnaireLanguage, QuestionnaireDefaultLanguage, Publication, EEGData, \
+    File
 from experiments.views import _get_q_default_language_or_first
 
 
@@ -24,12 +25,18 @@ def create_group(qtty, experiment):
     """
     fake = Factory.create()
 
+    groups = []
     for i in range(qtty):
-        Group.objects.create(
+        group = Group.objects.create(
             title=fake.text(max_nb_chars=15),
             description=fake.text(max_nb_chars=150),
             experiment=experiment
         )
+        groups.append(group)
+
+    if len(groups) == 1:
+        return groups[0]
+    return groups
 
 
 def create_study(experiment):
@@ -54,8 +61,9 @@ def create_experiment(qtty, owner, status):
     """
     fake = Factory.create()
 
+    experiments = []
     for i in range(qtty):
-        Experiment.objects.create(
+        experiment = Experiment.objects.create(
             title=fake.text(max_nb_chars=15),
             description=fake.text(max_nb_chars=200),
             nes_id=randint(1, 10000),  # TODO: guarantee that this won't
@@ -65,6 +73,11 @@ def create_experiment(qtty, owner, status):
             status=status,
             data_acquisition_done=choice([True, False]),
         )
+        experiments.append(experiment)
+
+    if len(experiments) == 1:
+        return experiments[0]
+    return experiments
 
 
 def create_trustee_users():
@@ -129,8 +142,9 @@ def create_experiment_protocol(group):
         )
         exp_pro.image.save(image_file.name, image_file)
         exp_pro.save()
-        # Update image of last experimental protocol with a null image to test
-        # displaying default image: "No image"
+
+    # Update image of last experimental protocol with a null image to test
+    # displaying default image: "No image"
     exp_pro = ExperimentalProtocol.objects.last()
     exp_pro.image = None
     exp_pro.save()
@@ -419,18 +433,49 @@ def create_questionnaire(qtty, code, group):
         )
 
 
-def create_data_collection(group, type):
+# Data Collection types constants
+DC_EEG = 'eeg'
+
+
+def create_binary_file(path):
+    with open(os.path.join(path, 'file.bin'), 'wb') as f:
+        f.write(b'carambola')
+    return f
+
+
+def create_data_collection(participant, type, path):
     """
-    Requires Experimental P1rotocol for group
-    :param group: group model instance
+    Requires Experimental Protocol for participant group
+    :param participant: Participant model instance
     :param type: type of data collection
+    :param path: path where to create files
     """
-    # TODO: implement it!
+    faker = Factory.create()
+
     # Create data_collection(s) to test
     # test_views.test_POSTing_download_experiment_data_returns_correct_content
-    participant = group.participants.first()
-    if type == 'eeg':
-        pass
+    if type == DC_EEG:
+        eegdata = EEGData.objects.create(
+            participant=participant,
+            date=datetime.utcnow(),
+            description=faker.text(),
+            file_format=faker.file_extension(),
+            # requires create EEGSetting in first place
+            eeg_setting=EEGSetting.objects.first(),
+        )
+        # create temp subdir equal to parameter path because it's possible
+        # that who called this function created tempdir not accessible
+        # outside its scope
+        if not os.path.exists(path):
+            os.makedirs(path)
+
+        create_binary_file(path)
+        file = File.objects.create()
+        f = open(os.path.join(path, 'file.bin'))
+        file.file.save(f.name, f)
+        f.close()
+
+        eegdata.files.add(file)
 
 
 def create_publication(qtty, experiment):
@@ -475,7 +520,7 @@ def create_experiment_related_objects(experiment):
     # TODO: implement it!
     # Create data_collection(s) to test
     # test_views.test_POSTing_download_experiment_data_returns_correct_content
-    create_data_collection(experiment.groups.first(), 'eeg')
+    # create_data_collection(experiment.groups.first(), 'eeg')
 
 
 def create_q_language_dir(q, questionnaire_metadata_dir):
@@ -552,7 +597,7 @@ def create_download_dir_structure_and_files(experiment, temp_media_root):
             experiment_download_dir, 'Group_' + group.title
         )
         # TODO: sometimes on creating this subdir, test fails claiming that
-        # TODO: that 'Questionnaire_metadata' already exists. It seems that
+        # TODO: 'Questionnaire_metadata' already exists. It seems that
         # TODO: some group title is repeating. Verify!
         questionnaire_metadata_dir = create_group_subdir(
             group_dir, 'Questionnaire_metadata'
@@ -667,60 +712,60 @@ def global_setup_ft():
     # Create experiments for 2 owners, randomly
     create_experiment(1, choice([owner1, owner2]),
                       Experiment.TO_BE_ANALYSED)
-    experiment = Experiment.objects.last()
-    create_study(experiment)
-    create_group(randint(2, 3), experiment)
+    experiment1 = Experiment.objects.last()
+    create_study(experiment1)
+    create_group(randint(2, 3), experiment1)
 
     create_experiment(1, choice([owner1, owner2]),
                       Experiment.TO_BE_ANALYSED)
-    experiment = Experiment.objects.last()
-    create_study(experiment)
-    create_group(randint(2, 3), experiment)
+    experiment2 = Experiment.objects.last()
+    create_study(experiment2)
+    create_group(randint(2, 3), experiment2)
     # To test search
-    experiment.title = 'Brachial Plexus'
-    experiment.save()
+    experiment2.title = 'Brachial Plexus'
+    experiment2.save()
 
     create_experiment(1, choice([owner1, owner2]),
                       Experiment.UNDER_ANALYSIS)
-    experiment = Experiment.objects.last()
-    create_study(experiment)
-    create_group(randint(2, 3), experiment)
+    experiment3 = Experiment.objects.last()
+    create_study(experiment3)
+    create_group(randint(2, 3), experiment3)
     create_experiment(1, choice([owner1, owner2]),
                       Experiment.UNDER_ANALYSIS)
-    experiment = Experiment.objects.last()
-    create_study(experiment)
-    create_group(randint(2, 3), experiment)
+    experiment4 = Experiment.objects.last()
+    create_study(experiment4)
+    create_group(randint(2, 3), experiment4)
     # To test search
-    experiment.title = 'Brachial Plexus'
-    experiment.save()
+    experiment4.title = 'Brachial Plexus'
+    experiment4.save()
 
     # TODO: refactor to create the 4 experiments at once (how it was
     # TODO: before)
     # TODO: see TODO's in create_study and create_group methods
     create_experiment(1, choice([owner1, owner2]),
                       Experiment.APPROVED)
-    experiment = Experiment.objects.last()
-    create_study(experiment)
-    create_group(randint(2, 3), experiment)
+    experiment5 = Experiment.objects.last()
+    create_study(experiment5)
+    create_group(randint(2, 3), experiment5)
     create_experiment(1, choice([owner1, owner2]),
                       Experiment.APPROVED)
-    experiment = Experiment.objects.last()
-    create_study(experiment)
-    create_group(randint(2, 3), experiment)
+    experiment6 = Experiment.objects.last()
+    create_study(experiment6)
+    create_group(randint(2, 3), experiment6)
     create_experiment(1, choice([owner1, owner2]),
                       Experiment.APPROVED)
-    experiment = Experiment.objects.last()
-    create_study(experiment)
-    create_group(randint(2, 3), experiment)
+    experiment7 = Experiment.objects.last()
+    create_study(experiment7)
+    create_group(randint(2, 3), experiment7)
     create_experiment(1, choice([owner1, owner2]),
                       Experiment.APPROVED)
-    experiment = Experiment.objects.last()
-    create_study(experiment)
-    create_group(randint(2, 3), experiment)
+    experiment8 = Experiment.objects.last()
+    create_study(experiment8)
+    create_group(randint(2, 3), experiment8)
     # Put some non-random strings in one approved experiment to test search
-    experiment.title = 'Brachial Plexus'
-    experiment.description = 'Ein Beschreibung.'
-    experiment.save()
+    experiment8.title = 'Brachial Plexus'
+    experiment8.description = 'Ein Beschreibung.'
+    experiment8.save()
     # Create version 2 of the experiment to test search - necessary to change
     # some field other than title, to include a non-random text, because we
     # are highlitghing the terms searched, and this put span's elements in
@@ -728,8 +773,8 @@ def global_setup_ft():
     # Plexus' in experiment title in test_search.py.
     # Related to: test_search_returns_only_last_version_experiment test.
     # experiment.pk = None # ???
-    experiment.version = 2
-    experiment.save()
+    experiment8.version = 2
+    experiment8.save()
 
     # To test search: we've created one experiment approved with 'Brachial
     # Plexus' in its title. We now create another experiment approved also
@@ -737,19 +782,19 @@ def global_setup_ft():
     # searching with filter.
     create_experiment(1, choice([owner1, owner2]),
                       Experiment.APPROVED)
-    experiment = Experiment.objects.last()
-    create_study(experiment)
-    create_group(randint(2, 3), experiment)
-    experiment.title = 'Brachial Plexus (with EMG Setting)'
-    experiment.description = 'Ein Beschreibung. Brachial plexus repair by ' \
+    experiment9 = Experiment.objects.last()
+    create_study(experiment9)
+    create_group(randint(2, 3), experiment9)
+    experiment9.title = 'Brachial Plexus (with EMG Setting)'
+    experiment9.description = 'Ein Beschreibung. Brachial plexus repair by ' \
                              'peripheral nerve ' \
                              'grafts directly into the spinal cord in rats ' \
                              'Behavioral and anatomical evidence of ' \
                              'functional recovery. The EEG text.'
-    experiment.save()
-    create_step(1, experiment.groups.first(), Step.EMG)
+    experiment9.save()
+    create_step(1, experiment9.groups.first(), Step.EMG)
     # Associate publications with experiment to test publications
-    create_publication(2, experiment)
+    create_publication(2, experiment9)
 
     # We change first experiment study approved to contain 'brachial' in
     # study description, so it have to be found by search test
@@ -806,20 +851,20 @@ def global_setup_ft():
     create_ethics_committee_info(Experiment.objects.last())
     create_experiment(1, choice([owner1, owner2]),
                       Experiment.NOT_APPROVED)
-    experiment = Experiment.objects.last()
-    create_study(experiment)
-    create_group(randint(2, 3), experiment)
+    experiment10 = Experiment.objects.last()
+    create_study(experiment10)
+    create_group(randint(2, 3), experiment10)
 
     # Associate trustee to experiments under analysis (requires create
     # experiments before)
     associate_experiments_to_trustees()
 
     # To test search
-    experiment = Experiment.objects.get(
+    experiment11 = Experiment.objects.get(
         trustee=models.User.objects.get(username='claudia')
     )
-    experiment.title = 'Experiment analysed by Claudia'
-    experiment.save()
+    experiment11.title = 'Experiment analysed by Claudia'
+    experiment11.save()
 
     # Create study collaborators (requires creating studies before)
     for study in Study.objects.all():
@@ -876,7 +921,7 @@ def global_setup_ft():
     cd.code = 'A74'
     cd.save()
 
-    # Create randint(3, 7) participants for each group (requires create
+    # Create randint(3, 7) participants for all groups (requires create
     # groups before), and experimental protocols
     for group in Group.objects.all():
         create_experiment_protocol(group)
@@ -897,8 +942,9 @@ def global_setup_ft():
     # To test searching TMS things
     ##
     # Create TMSSetting from an experiment Approved, to test search
-    experiment = Experiment.objects.filter(status=Experiment.APPROVED).first()
-    create_tms_setting(1, experiment)  # 1º TMSSetting
+    experiment12 = Experiment.objects.filter(
+        status=Experiment.APPROVED).first()
+    create_tms_setting(1, experiment12)  # 1º TMSSetting
     tms_setting = TMSSetting.objects.last()
     tms_setting.name = 'tmssettingname'
     tms_setting.save()
@@ -919,7 +965,7 @@ def global_setup_ft():
     tms_device_setting.save()
     # Create another TMSSetting and associate with same TMSDeviceSetting
     # created above to test searching TMSDevice and CoilModel
-    create_tms_setting(1, experiment)  # 2º TMSSetting
+    create_tms_setting(1, experiment12)  # 2º TMSSetting
     tms_setting = TMSSetting.objects.last()
     # 2º TMSDeviceSetting
     create_tms_device_setting(1, tms_setting, tms_device, coil_model)
@@ -928,7 +974,7 @@ def global_setup_ft():
     tms_device_setting.save()
     # Create others TMSDevice and CoilModel associated with TMSDeviceSetting >
     # TMSSetting > Experiment
-    create_tms_setting(1, experiment)  # 3º TMSSetting
+    create_tms_setting(1, experiment12)  # 3º TMSSetting
     tms_setting = TMSSetting.objects.last()
     # TODO: IMPORTANT! when creating a new TMSDevice and a new CoilModel to
     # TODO: associate with new TMSDeviceSetting, the tests with filters in
@@ -956,13 +1002,13 @@ def global_setup_ft():
     # (requires valid files 'questionnaire1.csv', 'questionnaire2.csv',
     # 'questionnaire3.csv', and their language variations in
     # 'experiments/tests' subdirectory)
-    experiment = Experiment.objects.filter(
+    experiment13 = Experiment.objects.filter(
         status=Experiment.APPROVED
     ).last()
     # TODO: not necessary while creating groups
     # TODO: inside create_experiment function. This has to be refactor.
-    create_group(2, experiment)
-    group_first = experiment.groups.first()
+    create_group(2, experiment13)
+    group_first = experiment13.groups.first()
     create_questionnaire(1, 'q1', group_first)
     questionnaire1 = Questionnaire.objects.last()
     # create questionnaire language data default for questionnaire1
@@ -1000,7 +1046,7 @@ def global_setup_ft():
         'de'
     )
 
-    group_last = experiment.groups.last()
+    group_last = experiment13.groups.last()
     create_questionnaire(1, 'q3', group_last)
     questionnaire3 = Questionnaire.objects.last()
     # create questionnaire language data default for questionnaire3

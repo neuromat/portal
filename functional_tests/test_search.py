@@ -413,13 +413,14 @@ class SearchTest(FunctionalTest):
         link_home = self.browser.find_element_by_id('link_home')
         self.assertEqual('Back Home', link_home.text)
         link_home.click()
-        time.sleep(1)
 
         # Joselina is back homepage
-        table_title = self.browser.find_element_by_id(
-            'id_table_title'
-        ).find_element_by_tag_name('h2').text
-        self.assertEqual('List of Experiments', table_title)
+        self.wait_for(
+            lambda:
+            self.assertEqual(self.browser.find_element_by_id(
+                'id_table_title'
+            ).find_element_by_tag_name('h2').text, 'List of Experiments')
+        )
 
     def test_search_tmssetting_returns_correct_objects(self):
         # Joselina searches for a TMS Setting whose name is 'tmssettingname'
@@ -697,24 +698,31 @@ class SearchTest(FunctionalTest):
         ).text
         self.assertIn('Verletzung des Plexus Brachialis', publication_text)
 
-
     def test_click_in_a_search_result_display_experiment_detail_page(self):
-        # TODO: the test tests for some match types not all. Wold be better
+        # TODO: the test tests for some match types, not all. Wold be better
         # TODO: to test for each and all match types.
 
         # The researcher searches for 'brachial' term
         self.search_for('brachial')
 
-        # She obtains some results. She clicks in on result link randomly
+        # She obtains some results. She clicks in on A result link randomly
         # and is redirected to experiment detail page
-        results_table = self.browser.find_element_by_id('search_table')
+        self.wait_for(
+            lambda:
+            self.browser.find_element_by_id('search_table')
+        )
 
-        links = results_table.find_elements_by_tag_name('a')
+        links = self.browser.find_element_by_id(
+            'search_table'
+        ).find_elements_by_tag_name('a')
         random_link = random.choice(links)
         random_link.click()
-        time.sleep(1)
 
-        detail_content_title = \
-            self.browser.find_element_by_tag_name('h2').text
-        self.assertEqual(detail_content_title,
-                         'Open Database for Experiments in Neuroscience')
+        self.wait_for(
+            lambda:
+            self.assertEqual(
+                self.browser.find_element_by_tag_name('h2').text,
+                'Open Database for Experiments in Neuroscience'
+            )
+        )
+
