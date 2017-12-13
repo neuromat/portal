@@ -172,30 +172,12 @@ class Collaborator(models.Model):
         return self.name
 
 
-class ProtocolComponent(models.Model):
-    experiment = models.ForeignKey(
-        Experiment, related_name='protocol_components'
-    )
-    nes_id = models.PositiveIntegerField()
-
-    identification = models.CharField(max_length=50)
-    description = models.TextField(blank=True)
-    duration_value = models.IntegerField(null=True)
-    component_type = models.CharField(max_length=30)
-
-    class Meta:
-        unique_together = ('nes_id', 'experiment')
-
-
 class Group(models.Model):
     experiment = models.ForeignKey(Experiment, related_name='groups')
     title = models.CharField(max_length=50)
     description = models.TextField()
     inclusion_criteria = \
         models.ManyToManyField(ClassificationOfDiseases, blank=True)
-    protocol_component = models.ForeignKey(
-        ProtocolComponent, null=True, blank=True
-    )
 
 
 class Gender(models.Model):

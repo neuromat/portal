@@ -1,11 +1,10 @@
-import time
 from django.contrib.auth.models import AnonymousUser
 from django.core.mail import send_mail
 from rest_framework import serializers, permissions, viewsets
 
 from experiments import appclasses
 from experiments.tasks import build_download_file
-from experiments.models import Experiment, Study, User, ProtocolComponent, \
+from experiments.models import Experiment, Study, User, \
     Group, ExperimentalProtocol, Researcher, Participant, Collaborator, \
     Keyword, ClassificationOfDiseases, \
     EEGSetting, EMGSetting, TMSSetting, ContextTree, Step, File, \
@@ -32,14 +31,11 @@ from experiments.models import Experiment, Study, User, ProtocolComponent, \
 ###################
 class ExperimentSerializer(serializers.ModelSerializer):
     owner = serializers.ReadOnlyField(source='owner.username')
-    protocol_components = serializers.PrimaryKeyRelatedField(
-        many=True, read_only=True
-    )
 
     class Meta:
         model = Experiment
         fields = ('id', 'title', 'description', 'data_acquisition_done',
-                  'nes_id', 'owner', 'status', 'protocol_components',
+                  'nes_id', 'owner', 'status',
                   'sent_date', 'project_url', 'ethics_committee_url',
                   'ethics_committee_file')
 
@@ -469,16 +465,6 @@ class ContextTreeSerializer(serializers.ModelSerializer):
     class Meta:
         model = ContextTree
         fields = ('id', 'experiment', 'name', 'description', 'setting_text', 'setting_file')
-
-
-class ProtocolComponentSerializer(serializers.ModelSerializer):
-    owner = serializers.ReadOnlyField(source='owner.username')
-    experiment = serializers.ReadOnlyField(source='experiment.title')
-
-    class Meta:
-        model = ProtocolComponent
-        fields = ('id', 'experiment_nes_id', 'identification', 'description',
-                  'duration_value', 'component_type', 'experiment', 'owner')
 
 
 class ClassificationOfDiseasesSerializer(serializers.Serializer):
