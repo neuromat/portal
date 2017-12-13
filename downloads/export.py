@@ -93,16 +93,9 @@ class ExportExecution:
         return self.directory_base  # MEDIA_ROOT/temp/export_id
 
     def __init__(self, export_id):
-        # self.get_session_key()
-
-        # questionnaire_id = 0
         self.files_to_zip_list = []
-        # self.participant_to_zip_list = []
-        # self.experimental_protocol_to_zip_list = []
-        # self.fields = []
         self.directory_base = ''
         self.base_directory_name = path.join(settings.MEDIA_ROOT, "download")
-        # self.directory_base = self.base_directory_name
         self.set_directory_base(export_id)
         self.base_export_directory = ""
         self.user_name = None
@@ -202,6 +195,12 @@ class ExportExecution:
             export_directory_group = path.join(export_experiment_data, group_directory_name)
 
             if hasattr(group, 'experimental_protocol'):
+                # If there's no minimal data in ExperimentalProtocol model
+                # do not create Experimental Protocol subdir
+                if not group.experimental_protocol.textual_description\
+                        and not group.experimental_protocol.image:
+                    continue
+
                 # build diseases inclusion criteria
                 if group.inclusion_criteria.all():
                     group_inclusion_criteria_list = self.process_group_inclusion_disease(group.inclusion_criteria.all())
