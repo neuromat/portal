@@ -72,11 +72,7 @@ def create_directory(basedir, path_to_create):
 
     complete_path = path.join(basedir, path_to_create)
 
-    # print("encode: ", sys.getfilesystemencoding(), sys.getdefaultencoding())
-    # print("create_directory-encode:", complete_path.encode('utf-8'))
     if not path.exists(complete_path.encode('utf-8')):
-        # print("create_directory:", basedir, path_to_create)
-        # print("create_directory:", complete_path)
         makedirs(complete_path.encode('utf-8'))
 
     return "", complete_path
@@ -222,7 +218,6 @@ class ExportExecution:
                 if error_msg != "":
                     return error_msg
 
-                # export_directory_experimental_protocol = EXPERIMENT_DOWNLOAD/Group_group.title/Experimental_protocol
                 export_directory_experimental_protocol = path.join(export_directory_group, "Experimental_protocol")
 
                 # save experimental protocol description
