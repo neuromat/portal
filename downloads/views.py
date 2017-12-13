@@ -214,7 +214,7 @@ def download_view(request, experiment_id):
     compressed_file = shutil.make_archive(os.path.join(
         tempfile.mkdtemp(), 'download'), 'zip', temp_dir
     )
-    # workaround to test serving compressed file
+    # workaround to unit test serving compressed file
     if 'test' in sys.argv or 'runserver' in sys.argv:
         file = open(os.path.join(temp_dir, compressed_file), 'rb')
         response = HttpResponse(file, content_type='application/zip')
@@ -302,10 +302,6 @@ def download_create(experiment_id, template_name):
         if export.files_to_zip_list:
             export_filename = export.get_input_data("export_filename")  # 'download.zip'
             export_complete_filename = path.join(base_directory_name, export_filename)
-            # if not path.exists(download_experiment_directory):
-            #     error_msg, download_experiment_directory = create_directory(directory_download_base, str(experiment_id))
-
-            # download_complete_filename = path.join(download_experiment_directory, export_filename)
 
             with ZipFile(export_complete_filename, 'w') as zip_file:
                 for filename, directory in export.files_to_zip_list:
@@ -314,26 +310,6 @@ def download_create(experiment_id, template_name):
                     zip_file.write(filename.encode('utf-8'), path.join(directory, fname))
 
             zip_file.close()
-
-            # output_download_file = path.join("download", path.join(path.join(str(experiment_id), str(export_filename))))
-            #
-            # with open(export_complete_filename, 'rb') as f:
-            #     data = f.read()
-            #
-            # with open(download_complete_filename, 'wb') as f:
-            #     f.write(data)
-
-            # experimento ultima versão
-            # experiment = get_object_or_404(Experiment, pk=experiment_id)
-            # experiment.download_url = "download/" + str(experiment_id) + "/" + export_filename
-            # experiment.save(update_fields=["download_url"])
-            #
-            # update_export_instance(input_export_file, output_download_file, export_instance)
-
-        # delete temporary directory: from base_directory and below
-        # base_export_directory = path.join(
-        #     settings.MEDIA_ROOT, path.join("temp", str(export_instance.id))
-        # )
 
         export_instance_directory = settings.MEDIA_ROOT + '/'
         temp_directory = path.join(export_instance_directory, path.join(EXPORT_DIRECTORY, str(export_instance.id)))
