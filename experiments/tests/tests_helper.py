@@ -25,12 +25,18 @@ def create_group(qtty, experiment):
     """
     fake = Factory.create()
 
+    groups = []
     for i in range(qtty):
-        Group.objects.create(
+        group = Group.objects.create(
             title=fake.text(max_nb_chars=15),
             description=fake.text(max_nb_chars=150),
             experiment=experiment
         )
+        groups.append(group)
+
+    if len(groups) == 1:
+        return groups[0]
+    return groups
 
 
 def create_study(experiment):
@@ -55,8 +61,9 @@ def create_experiment(qtty, owner, status):
     """
     fake = Factory.create()
 
+    experiments = []
     for i in range(qtty):
-        Experiment.objects.create(
+        experiment = Experiment.objects.create(
             title=fake.text(max_nb_chars=15),
             description=fake.text(max_nb_chars=200),
             nes_id=randint(1, 10000),  # TODO: guarantee that this won't
@@ -66,6 +73,11 @@ def create_experiment(qtty, owner, status):
             status=status,
             data_acquisition_done=choice([True, False]),
         )
+        experiments.append(experiment)
+
+    if len(experiments) == 1:
+        return experiments[0]
+    return experiments
 
 
 def create_trustee_users():
@@ -585,7 +597,7 @@ def create_download_dir_structure_and_files(experiment, temp_media_root):
             experiment_download_dir, 'Group_' + group.title
         )
         # TODO: sometimes on creating this subdir, test fails claiming that
-        # TODO: that 'Questionnaire_metadata' already exists. It seems that
+        # TODO: 'Questionnaire_metadata' already exists. It seems that
         # TODO: some group title is repeating. Verify!
         questionnaire_metadata_dir = create_group_subdir(
             group_dir, 'Questionnaire_metadata'
