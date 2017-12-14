@@ -22,7 +22,7 @@ class NepSearchForm(SearchForm):
                               'term2\nAll kind of combinations with AND, OR, '
                               'NOT are accepted in advanced searching.\nBy '
                               'default, searching for terms separated with '
-                              'one or more spaces will apply the AND '
+                              'one or more spaces will apply the OR '
                               'modifier.')}
         )
     )
