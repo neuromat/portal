@@ -15,7 +15,7 @@
                 {# to_be_analysed_count variable is from home.html #}
                 <i id="new_experiments" class="fa fa-bell fa-2x icon-grey
                 badger" data-toggle="tooltip"
-                   title="There is(are) {{ to_be_analysed_count }} experiments to be analysed"></i>
+                   title="{% trans 'There is(are)' %}&nbsp;{{ to_be_analysed_count }} {% trans 'experiment(s) to be analysed' %}"></i>
             {% else %}
                 <i id="new_experiments" class="fa fa-bell fa-2x
                 icon-grey"></i>

@@ -337,13 +337,13 @@
                             class="glyphicon glyphicon-download-alt"> </span>
                         {% trans "Download all experiment data" %}</a>
                 </div>
-                <h4>{% trans 'Select experiment data pieces to download' %}</h4>
+                <h4>{% trans 'Select experiment data itens to download' %}</h4>
                 <div class="panel panel-default nep-panel-group">
                     <form action="{% url 'download-view' experiment.id %}" method="post">
                         {% csrf_token %}
                         <div class="form-group">
                             {% if experiment.groups.all %}
-                                <label for="download_options">Select options</label>
+                                <label for="download_options">{% trans 'Select options' %}</label>
                                 <select name="download_selected" id="download_options" multiple>
                                     {% for group in experiment.groups.all %}
                                         {% if group.experimental_protocol %}
