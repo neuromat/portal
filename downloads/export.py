@@ -1,4 +1,5 @@
 import json
+import os
 
 from decimal import Decimal
 from os import path, makedirs
@@ -14,8 +15,6 @@ from experiments.models import Experiment, Group, Participant, EEGData, EMGData,
     QuestionnaireResponse, Questionnaire, EEG, EMG, TMS, GoalkeeperGame, Stimulus, EMGElectrodeSetting, \
     EEGElectrodePosition, EMGSurfacePlacement, EMGIntramuscularPlacement, EMGNeedlePlacement, QuestionnaireLanguage, \
     QuestionnaireDefaultLanguage
-
-from zipfile import ZipFile
 
 DEFAULT_LANGUAGE = "pt-BR"
 
@@ -86,7 +85,11 @@ class ExportExecution:
         return self.user_name
 
     def set_directory_base(self, export_id):
-        self.directory_base = path.join(self.base_directory_name, str(export_id))
+        if not os.path.exists(os.path.join(settings.MEDIA_ROOT + '/download')):
+            os.makedirs(os.path.join(settings.MEDIA_ROOT + '/download'))
+        self.directory_base = path.join(
+            self.base_directory_name, str(export_id)
+        )
 
     def get_directory_base(self):
 
