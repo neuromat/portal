@@ -445,9 +445,9 @@ class ExportExecution:
 
                         self.files_to_zip_list.append([complete_stimulus_filename, export_stimulus_directory])
 
-                    # additional files
-                    self.export_experimental_protocol_additional_files(stimulus_step, path_stimulus_directory,
-                                                                       export_stimulus_directory)
+                        # additional files
+                        self.export_experimental_protocol_additional_files(stimulus_step, path_stimulus_directory,
+                                                                           export_stimulus_directory)
 
                 generic_data_collection_list = Step.objects.filter(group=group, type='generic_data_collection')
                 for generic_data_step in generic_data_collection_list:
@@ -463,7 +463,7 @@ class ExportExecution:
                             return error_msg
 
                     export_generic_data_directory = path.join(export_directory_experimental_protocol,
-                                                                   generic_data_step_name)
+                                                              generic_data_step_name)
                     # additional files
                     self.export_experimental_protocol_additional_files(generic_data_step, path_generic_data_directory,
                                                                        export_generic_data_directory)
