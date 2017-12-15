@@ -278,6 +278,15 @@ api_step_list =\
         'post': 'create'
     })
 
+
+# Step Additional File
+api_step_additional_file_list =\
+    api.StepAdditionalFileViewSet.as_view({
+        'get': 'list',
+        'post': 'create'
+    })
+
+
 # EEG Steps
 api_eeg_step_list =\
     api.EEGStepViewSet.as_view({
@@ -542,6 +551,10 @@ urlpatterns = [
 
     # Step
     url(r'^groups/(?P<pk>[0-9]+)/step/$', api_step_list, name='api_step-list'),
+
+    # Step Additional File
+    url(r'^step/(?P<pk>[0-9]+)/step_additional_file/$',
+        api_step_additional_file_list, name='api_step_additional_file-list'),
 
     # EEG Step
     url(r'^groups/(?P<pk>[0-9]+)/eeg_step/$', api_eeg_step_list, name='api_eeg_step-list'),
