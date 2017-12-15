@@ -579,6 +579,11 @@ class Step(models.Model):
         return self.type
 
 
+class StepAdditionalFile(models.Model):
+    step = models.ForeignKey(Step, related_name="step_additional_files")
+    file = models.FileField(upload_to='uploads/%Y/%m/%d/')
+
+
 class EEG(Step):
     eeg_setting = models.ForeignKey(EEGSetting)
 
