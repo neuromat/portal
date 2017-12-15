@@ -250,8 +250,9 @@ def download_create(experiment_id, template_name):
     try:
         export_instance = create_export_instance()
 
-        input_export_file = path.join(EXPORT_DIRECTORY,
-                                      path.join(path.join(str(export_instance.id), str(JSON_FILENAME))))
+        input_export_file = path.join(
+            EXPORT_DIRECTORY, str(export_instance.id), str(JSON_FILENAME)
+        )
 
         input_filename = path.join(settings.MEDIA_ROOT, input_export_file)
 
