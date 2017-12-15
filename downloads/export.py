@@ -495,7 +495,7 @@ class ExportExecution:
 
         for additional_file in additional_files_list:
             file_name = additional_file.file.name
-            complete_additional_filename = path.join(directory_additional_files, file_name.split('.')[-1])
+            complete_additional_filename = path.join(directory_additional_files, file_name.split('/')[-1])
             read_additional_filename = path.join(settings.MEDIA_ROOT, file_name)
 
             with open(read_additional_filename, "rb") as f:
