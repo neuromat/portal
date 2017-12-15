@@ -1,8 +1,11 @@
 import json
+import tempfile
 from datetime import datetime
 from unittest import skip
 
+import os
 from django.contrib.auth.models import User
+from django.test import override_settings
 from django.urls import reverse
 from django.utils.encoding import smart_str
 from rest_framework import status
@@ -12,8 +15,10 @@ from experiments import api
 from experiments.helpers import generate_image_file
 from experiments.models import Experiment, Study, Group, Researcher, \
     Collaborator, ClassificationOfDiseases, Questionnaire, Step, \
-    QuestionnaireLanguage, QuestionnaireDefaultLanguage, Publication
-from experiments.tests.tests_helper import global_setup_ut, apply_setup
+    QuestionnaireLanguage, QuestionnaireDefaultLanguage, Publication, \
+    ExperimentalProtocol
+from experiments.tests.tests_helper import global_setup_ut, apply_setup, \
+    create_experiment, create_group
 
 
 @apply_setup(global_setup_ut)
@@ -1149,3 +1154,43 @@ class QuestionnaireLanguageAPITest(APITestCase):
 
     def test_POSTing_new_questionnairelanguage_cant_create_more_default_languages(self):
         pass
+
+
+TEMP_MEDIA_ROOT = os.path.join(tempfile.mkdtemp())
+
+
+@override_settings(MEDIA_ROOT=TEMP_MEDIA_ROOT)
+class ExperimentalProtocolAPITest(APITestCase):
+
+    def test_POSTing_new_experimental_protocol_with_image_creates_image_file(self):
+        owner = User.objects.create_user(username='lab1', password='nep-lab1')
+        experiment = create_experiment(1, owner, Experiment.TO_BE_ANALYSED)
+        group = create_group(1, experiment)
+        image_file = generate_image_file(filename='datei.jpg')
+        url = reverse(
+            'api_group_experimental_protocol-list',
+            kwargs={'pk': group.id}
+        )
+        self.client.login(username=owner.username, password='nep-lab1')
+        response = self.client.post(
+            url,
+            {
+                'image': image_file,
+                'textual_description': 'Ein wunderbar Beschreibung'
+            },
+            format='multipart'
+        )
+        self.client.logout()
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        new_exp_protocol = ExperimentalProtocol.objects.last()
+        self.assertEqual(
+            new_exp_protocol.textual_description, 'Ein wunderbar Beschreibung'
+        )
+        self.assertTrue(
+            os.path.exists(
+                os.path.join(TEMP_MEDIA_ROOT, 'uploads',
+                             datetime.utcnow().strftime('%Y/%m/%d'),
+                             'datei.jpg'
+                             )
+            )
+        )
