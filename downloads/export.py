@@ -445,9 +445,9 @@ class ExportExecution:
 
                         self.files_to_zip_list.append([complete_stimulus_filename, export_stimulus_directory])
 
-                    # additional files
-                    self.export_experimental_protocol_additional_files(stimulus_step, path_stimulus_directory,
-                                                                       export_stimulus_directory)
+                        # additional files
+                        self.export_experimental_protocol_additional_files(stimulus_step, path_stimulus_directory,
+                                                                           export_stimulus_directory)
 
                 generic_data_collection_list = Step.objects.filter(group=group, type='generic_data_collection')
                 for generic_data_step in generic_data_collection_list:
@@ -463,7 +463,7 @@ class ExportExecution:
                             return error_msg
 
                     export_generic_data_directory = path.join(export_directory_experimental_protocol,
-                                                                   generic_data_step_name)
+                                                              generic_data_step_name)
                     # additional files
                     self.export_experimental_protocol_additional_files(generic_data_step, path_generic_data_directory,
                                                                        export_generic_data_directory)
@@ -485,7 +485,8 @@ class ExportExecution:
 
     def export_experimental_protocol_additional_files(self, step_object, directory_step, export_directory_step):
         additional_files_list = step_object.step_additional_files.all()
-        if additional_files_list:
+        directory_additional_files = path.join(directory_step, "Additional_files")
+        if len(additional_files_list) > 0 and not path.exists(directory_additional_files):
             error_msg, directory_additional_files = create_directory(directory_step, "Additional_files")
             if error_msg != "":
                 return error_msg
