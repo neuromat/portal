@@ -6,7 +6,7 @@ from faker import Factory
 
 def generate_image_file(width=None, height=None, filename=None):
     """
-    Generates an image file with a random color
+    Generates an image file with random color
     :param filename with image extension
     :param width
     :param height
