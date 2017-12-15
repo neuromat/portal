@@ -485,7 +485,8 @@ class ExportExecution:
 
     def export_experimental_protocol_additional_files(self, step_object, directory_step, export_directory_step):
         additional_files_list = step_object.step_additional_files.all()
-        if len(additional_files_list) > 0:
+        directory_additional_files = path.join(directory_step, "Additional_files")
+        if len(additional_files_list) > 0 and not path.exists(directory_additional_files):
             error_msg, directory_additional_files = create_directory(directory_step, "Additional_files")
             if error_msg != "":
                 return error_msg
