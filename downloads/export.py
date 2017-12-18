@@ -626,7 +626,7 @@ class ExportExecution:
                     questionnaire_default_language = get_object_or_404(QuestionnaireDefaultLanguage,
                                                                        questionnaire_id=step_questionnaire.id)
                     survey_name = questionnaire_default_language.questionnaire_language.survey_name
-                    questionnaire_title = "%s_%s" % (str(questionnaire_code), str(survey_name))
+                    questionnaire_title = "%s_%s" % (str(questionnaire_code), survey.identification)
 
                     # data per questionnaire_response
                     if questionnaire_code not in self.per_group_data[group_id]['questionnaire_data']:
