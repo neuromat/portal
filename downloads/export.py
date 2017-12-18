@@ -240,15 +240,18 @@ class ExportExecution:
                         txt_file.writelines(experimental_protocol_description)
 
                 # save protocol image
-                experimental_protocol_image = group.experimental_protocol.image
-                if experimental_protocol_image:
+                if hasattr(group.experimental_protocol, "image"):
+                # experimental_protocol_image = group.experimental_protocol.image
+                # if experimental_protocol_image:
+                    experimental_protocol_image_filename = group.experimental_protocol.image.name
                     filename_protocol_image = "Experimental_protocol_image.png"
                     complete_protocol_image_filename = path.join(directory_experimental_protocol,
                                                                  filename_protocol_image)
                     self.files_to_zip_list.append([complete_protocol_image_filename,
                                                    export_directory_experimental_protocol])
 
-                    image_protocol = path.join(path.join(settings.BASE_DIR,"media/"), experimental_protocol_image.name)
+                    image_protocol = path.join(path.join(settings.BASE_DIR,"media/"),
+                                               experimental_protocol_image_filename)
                     with open(image_protocol, 'rb') as f:
                         data = f.read()
 
