@@ -955,21 +955,21 @@ class ExportExecution:
 
                                 self.files_to_zip_list.append([complete_eeg_data_filename, export_eeg_data_directory])
 
-                            # create eeg_setting_description
-                            eeg_setting_description = get_eeg_setting_description(eeg_data.eeg_setting_id)
-                            if eeg_setting_description:
-                                eeg_setting_filename = "%s_%s.json" % (eeg_data_filename.split(".")[0],
-                                                                       "setting_description")
+                                # create eeg_setting_description
+                                eeg_setting_description = get_eeg_setting_description(eeg_data.eeg_setting_id)
+                                if eeg_setting_description:
+                                    eeg_setting_filename = "%s_%s.json" % (eeg_data_filename.split(".")[0],
+                                                                           "setting_description")
 
-                                # ex. Users/.../EXPERIMENT_DOWNLOAD/Group_group.title/Participants/PXXXX/Step_XX_EEG/
-                                # eeg_rawfilename_setting_description.json#
-                                complete_setting_filename = path.join(path_per_eeg_data, eeg_setting_filename)
+                                    # ex. Users/.../EXPERIMENT_DOWNLOAD/Group_group.title/Participants/PXXXX/Step_XX_EEG/
+                                    # eeg_rawfilename_setting_description.json#
+                                    complete_setting_filename = path.join(path_per_eeg_data, eeg_setting_filename)
 
-                                self.files_to_zip_list.append([complete_setting_filename, export_eeg_data_directory])
+                                    self.files_to_zip_list.append([complete_setting_filename, export_eeg_data_directory])
 
-                                with open(complete_setting_filename.encode('utf-8'), 'w', newline='',
-                                          encoding='UTF-8') as outfile:
-                                    json.dump(eeg_setting_description, outfile, indent=4)
+                                    with open(complete_setting_filename.encode('utf-8'), 'w', newline='',
+                                              encoding='UTF-8') as outfile:
+                                        json.dump(eeg_setting_description, outfile, indent=4)
 
                             # if sensor position image exist
                             if hasattr(eeg_data.eeg_setting, "eeg_electrode_localization_system"):
@@ -1038,21 +1038,21 @@ class ExportExecution:
 
                                 self.files_to_zip_list.append([complete_emg_data_filename, export_emg_data_directory])
 
-                            # download emg_setting_description
-                            emg_setting_description = get_emg_setting_description(emg_data.emg_setting_id)
-                            if emg_setting_description:
-                                emg_setting_filename = "%s_%s.json" % (emg_data_filename.split(".")[0],
-                                                                       "setting_description")
+                                # download emg_setting_description
+                                emg_setting_description = get_emg_setting_description(emg_data.emg_setting_id)
+                                if emg_setting_description:
+                                    emg_setting_filename = "%s_%s.json" % (emg_data_filename.split(".")[0],
+                                                                           "setting_description")
 
-                                # ex. Users/.../EXPERIMENT_DOWNLOAD/Group_group.title/Participants/PXXXX/Step_XX_EMG
-                                # /EMGData_index/emg_rawfilename_setting_description.json#
-                                complete_setting_filename = path.join(path_per_emg_data, emg_setting_filename)
+                                    # ex. Users/.../EXPERIMENT_DOWNLOAD/Group_group.title/Participants/PXXXX/Step_XX_EMG
+                                    # /EMGData_index/emg_rawfilename_setting_description.json#
+                                    complete_setting_filename = path.join(path_per_emg_data, emg_setting_filename)
 
-                                self.files_to_zip_list.append([complete_setting_filename, export_emg_data_directory])
+                                    self.files_to_zip_list.append([complete_setting_filename, export_emg_data_directory])
 
-                                with open(complete_setting_filename.encode('utf-8'), 'w', newline='',
-                                          encoding='UTF-8') as outfile:
-                                    json.dump(emg_setting_description, outfile, indent=4)
+                                    with open(complete_setting_filename.encode('utf-8'), 'w', newline='',
+                                              encoding='UTF-8') as outfile:
+                                        json.dump(emg_setting_description, outfile, indent=4)
 
                     if 'tms_data' in self.per_group_data[group_id]['data_per_participant'][participant_code]:
                         tms_data_list = self.per_group_data[group_id]['data_per_participant'][participant_code][
