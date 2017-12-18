@@ -23,7 +23,7 @@ from experiments.models import Experiment, Study, User, \
     EMGAnalogFilterSetting, \
     EMGElectrodePlacementSetting, \
     EMGSurfacePlacement, EMGIntramuscularPlacement, EMGNeedlePlacement, \
-    QuestionnaireLanguage, QuestionnaireDefaultLanguage, Publication
+    QuestionnaireLanguage, QuestionnaireDefaultLanguage, Publication, StepAdditionalFile
 
 
 ###################
@@ -554,6 +554,14 @@ class StepSerializer(serializers.ModelSerializer):
                   'interval_between_repetitions_value',
                   'interval_between_repetitions_unit',
                   'random_position')
+
+
+class StepAdditionalFileSerializer(serializers.ModelSerializer):
+    step = serializers.ReadOnlyField(source='step.identification')
+
+    class Meta:
+        model = StepAdditionalFile
+        fields = ('step', 'file')
 
 
 class EEGStepSerializer(serializers.ModelSerializer):
@@ -1559,6 +1567,18 @@ class StepViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         group = Group.objects.get(pk=self.kwargs['pk'])
         serializer.save(group=group)
+
+
+class StepAdditionalFileViewSet(viewsets.ModelViewSet):
+    serializer_class = StepAdditionalFileSerializer
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
+
+    def get_queryset(self):
+        return StepAdditionalFile.objects.filter(step_id=self.kwargs['pk'])
+
+    def perform_create(self, serializer):
+        step = Step.objects.get(pk=self.kwargs['pk'])
+        serializer.save(step=step)
 
 
 class EEGStepViewSet(viewsets.ModelViewSet):

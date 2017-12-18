@@ -14,7 +14,7 @@ from experiments.models import Experiment, Group, Participant, EEGData, EMGData,
     TMSSetting, AdditionalData, ContextTree, GenericDataCollectionData, GoalkeeperGameData, Step, \
     QuestionnaireResponse, Questionnaire, EEG, EMG, TMS, GoalkeeperGame, Stimulus, EMGElectrodeSetting, \
     EEGElectrodePosition, EMGSurfacePlacement, EMGIntramuscularPlacement, EMGNeedlePlacement, QuestionnaireLanguage, \
-    QuestionnaireDefaultLanguage
+    QuestionnaireDefaultLanguage, StepAdditionalFile
 
 DEFAULT_LANGUAGE = "pt-BR"
 
@@ -255,168 +255,218 @@ class ExportExecution:
                     with open(complete_protocol_image_filename, 'wb') as f:
                         f.write(data)
 
-                # Experimental protocol - default setting
+                # By each step of the Experimental protocol - export default setting
+                questionnaire_setting_list = Step.objects.filter(group=group, type='questionnaire')
+                for questionnaire_step in questionnaire_setting_list:
+                    questionnaire_step_name = "STEP_" + questionnaire_step.numeration + "_" + \
+                                              questionnaire_step.type.upper()
+                    path_questionnaire_directory = path.join(directory_experimental_protocol, questionnaire_step_name)
+                    if not path.exists(path_questionnaire_directory):
+                        error_msg, path_questionnaire_directory = create_directory(directory_experimental_protocol,
+                                                                                   questionnaire_step_name)
+                        if error_msg != "":
+                            return error_msg
+
+                    export_questionnaire_directory = path.join(export_directory_experimental_protocol,
+                                                               questionnaire_step_name)
+                    self.export_experimental_protocol_additional_files(questionnaire_step, path_questionnaire_directory,
+                                                                       export_questionnaire_directory)
+
                 eeg_setting_list = Step.objects.filter(group=group, type='eeg')
-                if eeg_setting_list:
-                    for eeg_step in eeg_setting_list:
-                        # create directory of eeg step
-                        eeg_step_name = "STEP_" + eeg_step.numeration + "_" + eeg_step.type.upper()
-                        path_eeg_directory = path.join(directory_experimental_protocol, eeg_step_name)
-                        if not path.exists(path_eeg_directory):
-                            error_msg, directory_eeg_step = create_directory(directory_experimental_protocol, eeg_step_name)
-                            if error_msg != "":
-                                return error_msg
+                for eeg_step in eeg_setting_list:
+                    # create directory of eeg step
+                    eeg_step_name = "STEP_" + eeg_step.numeration + "_" + eeg_step.type.upper()
+                    path_eeg_directory = path.join(directory_experimental_protocol, eeg_step_name)
+                    if not path.exists(path_eeg_directory):
+                        error_msg, path_eeg_directory = create_directory(directory_experimental_protocol, eeg_step_name)
+                        if error_msg != "":
+                            return error_msg
 
-                        export_directory_eeg_step = path.join(export_directory_experimental_protocol, eeg_step_name)
-                        if hasattr(eeg_step, 'eeg'):
-                            default_eeg = get_object_or_404(EEG, pk=eeg_step.id)
-                            eeg_default_setting_description = get_eeg_setting_description(default_eeg.eeg_setting.id)
-                            if eeg_default_setting_description:
-                                eeg_setting_filename = "%s.json" % "eeg_default_setting"
-                                # TODO:
-                                # bug: fails if path exists. See "if not
-                                # path.exists" above
-                                complete_filename_eeg_setting = path.join(directory_eeg_step, eeg_setting_filename)
+                    export_eeg_directory = path.join(export_directory_experimental_protocol, eeg_step_name)
+                    if hasattr(eeg_step, 'eeg'):
+                        default_eeg = get_object_or_404(EEG, pk=eeg_step.id)
+                        eeg_default_setting_description = get_eeg_setting_description(default_eeg.eeg_setting.id)
+                        if eeg_default_setting_description:
+                            eeg_setting_filename = "%s.json" % "eeg_default_setting"
+                            # TODO:
+                            # bug: fails if path exists. See "if not
+                            # path.exists" above
+                            complete_filename_eeg_setting = path.join(path_eeg_directory, eeg_setting_filename)
 
-                                self.files_to_zip_list.append([complete_filename_eeg_setting, export_directory_eeg_step])
+                            self.files_to_zip_list.append([complete_filename_eeg_setting, export_eeg_directory])
 
-                                with open(complete_filename_eeg_setting.encode('utf-8'), 'w', newline='',
-                                          encoding='UTF-8') as outfile:
-                                    json.dump(eeg_default_setting_description, outfile, indent=4)
+                            with open(complete_filename_eeg_setting.encode('utf-8'), 'w', newline='',
+                                      encoding='UTF-8') as outfile:
+                                json.dump(eeg_default_setting_description, outfile, indent=4)
+
+                    # additional files
+                    self.export_experimental_protocol_additional_files(eeg_step, path_eeg_directory,
+                                                                       export_eeg_directory)
 
                 emg_setting_list = Step.objects.filter(group=group, type='emg')
-                if emg_setting_list:
-                    for emg_step in emg_setting_list:
-                        # create directory of emg step
-                        emg_step_name = "STEP_" + emg_step.numeration + "_" + emg_step.type.upper()
-                        path_emg_directory = path.join(directory_experimental_protocol, emg_step_name)
-                        if not path.exists(path_emg_directory):
-                            error_msg, directory_emg_step = create_directory(directory_experimental_protocol, emg_step_name)
-                            if error_msg != "":
-                                return error_msg
+                for emg_step in emg_setting_list:
+                    # create directory of emg step
+                    emg_step_name = "STEP_" + emg_step.numeration + "_" + emg_step.type.upper()
+                    path_emg_directory = path.join(directory_experimental_protocol, emg_step_name)
+                    if not path.exists(path_emg_directory):
+                        error_msg, path_emg_directory = create_directory(directory_experimental_protocol, emg_step_name)
+                        if error_msg != "":
+                            return error_msg
 
-                        export_directory_emg_step = path.join(export_directory_experimental_protocol, emg_step_name)
+                    export_emg_directory = path.join(export_directory_experimental_protocol, emg_step_name)
 
-                        if hasattr(emg_step, 'emg'):
-                            default_emg = get_object_or_404(EMG, pk=emg_step.id)
-                            emg_default_setting_description = get_emg_setting_description(default_emg.emg_setting.id)
-                            if emg_default_setting_description:
-                                emg_setting_filename = "%s.json" % "emg_default_setting"
-                                complete_filename_emg_setting = path.join(directory_emg_step, emg_setting_filename)
+                    if hasattr(emg_step, 'emg'):
+                        default_emg = get_object_or_404(EMG, pk=emg_step.id)
+                        emg_default_setting_description = get_emg_setting_description(default_emg.emg_setting.id)
+                        if emg_default_setting_description:
+                            emg_setting_filename = "%s.json" % "emg_default_setting"
+                            complete_filename_emg_setting = path.join(path_emg_directory, emg_setting_filename)
 
-                                self.files_to_zip_list.append([complete_filename_emg_setting, export_directory_emg_step])
+                            self.files_to_zip_list.append([complete_filename_emg_setting, export_emg_directory])
 
-                                with open(complete_filename_emg_setting.encode('utf-8'), 'w', newline='',
-                                          encoding='UTF-8') as outfile:
-                                    json.dump(emg_default_setting_description, outfile, indent=4)
+                            with open(complete_filename_emg_setting.encode('utf-8'), 'w', newline='',
+                                      encoding='UTF-8') as outfile:
+                                json.dump(emg_default_setting_description, outfile, indent=4)
+
+                    # additional files
+                    self.export_experimental_protocol_additional_files(emg_step, path_emg_directory,
+                                                                       export_emg_directory)
 
                 tms_setting_list = Step.objects.filter(group=group, type='tms')
-                if tms_setting_list:
-                    for tms_step in tms_setting_list:
-                        # create directory of tms step
-                        tms_step_name = "STEP_" + tms_step.numeration + "_" + tms_step.type.upper()
-                        path_tms_directory = path.join(directory_experimental_protocol, tms_step_name)
-                        if not path.exists(path_tms_directory):
-                            error_msg, directory_tms_step = create_directory(directory_experimental_protocol, tms_step_name)
+                for tms_step in tms_setting_list:
+                    # create directory of tms step
+                    tms_step_name = "STEP_" + tms_step.numeration + "_" + tms_step.type.upper()
+                    path_tms_directory = path.join(directory_experimental_protocol, tms_step_name)
+                    if not path.exists(path_tms_directory):
+                        error_msg, path_tms_directory = create_directory(directory_experimental_protocol, tms_step_name)
+                        if error_msg != "":
+                            return error_msg
+
+                    export_tms_directory = path.join(export_directory_experimental_protocol, tms_step_name)
+
+                    if hasattr(tms_step, 'tms'):
+                        default_tms = get_object_or_404(TMS, pk=tms_step.id)
+                        tms_default_setting_description = get_tms_setting_description(default_tms.tms_setting.id)
+                        if tms_default_setting_description:
+                            tms_setting_filename = "%s.json" % "tms_default_setting"
+                            complete_filename_tms_setting = path.join(path_tms_directory, tms_setting_filename)
+
+                            self.files_to_zip_list.append([complete_filename_tms_setting, export_tms_directory])
+
+                            with open(complete_filename_tms_setting.encode('utf-8'), 'w', newline='',
+                                      encoding='UTF-8') as outfile:
+                                json.dump(tms_default_setting_description, outfile, indent=4)
+
+                    # additional files
+                    self.export_experimental_protocol_additional_files(tms_step, path_tms_directory,
+                                                                       export_tms_directory)
+
+                goalkeeper_game_list = Step.objects.filter(group=group, type='goalkeeper_game')
+                for goalkeeper_game_step in goalkeeper_game_list:
+                    default_goalkeeper_game = get_object_or_404(GoalkeeperGame, pk=goalkeeper_game_step.id)
+
+                    context_tree_default_description = get_context_tree_description(
+                        default_goalkeeper_game.context_tree.id)
+                    if context_tree_default_description:
+                        # create directory of goalkeeper_game step
+                        goalkeeper_game_step_name = "STEP_" + goalkeeper_game_step.numeration + "_" + \
+                                                    goalkeeper_game_step.type.upper()
+
+                        path_goalkeeper_game_directory = path.join(directory_experimental_protocol,
+                                                                   goalkeeper_game_step_name)
+                        if not path.exists(path_goalkeeper_game_directory):
+                            error_msg, path_goalkeeper_game_directory = create_directory(directory_experimental_protocol,
+                                                                                         goalkeeper_game_step_name)
                             if error_msg != "":
                                 return error_msg
 
-                        export_directory_tms_step = path.join(export_directory_experimental_protocol, tms_step_name)
+                        export_goalkeeper_game_directory = path.join(export_directory_experimental_protocol,
+                                                                          goalkeeper_game_step_name)
 
-                        if hasattr(tms_step, 'tms'):
-                            default_tms = get_object_or_404(TMS, pk=tms_step.id)
-                            tms_default_setting_description = get_tms_setting_description(default_tms.tms_setting.id)
-                            if tms_default_setting_description:
-                                tms_setting_filename = "%s.json" % "tms_default_setting"
-                                complete_filename_tms_setting = path.join(directory_tms_step, tms_setting_filename)
+                        goalkeeper_game_setting_filename = "%s.json" % "goalkeeper_game_default_setting"
+                        complete_filename_goalkeeper_game_setting = path.join(path_goalkeeper_game_directory,
+                                                                              goalkeeper_game_setting_filename)
 
-                                self.files_to_zip_list.append([complete_filename_tms_setting, export_directory_tms_step])
+                        self.files_to_zip_list.append([complete_filename_goalkeeper_game_setting,
+                                                       export_goalkeeper_game_directory])
 
-                                with open(complete_filename_tms_setting.encode('utf-8'), 'w', newline='',
-                                          encoding='UTF-8') as outfile:
-                                    json.dump(tms_default_setting_description, outfile, indent=4)
+                        with open(complete_filename_goalkeeper_game_setting.encode('utf-8'), 'w', newline='',
+                                  encoding='UTF-8') as outfile:
+                            json.dump(context_tree_default_description, outfile, indent=4)
 
-                goalkeeper_game_list = Step.objects.filter(group=group, type='goalkeeper_game')
-                if goalkeeper_game_list:
-                    for goalkeeper_game_step in goalkeeper_game_list:
-                        default_goalkeeper_game = get_object_or_404(GoalkeeperGame, pk=goalkeeper_game_step.id)
+                        # if context_tree have a file
+                        setting_file = default_goalkeeper_game.context_tree.setting_file if \
+                            default_goalkeeper_game.context_tree.setting_file else ''
+                        if setting_file:
+                            context_tree_file = setting_file.file if setting_file.file else ''
+                            if context_tree_file:
+                                saved_context_tree_filename = context_tree_file.name
+                                read_filename_context_tree = path.join(settings.MEDIA_ROOT, saved_context_tree_filename)
+                                context_tree_filename = saved_context_tree_filename.split('/')[-1]
+                                complete_context_tree_filename = path.join(path_goalkeeper_game_directory,
+                                                                           context_tree_filename)
 
-                        context_tree_default_description = get_context_tree_description(
-                            default_goalkeeper_game.context_tree.id)
-                        if context_tree_default_description:
-                            # create directory of goalkeeper_game step
-                            goalkeeper_game_step_name = "STEP_" + goalkeeper_game_step.numeration + "_" + \
-                                                        goalkeeper_game_step.type.upper()
+                                with open(read_filename_context_tree, "rb") as f:
+                                    data = f.read()
+                                with open(complete_context_tree_filename, "wb") as f:
+                                    f.write(data)
 
-                            path_goalkeeper_game_directory = path.join(directory_experimental_protocol,
-                                                                       goalkeeper_game_step_name)
-                            if not path.exists(path_goalkeeper_game_directory):
-                                error_msg, directory_goalkeeper_game_step = create_directory(directory_experimental_protocol,
-                                                                                             goalkeeper_game_step_name)
-                                if error_msg != "":
-                                    return error_msg
+                                self.files_to_zip_list.append([complete_context_tree_filename,
+                                                               export_goalkeeper_game_directory])
 
-                            export_directory_goalkeeper_game_step = path.join(export_directory_experimental_protocol,
-                                                                              goalkeeper_game_step_name)
-
-                            goalkeeper_game_setting_filename = "%s.json" % "goalkeeper_game_default_setting"
-                            complete_filename_goalkeeper_game_setting = path.join(directory_goalkeeper_game_step,
-                                                                                  goalkeeper_game_setting_filename)
-
-                            self.files_to_zip_list.append([complete_filename_goalkeeper_game_setting,
-                                                           export_directory_goalkeeper_game_step])
-
-                            with open(complete_filename_goalkeeper_game_setting.encode('utf-8'), 'w', newline='',
-                                      encoding='UTF-8') as outfile:
-                                json.dump(context_tree_default_description, outfile, indent=4)
-
-                            # if context_tree have a file
-                            setting_file = default_goalkeeper_game.context_tree.setting_file if \
-                                default_goalkeeper_game.context_tree.setting_file else ''
-                            if setting_file:
-                                context_tree_file = setting_file.file if setting_file.file else ''
-                                if context_tree_file:
-                                    saved_context_tree_filename = context_tree_file.name
-                                    read_filename_context_tree = path.join(settings.MEDIA_ROOT, saved_context_tree_filename)
-                                    context_tree_filename = saved_context_tree_filename.split('/')[-1]
-                                    complete_context_tree_filename = path.join(directory_goalkeeper_game_step,
-                                                                               context_tree_filename)
-
-                                    with open(read_filename_context_tree, "rb") as f:
-                                        data = f.read()
-                                    with open(complete_context_tree_filename, "wb") as f:
-                                        f.write(data)
-
-                                    self.files_to_zip_list.append([complete_context_tree_filename,
-                                                                   export_directory_goalkeeper_game_step])
+                    # additional files
+                    self.export_experimental_protocol_additional_files(goalkeeper_game_step,
+                                                                       path_goalkeeper_game_directory,
+                                                                       export_goalkeeper_game_directory)
 
                 stimulus_list = Step.objects.filter(group=group, type='stimulus')
-                if stimulus_list:
-                    for stimulus_step in stimulus_list:
-                        stimulus = get_object_or_404(Stimulus, pk=stimulus_step.id)
-                        if stimulus.media_file:
-                            stimulus_step_name = "STEP_" + stimulus_step.numeration + "_" + stimulus_step.type.upper()
-                            path_stimulus_directory = path.join(directory_experimental_protocol, stimulus_step_name)
-                            if not path.exists(path_stimulus_directory):
-                                error_msg, directory_stimulus_data = create_directory(directory_experimental_protocol,
-                                                                                      stimulus_step_name)
-                                if error_msg != "":
-                                    return error_msg
+                for stimulus_step in stimulus_list:
+                    stimulus = get_object_or_404(Stimulus, pk=stimulus_step.id)
+                    if stimulus.media_file:
+                        stimulus_step_name = "STEP_" + stimulus_step.numeration + "_" + stimulus_step.type.upper()
+                        path_stimulus_directory = path.join(directory_experimental_protocol, stimulus_step_name)
+                        if not path.exists(path_stimulus_directory):
+                            error_msg, path_stimulus_directory = create_directory(directory_experimental_protocol,
+                                                                                  stimulus_step_name)
+                            if error_msg != "":
+                                return error_msg
 
-                            export_directory_stimulus_data = path.join(export_directory_experimental_protocol,
-                                                                       stimulus_step_name)
+                        export_stimulus_directory = path.join(export_directory_experimental_protocol,
+                                                                   stimulus_step_name)
 
-                            stimulus_setting_filename = stimulus.media_file.name.split('/')[-1]
-                            complete_stimulus_filename = path.join(directory_experimental_protocol,
-                                                                   stimulus_setting_filename)
-                            read_stimulus_filename = path.join(settings.MEDIA_ROOT, stimulus.media_file.name)
+                        stimulus_setting_filename = stimulus.media_file.name.split('/')[-1]
+                        complete_stimulus_filename = path.join(path_stimulus_directory, stimulus_setting_filename)
+                        read_stimulus_filename = path.join(settings.MEDIA_ROOT, stimulus.media_file.name)
 
-                            with open(read_stimulus_filename, "rb") as f:
-                                data = f.read()
-                            with open(complete_stimulus_filename, "wb") as f:
-                                f.write(data)
+                        with open(read_stimulus_filename, "rb") as f:
+                            data = f.read()
+                        with open(complete_stimulus_filename, "wb") as f:
+                            f.write(data)
 
-                            self.files_to_zip_list.append([complete_stimulus_filename, export_directory_stimulus_data])
+                        self.files_to_zip_list.append([complete_stimulus_filename, export_stimulus_directory])
+
+                        # additional files
+                        self.export_experimental_protocol_additional_files(stimulus_step, path_stimulus_directory,
+                                                                           export_stimulus_directory)
+
+                generic_data_collection_list = Step.objects.filter(group=group, type='generic_data_collection')
+                for generic_data_step in generic_data_collection_list:
+                    # generic_data_collection = get_object_or_404(GenericDataCollectionData,
+                    #                                             pk=generic_data_step.id)
+                    # create directory of generic_data step
+                    generic_data_step_name = "STEP_" + generic_data_step.numeration + "_" + generic_data_step.type.upper()
+                    path_generic_data_directory = path.join(directory_experimental_protocol, generic_data_step_name)
+                    if not path.exists(path_generic_data_directory):
+                        error_msg, path_generic_data_directory = create_directory(directory_experimental_protocol,
+                                                                                  generic_data_step_name)
+                        if error_msg != "":
+                            return error_msg
+
+                    export_generic_data_directory = path.join(export_directory_experimental_protocol,
+                                                              generic_data_step_name)
+                    # additional files
+                    self.export_experimental_protocol_additional_files(generic_data_step, path_generic_data_directory,
+                                                                       export_generic_data_directory)
 
             # Export data per Participant
             participant_list = Participant.objects.filter(group=group)
@@ -432,6 +482,28 @@ class ExportExecution:
                 self.files_to_zip_list.append([complete_participant_filename, export_directory_group])
 
         return error_msg
+
+    def export_experimental_protocol_additional_files(self, step_object, directory_step, export_directory_step):
+        additional_files_list = step_object.step_additional_files.all()
+        directory_additional_files = path.join(directory_step, "Additional_files")
+        if len(additional_files_list) > 0 and not path.exists(directory_additional_files):
+            error_msg, directory_additional_files = create_directory(directory_step, "Additional_files")
+            if error_msg != "":
+                return error_msg
+
+            export_directory_additional_files = path.join(export_directory_step, "Additional_files")
+
+        for additional_file in additional_files_list:
+            file_name = additional_file.file.name
+            complete_additional_filename = path.join(directory_additional_files, file_name.split('/')[-1])
+            read_additional_filename = path.join(settings.MEDIA_ROOT, file_name)
+
+            with open(read_additional_filename, "rb") as f:
+                data = f.read()
+            with open(complete_additional_filename, "wb") as f:
+                f.write(data)
+
+            self.files_to_zip_list.append([complete_additional_filename, export_directory_additional_files])
 
     def handle_exported_field(self, field):
         if field is None:
