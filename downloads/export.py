@@ -629,8 +629,9 @@ class ExportExecution:
                                                      questionnaire_default_language.questionnaire_language.survey_name)
 
                     # questionnaire language
-                    questionnaire_language_list = get_object_or_404(QuestionnaireLanguage,
-                                                                    questionnaire_id=step_questionnaire.id)
+                    questionnaire_language_list = QuestionnaireLanguage.objects.filter(
+                        questionnaire_id=step_questionnaire.id)
+
                     # questionnaire_title in english
                     for questionnaire_language in questionnaire_language_list:
                         language_code = questionnaire_language.language_code
