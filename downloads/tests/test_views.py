@@ -16,7 +16,7 @@ class DownloadCreateView(TestCase):
     def test_create_download_subdir_if_not_exist(self):
         owner = User.objects.create_user(username='lab1', password='nep-lab1')
         experiment = create_experiment(1, owner, Experiment.TO_BE_ANALYSED)
-        create_study(experiment)
+        create_study(1, experiment)
 
         download_create(experiment.id, '')
 
