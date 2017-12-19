@@ -39,18 +39,25 @@ def create_group(qtty, experiment):
     return groups
 
 
-def create_study(experiment):
-    # TODO: refactor to accept more than one experiment (insert qtty parameter)
+def create_study(qtty, experiment):
     """
+    :param qtty: number of studies to be created
     :param experiment: Experiment to be associated with Study
     """
     fake = Factory.create()
 
-    Study.objects.create(
-        title=fake.text(max_nb_chars=15),
-        description=fake.text(max_nb_chars=200),
-        start_date=datetime.utcnow(), experiment=experiment
-    )
+    studies = []
+    for i in range(qtty):
+        study = Study.objects.create(
+            title=fake.text(max_nb_chars=15),
+            description=fake.text(max_nb_chars=200),
+            start_date=datetime.utcnow(), experiment=experiment
+        )
+        studies.append(study)
+
+    if len(studies) == 1:
+        return studies[0]
+    return studies
 
 
 def create_experiment(qtty, owner, status):
@@ -66,8 +73,9 @@ def create_experiment(qtty, owner, status):
         experiment = Experiment.objects.create(
             title=fake.text(max_nb_chars=15),
             description=fake.text(max_nb_chars=200),
-            nes_id=randint(1, 10000),  # TODO: guarantee that this won't
-            # TODO: genetates constraint violaton (nes_id, owner_id)
+            # TODO: guarantee that this won't
+            # TODO: genetates constraint violaton (nes_id, owner_id)!
+            nes_id=randint(1, 10000),
             owner=owner, version=1,
             sent_date=datetime.utcnow(),
             status=status,
@@ -500,7 +508,7 @@ def create_experiment_related_objects(experiment):
     pieces selected by the user.
     :param experiment: Experiment model instance
     """
-    create_study(experiment)
+    create_study(1, experiment)
     study = Study.objects.last()
     # necessary creating researcher for study. See comment in
     # search_indexes.StudyIndex class
@@ -713,13 +721,13 @@ def global_setup_ft():
     create_experiment(1, choice([owner1, owner2]),
                       Experiment.TO_BE_ANALYSED)
     experiment1 = Experiment.objects.last()
-    create_study(experiment1)
+    create_study(1, experiment1)
     create_group(randint(2, 3), experiment1)
 
     create_experiment(1, choice([owner1, owner2]),
                       Experiment.TO_BE_ANALYSED)
     experiment2 = Experiment.objects.last()
-    create_study(experiment2)
+    create_study(1, experiment2)
     create_group(randint(2, 3), experiment2)
     # To test search
     experiment2.title = 'Brachial Plexus'
@@ -728,12 +736,12 @@ def global_setup_ft():
     create_experiment(1, choice([owner1, owner2]),
                       Experiment.UNDER_ANALYSIS)
     experiment3 = Experiment.objects.last()
-    create_study(experiment3)
+    create_study(1, experiment3)
     create_group(randint(2, 3), experiment3)
     create_experiment(1, choice([owner1, owner2]),
                       Experiment.UNDER_ANALYSIS)
     experiment4 = Experiment.objects.last()
-    create_study(experiment4)
+    create_study(1, experiment4)
     create_group(randint(2, 3), experiment4)
     # To test search
     experiment4.title = 'Brachial Plexus'
@@ -745,22 +753,22 @@ def global_setup_ft():
     create_experiment(1, choice([owner1, owner2]),
                       Experiment.APPROVED)
     experiment5 = Experiment.objects.last()
-    create_study(experiment5)
+    create_study(1, experiment5)
     create_group(randint(2, 3), experiment5)
     create_experiment(1, choice([owner1, owner2]),
                       Experiment.APPROVED)
     experiment6 = Experiment.objects.last()
-    create_study(experiment6)
+    create_study(1, experiment6)
     create_group(randint(2, 3), experiment6)
     create_experiment(1, choice([owner1, owner2]),
                       Experiment.APPROVED)
     experiment7 = Experiment.objects.last()
-    create_study(experiment7)
+    create_study(1, experiment7)
     create_group(randint(2, 3), experiment7)
     create_experiment(1, choice([owner1, owner2]),
                       Experiment.APPROVED)
     experiment8 = Experiment.objects.last()
-    create_study(experiment8)
+    create_study(1, experiment8)
     create_group(randint(2, 3), experiment8)
     # Put some non-random strings in one approved experiment to test search
     experiment8.title = 'Brachial Plexus'
@@ -783,7 +791,7 @@ def global_setup_ft():
     create_experiment(1, choice([owner1, owner2]),
                       Experiment.APPROVED)
     experiment9 = Experiment.objects.last()
-    create_study(experiment9)
+    create_study(1, experiment9)
     create_group(randint(2, 3), experiment9)
     experiment9.title = 'Brachial Plexus (with EMG Setting)'
     experiment9.description = 'Ein Beschreibung. Brachial plexus repair by ' \
@@ -852,7 +860,7 @@ def global_setup_ft():
     create_experiment(1, choice([owner1, owner2]),
                       Experiment.NOT_APPROVED)
     experiment10 = Experiment.objects.last()
-    create_study(experiment10)
+    create_study(1, experiment10)
     create_group(randint(2, 3), experiment10)
 
     # Associate trustee to experiments under analysis (requires create

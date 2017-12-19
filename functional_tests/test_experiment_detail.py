@@ -11,12 +11,13 @@ from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.common.keys import Keys
 
 from downloads.views import DOWNLOAD_ERROR_MESSAGE
-from experiments.models import Experiment, Questionnaire, Step, Group, Gender
+from experiments.models import Experiment, Questionnaire, Step, Group, Gender, \
+    Study
 from experiments.tests.tests_helper import create_experiment, create_group, \
     create_participant, create_download_dir_structure_and_files, \
     remove_selected_subdir, create_data_collection, \
     create_experiment_protocol, \
-    create_questionnaire, create_questionnaire_language
+    create_questionnaire, create_questionnaire_language, create_study
 from functional_tests.base import FunctionalTest
 from nep import settings
 
@@ -82,7 +83,7 @@ class ExperimentDetailTest(FunctionalTest):
         study_text = self.browser.find_element_by_id('id_detail_study').text
         self.assertIn('From study: ' + experiment.study.title, study_text)
 
-        # She clicks in Related study link and see a modal with Study data
+        # She clicks in Related study link and sees a modal with Study data
         self.browser.find_element_by_link_text(experiment.study.title).click()
 
         # The modal has the study title and the study description
@@ -103,8 +104,10 @@ class ExperimentDetailTest(FunctionalTest):
         study_start_date = self.browser.find_element_by_id(
             'study_startdate').text
         self.assertIn('Start date:', study_start_date)
+        ##
         # Obs.: code line right below is only to conform to study_start_date
         # format in browser
+        ##
         self.assertIn(experiment.study.start_date.strftime("%b. %d, %Y")
                       .lstrip("0").replace(" 0", " "), study_start_date)
         study_end_date = self.browser.find_element_by_id(
@@ -113,41 +116,40 @@ class ExperimentDetailTest(FunctionalTest):
         if experiment.study.end_date:
             self.assertIn(experiment.study.end_date.strftime("%B %d, %Y"),
                           study_end_date)
-        else:
-            self.assertIn(str(None), study_end_date)
 
         # Right below there is a relation of contributors of the study,
         # the contributor's team and coordinator
         study_contributors = self.browser.find_element_by_id(
             'study_contributors').text
-        self.assertIn('Contributors:', study_contributors)
-        table_contributors = self.browser.find_element_by_id(
-            'table_contributors')
-        row_headers_contrib = table_contributors.find_element_by_tag_name(
-            'thead').find_element_by_tag_name('tr')
-        col_headers_contrib = row_headers_contrib.find_elements_by_tag_name(
-            'th')
-        self.assertTrue(col_headers_contrib[0].text == 'Person')
-        self.assertTrue(col_headers_contrib[1].text == 'Team')
-        self.assertTrue(col_headers_contrib[2].text == 'Coordinator')
+        if experiment.study.collaborators:
+            self.assertIn('Contributors:', study_contributors)
+            table_contributors = self.browser.find_element_by_id(
+                'table_contributors')
+            row_headers_contrib = table_contributors.find_element_by_tag_name(
+                'thead').find_element_by_tag_name('tr')
+            col_headers_contrib = row_headers_contrib.find_elements_by_tag_name(
+                'th')
+            self.assertTrue(col_headers_contrib[0].text == 'Person')
+            self.assertTrue(col_headers_contrib[1].text == 'Team')
+            self.assertTrue(col_headers_contrib[2].text == 'Coordinator')
 
-        # She sees the content of contributors list
-        rows = table_contributors.find_element_by_tag_name(
-            'tbody').find_elements_by_tag_name('tr')
-        self.assertTrue(
-            any(row.find_elements_by_tag_name('td')[0].text ==
-                experiment.study.collaborators.first().name for row in rows)
-        )
-        self.assertTrue(
-            any(row.find_elements_by_tag_name('td')[1].text ==
-                experiment.study.collaborators.first().team for row in
-                rows)
-        )
-        self.assertTrue(
-            any(row.find_elements_by_tag_name('td')[2].text ==
-                str(experiment.study.collaborators.first().coordinator)
-                for row in rows)
-        )
+            # She sees the content of contributors list
+            rows = table_contributors.find_element_by_tag_name(
+                'tbody').find_elements_by_tag_name('tr')
+            self.assertTrue(
+                any(row.find_elements_by_tag_name('td')[0].text ==
+                    experiment.study.collaborators.first().name for row in rows)
+            )
+            self.assertTrue(
+                any(row.find_elements_by_tag_name('td')[1].text ==
+                    experiment.study.collaborators.first().team for row in
+                    rows)
+            )
+            self.assertTrue(
+                any(row.find_elements_by_tag_name('td')[2].text ==
+                    str(experiment.study.collaborators.first().coordinator)
+                    for row in rows)
+            )
         # Finally, in the study modal, she sees a list of keywords
         # associated with the study
         keywords_text = self.browser.find_element_by_id('keywords').text
@@ -741,6 +743,59 @@ class ExperimentDetailTest(FunctionalTest):
         self.assertIn('The user answers yes or not',
                       questionnaires_content)
 
+    def test_does_not_display_study_elements_if_they_not_exist(self):
+        owner = User.objects.create(username='labor1', password='nep-lab1')
+        experiment = create_experiment(1, owner, Experiment.APPROVED)
+        ##
+        # create study without end_date and keywords. We won't create
+        # contributors either
+        ##
+        create_study(1, experiment)
+
+        ##
+        # TODO:
+        # We have to refresh live server again because in parent setUp we
+        # already called it without new experiment created. When refactoring
+        # tests_helper call only in the classes setUp methods.
+        self.browser.get(self.browser.current_url)
+
+        # Jucileine clicks in the experiment approved
+        self.wait_for(
+            lambda:
+            self.browser.find_element_by_xpath(
+                "//a[@href='/experiments/" + experiment.slug + "/']"
+            ).click()
+        )
+
+        # Jucileine clicks in From study link and sees a modal with Study
+        # data
+        self.wait_for(
+            lambda:
+            self.browser.find_element_by_link_text(
+                experiment.study.title).click()
+        )
+
+        # The modal pops up and she see the fields of the study
+        self.wait_for(lambda: self.assertIn(
+            experiment.study.title,
+            self.browser.find_element_by_id('modal_study_title').text
+        ))
+
+        # As the study has no end date, no contributors and no keywords
+        # those fields did not appear in study modal
+        self.assertIn(
+            'No end date',
+            self.browser.find_element_by_id('study_enddate').text
+        )
+        self.assertNotIn(
+            'Contributors:',
+            self.browser.find_element_by_id('study_contributors').text
+        )
+        self.assertNotIn(
+            'Keywords:',
+            self.browser.find_element_by_id('keywords').text
+        )
+
 
 class DownloadExperimentTest(FunctionalTest):
 
@@ -755,7 +810,9 @@ class DownloadExperimentTest(FunctionalTest):
         # She sees that there is a "Downloads" written tab. She
         # clicks in it, and sees a section bellow the tabs with a title
         # "Select experiment data pieces to download"
-        self.browser.find_element_by_link_text('Downloads').click()
+        self.browser.find_element_by_link_text(
+            'Downloads'
+        ).send_keys(Keys.ENTER)
         downloads_tab_content = self.browser.find_element_by_id(
             'downloads_tab'
         )
@@ -790,9 +847,12 @@ class DownloadExperimentTest(FunctionalTest):
         # wait for tree-multiselect plugin to render multiselection
         time.sleep(0.5)
 
-        downloads_header = downloads_tab_content.find_element_by_tag_name('h4')
-        self.assertEqual(
-            'Select experiment data pieces to download', downloads_header.text
+        self.wait_for(
+            lambda:
+            self.assertEqual(
+                'Select experiment data itens to download',
+                downloads_tab_content.find_element_by_tag_name('h4').text
+            )
         )
 
         ##

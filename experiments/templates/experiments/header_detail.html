@@ -67,43 +67,53 @@
                 </div>
                 <div class="modal-body">
                     <p id="study_description">{{ experiment.study.description }}</p>
-                    <section>
+                    <section class="row">
                         <div id="study_researcher" class="col-md-6"><strong>{% trans "Researcher" %}:</strong>
-                            {{ experiment.study.researcher.name }}</div>
-                        <div id="study_startdate"
-                             class="col-md-3"><strong>{% trans "Start date" %}:</strong><br>
-                            {{ experiment.study.start_date }}</div>
-                        <div id="study_enddate"
-                             class="col-md-3"><strong>{% trans "End date" %}:</strong><br>
-                            {{ experiment.study.end_date }}</div>
+                            {{ experiment.study.researcher.name }}
+                        </div>
+                        <div id="study_startdate" class="col-md-3"><strong>{% trans "Start date" %}:</strong><br>
+                            {{ experiment.study.start_date }}
+                        </div>
+                        <div id="study_enddate" class="col-md-3"><strong>{% trans "End date" %}:</strong><br>
+                            {% if experiment.study.end_date %}
+                                {{ experiment.study.end_date }}
+                            {% else %}
+                                {% trans 'No end date' %}
+                            {% endif %}
+                        </div>
                     </section>
-                    <section>
-                        <div id="study_contributors"><strong>{% trans "Contributors" %}:</strong></div>
-                        <table id="table_contributors" class="table">
-                            <thead>
-                            <tr>
-                                <th>{% trans "Person" %}</th>
-                                <th>{% trans "Team" %}</th>
-                                <th>{% trans "Coordinator" %}</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            {% for collaborator in experiment.study.collaborators.all %}
+                    <br>
+                    <section id="study_contributors">
+                        {% if experiment.study.collaborators.all %}
+                            <strong>{% trans "Contributors" %}:</strong>
+                            <table id="table_contributors" class="table">
+                                <thead>
                                 <tr>
-                                    <td>{{ collaborator.name }}</td>
-                                    <td>{{ collaborator.team }}</td>
-                                    <td>{{ collaborator.coordinator }}</td>
+                                    <th>{% trans "Person" %}</th>
+                                    <th>{% trans "Team" %}</th>
+                                    <th>{% trans "Coordinator" %}</th>
                                 </tr>
-                            {% endfor %}
-                            </tbody>
-                        </table>
+                                </thead>
+                                <tbody>
+                                {% for collaborator in experiment.study.collaborators.all %}
+                                    <tr>
+                                        <td>{{ collaborator.name }}</td>
+                                        <td>{{ collaborator.team }}</td>
+                                        <td>{{ collaborator.coordinator }}</td>
+                                    </tr>
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                        {% endif %}
                     </section>
-                    <section>
-                        <div id="keywords"><strong>{% trans "Keywords" %}: </strong>
+                    <br>
+                    <section id="keywords">
+                        {% if experiment.study.keywords.all %}
+                            <strong>{% trans "Keywords" %}: </strong>
                             {% for keyword in experiment.study.keywords.all %}
                                 {{ keyword.name }}{% if not forloop.last %} | {% endif %}
                             {% endfor %}
-                        </div>
+                        {% endif %}
                     </section>
                 </div>
                 <div class="modal-footer">
