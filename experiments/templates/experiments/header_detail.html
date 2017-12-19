@@ -84,7 +84,7 @@
                     </section>
                     <br>
                     <section id="study_contributors">
-                        {% if experiment.study.collaborators %}
+                        {% if experiment.study.collaborators.all %}
                             <strong>{% trans "Contributors" %}:</strong>
                             <table id="table_contributors" class="table">
                                 <thead>
