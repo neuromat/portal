@@ -321,7 +321,7 @@ class SearchTest(FunctionalTest):
             'search. For instance:\nterm1 AND term2\nterm1 OR term2\nterm1 '
             'NOT term2\nAll kind of combinations with AND, OR, NOT are '
             'accepted in advanced searching.\nBy default, searching for '
-            'terms separated with one or more spaces will apply the AND '
+            'terms separated with one or more spaces will apply the OR '
             'modifier.'
             , tooltip_text
         )

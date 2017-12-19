@@ -618,6 +618,6 @@ class TrusteeTest(FunctionalTestTrustee):
         tooltip_text = notification_bell.get_attribute('title')
         self.assertEqual(
             'There is(are) ' + str(experiments) +
-            ' experiments to be analysed',
+            ' experiment(s) to be analysed',
             tooltip_text
         )
