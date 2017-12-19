@@ -622,11 +622,20 @@ class ExportExecution:
                     # get questionnaire (survey)
                     survey = get_object_or_404(Questionnaire, pk=step_questionnaire.id)
                     questionnaire_code = survey.code
-                    # survey name
+                    # questionnaire title
                     questionnaire_default_language = get_object_or_404(QuestionnaireDefaultLanguage,
                                                                        questionnaire_id=step_questionnaire.id)
-                    survey_name = questionnaire_default_language.questionnaire_language.survey_name
-                    questionnaire_title = "%s_%s" % (str(questionnaire_code), survey.identification)
+                    questionnaire_title = "%s_%s" % (str(questionnaire_code),
+                                                     questionnaire_default_language.questionnaire_language.survey_name)
+
+                    # questionnaire language
+                    questionnaire_language_list = get_object_or_404(QuestionnaireLanguage,
+                                                                    questionnaire_id=step_questionnaire.id)
+                    # questionnaire_title in english
+                    for questionnaire_language in questionnaire_language_list:
+                        language_code = questionnaire_language.language_code
+                        if language_code == 'en':
+                            questionnaire_title = "%s_%s" % (str(questionnaire_code),questionnaire_language.survey_name)
 
                     # data per questionnaire_response
                     if questionnaire_code not in self.per_group_data[group_id]['questionnaire_data']:
@@ -676,9 +685,9 @@ class ExportExecution:
                         questionnaire_language_list = QuestionnaireLanguage.objects.filter(
                             questionnaire_id=step_questionnaire.id)
                         for questionnaire_language in questionnaire_language_list:
-                            survey_name = questionnaire_language.survey_name
-                            questionnaire_code = questionnaire_language.questionnaire.code
-                            questionnaire_title = "%s_%s" % (str(questionnaire_code), str(survey_name))
+                            # survey_name = questionnaire_language.survey_name
+                            # questionnaire_code = questionnaire_language.questionnaire.code
+                            # questionnaire_title = "%s_%s" % (str(questionnaire_code), str(survey_name))
                             survey_metadata = questionnaire_language.survey_metadata
                             language_code = questionnaire_language.language_code
 
