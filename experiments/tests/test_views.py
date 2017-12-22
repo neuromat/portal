@@ -391,7 +391,7 @@ class SearchTest(TestCase):
         # Tests helper creates an experiment UNDER_ANALYSIS with 'Experiment
         # 2' as experiment title
         results = SearchQuerySet().filter(content='Experiment 2')
-        # TODO: by now we have 4 models been indexed
+        # TODO: by now we have 4 models being indexed
         self.assertEqual(results.count(), 1)
         self.assertEqual(results[0].model_name, 'experiment')
         self.assertEqual(results[0].object.title, 'Experiment 2')
