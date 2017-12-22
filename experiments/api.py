@@ -510,7 +510,7 @@ class GroupSerializer(serializers.ModelSerializer):
                             code=criteria['code'],
                             description='Code not recognized',
                             abbreviated_description='Code not recognized',
-                            description_pt_br='Códico não reconhecido',
+                            description_pt_br='Código não reconhecido',
                             abbreviated_description_pt_br='Código não '
                                                           'reconhecido'
                         )
