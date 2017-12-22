@@ -301,10 +301,8 @@ msgid "setting text: "
 msgstr "texto das configurações: "
 
 #: experiments/templates/experiments/detail.html:310
-#, fuzzy
-#| msgid "Questionnaires"
 msgid "Questionnaires for group"
-msgstr "Questionários"
+msgstr "Questionários para o grupo"
 
 #: experiments/templates/experiments/detail.html:335
 msgid "Download zip file with all experiment data and metadata"
