@@ -11,12 +11,11 @@ from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.common.keys import Keys
 
 from downloads.views import DOWNLOAD_ERROR_MESSAGE
-from experiments.models import Experiment, Questionnaire, Step, Group, Gender, \
-    Study
+from experiments.models import Experiment, Questionnaire, Step, Group, Gender
 from experiments.tests.tests_helper import create_experiment, create_group, \
     create_participant, create_download_dir_structure_and_files, \
     remove_selected_subdir, create_data_collection, \
-    create_experiment_protocol, \
+    create_experimental_protocol, \
     create_questionnaire, create_questionnaire_language, create_study
 from functional_tests.base import FunctionalTest
 from nep import settings
@@ -1082,7 +1081,7 @@ class DownloadExperimentTest(FunctionalTest):
             try:
                 group.experimental_protocol
             except ObjectDoesNotExist:
-                create_experiment_protocol(group)
+                create_experimental_protocol(group)
             if not group.steps.filter(type=Step.QUESTIONNAIRE):
                 create_questionnaire(1, 'code', group)
                 q = Questionnaire.objects.last()

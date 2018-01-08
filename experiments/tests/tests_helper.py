@@ -1,9 +1,14 @@
 import os
 import random
 import shutil
+import tempfile
 from datetime import datetime
 from random import randint, choice
 from faker import Factory
+
+from django.contrib.auth.models import User
+# TODO: remove import above making the use of User model directly not
+# TODO: model.User
 from django.contrib.auth import models
 
 from nep import settings
@@ -60,13 +65,20 @@ def create_study(qtty, experiment):
     return studies
 
 
-def create_experiment(qtty, owner, status):
+def create_owner():
+    return User.objects.create_user(username='lab1', password='nep-lab1')
+
+
+def create_experiment(qtty, owner=None, status=Experiment.TO_BE_ANALYSED):
     """
-    :param qtty: Number of experiments
-    :param owner: Owner of experiment - User instance model
-    :param status: Expeeriment status
+    :param qtty: number of experiments to be created
+    :param owner: owner of experiment - User instance model
+    :param status: experiment status
     """
     fake = Factory.create()
+
+    if not owner:
+        owner = create_owner()
 
     experiments = []
     for i in range(qtty):
@@ -125,37 +137,54 @@ def create_participant(qtty, group, gender):
     :param group: Group model instance
     """
     code = randint(1, 1000)
+
+    participants = []
     for j in range(qtty):
-        Participant.objects.create(
+        participant = Participant.objects.create(
             code=code, age=randint(18, 80),
             gender=gender,
             group=group
         )
         code += 1
+        participants.append(participant)
+
+    if len(participants) == 1:
+        return participants[0]
+    return participants
 
 
-def create_experiment_protocol(group):
+def create_experimental_protocol(group):
     """
     :type group: Group model instance
     """
     fake = Factory.create()
 
-    ExperimentalProtocol.objects.create(
+    exp_prot = ExperimentalProtocol.objects.create(
         group=group,
         textual_description=fake.text()
     )
-    for exp_pro in ExperimentalProtocol.objects.all():
-        image_file = generate_image_file(
-            randint(100, 800), randint(300, 700), fake.word() + '.jpg'
-        )
-        exp_pro.image.save(image_file.name, image_file)
-        exp_pro.save()
+
+    # create experimental protocol image
+    image_file = generate_image_file(
+        randint(100, 800), randint(300, 700), fake.word() + '.jpg'
+    )
+    exp_prot.image.save(image_file.name, image_file)
+    exp_prot.save()
+
+    return exp_prot
+
+    # for exp_pro in ExperimentalProtocol.objects.all():
+    #     image_file = generate_image_file(
+    #         randint(100, 800), randint(300, 700), fake.word() + '.jpg'
+    #     )
+    #     exp_pro.image.save(image_file.name, image_file)
+    #     exp_pro.save()
 
     # Update image of last experimental protocol with a null image to test
     # displaying default image: "No image"
-    exp_pro = ExperimentalProtocol.objects.last()
-    exp_pro.image = None
-    exp_pro.save()
+    # exp_pro = ExperimentalProtocol.objects.last()
+    # exp_pro.image = None
+    # exp_pro.save()
 
 
 def create_classification_of_deseases(qtty):
@@ -366,9 +395,16 @@ def create_eeg_setting(qtty, experiment):
     """
     faker = Factory.create()
 
+    eeg_settings = []
     for i in range(qtty):
-        EEGSetting.objects.create(experiment=experiment, name=faker.word(),
-                                  description=faker.text())
+        eeg_setting = EEGSetting.objects.create(
+            experiment=experiment, name=faker.word(), description=faker.text()
+        )
+        eeg_settings.append(eeg_setting)
+
+    if len(eeg_settings) == 1:
+        return eeg_settings[0]
+    return eeg_settings
 
 
 def create_eegsetting_objects_to_test_search():
@@ -451,39 +487,34 @@ def create_binary_file(path):
     return f
 
 
-def create_data_collection(participant, type, path):
+def create_data_collection(participant, type, eeg_setting):
     """
     Requires Experimental Protocol for participant group
     :param participant: Participant model instance
     :param type: type of data collection
-    :param path: path where to create files
+    :param eeg_setting: EEGSetting model instance
     """
     faker = Factory.create()
 
-    # Create data_collection(s) to test
-    # test_views.test_POSTing_download_experiment_data_returns_correct_content
+    eegdata = None  # just to guarantee function return value
+    # TODO: only creating for type DC_EEG. Create for the other types.
     if type == DC_EEG:
         eegdata = EEGData.objects.create(
             participant=participant,
             date=datetime.utcnow(),
             description=faker.text(),
             file_format=faker.file_extension(),
-            # requires create EEGSetting in first place
-            eeg_setting=EEGSetting.objects.first(),
+            eeg_setting=eeg_setting
         )
-        # create temp subdir equal to parameter path because it's possible
-        # that who called this function created tempdir not accessible
-        # outside its scope
-        if not os.path.exists(path):
-            os.makedirs(path)
 
-        create_binary_file(path)
-        file = File.objects.create()
-        f = open(os.path.join(path, 'file.bin'))
-        file.file.save(f.name, f)
-        f.close()
+        with tempfile.TemporaryDirectory() as tmpdirname:
+            bin_file = create_binary_file(tmpdirname)
+            file_collected = File.objects.create()
+            with open(bin_file.name, 'rb') as f:
+                file_collected.file.save('file.bin', f)
+            eegdata.files.add(file_collected)
 
-        eegdata.files.add(file)
+    return eegdata
 
 
 def create_publication(qtty, experiment):
@@ -522,7 +553,7 @@ def create_experiment_related_objects(experiment):
             randint(2, 6), group,
             gender1 if randint(1, 2) == 1 else gender2
         )
-        create_experiment_protocol(group)
+        create_experimental_protocol(group)
 
     # create data collection
     # TODO: implement it!
@@ -932,7 +963,7 @@ def global_setup_ft():
     # Create randint(3, 7) participants for all groups (requires create
     # groups before), and experimental protocols
     for group in Group.objects.all():
-        create_experiment_protocol(group)
+        create_experimental_protocol(group)
         create_participant(
             randint(3, 7), group,
             gender1 if randint(1, 2) == 1 else gender2
