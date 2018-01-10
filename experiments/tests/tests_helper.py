@@ -18,8 +18,10 @@ from experiments.models import Experiment, Study, Group, Researcher, \
     ClassificationOfDiseases, Keyword, Step, TMSSetting, TMSDevice, CoilModel, \
     TMSDeviceSetting, TMSData, EEGSetting, Questionnaire, \
     QuestionnaireLanguage, QuestionnaireDefaultLanguage, Publication, EEGData, \
-    File
-from experiments.views import _get_q_default_language_or_first
+    EEGElectrodeLocalizationSystem, ContextTree, Stimulus, EEG, EMG, \
+    EMGSetting, EMGData, GoalkeeperGame, GoalkeeperGameData, \
+    GenericDataCollection, GenericDataCollectionData, AdditionalData
+from experiments.views import get_q_default_language_or_first
 
 
 def create_group(qtty, experiment):
@@ -66,7 +68,8 @@ def create_study(qtty, experiment):
 
 
 def create_owner():
-    return User.objects.create_user(username='lab1', password='nep-lab1')
+    fake = Factory.create()
+    return User.objects.create_user(username=fake.word(), password='nep-lab1')
 
 
 def create_experiment(qtty, owner=None, status=Experiment.TO_BE_ANALYSED):
@@ -130,6 +133,11 @@ def create_researchers():
                                     coordinator=False, study=study)
 
 
+def create_genders():
+    Gender.objects.create(name='male')
+    Gender.objects.create(name='female')
+
+
 def create_participant(qtty, group, gender):
     """
     :param gender:
@@ -172,19 +180,6 @@ def create_experimental_protocol(group):
     exp_prot.save()
 
     return exp_prot
-
-    # for exp_pro in ExperimentalProtocol.objects.all():
-    #     image_file = generate_image_file(
-    #         randint(100, 800), randint(300, 700), fake.word() + '.jpg'
-    #     )
-    #     exp_pro.image.save(image_file.name, image_file)
-    #     exp_pro.save()
-
-    # Update image of last experimental protocol with a null image to test
-    # displaying default image: "No image"
-    # exp_pro = ExperimentalProtocol.objects.last()
-    # exp_pro.image = None
-    # exp_pro.save()
 
 
 def create_classification_of_deseases(qtty):
@@ -265,18 +260,96 @@ def create_ethics_committee_info(experiment):
 
 def create_step(qtty, group, type):
     """
-    :param qtty: number of emg settings
-    :param group: Experiment model instance
-    :param type: step type: eeg, emg, tms etc.
+    :param qtty: number of Step model instances
+    :param group: Group model instance
+    :param type: Step type: eeg, emg, tms etc.
     """
     fake = Factory.create()
 
+    steps = []
     for i in range(qtty):
-        Step.objects.create(
+        step = Step.objects.create(
             group=group,
             identification=fake.word(), numeration=fake.ssn(),
             type=type, order=randint(1, 20)
         )
+        steps.append(step)
+
+    if len(steps) == 1:
+        return steps[0]
+    return steps
+
+
+def create_eeg_step(group, eeg_setting):
+    """
+    :param group: Group model instance
+    :param eeg_setting: EEGSetting model instance
+    """
+    faker = Factory.create()
+
+    return EEG.objects.create(
+        group=group, eeg_setting=eeg_setting,
+        identification=faker.word(), numeration=faker.ssn(),
+        type=Step.EEG, order=randint(1, 20)
+    )
+
+
+def create_emg_setting(experiment):
+    """
+    :param experiment: Experiment model instance
+    """
+    return EMGSetting.objects.create(
+        experiment=experiment
+    )
+
+
+def create_emg_step(group, emg_setting):
+    """
+    :param group: Group model instance
+    :param emg_setting: EMGSetting model instance
+    """
+    faker = Factory.create()
+
+    return EMG.objects.create(
+        group=group, emg_setting=emg_setting,
+        identification=faker.word(), numeration=faker.ssn(),
+        type=Step.EMG, order=randint(1, 20)
+    )
+
+
+def create_emg_data(emg_setting, emg_step, participant):
+    """
+    :param emg_setting: EMGSetting model instance
+    :param emg_step: EMG(Step) model instance
+    :param participant: Participant model instance
+    """
+    return EMGData.objects.create(
+        emg_setting=emg_setting,
+        step=emg_step,
+        participant=participant,
+        date=datetime.utcnow()
+    )
+
+
+def create_stimulus_step(qtty, group):
+    """
+    :param qtty: number of Stimulus model instances
+    :param group: Group model instance
+    """
+    fake = Factory.create()
+
+    stimuli = []
+    for i in range(qtty):
+        stimulus = Stimulus.objects.create(
+            group=group,
+            identification=fake.word(), numeration=fake.ssn(),
+            type=Step.STIMULUS, order=randint(1, 20), stimulus_type_name=fake.word()
+        )
+        stimuli.append(stimulus)
+
+    if len(stimuli) == 1:
+        return stimuli[0]
+    return stimuli
 
 
 def create_tms_setting(qtty, experiment):
@@ -286,12 +359,18 @@ def create_tms_setting(qtty, experiment):
     """
     fake = Factory.create()
 
+    tms_settings = []
     for i in range(qtty):
-        TMSSetting.objects.create(
+        tms_setting = TMSSetting.objects.create(
             experiment=experiment,
             name=fake.word(),
             description=fake.text()
         )
+        tms_settings.append(tms_setting)
+
+    if len(tms_settings) == 1:
+        return tms_settings[0]
+    return tms_settings
 
 
 def create_tms_device(qtty):
@@ -348,8 +427,9 @@ def create_tms_data(qtty, tmssetting, participant):
     """
     faker = Factory.create()
 
+    tms_data_list = []
     for i in range(qtty):
-        TMSData.objects.create(
+        tms_data = TMSData.objects.create(
             participant=participant,
             date=datetime.utcnow(),
             tms_setting=tmssetting,
@@ -367,6 +447,11 @@ def create_tms_data(qtty, tmssetting, participant):
             brain_area_system_name=faker.word(),
             brain_area_system_description=faker.text()
         )
+        tms_data_list.append(tms_data)
+
+    if len(tms_data_list) == 1:
+        return tms_data_list[0]
+    return tms_data_list
 
 
 def create_tmsdata_objects_to_test_search():
@@ -407,6 +492,31 @@ def create_eeg_setting(qtty, experiment):
     return eeg_settings
 
 
+def create_eeg_data(eeg_setting, eeg_step, participant):
+    """
+    :param eeg_setting: EEGSetting model instance
+    :param eeg_step: EEG(Step) model instance
+    :param participant: Participant model instance
+    """
+    return EEGData.objects.create(
+        eeg_setting=eeg_setting,
+        step=eeg_step,
+        participant=participant,
+        date=datetime.utcnow()
+    )
+
+
+def create_eeg_electrode_localization_system(eeg_setting):
+    """
+    :param eeg_setting: EEGSetting model instance
+    """
+    fake = Factory.create()
+    return EEGElectrodeLocalizationSystem.objects.create(
+        eeg_setting=eeg_setting,
+        name=fake.word(),
+    )
+
+
 def create_eegsetting_objects_to_test_search():
     experiment1 = Experiment.objects.filter(status=Experiment.APPROVED).first()
     experiment2 = Experiment.objects.filter(status=Experiment.APPROVED).last()
@@ -422,6 +532,51 @@ def create_eegsetting_objects_to_test_search():
     tmss3 = EEGSetting.objects.last()
     tmss3.name = 'eegsettingname'
     tmss3.save()
+
+
+def create_goal_keeper_game_step(group, context_tree):
+    """
+    :param group: Group model instance
+    :param context_tree: ContextTree model instance
+    """
+    faker = Factory.create()
+
+    return GoalkeeperGame.objects.create(
+        group=group, context_tree=context_tree,
+        identification=faker.word(), numeration=faker.ssn(),
+        type=Step.GOALKEEPER, order=randint(1, 20)
+    )
+
+
+def create_goal_keeper_game_data(gkg_step, participant):
+    """
+    :param gkg_step: GoalkeeperGame(Step) model instance
+    :param participant: Participant model instance
+    :return: GoalkeeperGameData mode instance
+    """
+    return GoalkeeperGameData.objects.create(
+        step=gkg_step, participant=participant, date=datetime.utcnow()
+    )
+
+
+def create_generic_data_collection_step(group):
+    """
+    :param group: Group model instance
+    :return: GenericDataCollection model instance
+    """
+    faker = Factory.create()
+
+    return GenericDataCollection.objects.create(
+        group=group,
+        identification=faker.word(), numeration=faker.ssn(),
+        type=Step.GENERIC, order=randint(1, 20)
+    )
+
+
+def create_generic_data_collection_data(gdc_step, participant):
+    return GenericDataCollectionData.objects.create(
+        step=gdc_step, participant=participant, date=datetime.utcnow()
+    )
 
 
 def create_questionnaire_language(questionnaire, source, language):
@@ -487,34 +642,23 @@ def create_binary_file(path):
     return f
 
 
-def create_data_collection(participant, type, eeg_setting):
+def create_additional_data(participant):
+    return AdditionalData.objects.create(
+        participant=participant, date=datetime.utcnow()
+    )
+
+
+def create_context_tree(experiment):
     """
-    Requires Experimental Protocol for participant group
-    :param participant: Participant model instance
-    :param type: type of data collection
-    :param eeg_setting: EEGSetting model instance
+    :param experiment: Experiment model instance
     """
-    faker = Factory.create()
+    fake = Factory.create()
 
-    eegdata = None  # just to guarantee function return value
-    # TODO: only creating for type DC_EEG. Create for the other types.
-    if type == DC_EEG:
-        eegdata = EEGData.objects.create(
-            participant=participant,
-            date=datetime.utcnow(),
-            description=faker.text(),
-            file_format=faker.file_extension(),
-            eeg_setting=eeg_setting
-        )
-
-        with tempfile.TemporaryDirectory() as tmpdirname:
-            bin_file = create_binary_file(tmpdirname)
-            file_collected = File.objects.create()
-            with open(bin_file.name, 'rb') as f:
-                file_collected.file.save('file.bin', f)
-            eegdata.files.add(file_collected)
-
-    return eegdata
+    return ContextTree.objects.create(
+        experiment=experiment,
+        name=fake.word(),
+        description=fake.text()
+    )
 
 
 def create_publication(qtty, experiment):
@@ -563,7 +707,7 @@ def create_experiment_related_objects(experiment):
 
 
 def create_q_language_dir(q, questionnaire_metadata_dir):
-    q_default = _get_q_default_language_or_first(q)
+    q_default = get_q_default_language_or_first(q)
     q_language_dir = os.path.join(
         questionnaire_metadata_dir,
         q.code + '_' + q_default.survey_name

@@ -7,10 +7,11 @@ from django.test import TestCase, override_settings
 from django.utils.six import StringIO
 
 from experiments.models import Gender, Study, Group, EEGSetting, \
-    ExperimentalProtocol, Participant, EEGData
+    ExperimentalProtocol, EEGData
 from experiments.tests.tests_helper import create_experiment, create_study, \
     create_group, create_participant, create_experimental_protocol, \
-    create_data_collection, create_eeg_setting
+    create_eeg_setting, create_eeg_data, \
+    create_eeg_step
 
 TEMP_MEDIA_ROOT = tempfile.mkdtemp()
 
@@ -35,13 +36,12 @@ class CommandsTest(TestCase):
         exp_prot = None  # just to protect assert below
         for group in groups:
             exp_prot = create_experimental_protocol(group)
+            eeg_step = create_eeg_step(group, eeg_setting)
             participants = create_participant(
                 3, group, gender=Gender.objects.order_by('?').first()
             )
             for participant in participants:
-                create_data_collection(
-                    participant, 'eeg', eeg_setting
-                )
+                create_eeg_data(eeg_setting, eeg_step, participant)
 
         # remove experiment last version and its related objects
         out = StringIO()
@@ -55,7 +55,8 @@ class CommandsTest(TestCase):
         self.assertFalse(EEGSetting.objects.filter(pk=eeg_setting.id).exists())
         # TODO: fix this after fix tests helper (does not create model
         # TODO: instances for all in it, create under demand in tests). Test
-        # TODO: for all objects at once.
+        # TODO: for
+        # TODO: all objects at once.
         for group in groups:
             self.assertFalse(Group.objects.filter(pk=group.id).exists())
             self.assertFalse(ExperimentalProtocol.objects.filter(

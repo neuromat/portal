@@ -229,7 +229,7 @@ class ExperimentDetailTest(TestCase):
                 # The rule is display default questionnaire language data or
                 # first questionnaire language data if not set default
                 # questionnaire language. So we mimic the function
-                # _get_q_default_language_or_first from views that do that.
+                # get_q_default_language_or_first from views that do that.
                 # TODO: In tests helper we always create default
                 # TODO: questionnaire language as English. So we would to test
                 # TODO: only if we had first language.

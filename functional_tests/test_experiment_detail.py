@@ -14,9 +14,9 @@ from downloads.views import DOWNLOAD_ERROR_MESSAGE
 from experiments.models import Experiment, Questionnaire, Step, Group, Gender
 from experiments.tests.tests_helper import create_experiment, create_group, \
     create_participant, create_download_dir_structure_and_files, \
-    remove_selected_subdir, create_data_collection, \
-    create_experimental_protocol, \
-    create_questionnaire, create_questionnaire_language, create_study
+    remove_selected_subdir, create_experimental_protocol, \
+    create_questionnaire, create_questionnaire_language, create_study, \
+    create_eeg_data, create_eeg_setting, create_eeg_step
 from functional_tests.base import FunctionalTest
 from nep import settings
 
@@ -1068,7 +1068,7 @@ class DownloadExperimentTest(FunctionalTest):
         ))
 
     @override_settings(MEDIA_ROOT=TEMP_MEDIA_ROOT)
-    def test_if_there_is_not_a_subdir_in_temp_download_dir_structure_return_message(self):
+    def test_if_there_is_not_a_subdir_in_download_dir_structure_return_message(self):
         ##
         # Last approved experiment created in tests helper has the objects that
         # we need for all groups, besides questionnaires and experimental
@@ -1097,9 +1097,9 @@ class DownloadExperimentTest(FunctionalTest):
         ##
         for group in experiment.groups.all():
             for participant in group.participants.all():
-                create_data_collection(
-                    participant, 'eeg', self.TEMP_MEDIA_ROOT
-                )
+                eeg_setting = create_eeg_setting(1, experiment)
+                eeg_step = create_eeg_step(group, eeg_setting)
+                create_eeg_data(eeg_setting, eeg_step, participant)
 
         create_download_dir_structure_and_files(
             experiment, self.TEMP_MEDIA_ROOT
