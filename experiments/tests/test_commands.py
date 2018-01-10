@@ -7,11 +7,11 @@ from django.test import TestCase, override_settings
 from django.utils.six import StringIO
 
 from experiments.models import Gender, Study, Group, EEGSetting, \
-    ExperimentalProtocol, EEGData
+    ExperimentalProtocol, EEGData, Experiment, EEG
 from experiments.tests.tests_helper import create_experiment, create_study, \
     create_group, create_participant, create_experimental_protocol, \
     create_eeg_setting, create_eeg_data, \
-    create_eeg_step
+    create_eeg_step, create_genders
 
 TEMP_MEDIA_ROOT = tempfile.mkdtemp()
 
@@ -20,17 +20,18 @@ TEMP_MEDIA_ROOT = tempfile.mkdtemp()
 class CommandsTest(TestCase):
 
     def setUp(self):
-        Gender.objects.create(name='male')
-        Gender.objects.create(name='female')
+        create_genders()
 
     def tearDown(self):
         shutil.rmtree(TEMP_MEDIA_ROOT)
-        # pass
 
     def test_remove_experiment_last_version(self):
-        # create experiment and other object associated with it
+        """
+        Do not test for files deleted. This tests are made in models tests.
+        """
+        # create experiment and some objects associated with it
         experiment = create_experiment(1)
-        study = create_study(1, experiment)
+        create_study(1, experiment)
         groups = create_group(3, experiment)
         eeg_setting = create_eeg_setting(1, experiment)
         exp_prot = None  # just to protect assert below
@@ -51,17 +52,18 @@ class CommandsTest(TestCase):
         )
 
         # asserts
-        self.assertFalse(Study.objects.filter(pk=study.id).exists())
-        self.assertFalse(EEGSetting.objects.filter(pk=eeg_setting.id).exists())
+        self.assertFalse(Experiment.objects.exists())
+        self.assertFalse(Study.objects.exists())
+        self.assertFalse(EEGSetting.objects.exists())
         # TODO: fix this after fix tests helper (does not create model
         # TODO: instances for all in it, create under demand in tests). Test
-        # TODO: for
-        # TODO: all objects at once.
+        # TODO: for all objects at once.
         for group in groups:
             self.assertFalse(Group.objects.filter(pk=group.id).exists())
             self.assertFalse(ExperimentalProtocol.objects.filter(
                 pk=exp_prot.id
             ).exists())
+            self.assertFalse(EEG.objects.filter(group=group).exists())
             self.assertFalse(group.participants.exists())
         self.assertFalse(EEGData.objects.exists())
 
