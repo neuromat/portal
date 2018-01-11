@@ -20,7 +20,8 @@ from experiments.models import Experiment, Study, Group, Researcher, \
     QuestionnaireLanguage, QuestionnaireDefaultLanguage, Publication, EEGData, \
     EEGElectrodeLocalizationSystem, ContextTree, Stimulus, EEG, EMG, \
     EMGSetting, EMGData, GoalkeeperGame, GoalkeeperGameData, \
-    GenericDataCollection, GenericDataCollectionData, AdditionalData
+    GenericDataCollection, GenericDataCollectionData, AdditionalData, \
+    EMGElectrodePlacement, EMGSurfacePlacement
 from experiments.views import get_q_default_language_or_first
 
 
@@ -354,6 +355,17 @@ def create_emg_data(emg_setting, emg_step, participant):
         step=emg_step,
         participant=participant,
         date=datetime.utcnow()
+    )
+
+
+def create_emg_electrode_placement():
+    """
+    :return: EMGElectrodePlacement model instance
+    """
+    faker = Factory.create()
+
+    return EMGElectrodePlacement.objects.create(
+        standardization_system_name=faker.word()
     )
 
 

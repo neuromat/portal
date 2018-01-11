@@ -22,7 +22,7 @@ from experiments.tests.tests_helper import global_setup_ut, apply_setup, \
     create_eeg_step, create_emg_step, create_emg_setting, create_emg_data, \
     create_goal_keeper_game_step, create_goal_keeper_game_data, \
     create_generic_data_collection_step, create_generic_data_collection_data, \
-    create_additional_data
+    create_additional_data, create_emg_electrode_placement
 
 
 def add_temporary_file_to_file_instance(file_instance):
@@ -570,6 +570,28 @@ class EMGDataModel(TestCase):
                     self.TEMP_MEDIA_ROOT, file_collected.file.name
                 ))
             )
+
+
+class EMGElectrodePlacementModelTest(TestCase):
+    TEMP_MEDIA_ROOT = tempfile.mkdtemp()
+
+    def tearDown(self):
+        if os.path.exists(self.TEMP_MEDIA_ROOT):
+            shutil.rmtree(self.TEMP_MEDIA_ROOT)
+
+    @override_settings(MEDIA_ROOT=TEMP_MEDIA_ROOT)
+    def test_delete_instance_deletes_its_files(self):
+        emg_electrode_placement = create_emg_electrode_placement()
+
+        file_instance = emg_electrode_placement.photo
+        add_temporary_file_to_file_instance(file_instance)
+
+        emg_electrode_placement.delete()
+        self.assertFalse(
+            os.path.exists(os.path.join(
+                self.TEMP_MEDIA_ROOT, file_instance.name
+            ))
+        )
 
 
 class GoalkeeperGameDataModel(TestCase):
