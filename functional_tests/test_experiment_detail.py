@@ -433,7 +433,7 @@ class ExperimentDetailTest(FunctionalTest):
         ).last()
 
         # When the new visitor visits an experiment that has questionnaires,
-        # in right side of each questionnaire title that is a 'Detail'
+        # in right side of each questionnaire title is a 'Detail'
         # button. When she clicks on it, the questionnaire expand to display
         # the questions and answers.
         self.browser.find_element_by_xpath(
@@ -446,10 +446,7 @@ class ExperimentDetailTest(FunctionalTest):
         button_details = self.browser.find_element_by_id(
             'questionnaires_tab'
         ).find_element_by_link_text('Details')
-        button_details.click()
-        time.sleep(1)
-        button_details.click()
-        time.sleep(1)  # just to see better on the browser, before page closes
+        button_details.send_keys(Keys.ENTER)
 
         self.assertEqual(button_details.text, 'Details')
 
@@ -552,7 +549,9 @@ class ExperimentDetailTest(FunctionalTest):
         # of columns, when the new visitor clicks in Questionnaires tab she
         # sees a message telling her that something is wrong with that
         # questionnaire.
-        self.browser.find_element_by_link_text('Questionnaires').click()
+        self.browser.find_element_by_link_text('Questionnaires').send_keys(
+            Keys.ENTER
+        )
 
         questionnaires_content = self.browser.find_element_by_id(
             'questionnaires_tab'

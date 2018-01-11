@@ -14,17 +14,11 @@ from experiments.tests.tests_helper import create_experiment, create_study, \
     create_eeg_setting, create_eeg_data, \
     create_eeg_step, create_genders, create_experiment_versions, create_owner
 
-TEMP_MEDIA_ROOT = tempfile.mkdtemp()
 
-
-@override_settings(MEDIA_ROOT=TEMP_MEDIA_ROOT)
 class CommandsTest(TestCase):
 
     def setUp(self):
         create_genders()
-
-    def tearDown(self):
-        shutil.rmtree(TEMP_MEDIA_ROOT)
 
     def test_remove_experiment_last_version_removes_objects_associated(self):
         """
@@ -75,7 +69,8 @@ class CommandsTest(TestCase):
 
     def test_remove_experiment_last_version_removes_only_last_version(self):
 
-        experiment = create_experiment(1, owner='nep-labX')
+        owner = create_owner('labX')
+        experiment = create_experiment(1, owner=owner)
         experiment_versions = create_experiment_versions(5, experiment)
         experiment_version = choice(experiment_versions)
 
