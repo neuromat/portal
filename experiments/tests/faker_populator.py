@@ -14,7 +14,7 @@ from experiments.models import Gender, ClassificationOfDiseases, Keyword, \
     Collaborator, Step, TMSSetting, TMSDevice, CoilModel, TMSDeviceSetting
 from experiments.tests.tests_helper import create_classification_of_deseases, \
     create_questionnaire
-from experiments.tests.tests_helper import create_experiment_protocol
+from experiments.tests.tests_helper import create_experimental_protocol
 from experiments.tests.tests_helper import create_group, \
     create_ethics_committee_info, create_step, create_tms_setting, \
     create_tms_device, create_coil_model, create_tms_device_setting, \
@@ -180,7 +180,7 @@ gender2 = Gender.objects.create(name='female')
 
 # Create groups' experimental protocols and participants
 for group in Group.objects.all():
-    create_experiment_protocol(group)
+    create_experimental_protocol(group)
     create_participant(
         randint(3, 7), group,
         gender1 if randint(1, 2) == 1 else gender2

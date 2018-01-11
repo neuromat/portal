@@ -4,6 +4,8 @@ from datetime import datetime
 from unittest import skip
 
 import os
+
+import shutil
 from django.contrib.auth.models import User
 from django.test import override_settings
 from django.urls import reverse
@@ -21,12 +23,19 @@ from experiments.tests.tests_helper import global_setup_ut, apply_setup, \
     create_experiment, create_group
 
 
+TEMP_MEDIA_ROOT = tempfile.mkdtemp()
+
+
 @apply_setup(global_setup_ut)
+@override_settings(MEDIA_ROOT=TEMP_MEDIA_ROOT)
 class ExperimentAPITest(APITestCase):
     list_url = reverse('api_experiments-list')
 
     def setUp(self):
         global_setup_ut()
+
+    def tearDown(self):
+        shutil.rmtree(TEMP_MEDIA_ROOT)
 
     def test_get_returns_all_experiments(self):
         owner1 = User.objects.get(username='lab1')
@@ -1154,9 +1163,6 @@ class QuestionnaireLanguageAPITest(APITestCase):
 
     def test_POSTing_new_questionnairelanguage_cant_create_more_default_languages(self):
         pass
-
-
-TEMP_MEDIA_ROOT = os.path.join(tempfile.mkdtemp())
 
 
 @override_settings(MEDIA_ROOT=TEMP_MEDIA_ROOT)

@@ -97,7 +97,7 @@ def _get_questionnaire_metadata(metadata):
     return records
 
 
-def _get_q_default_language_or_first(questionnaire):
+def get_q_default_language_or_first(questionnaire):
     # TODO: correct this to adapt to unique QuestionnaireDefaultLanguage
     # TODO: model with OneToOne relation with Questionnaire
     qdl = QuestionnaireDefaultLanguage.objects.filter(
@@ -190,7 +190,7 @@ def experiment_detail(request, slug):
                 questionnaires[group.title][q.id] = {}
                 # get questionnaire default language data or first
                 # questionnaire language
-                questioinnaire_default = _get_q_default_language_or_first(q)
+                questioinnaire_default = get_q_default_language_or_first(q)
 
                 questionnaires[group.title][q.id]['survey_name'] = \
                     questioinnaire_default.survey_name
