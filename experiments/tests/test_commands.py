@@ -112,3 +112,11 @@ class CommandsTest(TestCase):
     def test_send_confirmation_message(self):
         # TODO: implement it!
         pass
+
+    def test_remove_experiment_removes_download_media_experiment_subdir(self):
+        # TODO: implement it!
+        pass
+
+    def test_remove_experiment_display_message_to_user_to_wait(self):
+        # TODO: implement it!
+        pass
