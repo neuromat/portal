@@ -67,9 +67,16 @@ def create_study(qtty, experiment):
     return studies
 
 
-def create_owner():
-    fake = Factory.create()
-    return User.objects.create_user(username=fake.word(), password='nep-lab1')
+def create_owner(username=None):
+    """
+    :param username: String
+    :return: auth.User model instance
+    """
+    if not username:
+        fake = Factory.create()
+        username = fake.word()
+
+    return User.objects.create_user(username=username, password='labX')
 
 
 def create_experiment(qtty, owner=None, status=Experiment.TO_BE_ANALYSED):

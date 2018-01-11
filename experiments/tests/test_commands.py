@@ -12,7 +12,7 @@ from experiments.models import Gender, Study, Group, EEGSetting, \
 from experiments.tests.tests_helper import create_experiment, create_study, \
     create_group, create_participant, create_experimental_protocol, \
     create_eeg_setting, create_eeg_data, \
-    create_eeg_step, create_genders, create_experiment_versions
+    create_eeg_step, create_genders, create_experiment_versions, create_owner
 
 TEMP_MEDIA_ROOT = tempfile.mkdtemp()
 
@@ -75,7 +75,7 @@ class CommandsTest(TestCase):
 
     def test_remove_experiment_last_version_removes_only_last_version(self):
 
-        experiment = create_experiment(1)
+        experiment = create_experiment(1, owner='nep-labX')
         experiment_versions = create_experiment_versions(5, experiment)
         experiment_version = choice(experiment_versions)
 
@@ -91,5 +91,25 @@ class CommandsTest(TestCase):
 
         self.assertIn(
             'Last version of experiment "%s" successfully removed'
+            % experiment.title, out.getvalue()
+        )
+
+    def test_remove_experiment(self):
+
+        owner = create_owner('labX')
+        experiment = create_experiment(1, owner=owner)
+        experiment_versions = create_experiment_versions(11, experiment)
+        experiment_version = choice(experiment_versions)
+
+        out = StringIO()
+        call_command(
+            'remove_experiment',
+            experiment_version.nes_id, experiment_version.owner,
+            stdout=out
+        )
+
+        self.assertFalse(Experiment.objects.exists())
+        self.assertIn(
+            'All version of experiment "%s" successfully removed'
             % experiment.title, out.getvalue()
         )

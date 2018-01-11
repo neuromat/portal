@@ -19,27 +19,33 @@ class Command(BaseCommand):
         )
 
     def handle(self, *args, **options):
-        if options['last']:
-            try:
-                user = User.objects.get(username=options['owner'])
-                experiment = Experiment.lastversion_objects.get(
-                    nes_id=options['nes_id'], owner=user
-                )
-            except User.DoesNotExist:
-                raise CommandError(
-                    'Owner "%s" does not exist' % options['owner']
-                )
-            except Experiment.DoesNotExist:
-                raise CommandError(
-                    'Experiment with nes_id "%d" and owner "%s" does not exist'
-                    % (options['nes_id'], options['owner'])
-                )
+        try:
+            owner = User.objects.get(username=options['owner'])
+            experiment = Experiment.lastversion_objects.get(
+                nes_id=options['nes_id'], owner=owner
+            )
+        except User.DoesNotExist:
+            raise CommandError(
+                'Owner "%s" does not exist' % options['owner']
+            )
+        except Experiment.DoesNotExist:
+            raise CommandError(
+                'Experiment with nes_id "%d" and owner "%s" does not exist'
+                % (options['nes_id'], options['owner'])
+            )
 
+        if options['last']:
             experiment.delete()
             self.stdout.write(self.style.SUCCESS(
                 'Last version of experiment "%s" successfully removed' %
                 experiment.title
             ))
         else:
-            # TODO: remove all experiments
-            pass
+            for experiment in Experiment.objects.filter(
+                    nes_id=options['nes_id'], owner=owner
+            ):
+                experiment.delete()
+                self.stdout.write(self.style.SUCCESS(
+                    'All version of experiment "%s" successfully removed' %
+                    experiment.title
+                ))
