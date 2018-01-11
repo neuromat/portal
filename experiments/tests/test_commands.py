@@ -1,6 +1,7 @@
 import tempfile
 
 import shutil
+from random import choice
 
 from django.core.management import call_command
 from django.test import TestCase, override_settings
@@ -11,7 +12,7 @@ from experiments.models import Gender, Study, Group, EEGSetting, \
 from experiments.tests.tests_helper import create_experiment, create_study, \
     create_group, create_participant, create_experimental_protocol, \
     create_eeg_setting, create_eeg_data, \
-    create_eeg_step, create_genders
+    create_eeg_step, create_genders, create_experiment_versions
 
 TEMP_MEDIA_ROOT = tempfile.mkdtemp()
 
@@ -25,7 +26,7 @@ class CommandsTest(TestCase):
     def tearDown(self):
         shutil.rmtree(TEMP_MEDIA_ROOT)
 
-    def test_remove_experiment_last_version(self):
+    def test_remove_experiment_last_version_removes_objects_associated(self):
         """
         Do not test for files deleted. This tests are made in models tests.
         """
@@ -66,6 +67,27 @@ class CommandsTest(TestCase):
             self.assertFalse(EEG.objects.filter(group=group).exists())
             self.assertFalse(group.participants.exists())
         self.assertFalse(EEGData.objects.exists())
+
+        self.assertIn(
+            'Last version of experiment "%s" successfully removed'
+            % experiment.title, out.getvalue()
+        )
+
+    def test_remove_experiment_last_version_removes_only_last_version(self):
+
+        experiment = create_experiment(1)
+        experiment_versions = create_experiment_versions(5, experiment)
+        experiment_version = choice(experiment_versions)
+
+        out = StringIO()
+        call_command(
+            'remove_experiment',
+            experiment_version.nes_id, experiment_version.owner,
+            '--last', stdout=out
+        )
+
+        self.assertEqual(5, Experiment.objects.count())
+        self.assertEqual(5, Experiment.lastversion_objects.last().version)
 
         self.assertIn(
             'Last version of experiment "%s" successfully removed'

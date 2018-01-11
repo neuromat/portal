@@ -113,10 +113,8 @@ class Experiment(models.Model):
     )
     trustee = models.ForeignKey(User, null=True,
                                 blank=True, related_name='experiments')
-    # TODO: We want slug field do not save empty string, but in console we
-    # TODO: do can save an experiment with empty string, even when we set
-    # TODO: blank=False. By the way, when doing this makemigrations doesn't
-    # TODO: detect the change. This implies that the experiments are being
+    # TODO: We want slug field do not save empty string.
+    # TODO: This implies that the experiments are being
     # TODO: saved in tests, with slug='', what we don't want. The tests should
     # TODO: regret when saving experiments with slug=''.
     slug = models.SlugField(max_length=100, unique=True)
@@ -135,8 +133,8 @@ class Experiment(models.Model):
         super(Experiment, self).save()
 
 
-# remove files associated to Experiment
-# TODO: delete parent subdirs if they are empty after post_delete
+# TODO: delete parent subdirs if they are empty after post_delete. Example:
+# TODO: uploads/2018/01/10
 @receiver(post_delete, sender=Experiment)
 def experiment_delete(instance, **kwargs):
     instance.ethics_committee_file.delete(save=False)

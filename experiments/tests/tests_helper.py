@@ -103,6 +103,25 @@ def create_experiment(qtty, owner=None, status=Experiment.TO_BE_ANALYSED):
     return experiments
 
 
+def create_experiment_versions(qtty, experiment):
+    """
+    :param qtty: number of versions to create
+    :param experiment: Experiment model instance
+    :return: list
+    """
+    experiment_versions = []
+    current_version = experiment.version
+    for version in range(qtty):
+        experiment_version = experiment
+        experiment_version.pk = None
+        experiment_version.version = current_version + 1
+        experiment_version.save()
+        experiment_versions.append(experiment_version)
+        current_version += 1
+
+    return experiment_versions
+
+
 def create_trustee_users():
     group = models.Group.objects.create(name='trustees')
 
