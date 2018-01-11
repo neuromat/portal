@@ -45,7 +45,8 @@ class Command(BaseCommand):
                     nes_id=options['nes_id'], owner=owner
             ):
                 experiment.delete()
-                self.stdout.write(self.style.SUCCESS(
-                    'All version of experiment "%s" successfully removed' %
-                    experiment.title
-                ))
+
+            self.stdout.write(self.style.SUCCESS(
+                'All versions of experiment "%s" successfully removed' %
+                experiment.title
+            ))

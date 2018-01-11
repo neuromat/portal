@@ -110,6 +110,10 @@ class CommandsTest(TestCase):
 
         self.assertFalse(Experiment.objects.exists())
         self.assertIn(
-            'All version of experiment "%s" successfully removed'
+            'All versions of experiment "%s" successfully removed'
             % experiment.title, out.getvalue()
         )
+
+    def test_send_confirmation_message(self):
+        # TODO: implement it!
+        pass
