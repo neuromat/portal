@@ -65,12 +65,20 @@ class Command(BaseCommand):
             )
 
         if options['last']:
+            self.stdout.write(
+                'Removing last version of experiment "%s" data and files...'
+                % experiment.title
+            )
             self.remove_experiment_and_media_subdirs(experiment)
             self.stdout.write(self.style.SUCCESS(
                 'Last version of experiment "%s" successfully removed' %
                 experiment.title
             ))
         else:
+            self.stdout.write(
+                'Removing all versions of experiment "%s" data and files...'
+                % experiment.title
+            )
             for experiment in Experiment.objects.filter(
                     nes_id=options['nes_id'], owner=owner
             ):

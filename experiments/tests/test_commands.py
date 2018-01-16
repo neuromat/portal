@@ -123,11 +123,6 @@ class CommandsTest(TestCase):
         )
 
     @override_settings(MEDIA_ROOT=TEMP_MEDIA_ROOT)
-    def test_display_confirmation_message(self):
-        # TODO: implement it!
-        pass
-
-    @override_settings(MEDIA_ROOT=TEMP_MEDIA_ROOT)
     def test_remove_experiment_removes_media_download_experiment_subdir(self):
         owner = create_owner('labX')
         experiments = create_experiment(2, owner=owner)
@@ -213,8 +208,39 @@ class CommandsTest(TestCase):
         self.assertFalse(os.path.exists(uploads_subdir))
         self.assertTrue(os.path.exists(self.TEMP_MEDIA_ROOT))
 
+    @override_settings(MEDIA_ROOT=TEMP_MEDIA_ROOT)
+    def test_remove_experiment_last_version_display_message_wait(self):
+        owner = create_owner('labX')
+        experiment = create_experiment(1, owner=owner)
+
+        out = StringIO()
+        call_command(
+            'remove_experiment', experiment.nes_id, experiment.owner,
+            '--last', stdout=out
+        )
+
+        self.assertIn(
+            'Removing last version of experiment "%s" data and files...'
+            % experiment.title, out.getvalue()
+        )
 
     @override_settings(MEDIA_ROOT=TEMP_MEDIA_ROOT)
-    def test_remove_experiment_display_message_to_user_to_wait(self):
+    def test_remove_experiment_display_message_wait(self):
+        owner = create_owner('labX')
+        experiment = create_experiment(1, owner=owner)
+
+        out = StringIO()
+        call_command(
+            'remove_experiment', experiment.nes_id, experiment.owner,
+            stdout=out
+        )
+
+        self.assertIn(
+            'Removing all versions of experiment "%s" data and files...'
+            % experiment.title, out.getvalue()
+        )
+
+    @override_settings(MEDIA_ROOT=TEMP_MEDIA_ROOT)
+    def test_display_confirmation_message(self):
         # TODO: implement it!
         pass
