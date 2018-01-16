@@ -196,7 +196,7 @@ class CommandsTest(TestCase):
                 self.assertTrue(os.path.exists(root))
 
     @override_settings(MEDIA_ROOT=TEMP_MEDIA_ROOT)
-    def test_remove_experiment_removes_uploads_subdir_if_there_are_any_files(self):
+    def test_remove_experiment_removes_uploads_subdir_if_there_are_not_files(self):
         owner = create_owner('labX')
         experiment = create_experiment(1, owner=owner)
 

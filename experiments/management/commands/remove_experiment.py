@@ -21,12 +21,10 @@ class Command(BaseCommand):
                     os.rmdir(root)
 
     def clear_media_uploads_subdirs(self):
-        for root, dirs, files in os.walk(os.path.join(
-                settings.MEDIA_ROOT, 'uploads')
-        ):
-            # if not dirs:  # it's in a path tree leaf (e.g. '2018/01/15')
-            if not files:
-                shutil.rmtree(root)
+        uploads_path = os.path.join(settings.MEDIA_ROOT, 'uploads')
+        for root, dirs, files in os.walk(uploads_path):
+            if not dirs and not files:
+                shutil.rmtree(os.path.join(settings.MEDIA_ROOT, 'uploads'))
 
     def remove_experiment_and_media_subdirs(self, experiment):
         experiment_id = experiment.id

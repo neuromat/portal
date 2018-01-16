@@ -686,7 +686,7 @@ def create_additional_data(step, participant):
     )
 
 
-def create_uploads_subdirs_and_files(uploads_subdir, empty=None):
+def create_uploads_subdirs_and_files(uploads_subdir, empty=False):
     os.mkdir(uploads_subdir)
     for year in ['2017', '2018', '2019']:
         for month in ['03', '04']:
