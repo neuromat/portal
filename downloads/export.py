@@ -778,40 +778,89 @@ class ExportExecution:
                     'export_directory_step': path.join(export_participant_code_directory, directory_step_name),
                 })
 
-            additional_data_list = AdditionalData.objects.filter(participant__in=participant_group_list)
+            additional_data_list = AdditionalData.objects.filter(
+                participant__in=participant_group_list
+            )
+            whole_additional_data = 0
             for additional_data in additional_data_list:
                 participant_code = additional_data.participant.code
-                participant_code_directory_name = "Participant_" + participant_code
-                directory_step_name = "STEP_" + str(additional_data.step.numeration) + "_" + \
-                                      additional_data.step.type.upper()
-                participant_code_directory = path.join(participant_directory, participant_code_directory_name)
-                export_participant_code_directory = path.join(export_participant_directory,
-                                                              participant_code_directory_name)
-                if participant_code not in self.per_group_data[group_id]['data_per_participant']:
-                    self.per_group_data[group_id]['data_per_participant'][participant_code] = {}
-                if 'additional_data_list' not in self.per_group_data[group_id]['data_per_participant'][
-                    participant_code]:
-                    self.per_group_data[group_id]['data_per_participant'][participant_code]['additional_data_list'] = []
-                if additional_data.step.type not in self.per_group_data[group_id]['data_per_participant'][
-                    participant_code]:
-                    self.per_group_data[group_id]['data_per_participant'][participant_code][
-                        additional_data.step.type] = {'data_index': 1}
+                participant_code_directory_name = \
+                    "Participant_" + participant_code
+                if additional_data.step:
+                    directory_step_name = \
+                        "STEP_" + str(additional_data.step.numeration) + \
+                        "_" + additional_data.step.type.upper()
                 else:
-                    self.per_group_data[group_id]['data_per_participant'][participant_code][
-                        additional_data.step.type]['data_index'] += 1
-                index = str(self.per_group_data[group_id]['data_per_participant'][participant_code][
-                                additional_data.step.type]['data_index'])
-                self.per_group_data[group_id]['data_per_participant'][participant_code]['additional_data_list'].append({
-                    'step_identification': additional_data.step.identification,
-                    'setting_id': '',
-                    'data_id': additional_data.id,
-                    'directory_step_name': directory_step_name,
-                    'additional_data_directory_name': "AdditionalData_" + index,
-                    'directory_step': path.join(participant_code_directory, directory_step_name),
-                    'export_directory_step': path.join(export_participant_code_directory, directory_step_name),
-                })
+                    whole_additional_data += 1
+                    directory_step_name = 'Step_0'
+                participant_code_directory = path.join(
+                    participant_directory, participant_code_directory_name
+                )
+                export_participant_code_directory = \
+                    path.join(
+                        export_participant_directory,
+                        participant_code_directory_name
+                    )
+                if participant_code not in self.per_group_data[group_id][
+                    'data_per_participant']:
+                    self.per_group_data[group_id]['data_per_participant'][
+                        participant_code] = {}
+                if 'additional_data_list' not in self.per_group_data[group_id][
+                    'data_per_participant'][participant_code]:
+                    self.per_group_data[group_id]['data_per_participant'][
+                        participant_code]['additional_data_list'] = []
+                if additional_data.step:
+                    if additional_data.step.type not in \
+                            self.per_group_data[group_id][
+                                'data_per_participant'][participant_code]:
+                        self.per_group_data[group_id]['data_per_participant'][
+                            participant_code][
+                            additional_data.step.type] = {'data_index': 1}
+                    else:
+                        self.per_group_data[group_id]['data_per_participant'][
+                            participant_code][
+                            additional_data.step.type]['data_index'] += 1
+                else:
+                    if 'whole' not in \
+                        self.per_group_data[group_id]['data_per_participant'][
+                            participant_code]:
+                        self.per_group_data[group_id]['data_per_participant'][
+                            participant_code]['whole'] = {'data_index': 1}
+                    else:
+                        self.per_group_data[group_id]['data_per_participant'][
+                            participant_code]['whole']['data_index'] += 1
+                if additional_data.step:
+                    index = str(self.per_group_data[group_id][
+                                    'data_per_participant'][participant_code][
+                                    additional_data.step.type]['data_index'])
+                else:
+                    index = str(self.per_group_data[group_id][
+                                    'data_per_participant'][participant_code][
+                                    'whole']['data_index'])
+                self.per_group_data[group_id]['data_per_participant'][
+                    participant_code]['additional_data_list'].append(
+                    {
+                        'step_identification':
+                            additional_data.step.identification if
+                            additional_data.step else 'Step_0',
+                        'setting_id': '',
+                        'data_id': additional_data.id,
+                        'directory_step_name': directory_step_name,
+                        'additional_data_directory_name':
+                            "AdditionalData_" + index,
+                        'directory_step': path.join(
+                            participant_code_directory, directory_step_name
+                        ),
+                        'export_directory_step': path.join(
+                            export_participant_code_directory,
+                            directory_step_name
+                        ),
+                    }
+                )
 
-            generic_data_list = GenericDataCollectionData.objects.filter(participant__in=participant_group_list)
+            generic_data_list = GenericDataCollectionData.objects.filter(
+                participant__in=participant_group_list
+            )
             for generic_data in generic_data_list:
                 participant_code = generic_data.participant.code
                 participant_code_directory_name = "Participant_" + participant_code

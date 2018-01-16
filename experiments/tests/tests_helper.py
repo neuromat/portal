@@ -680,10 +680,28 @@ def create_binary_file(path):
     return f
 
 
-def create_additional_data(participant):
+def create_additional_data(step, participant):
     return AdditionalData.objects.create(
-        participant=participant, date=datetime.utcnow()
+        step=step, participant=participant, date=datetime.utcnow()
     )
+
+
+def create_uploads_subdirs_and_files(uploads_subdir, empty=None):
+    os.mkdir(uploads_subdir)
+    for year in ['2017', '2018', '2019']:
+        for month in ['03', '04']:
+            for day in ['13', '14']:
+                file_path = os.path.join(uploads_subdir, year, month, day)
+                os.makedirs(file_path)
+                if not empty:
+                    if choice([0, 1]) == 0:
+                        create_binary_file(file_path)
+
+
+def create_download_subdirs(download_subdir):
+    os.makedirs(download_subdir)
+    create_binary_file(download_subdir)
+    os.mkdir(os.path.join(download_subdir, 'Some_Group'))
 
 
 def create_context_tree(experiment):

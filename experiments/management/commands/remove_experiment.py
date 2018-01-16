@@ -1,12 +1,44 @@
+import os
+
+import shutil
 from django.contrib.auth.models import User
 from django.core.management import BaseCommand, CommandError
 
 from experiments.models import Experiment
+from nep import settings
 
 
 class Command(BaseCommand):
     help = 'Remove all experiments based on API client external code or ' \
            'just the last version'
+
+    def clear_media_download_subdirs(self):
+        for root, dirs, files in os.walk(os.path.join(
+                settings.MEDIA_ROOT, 'download')
+        ):
+            if not dirs:  # it's in a path tree leaf (e.g. '2018/01/15')
+                if not files:
+                    os.rmdir(root)
+
+    def clear_media_uploads_subdirs(self):
+        for root, dirs, files in os.walk(os.path.join(
+                settings.MEDIA_ROOT, 'uploads')
+        ):
+            # if not dirs:  # it's in a path tree leaf (e.g. '2018/01/15')
+            if not files:
+                shutil.rmtree(root)
+
+    def remove_experiment_and_media_subdirs(self, experiment):
+        experiment_id = experiment.id
+        experiment.delete()
+        self.clear_media_uploads_subdirs()
+        experiment_media_download_path = os.path.join(
+            settings.MEDIA_ROOT, 'download', str(experiment_id)
+        )
+        if os.path.exists(experiment_media_download_path):
+            shutil.rmtree(experiment_media_download_path)
+        # if is the only experiment that has download subdir remove it
+        self.clear_media_download_subdirs()
 
     def add_arguments(self, parser):
         parser.add_argument('nes_id', type=int)
@@ -35,7 +67,7 @@ class Command(BaseCommand):
             )
 
         if options['last']:
-            experiment.delete()
+            self.remove_experiment_and_media_subdirs(experiment)
             self.stdout.write(self.style.SUCCESS(
                 'Last version of experiment "%s" successfully removed' %
                 experiment.title
@@ -44,8 +76,7 @@ class Command(BaseCommand):
             for experiment in Experiment.objects.filter(
                     nes_id=options['nes_id'], owner=owner
             ):
-                experiment.delete()
-
+                self.remove_experiment_and_media_subdirs(experiment)
             self.stdout.write(self.style.SUCCESS(
                 'All versions of experiment "%s" successfully removed' %
                 experiment.title

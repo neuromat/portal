@@ -1,5 +1,5 @@
 import tempfile
-from random import randint
+from random import randint, choice
 
 import os
 
@@ -317,7 +317,7 @@ class ExperimentModelTest(TestCase):
         )
         self.assertEqual(slugify(e7.title), e7.slug)
 
-    @override_settings(MEDIA_ROOT=TEMP_MEDIA_ROOT)
+
     def test_delete_instance_deletes_its_files(self):
         experiment = create_experiment(1)
 
@@ -651,7 +651,7 @@ class GenericDataCollectionDataModel(TestCase):
             )
 
 
-class AdditionalDataModel(TestCase):
+class AdditionalDataModelTest(TestCase):
     TEMP_MEDIA_ROOT = tempfile.mkdtemp()
 
     def tearDown(self):
@@ -660,8 +660,14 @@ class AdditionalDataModel(TestCase):
     @override_settings(MEDIA_ROOT=TEMP_MEDIA_ROOT)
     def test_delete_instance_deletes_related_instances_and_files(self):
         model_instances_dict = create_model_instances_to_test_step_type_data()
+        # we random select a step type because additional data can be any step
+        some_step = create_step(
+            1, model_instances_dict['group'], choice(Step.STEP_TYPES)
+        )
+        # Additional data can have step=None, that refers to whole
+        # experimental protocol.
         additional_data = create_additional_data(
-            model_instances_dict['participant']
+            choice([some_step, None]), model_instances_dict['participant']
         )
 
         files_collected = create_file_collected(2, additional_data)

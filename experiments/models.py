@@ -726,6 +726,8 @@ def experimental_protocol_delete(instance, **kwargs):
 
 
 class DataCollection(models.Model):
+    # step == null means data collection is associated to whole experimental
+    # protocol.
     step = models.ForeignKey(Step, null=True, blank=True)
     participant = models.ForeignKey(Participant)
     date = models.DateField()
