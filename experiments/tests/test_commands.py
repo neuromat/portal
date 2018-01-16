@@ -3,6 +3,7 @@ import tempfile
 import shutil
 from random import choice
 
+import os
 from django.core.management import call_command
 from django.test import TestCase, override_settings
 from django.utils.six import StringIO
@@ -12,14 +13,24 @@ from experiments.models import Gender, Study, Group, EEGSetting, \
 from experiments.tests.tests_helper import create_experiment, create_study, \
     create_group, create_participant, create_experimental_protocol, \
     create_eeg_setting, create_eeg_data, \
-    create_eeg_step, create_genders, create_experiment_versions, create_owner
+    create_eeg_step, create_genders, create_experiment_versions, create_owner, \
+    create_binary_file, create_uploads_subdirs_and_files, \
+    create_download_subdirs
+from nep import settings
 
 
 class CommandsTest(TestCase):
+    TEMP_MEDIA_ROOT = ''
 
     def setUp(self):
         create_genders()
+        self.TEMP_MEDIA_ROOT = tempfile.mkdtemp()
+        settings.MEDIA_ROOT = self.TEMP_MEDIA_ROOT
 
+    def tearDown(self):
+        shutil.rmtree(self.TEMP_MEDIA_ROOT)
+
+    @override_settings(MEDIA_ROOT=TEMP_MEDIA_ROOT)
     def test_remove_experiment_last_version_removes_objects_associated(self):
         """
         Do not test for files deleted. This tests are made in models tests.
@@ -67,6 +78,7 @@ class CommandsTest(TestCase):
             % experiment.title, out.getvalue()
         )
 
+    @override_settings(MEDIA_ROOT=TEMP_MEDIA_ROOT)
     def test_remove_experiment_last_version_removes_only_last_version(self):
 
         owner = create_owner('labX')
@@ -89,7 +101,8 @@ class CommandsTest(TestCase):
             % experiment.title, out.getvalue()
         )
 
-    def test_remove_experiment(self):
+    @override_settings(MEDIA_ROOT=TEMP_MEDIA_ROOT)
+    def test_remove_experiment_removes_all_versions(self):
 
         owner = create_owner('labX')
         experiment = create_experiment(1, owner=owner)
@@ -109,6 +122,99 @@ class CommandsTest(TestCase):
             % experiment.title, out.getvalue()
         )
 
-    def test_send_confirmation_message(self):
+    @override_settings(MEDIA_ROOT=TEMP_MEDIA_ROOT)
+    def test_display_confirmation_message(self):
+        # TODO: implement it!
+        pass
+
+    @override_settings(MEDIA_ROOT=TEMP_MEDIA_ROOT)
+    def test_remove_experiment_removes_media_download_experiment_subdir(self):
+        owner = create_owner('labX')
+        experiments = create_experiment(2, owner=owner)
+
+        download_subdirs = []
+        for experiment in experiments:
+            download_subdir = os.path.join(
+                self.TEMP_MEDIA_ROOT, 'download', str(experiment.id)
+            )
+            create_download_subdirs(download_subdir)
+            download_subdirs.append(download_subdir)
+
+        out = StringIO()
+        call_command(
+            'remove_experiment',
+            experiments[0].nes_id, experiments[0].owner,
+            stdout=out
+        )
+
+        self.assertFalse(os.path.exists(download_subdirs[0]))
+        self.assertTrue(os.path.exists(
+            os.path.join(self.TEMP_MEDIA_ROOT, 'download')
+        ))
+
+    @override_settings(MEDIA_ROOT=TEMP_MEDIA_ROOT)
+    def test_remove_the_only_experiment_that_exists_removes_media_download_subdir(self):
+        owner = create_owner('labX')
+        experiment = create_experiment(1, owner=owner)
+
+        download_subdir = os.path.join(
+            self.TEMP_MEDIA_ROOT, 'download', str(experiment.id)
+        )
+
+        create_download_subdirs(download_subdir)
+
+        out = StringIO()
+        call_command(
+            'remove_experiment',
+            experiment.nes_id, experiment.owner,
+            stdout=out
+        )
+
+        self.assertFalse(os.path.exists(download_subdir))
+        self.assertFalse(os.path.exists(
+            os.path.join(self.TEMP_MEDIA_ROOT, 'download')
+        ))
+
+    @override_settings(MEDIA_ROOT=TEMP_MEDIA_ROOT)
+    def test_remove_experiment_removes_uploads_subdirs_if_they_are_empty(self):
+        owner = create_owner('labX')
+        experiment = create_experiment(1, owner=owner)
+
+        uploads_subdir = os.path.join(self.TEMP_MEDIA_ROOT, 'uploads')
+        create_uploads_subdirs_and_files(uploads_subdir)
+
+        out = StringIO()
+        call_command(
+            'remove_experiment',
+            experiment.nes_id, experiment.owner,
+            stdout=out
+        )
+
+        for root, dirs, files in os.walk(uploads_subdir):
+            # it's in a path tree leaf wo files (e.g. 'uploads/2018/01/15')
+            if not dirs:
+                self.assertTrue(os.path.exists(root))
+
+    @override_settings(MEDIA_ROOT=TEMP_MEDIA_ROOT)
+    def test_remove_experiment_removes_uploads_subdir_if_there_are_not_files(self):
+        owner = create_owner('labX')
+        experiment = create_experiment(1, owner=owner)
+
+        uploads_subdir = os.path.join(self.TEMP_MEDIA_ROOT, 'uploads')
+        create_uploads_subdirs_and_files(uploads_subdir, empty=True)
+
+        out = StringIO()
+        call_command(
+            'remove_experiment',
+            experiment.nes_id, experiment.owner,
+            stdout=out
+        )
+
+        self.assertFalse(os.path.exists(uploads_subdir))
+        self.assertTrue(os.path.exists(self.TEMP_MEDIA_ROOT))
+
+
+    @override_settings(MEDIA_ROOT=TEMP_MEDIA_ROOT)
+    def test_remove_experiment_display_message_to_user_to_wait(self):
         # TODO: implement it!
         pass

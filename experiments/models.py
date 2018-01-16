@@ -472,19 +472,31 @@ class EMGAnalogFilterSetting(models.Model):
 
 
 class EMGElectrodePlacement(models.Model):
+    SURFACE = 'surface'
+    INTRAMUSCULAR = "intramuscular"
+    NEEDLE = "needle"
     PLACEMENT_TYPES = (
-        ("surface", "Surface"),
-        ("intramuscular", "Intramuscular"),
-        ("needle", "Needle"),
+        (SURFACE, "Surface"),
+        (INTRAMUSCULAR, "Intramuscular"),
+        (NEEDLE, "Needle"),
     )
     standardization_system_name = models.CharField(max_length=150)
-    standardization_system_description = models.TextField(null=True, blank=True)
+    standardization_system_description = models.TextField(
+        null=True, blank=True
+    )
     muscle_anatomy_origin = models.TextField(null=True, blank=True)
     muscle_anatomy_insertion = models.TextField(null=True, blank=True)
     muscle_anatomy_function = models.TextField(null=True, blank=True)
-    photo = models.FileField(upload_to='uploads/%Y/%m/%d/', null=True, blank=True)
+    photo = models.FileField(
+        upload_to='uploads/%Y/%m/%d/', null=True, blank=True
+    )
     location = models.TextField(null=True, blank=True)
     placement_type = models.CharField(max_length=50, choices=PLACEMENT_TYPES)
+
+
+@receiver(post_delete, sender=EMGElectrodePlacement)
+def emg_electrode_placement(instance, **kwargs):
+    instance.photo.delete(save=False)
 
 
 class EMGSurfacePlacement(EMGElectrodePlacement):
@@ -714,6 +726,8 @@ def experimental_protocol_delete(instance, **kwargs):
 
 
 class DataCollection(models.Model):
+    # step == null means data collection is associated to whole experimental
+    # protocol.
     step = models.ForeignKey(Step, null=True, blank=True)
     participant = models.ForeignKey(Participant)
     date = models.DateField()
