@@ -6,7 +6,7 @@ from random import choice
 import os
 from unittest.mock import patch
 
-from django.core.management import call_command
+from django.core.management import call_command, BaseCommand
 from django.test import TestCase, override_settings
 from django.utils.six import StringIO
 
@@ -291,9 +291,9 @@ class CommandsTest(TestCase):
 
         self.assertEqual(mock_user_input.called, True)
         (text,), kwargs = mock_user_input.call_args
-        self.assertEqual(text, 'All versions of the experiment "%s" will be '
-                               'destroyed and cannot be recovered. Are you '
-                               'sure? (Yes/n) ' % experiment.title)
+        self.assertEqual(text, BaseCommand().style.WARNING(
+            'All versions of experiment "%s" will be destroyed and cannot be '
+            'recovered. Are you sure? (Yes/n) ' % experiment.title))
         self.assertFalse(Experiment.objects.exists())
 
     @override_settings(MEDIA_ROOT=TEMP_MEDIA_ROOT)
@@ -313,9 +313,9 @@ class CommandsTest(TestCase):
 
         self.assertEqual(mock_user_input.called, True)
         (text,), kwargs = mock_user_input.call_args
-        self.assertEqual(text, 'All versions of experiment "%s" will be '
-                               'destroyed and cannot be recovered. Are you '
-                               'sure? (Yes/n) ' % experiment.title)
+        self.assertEqual(text, BaseCommand().style.WARNING(
+            'All versions of experiment "%s" will be destroyed and cannot be '
+            'recovered. Are you sure? (Yes/n) ' % experiment.title))
         self.assertTrue(Experiment.objects.exists())
         self.assertIn('Aborted', out.getvalue())
 
@@ -336,9 +336,9 @@ class CommandsTest(TestCase):
 
         self.assertEqual(mock_user_input.called, True)
         (text,), kwargs = mock_user_input.call_args
-        self.assertEqual(text, 'Last version of experiment "%s" will be '
-                               'destroyed and cannot be recovered. Are you '
-                               'sure? (Yes/n) ' % experiment.title)
+        self.assertEqual(text, BaseCommand().style.WARNING(
+            'Last version of experiment "%s" will be destroyed and cannot be '
+            'recovered. Are you sure? (Yes/n) ' % experiment.title))
         self.assertFalse(Experiment.objects.exists())
 
     @override_settings(MEDIA_ROOT=TEMP_MEDIA_ROOT)
@@ -358,8 +358,8 @@ class CommandsTest(TestCase):
 
         self.assertEqual(mock_user_input.called, True)
         (text,), kwargs = mock_user_input.call_args
-        self.assertEqual(text, 'Last version of experiment "%s" will be '
-                               'destroyed and cannot be recovered. Are you '
-                               'sure? (Yes/n) ' % experiment.title)
+        self.assertEqual(text, BaseCommand().style.WARNING(
+            'Last version of experiment "%s" will be destroyed and cannot be '
+            'recovered. Are you sure? (Yes/n) ' % experiment.title))
         self.assertTrue(Experiment.objects.exists())
         self.assertIn('Aborted', out.getvalue())

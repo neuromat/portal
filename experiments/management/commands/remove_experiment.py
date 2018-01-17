@@ -69,11 +69,11 @@ class Command(BaseCommand):
             )
 
         if options['last']:
-            answer = get_input(
+            answer = get_input(self.style.WARNING(
                 'Last version of experiment "%s" will be destroyed and '
                 'cannot be recovered. Are you sure? (Yes/n) ' %
                 experiment.title
-            )
+            ))
             if answer == 'Yes':
                 self.stdout.write(
                     'Removing last version of experiment "%s" data and '
