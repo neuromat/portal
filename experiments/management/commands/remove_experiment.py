@@ -8,6 +8,10 @@ from experiments.models import Experiment
 from nep import settings
 
 
+def get_input(text):
+    return input(text)
+
+
 class Command(BaseCommand):
     help = 'Remove all experiments based on API client external code or ' \
            'just the last version'
@@ -65,25 +69,43 @@ class Command(BaseCommand):
             )
 
         if options['last']:
-            self.stdout.write(
-                'Removing last version of experiment "%s" data and files...'
-                % experiment.title
-            )
-            self.remove_experiment_and_media_subdirs(experiment)
-            self.stdout.write(self.style.SUCCESS(
-                'Last version of experiment "%s" successfully removed' %
+            answer = get_input(
+                'Last version of experiment "%s" will be destroyed and '
+                'cannot be recovered. Are you sure? (Yes/n) ' %
                 experiment.title
-            ))
-        else:
-            self.stdout.write(
-                'Removing all versions of experiment "%s" data and files...'
-                % experiment.title
             )
-            for experiment in Experiment.objects.filter(
-                    nes_id=options['nes_id'], owner=owner
-            ):
+            if answer == 'Yes':
+                self.stdout.write(
+                    'Removing last version of experiment "%s" data and '
+                    'files...'
+                    % experiment.title
+                )
                 self.remove_experiment_and_media_subdirs(experiment)
-            self.stdout.write(self.style.SUCCESS(
-                'All versions of experiment "%s" successfully removed' %
+                self.stdout.write(self.style.SUCCESS(
+                    'Last version of experiment "%s" successfully removed' %
+                    experiment.title
+                ))
+            else:
+                self.stdout.write('Aborted')
+        else:
+            answer = get_input(self.style.WARNING(
+                'All versions of experiment "%s" will be destroyed and '
+                'cannot be recovered. Are you sure? (Yes/n) ' %
                 experiment.title
             ))
+            if answer == 'Yes':
+                self.stdout.write(
+                    'Removing all versions of experiment "%s" data and '
+                    'files... '
+                    % experiment.title
+                )
+                for experiment in Experiment.objects.filter(
+                        nes_id=options['nes_id'], owner=owner
+                ):
+                    self.remove_experiment_and_media_subdirs(experiment)
+                self.stdout.write(self.style.SUCCESS(
+                    'All versions of experiment "%s" successfully removed' %
+                    experiment.title
+                ))
+            else:
+                self.stdout.write('Aborted')

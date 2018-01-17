@@ -4,6 +4,8 @@ import shutil
 from random import choice
 
 import os
+from unittest.mock import patch
+
 from django.core.management import call_command
 from django.test import TestCase, override_settings
 from django.utils.six import StringIO
@@ -14,7 +16,7 @@ from experiments.tests.tests_helper import create_experiment, create_study, \
     create_group, create_participant, create_experimental_protocol, \
     create_eeg_setting, create_eeg_data, \
     create_eeg_step, create_genders, create_experiment_versions, create_owner, \
-    create_binary_file, create_uploads_subdirs_and_files, \
+    create_uploads_subdirs_and_files, \
     create_download_subdirs
 from nep import settings
 
@@ -31,7 +33,11 @@ class CommandsTest(TestCase):
         shutil.rmtree(self.TEMP_MEDIA_ROOT)
 
     @override_settings(MEDIA_ROOT=TEMP_MEDIA_ROOT)
-    def test_remove_experiment_last_version_removes_objects_associated(self):
+    @patch('experiments.management.commands.remove_experiment.get_input',
+           return_value='Yes')
+    def test_remove_experiment_last_version_removes_objects_associated(
+            self, mock_user_input
+    ):
         """
         Do not test for files deleted. This tests are made in models tests.
         """
@@ -79,7 +85,11 @@ class CommandsTest(TestCase):
         )
 
     @override_settings(MEDIA_ROOT=TEMP_MEDIA_ROOT)
-    def test_remove_experiment_last_version_removes_only_last_version(self):
+    @patch('experiments.management.commands.remove_experiment.get_input',
+           return_value='Yes')
+    def test_remove_experiment_last_version_removes_only_last_version(
+            self, mock_user_input
+    ):
 
         owner = create_owner('labX')
         experiment = create_experiment(1, owner=owner)
@@ -102,7 +112,9 @@ class CommandsTest(TestCase):
         )
 
     @override_settings(MEDIA_ROOT=TEMP_MEDIA_ROOT)
-    def test_remove_experiment_removes_all_versions(self):
+    @patch('experiments.management.commands.remove_experiment.get_input',
+           return_value='Yes')
+    def test_remove_experiment_removes_all_versions(self, mock_user_input):
 
         owner = create_owner('labX')
         experiment = create_experiment(1, owner=owner)
@@ -123,7 +135,11 @@ class CommandsTest(TestCase):
         )
 
     @override_settings(MEDIA_ROOT=TEMP_MEDIA_ROOT)
-    def test_remove_experiment_removes_media_download_experiment_subdir(self):
+    @patch('experiments.management.commands.remove_experiment.get_input',
+           return_value='Yes')
+    def test_remove_experiment_removes_media_download_experiment_subdir(
+            self, mock_user_input
+    ):
         owner = create_owner('labX')
         experiments = create_experiment(2, owner=owner)
 
@@ -148,7 +164,11 @@ class CommandsTest(TestCase):
         ))
 
     @override_settings(MEDIA_ROOT=TEMP_MEDIA_ROOT)
-    def test_remove_the_only_experiment_that_exists_removes_media_download_subdir(self):
+    @patch('experiments.management.commands.remove_experiment.get_input',
+           return_value='Yes')
+    def test_remove_the_only_experiment_that_exists_removes_media_download_subdir(
+            self, mock_user_input
+    ):
         owner = create_owner('labX')
         experiment = create_experiment(1, owner=owner)
 
@@ -171,7 +191,11 @@ class CommandsTest(TestCase):
         ))
 
     @override_settings(MEDIA_ROOT=TEMP_MEDIA_ROOT)
-    def test_remove_experiment_removes_uploads_subdirs_if_they_are_empty(self):
+    @patch('experiments.management.commands.remove_experiment.get_input',
+           return_value='Yes')
+    def test_remove_experiment_removes_uploads_subdirs_if_they_are_empty(
+            self, mock_user_input
+    ):
         owner = create_owner('labX')
         experiment = create_experiment(1, owner=owner)
 
@@ -191,7 +215,11 @@ class CommandsTest(TestCase):
                 self.assertTrue(os.path.exists(root))
 
     @override_settings(MEDIA_ROOT=TEMP_MEDIA_ROOT)
-    def test_remove_experiment_removes_uploads_subdir_if_there_are_not_files(self):
+    @patch('experiments.management.commands.remove_experiment.get_input',
+           return_value='Yes')
+    def test_remove_experiment_removes_uploads_subdir_if_there_are_not_files(
+            self, mock_user_input
+    ):
         owner = create_owner('labX')
         experiment = create_experiment(1, owner=owner)
 
@@ -209,7 +237,11 @@ class CommandsTest(TestCase):
         self.assertTrue(os.path.exists(self.TEMP_MEDIA_ROOT))
 
     @override_settings(MEDIA_ROOT=TEMP_MEDIA_ROOT)
-    def test_remove_experiment_last_version_display_message_wait(self):
+    @patch('experiments.management.commands.remove_experiment.get_input',
+           return_value='Yes')
+    def test_remove_experiment_last_version_display_message_wait(
+            self, mock_user_input
+    ):
         owner = create_owner('labX')
         experiment = create_experiment(1, owner=owner)
 
@@ -225,7 +257,9 @@ class CommandsTest(TestCase):
         )
 
     @override_settings(MEDIA_ROOT=TEMP_MEDIA_ROOT)
-    def test_remove_experiment_display_message_wait(self):
+    @patch('experiments.management.commands.remove_experiment.get_input',
+           return_value='Yes')
+    def test_remove_experiment_display_message_removing(self, mock_user_input):
         owner = create_owner('labX')
         experiment = create_experiment(1, owner=owner)
 
@@ -241,6 +275,91 @@ class CommandsTest(TestCase):
         )
 
     @override_settings(MEDIA_ROOT=TEMP_MEDIA_ROOT)
-    def test_display_confirmation_message(self):
-        # TODO: implement it!
-        pass
+    @patch('experiments.management.commands.remove_experiment.get_input',
+           return_value='Yes')
+    def test_remove_experiment_displays_prompt_and_user_confirm_removing(
+            self, mock_user_input
+    ):
+        owner = create_owner('labX')
+        experiment = create_experiment(1, owner=owner)
+
+        out = StringIO()
+        call_command(
+            'remove_experiment', experiment.nes_id, experiment.owner,
+            stdout=out
+        )
+
+        self.assertEqual(mock_user_input.called, True)
+        (text,), kwargs = mock_user_input.call_args
+        self.assertEqual(text, 'All versions of the experiment "%s" will be '
+                               'destroyed and cannot be recovered. Are you '
+                               'sure? (Yes/n) ' % experiment.title)
+        self.assertFalse(Experiment.objects.exists())
+
+    @override_settings(MEDIA_ROOT=TEMP_MEDIA_ROOT)
+    @patch('experiments.management.commands.remove_experiment.get_input',
+           return_value='n')
+    def test_remove_experiment_displays_prompt_and_user_do_not_confirm_removing(
+            self, mock_user_input
+    ):
+        owner = create_owner('labX')
+        experiment = create_experiment(1, owner=owner)
+
+        out = StringIO()
+        call_command(
+            'remove_experiment', experiment.nes_id, experiment.owner,
+            stdout=out
+        )
+
+        self.assertEqual(mock_user_input.called, True)
+        (text,), kwargs = mock_user_input.call_args
+        self.assertEqual(text, 'All versions of experiment "%s" will be '
+                               'destroyed and cannot be recovered. Are you '
+                               'sure? (Yes/n) ' % experiment.title)
+        self.assertTrue(Experiment.objects.exists())
+        self.assertIn('Aborted', out.getvalue())
+
+    @override_settings(MEDIA_ROOT=TEMP_MEDIA_ROOT)
+    @patch('experiments.management.commands.remove_experiment.get_input',
+           return_value='Yes')
+    def test_remove_experiment_last_version_displays_prompt_and_user_confirm_removing(
+            self, mock_user_input
+    ):
+        owner = create_owner('labX')
+        experiment = create_experiment(1, owner=owner)
+
+        out = StringIO()
+        call_command(
+            'remove_experiment', experiment.nes_id, experiment.owner,
+            '--last', stdout=out
+        )
+
+        self.assertEqual(mock_user_input.called, True)
+        (text,), kwargs = mock_user_input.call_args
+        self.assertEqual(text, 'Last version of experiment "%s" will be '
+                               'destroyed and cannot be recovered. Are you '
+                               'sure? (Yes/n) ' % experiment.title)
+        self.assertFalse(Experiment.objects.exists())
+
+    @override_settings(MEDIA_ROOT=TEMP_MEDIA_ROOT)
+    @patch('experiments.management.commands.remove_experiment.get_input',
+           return_value='n')
+    def test_remove_experiment_last_version_displays_prompt_and_user_do_not_confirm_removing(
+            self, mock_user_input
+    ):
+        owner = create_owner('labX')
+        experiment = create_experiment(1, owner=owner)
+
+        out = StringIO()
+        call_command(
+            'remove_experiment', experiment.nes_id, experiment.owner,
+            '--last', stdout=out
+        )
+
+        self.assertEqual(mock_user_input.called, True)
+        (text,), kwargs = mock_user_input.call_args
+        self.assertEqual(text, 'Last version of experiment "%s" will be '
+                               'destroyed and cannot be recovered. Are you '
+                               'sure? (Yes/n) ' % experiment.title)
+        self.assertTrue(Experiment.objects.exists())
+        self.assertIn('Aborted', out.getvalue())
