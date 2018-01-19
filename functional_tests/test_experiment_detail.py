@@ -23,20 +23,23 @@ from nep import settings
 
 class ExperimentDetailTest(FunctionalTest):
 
+    def _access_experiment_detail_page(self, experiment):
+        # The new visitor is in home page and see the list of experiments.
+        # She clicks in a "View" link and is redirected to experiment
+        # detail page
+        link = self.browser.find_element_by_xpath(
+            "//a[@href='/experiments/" + experiment.slug + "/']"
+        )
+        link.click()
+
+
     # TODO: break by tabs
     def test_can_view_detail_page(self):
         experiment = Experiment.objects.filter(
             status=Experiment.APPROVED
         ).last()
 
-        # The new visitor is in home page and see the list of experiments.
-        # She clicks in second "View" link and is redirected to experiment
-        # detail page
-        # TODO: frequently fails to catch second link (see if it's solved)
-        link = self.browser.find_element_by_xpath(
-            "//a[@href='/experiments/" + experiment.slug + "/']"
-        )
-        link.click()
+        self._access_experiment_detail_page(experiment)
 
         # She sees a new page with a header title: Open Database
         # for Experiments in Neuroscience.
@@ -793,6 +796,20 @@ class ExperimentDetailTest(FunctionalTest):
             'Keywords:',
             self.browser.find_element_by_id('keywords').text
         )
+
+    def test_can_see_url_text_for_experiments_approved(self):
+
+        experiment = Experiment.objects.filter(
+            status=Experiment.APPROVED
+        ).first()
+        self._access_experiment_detail_page(experiment)
+
+        # TODO: see if we can get current url not just self.live_server_url
+        self.wait_for(lambda: self.assertIn(
+            'url: ' + self.live_server_url + '/experiments/' +
+                      experiment.slug,
+            self.browser.find_element_by_class_name('detail-header').text
+        ))
 
 
 class DownloadExperimentTest(FunctionalTest):

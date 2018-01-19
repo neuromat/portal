@@ -5,6 +5,8 @@
     <div id="id_link_home" class="detail-back-search">
         <a href="{% url 'home' %}" class="nep-return"> <span class="glyphicon glyphicon-menu-left"> </span> {% trans "Back Home" %}</a>
     </div>
+    <div style="clear:both; margin: 0 5px;"><strong>url:</strong>&nbsp
+        {{ request.build_absolute_uri }}</div>
     <div id="id_detail_description" class="detail-description">{{ experiment.description }}</div>
     {% if experiment.data_acquisition_done %}
         <div id="id_detail_acquisition" class="pull-right">
