@@ -2,6 +2,8 @@ import re
 import time
 
 import sys
+
+from django.contrib.auth import authenticate
 from django.core import mail
 from django.core.management import call_command
 from selenium.webdriver.common.keys import Keys
@@ -11,6 +13,16 @@ from functional_tests.base import FunctionalTestTrustee
 
 
 class TrusteeTest(FunctionalTestTrustee):
+
+    def _access_experiment_detail_page(self, experiment):
+        # The new visitor is in home page and see the list of experiments.
+        # She clicks in a "View" link and is redirected to experiment
+        # detail page
+        self.wait_for(
+            lambda: self.browser.find_element_by_xpath(
+                "//a[@href='/experiments/" + experiment.slug + "/']"
+            ).click()
+        )
 
     # TODO: repeated from test_search.SearchTest
     def search_for(self, string):
@@ -620,4 +632,64 @@ class TrusteeTest(FunctionalTestTrustee):
             'There is(are) ' + str(experiments) +
             ' experiment(s) to be analysed',
             tooltip_text
+        )
+
+    def test_click_in_experiment_url_editor_displays_modal_to_change_url(self):
+
+        experiment = Experiment.objects.filter(
+            status=Experiment.TO_BE_ANALYSED
+        ).first()
+        # TODO: to test experiment detail page is enough to load page
+        # TODO: directly in experiment detail
+        self._access_experiment_detail_page(experiment)
+
+        # The trustee clicks in experiment url link and sees a modal with a
+        # title informing that she can change the that url
+        self.wait_for(
+            lambda: self.browser.find_element_by_class_name(
+                'fa-pencil-square-o').click()
+        )
+        self.wait_for(
+            lambda: self.assertIn(
+                'Change experiment url slug',
+                self.browser.find_element_by_id('change_url_modal').text
+            )
+        )
+
+    def test_url_editor_modal_displays_correct_content(self):
+
+        experiment = Experiment.objects.filter(
+            status=Experiment.TO_BE_ANALYSED
+        ).first()
+
+        self._access_experiment_detail_page(experiment)
+
+        # The trustee clicks in experiment url link and sees a modal with a
+        # title informing that she can change the that url
+        self.wait_for(
+            lambda: self.browser.find_element_by_class_name(
+                'fa-pencil-square-o').click()
+        )
+
+        # In modal there are some content about the current url, a label for
+        # an input text form that trustee type the new slug, a sentence
+        # telling how the new slug will be
+        self.wait_for(
+            lambda: self.assertIn(
+                'Current url: ' + self.live_server_url + '/experiments/' +
+                experiment.slug,
+                self.browser.find_element_by_id('change_url_modal').text
+            )
+        )
+        self.assertIn(
+            'New experiment url slug (type only letters an dashes)',
+            self.browser.find_element_by_id('change_url_modal').text
+        )
+        change_slug_box = self.browser.find_element_by_id('change_slug')
+        self.assertEqual(
+            experiment.slug, change_slug_box.get_attribute('placeholder')
+        )
+        self.assertIn(
+            'How will the new url be?',
+            self.browser.find_element_by_id('change_url_modal').text
         )

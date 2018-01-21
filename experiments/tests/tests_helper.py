@@ -21,8 +21,8 @@ from experiments.models import Experiment, Study, Group, Researcher, \
     EEGElectrodeLocalizationSystem, ContextTree, Stimulus, EEG, EMG, \
     EMGSetting, EMGData, GoalkeeperGame, GoalkeeperGameData, \
     GenericDataCollection, GenericDataCollectionData, AdditionalData, \
-    EMGElectrodePlacement, EMGSurfacePlacement
-from experiments.views import get_q_default_language_or_first
+    EMGElectrodePlacement
+from experiments.views import _get_q_default_language_or_first
 
 
 def create_group(qtty, experiment):
@@ -763,7 +763,7 @@ def create_experiment_related_objects(experiment):
 
 
 def create_q_language_dir(q, questionnaire_metadata_dir):
-    q_default = get_q_default_language_or_first(q)
+    q_default = _get_q_default_language_or_first(q)
     q_language_dir = os.path.join(
         questionnaire_metadata_dir,
         q.code + '_' + q_default.survey_name

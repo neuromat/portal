@@ -17,11 +17,12 @@ from django.utils.encoding import smart_str
 from haystack.query import SearchQuerySet
 
 from experiments import views
+from experiments.forms import ChangeSlugForm
 from experiments.models import Experiment, Step, Questionnaire, \
     QuestionnaireDefaultLanguage, QuestionnaireLanguage, Group
 from experiments.tests.tests_helper import apply_setup, global_setup_ut, \
     create_experiment_related_objects, create_download_dir_structure_and_files, \
-    remove_selected_subdir
+    remove_selected_subdir, create_experiment
 from nep import settings
 
 
@@ -229,7 +230,7 @@ class ExperimentDetailTest(TestCase):
                 # The rule is display default questionnaire language data or
                 # first questionnaire language data if not set default
                 # questionnaire language. So we mimic the function
-                # get_q_default_language_or_first from views that do that.
+                # _get_q_default_language_or_first from views that do that.
                 # TODO: In tests helper we always create default
                 # TODO: questionnaire language as English. So we would to test
                 # TODO: only if we had first language.
@@ -847,3 +848,9 @@ class DownloadExperimentTest(TestCase):
             response,
             reverse('experiment-detail', kwargs={'slug': experiment.slug})
         )
+
+    def test_experiment_detail_page_has_change_slug_form(self):
+        experiment = create_experiment(1)
+
+        response = self.client.get('/experiments/' + experiment.slug + '/')
+        self.assertIsInstance(response.context['form'], ChangeSlugForm)

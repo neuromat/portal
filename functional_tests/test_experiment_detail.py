@@ -806,8 +806,7 @@ class ExperimentDetailTest(FunctionalTest):
 
         # TODO: see if we can get current url not just self.live_server_url
         self.wait_for(lambda: self.assertIn(
-            'url: ' + self.live_server_url + '/experiments/' +
-                      experiment.slug,
+            'url: ' + self.live_server_url + '/experiments/' + experiment.slug,
             self.browser.find_element_by_class_name('detail-header').text
         ))
 

@@ -83,6 +83,11 @@ i#new_experiments {
   color: white;
 }
 
+#experiment_url {
+    clear:both;
+    margin: 0 5px;
+}
+
 /*
   ========================================
   Buttons
