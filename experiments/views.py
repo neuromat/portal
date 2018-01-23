@@ -9,10 +9,12 @@ from django.core.mail import send_mail
 from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import render
 from django.template.loader import render_to_string
-from haystack.generic_views import SearchView
+from django.utils.text import slugify
 from django.utils.translation import activate, LANGUAGE_SESSION_KEY, \
     ugettext as _
+from django.template.defaultfilters import slugify
 
+from haystack.generic_views import SearchView
 from experiments.forms import NepSearchForm, ChangeSlugForm
 from experiments.models import Experiment, RejectJustification, Step, \
     Questionnaire, QuestionnaireDefaultLanguage, QuestionnaireLanguage
@@ -324,6 +326,40 @@ def change_status(request, experiment_id):
             )
 
     return HttpResponseRedirect('/')
+
+
+def change_slug(request, experiment_id):
+    # TODO: move validation logic to ChangeSlugForm form
+    experiment = Experiment.objects.get(pk=experiment_id)
+
+    new_slug = request.POST.get('slug')
+    if not new_slug:
+        messages.error(
+            request,
+            _('Empty slugs is not allowed. Please enter a valid slug')
+        )
+    elif new_slug != slugify(new_slug):
+        messages.error(
+            request,
+            _('The slug entered is not allowed. Please enter a valid slug. '
+              'Type only, letters without accents, numbers, dash, '
+              'and underscore signs')
+        )
+    else:
+        experiment_versions = Experiment.objects.filter(
+            nes_id=experiment.nes_id, owner=experiment.owner
+        )
+        for experiment in experiment_versions:
+            version = experiment.version
+            version_suffix = '-v' + str(version) if version > 1 else ''
+            experiment.slug = request.POST.get('slug') + version_suffix
+            experiment.save()
+        messages.success(
+            request,
+            _("The experiment's slug was modified")
+        )
+
+    return HttpResponseRedirect('/experiments/' + experiment.slug + '/')
 
 
 def ajax_to_be_analysed(request):

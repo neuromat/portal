@@ -8,8 +8,7 @@
     <div id="experiment_url">
         <strong>url:</strong>&nbsp;{{ request.build_absolute_uri }}&nbsp;&nbsp;<a
             data-toggle="modal"
-            href="#change_url_modal"><i class="fa fa-pencil-square-o"
-                        aria-hidden="true"></i></a>
+            href="#change_url_modal"><i class="fa fa-pencil-square-o" aria-hidden="true"></i></a>
     </div>
     <div id="id_detail_description" class="detail-description">{{ experiment.description }}</div>
     {% if experiment.data_acquisition_done %}
@@ -69,19 +68,21 @@
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
                     <h4 class="modal-title">Change experiment url slug</h4>
                 </div>
-                <div class="modal-body">
-                    <p>Current url: {{ request.build_absolute_uri }}</p>
-                    <p>New experiment url slug (type only letters an dashes)</p>
-                    <form action="{% url 'experiment-detail' experiment.slug %}" method="post">
-                        {% csrf_token %}
+                <form action="{% url 'change-slug' experiment.id %}" method="post">
+                    {% csrf_token %}
+                    <div class="modal-body">
+                        <p><strong>Current url:</strong> {{ request.build_absolute_uri }}</p>
+                        <p><strong>Current slug:</strong> {{ experiment.slug }}</p>
+                        <p><strong>New slug</strong> (type only, letters without accents, numbers, dash, and underscore signs):</p>
                         {{ form.slug }}
-                    </form>
-                    <p>How will the new url be?</p>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary">Save changes</button>
-                </div>
+                        <br>
+                        <p>How will the new url be?</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                        <input id="submit" type="submit" class="btn btn-primary" value="Save">
+                    </div>
+                </form>
             </div><!-- /.modal-content -->
         </div><!-- /.modal-dialog -->
     </div><!-- /.modal -->

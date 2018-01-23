@@ -96,7 +96,7 @@ class FunctionalTestTrustee(StaticLiveServerTestCase):
             ).send_keys('claudia')
         )
         self.browser.find_element_by_id('id_password').send_keys('passwd')
-        self.browser.find_element_by_id('id_submit').send_keys(Keys.ENTER)
+        self.browser.find_element_by_id('id_submit').click()
 
     def tearDown(self):
         self.browser.quit()

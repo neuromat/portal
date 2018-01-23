@@ -153,8 +153,9 @@ class ExperimentModelTest(TestCase):
         # version=17: large number to avoid conflicts with global setup
         experiment = Experiment(
             nes_id=1, title='', description='', owner=owner,
-            version=17, sent_date=datetime.utcnow()
+            version=17, slug='', sent_date=datetime.utcnow()
         )
+        # TODO: slug='' does not raises ValidationError
         with self.assertRaises(ValidationError):
             experiment.save()
             experiment.full_clean()
