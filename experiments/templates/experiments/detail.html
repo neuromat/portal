@@ -412,6 +412,23 @@
     <script src="{% static 'js/jquery.fileDownload.js' %}"></script>
     <script src="{% static 'js/download.js' %}"></script>
 
+    {# Prevent submit and prohibited chars in change url modal #}
+    <script>
+        $("#slug")
+            .keyup(function () {
+            // slug has to be at least 3 characters length
+                $("#submit").prop("disabled", $(this).val().length < 3);
+            }).keypress(function (event) {
+            // slug has to be only letters without accents, numbers, dashes and
+            // underscores
+                const regex = new RegExp("^[a-zA-Z0-9_-]+$");
+                const invisibles = (event.which === 0 || event.which === 8);
+                let key = String.fromCharCode(event.which);
+                return (regex.test(key) || invisibles);
+        });
+
+    </script>
+
     {##}
     {# Script related to experiments/top.html #}
     {##}
