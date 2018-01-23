@@ -50,7 +50,7 @@ def _create_slug(experiment):
     )
     # if it is not first version
     if older_versions.count() > 0:
-        # adds '-v#' to the end of slugified title, where '#' is the
+        # adds '-v#' to the end of slugfield title, where '#' is the
         # version number of the new experiment
         experiment.slug = older_versions.first().slug + '-v' + \
                           str(older_versions.count() + 1)
@@ -61,7 +61,7 @@ def _create_slug(experiment):
         # 2) <slug>-<#>
         # 3) <slug>-<#>-v<#>
         # we're filter and counting 1º and 2º form of slugs. Those
-        # forms determine if slug base, <slug>, conflicts with a new
+        # forms determine if slug base, <slug>, conflicts with slug from a new
         # experiment created.
         slugs = Experiment.objects.filter(
             slug__regex=r'^' + slugify(experiment.title) + '($|-[0-9]+$)'

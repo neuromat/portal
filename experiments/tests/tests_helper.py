@@ -21,8 +21,8 @@ from experiments.models import Experiment, Study, Group, Researcher, \
     EEGElectrodeLocalizationSystem, ContextTree, Stimulus, EEG, EMG, \
     EMGSetting, EMGData, GoalkeeperGame, GoalkeeperGameData, \
     GenericDataCollection, GenericDataCollectionData, AdditionalData, \
-    EMGElectrodePlacement, EMGSurfacePlacement
-from experiments.views import get_q_default_language_or_first
+    EMGElectrodePlacement
+from experiments.views import _get_q_default_language_or_first
 
 
 def create_group(qtty, experiment):
@@ -115,18 +115,19 @@ def create_experiment_versions(qtty, experiment):
     """
     :param qtty: number of versions to create
     :param experiment: Experiment model instance
-    :return: list
+    :return: list of all versions including the first
     """
-    experiment_versions = []
     current_version = experiment.version
     for version in range(qtty):
         experiment_version = experiment
         experiment_version.pk = None
         experiment_version.version = current_version + 1
         experiment_version.save()
-        experiment_versions.append(experiment_version)
         current_version += 1
 
+    experiment_versions = []
+    for ev in Experiment.objects.all():
+        experiment_versions.append(ev)
     return experiment_versions
 
 
@@ -144,6 +145,11 @@ def create_trustee_users():
     )
     group.user_set.add(trustee1)
     group.user_set.add(trustee2)
+
+    trustees = list()
+    trustees.append(trustee1)
+    trustees.append(trustee2)
+    return trustees
 
 
 def create_researchers():
@@ -763,7 +769,7 @@ def create_experiment_related_objects(experiment):
 
 
 def create_q_language_dir(q, questionnaire_metadata_dir):
-    q_default = get_q_default_language_or_first(q)
+    q_default = _get_q_default_language_or_first(q)
     q_language_dir = os.path.join(
         questionnaire_metadata_dir,
         q.code + '_' + q_default.survey_name
@@ -1310,6 +1316,15 @@ def global_setup_ft():
         settings.BASE_DIR + '/experiments/tests/questionnaire4.csv',
         'en'
     )
+
+
+def random_utf8_string(length):
+    result = b''
+    for i in range(length):
+        a = b'\\u%04x' % random.randrange(0x10000)
+        result = result + a
+    result.decode('unicode-escape')
+    return result.decode()
 
 
 def global_setup_ut():

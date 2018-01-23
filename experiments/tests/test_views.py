@@ -12,16 +12,20 @@ import os
 from django.contrib.auth.models import User
 from django.core.management import call_command
 from django.test import TestCase, override_settings
-from django.urls import reverse
+from django.urls import reverse, resolve
 from django.utils.encoding import smart_str
 from haystack.query import SearchQuerySet
 
 from experiments import views
+from experiments.forms import ChangeSlugForm
 from experiments.models import Experiment, Step, Questionnaire, \
     QuestionnaireDefaultLanguage, QuestionnaireLanguage, Group
 from experiments.tests.tests_helper import apply_setup, global_setup_ut, \
-    create_experiment_related_objects, create_download_dir_structure_and_files, \
-    remove_selected_subdir
+    create_experiment_related_objects, \
+    create_download_dir_structure_and_files, \
+    remove_selected_subdir, create_experiment, create_trustee_users, \
+    create_experiment_versions, random_utf8_string
+from experiments.views import change_slug
 from nep import settings
 
 
@@ -44,12 +48,12 @@ class HomePageTest(TestCase):
         ).first()
         response = self.client.post(
             '/experiments/' + str(experiment.id) + '/change_status/',
-            {'status': Experiment.UNDER_ANALYSIS},
-            )
+            {'status': Experiment.UNDER_ANALYSIS}
+        )
         # Is it redirecting?
         self.assertEqual(response.status_code, 302)
         # TODO: is it using correct template after redirecting
-        # experiment has changed status to UNDER_ANALYSIS?
+        # TODO: experiment has changed status to UNDER_ANALYSIS?
         experiment = Experiment.objects.get(pk=experiment.id)
         self.assertEqual(experiment.status, Experiment.UNDER_ANALYSIS)
 
@@ -88,7 +92,7 @@ class HomePageTest(TestCase):
         self.assertEqual(self.to, [experiment.study.researcher.email])
 
     def test_adds_success_message(self):
-        # TODO: see if is worth to test other messages
+        # TODO: see if it is worth to test other messages
         experiment = Experiment.objects.filter(
             status=Experiment.UNDER_ANALYSIS
         ).first()
@@ -229,7 +233,7 @@ class ExperimentDetailTest(TestCase):
                 # The rule is display default questionnaire language data or
                 # first questionnaire language data if not set default
                 # questionnaire language. So we mimic the function
-                # get_q_default_language_or_first from views that do that.
+                # _get_q_default_language_or_first from views that do that.
                 # TODO: In tests helper we always create default
                 # TODO: questionnaire language as English. So we would to test
                 # TODO: only if we had first language.
@@ -332,6 +336,116 @@ class ExperimentDetailTest(TestCase):
             response.context['questionnaires'][group2.title][q2.id][
                 'survey_metadata'], 'invalid_questionnaire'
         )
+
+    def test_experiment_detail_page_has_change_slug_form(self):
+        experiment = create_experiment(1)
+
+        response = self.client.get('/experiments/' + experiment.slug + '/')
+        self.assertIsInstance(response.context['form'], ChangeSlugForm)
+
+
+class ChangeExperimentSlugTest(TestCase):
+
+    def setUp(self):
+        create_experiment(1)
+        trustee_users = create_trustee_users()
+        trustee = trustee_users[0]
+        self.client.login(username=trustee.username, password='passwd')
+
+    def test_change_slug_url_resolves_to_change_slug_view(self):
+        experiment = Experiment.objects.first()
+
+        found = resolve(
+            '/experiments/' + str(experiment.id) + '/change_slug/'
+        )
+        self.assertEqual(found.func, change_slug)
+
+    def test_POSTing_returns_redirect_to_experiment_detail_page(self):
+        experiment = Experiment.objects.first()
+
+        response = self.client.post(
+            '/experiments/' + str(experiment.id) + '/change_slug/',
+            {'slug': 'a-brand_new-slug'}
+        )
+        self.assertEqual(response.status_code, 302)
+
+    def test_POSTing_a_valid_first_version_slug_saves_new_slug_correctly(self):
+        experiment = Experiment.objects.first()
+
+        response = self.client.post(
+            '/experiments/' + str(experiment.id) + '/change_slug/',
+            {'slug': 'a-brand_new-slug-for-version-1'},
+            follow=True
+        )
+
+        experiment = Experiment.objects.first()
+        self.assertEqual('a-brand_new-slug-for-version-1', experiment.slug)
+
+        message = list(response.context['messages'])[0]
+        self.assertEqual(
+            message.message,
+            "The experiment's slug was modified"
+        )
+        self.assertEqual(message.tags, "success")
+
+    def test_POSTing_a_valid_n_experiment_version_changes_all_slugs_correctly(
+            self):
+        experiment = Experiment.objects.first()
+        experiment_versions = create_experiment_versions(3, experiment)
+        last_version = experiment_versions[len(experiment_versions) - 1]
+
+        self.client.post(
+            '/experiments/' + str(last_version.id) + '/change_slug/',
+            {'slug': 'new-slug-for-version-4'}
+        )
+
+        for experiment in Experiment.objects.all():
+            version = experiment.version
+            version_suffix = '-v' + str(version) if version > 1 else ''
+            self.assertEqual(
+                'new-slug-for-version-4' + version_suffix,
+                experiment.slug
+            )
+
+    def test_POSTing_empty_slug_returns_error_message(self):
+        experiment_before = Experiment.objects.first()
+
+        response = self.client.post(
+            '/experiments/' + str(experiment_before.id) + '/change_slug/',
+            {'slug': ''}, follow=True
+        )
+
+        experiment_after = Experiment.objects.first()
+        self.assertEqual(experiment_before.slug, experiment_after.slug)
+
+        message = list(response.context['messages'])[0]
+        self.assertEqual(
+            message.message,
+            'Empty slugs is not allowed. Please enter a valid slug'
+        )
+        self.assertEqual(message.tags, "error")
+
+    def test_POSTing_invalid_slug_returns_error_message(self):
+        # generates random string to post random utf-8 slug
+        # TODO: verify if function is returning correct string
+        slug = random_utf8_string(random.randint(1, 50))
+
+        experiment_before = Experiment.objects.first()
+        response = self.client.post(
+            '/experiments/' + str(experiment_before.id) + '/change_slug/',
+            {'slug': slug}, follow=True
+        )
+        experiment_after = Experiment.objects.first()
+        self.assertEqual(experiment_before.slug, experiment_after.slug)
+
+        message = list(response.context['messages'])[0]
+        self.assertEqual(
+            message.message,
+            'The slug entered is not allowed. Please enter a valid slug. '
+            'Type only, letters without accents, numbers, dash, '
+            'and underscore signs'
+        )
+        self.assertEqual(message.tags, "error")
 
 
 @override_settings(HAYSTACK_CONNECTIONS=TEST_HAYSTACK_CONNECTIONS)
