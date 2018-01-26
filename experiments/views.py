@@ -330,6 +330,7 @@ def change_status(request, experiment_id):
 
 def change_slug(request, experiment_id):
     # TODO: move validation logic to ChangeSlugForm form
+    # TODO: implement validation in model too
     experiment = Experiment.objects.get(pk=experiment_id)
 
     new_slug = request.POST.get('slug')
@@ -344,6 +345,12 @@ def change_slug(request, experiment_id):
             _('The slug entered is not allowed. Please enter a valid slug. '
               'Type only letters without accents, numbers, dash, '
               'and underscore signs')
+        )
+    elif len(new_slug) < 3:
+        messages.error(
+            request,
+            _('The slug entered is two small. Please enter at least 3 '
+              'characters')
         )
     else:
         experiment_versions = Experiment.objects.filter(
