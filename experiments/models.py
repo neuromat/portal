@@ -367,8 +367,10 @@ class SurfaceElectrode(ElectrodeModel):
 
 
 class EEGElectrodePosition(models.Model):
-    eeg_electrode_localization_system = models.ForeignKey(EEGElectrodeLocalizationSystem,
-                                                          related_name="electrode_positions")
+    eeg_electrode_localization_system = models.ForeignKey(
+        EEGElectrodeLocalizationSystem,
+        related_name="electrode_positions"
+    )
     electrode_model = models.ForeignKey(ElectrodeModel)
     name = models.CharField(max_length=150)
     coordinate_x = models.IntegerField(null=True, blank=True)

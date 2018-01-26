@@ -3,7 +3,7 @@ from haystack import indexes
 from experiments.models import Experiment, Study, Group, \
     ExperimentalProtocol, TMSSetting, TMSDeviceSetting, TMSDevice, \
     CoilModel, TMSData, EEGSetting, Questionnaire, Step, \
-    QuestionnaireLanguage, Publication
+    QuestionnaireLanguage, Publication, EMGSetting
 
 
 class ExperimentIndex(indexes.SearchIndex, indexes.Indexable):
@@ -193,6 +193,20 @@ class EEGSettingIndex(indexes.SearchIndex, indexes.Indexable):
 
     def get_model(self):
         return EEGSetting
+
+    def index_queryset(self, using=None):
+        experiments = Experiment.lastversion_objects.filter(
+            status=Experiment.APPROVED
+        )
+        return self.get_model().objects.filter(experiment__in=experiments)
+
+
+class EMGSettingIndex(indexes.SearchIndex, indexes.Indexable):
+    text = indexes.CharField(document=True, use_template=True)
+    experiment = indexes.CharField(model_attr='experiment__id')
+
+    def get_model(self):
+        return EMGSetting
 
     def index_queryset(self, using=None):
         experiments = Experiment.lastversion_objects.filter(

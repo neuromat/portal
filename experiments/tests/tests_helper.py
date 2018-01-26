@@ -330,9 +330,13 @@ def create_eeg_step(group, eeg_setting):
 def create_emg_setting(experiment):
     """
     :param experiment: Experiment model instance
+    :return: EMGSetting model instance
     """
+    faker = Factory.create()
+
     return EMGSetting.objects.create(
-        experiment=experiment
+        experiment=experiment, name=faker.word(), description=faker.text(),
+        acquisition_software_version=faker.ssn()
     )
 
 

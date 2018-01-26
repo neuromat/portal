@@ -4,7 +4,9 @@ import sys
 import haystack
 from django.core.management import call_command
 
-from experiments.models import Study, Experiment, Group, Step
+from experiments.models import Study, Experiment, Group, Step, EMGSetting
+from experiments.tests.tests_helper import create_experiment, \
+    create_emg_setting
 from functional_tests.base import FunctionalTest
 
 import time
@@ -44,10 +46,8 @@ class SearchTest(FunctionalTest):
         search_box.clear()
         search_box.send_keys(string)
         self.browser.find_element_by_id('submit_terms').click()
-        time.sleep(1)
 
     def test_search_two_words_returns_correct_objects(self):
-
         # Joselina, a neuroscience researcher at Numec is delighted with the
         # NED Portal. She decides to search for experiments that contains
         # "Braquial Plexus" in whatever part of the portal. The search
@@ -63,8 +63,9 @@ class SearchTest(FunctionalTest):
         # one list for each of them.
         # One experiment has 'Brachial Plexus' in title, other has 'Brachial
         # plexus' in description
-        search_header_title = self.browser.find_element_by_tag_name('h2').text
-        self.assertEqual(search_header_title, 'Search Results')
+        self.wait_for(lambda: self.assertEqual(
+            self.browser.find_element_by_tag_name('h2').text, 'Search Results'
+        ))
 
         table = self.browser.find_element_by_id('search_table')
         experiment_rows = \
@@ -130,9 +131,19 @@ class SearchTest(FunctionalTest):
         self.search_for('Pero Vaz')
         # She sees that there is one Study whose one of the collaborators is
         # Pero Vaz.
-        study_rows = \
-            self.browser.find_elements_by_class_name('study-matches')
-        self.assertTrue(any('Pero Vaz' in row.text for row in study_rows))
+        # self.wait_for(lambda: self.browser.find_elements_by_class_name(
+        #     'study-matches'
+        # ))
+        # study_rows = \
+        #     self.browser.find_elements_by_class_name('study-matches')
+        # self.assertTrue(any('Pero Vaz' in row.text for row in study_rows))
+        
+        self.wait_for(
+            lambda: self.assertTrue(
+                any('Pero Vaz' in row.text for row in self.browser
+                    .find_elements_by_class_name('study-matches'))
+            )
+        )
 
     def test_search_returns_only_last_version_experiments(self):
 
@@ -143,6 +154,7 @@ class SearchTest(FunctionalTest):
         # as tests helper creates version 2 of an experiment, only version 2
         # is supposed to appear in search results. Obs.: this test only
         # tests for duplicate result, not for the correct version.
+        self.wait_for(lambda: self.browser.find_element_by_id('search_table'))
         table = self.browser.find_element_by_id('search_table')
         # we make experiment.description = Ein Beschreibung in tests helper
         experiment_rows = \
@@ -163,7 +175,9 @@ class SearchTest(FunctionalTest):
         # in tests helper), it's supposed to two matches occurs (the
         # experiments approved), the Experiment's tha has matches for
         # 'Brachial Plexus' haystack search results.
-        self.verify_n_objects_in_table_rows(2, 'experiment-matches')
+        self.wait_for(lambda: self.verify_n_objects_in_table_rows(
+            2, 'experiment-matches'
+        ))
 
     def test_search_with_one_filter_returns_correct_objects(self):
 
@@ -228,7 +242,9 @@ class SearchTest(FunctionalTest):
         # with 'brachial ... EEG' in its description, the search results bring
         # an experiment and a study.
         ##
-        self.verify_n_objects_in_table_rows(1, 'experiment-matches')
+        self.wait_for(lambda: self.verify_n_objects_in_table_rows(
+            1, 'experiment-matches'
+        ))
         experiment = self.browser.find_element_by_class_name(
             'experiment-matches').text
         self.assertIn('Brachial', experiment)
@@ -254,7 +270,9 @@ class SearchTest(FunctionalTest):
         # and 'EEG' in description. There's a study with 'EEG' in study
         # description. So, she's got two rows in Search Results.
         ##
-        self.verify_n_objects_in_table_rows(1, 'experiment-matches')
+        self.wait_for(lambda: self.verify_n_objects_in_table_rows(
+            1, 'experiment-matches'
+        ))
         experiment = self.browser.find_element_by_class_name(
             'experiment-matches').text
         self.assertIn('EMG', experiment)
@@ -278,7 +296,9 @@ class SearchTest(FunctionalTest):
         # we obtain just one row in Search results: that group with
         # 'Brachial only' in title.
         ##
-        self.verify_n_objects_in_table_rows(0, 'experiment-matches')
+        self.wait_for(lambda: self.verify_n_objects_in_table_rows(
+            0, 'experiment-matches'
+        ))
         self.verify_n_objects_in_table_rows(0, 'study-matches')
         self.verify_n_objects_in_table_rows(0, 'experimentalprotocol-matches')
         self.verify_n_objects_in_table_rows(1, 'group-matches')
@@ -299,7 +319,9 @@ class SearchTest(FunctionalTest):
         # Haystack SearchQuerySet filter method, content__exact attribute
         # does not differentiate by upper or lower case in that attribute.
         ##
-        self.verify_n_objects_in_table_rows(0, 'experiment-matches')
+        self.wait_for(lambda: self.verify_n_objects_in_table_rows(
+            0, 'experiment-matches'
+        ))
         self.verify_n_objects_in_table_rows(0, 'study-matches')
         self.verify_n_objects_in_table_rows(0, 'experimentalprotocol-matches')
         self.verify_n_objects_in_table_rows(1, 'group-matches')
@@ -410,9 +432,10 @@ class SearchTest(FunctionalTest):
         # When Joselina makes searches, a button to back homepage is
         # displayed on the right side, above the list of search results
         self.search_for('brachial plexus')
-        link_home = self.browser.find_element_by_id('link_home')
-        self.assertEqual('Back Home', link_home.text)
-        link_home.click()
+        self.wait_for(lambda: self.assertEqual(
+            'Back Home', self.browser.find_element_by_id('link_home').text
+        ))
+        self.browser.find_element_by_id('link_home').click()
 
         # Joselina is back homepage
         self.wait_for(
@@ -428,7 +451,9 @@ class SearchTest(FunctionalTest):
 
         # As there is one TMSSetting object with that name, she sees just
         # one row in Search Results list
-        self.verify_n_objects_in_table_rows(1, 'tmssetting-matches')
+        self.wait_for(lambda: self.verify_n_objects_in_table_rows(
+            1, 'tmssetting-matches'
+        ))
         self.verify_n_objects_in_table_rows(0, 'experiment-matches')
         self.verify_n_objects_in_table_rows(0, 'study-matches')
         self.verify_n_objects_in_table_rows(0, 'group-matches')
@@ -446,7 +471,9 @@ class SearchTest(FunctionalTest):
 
         # As there is three TMSDeviceSetting object with that name, she sees
         # just one row in Search Results list
-        self.verify_n_objects_in_table_rows(3, 'tmsdevicesetting-matches')
+        self.wait_for(lambda: self.verify_n_objects_in_table_rows(
+            3, 'tmsdevicesetting-matches'
+        ))
         self.verify_n_objects_in_table_rows(0, 'tmssetting-matches')
         self.verify_n_objects_in_table_rows(0, 'experiment-matches')
         self.verify_n_objects_in_table_rows(0, 'study-matches')
@@ -465,7 +492,9 @@ class SearchTest(FunctionalTest):
         # As there is one TMSDevice object that has Magstim as manufacturer,
         # but three TMSDeviceSetting objects that has that TMSDevice object as
         # a Foreign Key, she sees three rows in Search Results list
-        self.verify_n_objects_in_table_rows(3, 'tmsdevice-matches')
+        self.wait_for(lambda: self.verify_n_objects_in_table_rows(
+            3, 'tmsdevice-matches'
+        ))
         self.verify_n_objects_in_table_rows(0, 'tmsdevicesetting-matches')
         self.verify_n_objects_in_table_rows(0, 'tmssetting-matches')
         self.verify_n_objects_in_table_rows(0, 'experiment-matches')
@@ -484,7 +513,9 @@ class SearchTest(FunctionalTest):
         # As there is one CoilModel object that has Magstim as manufacturer,
         # but three TMSDeviceSetting objects that has that CoilModel object as
         # a Foreign Key, she sees three rows in Search Results list
-        self.verify_n_objects_in_table_rows(3, 'coilmodel-matches')
+        self.wait_for(lambda: self.verify_n_objects_in_table_rows(
+            3, 'coilmodel-matches'
+        ))
         self.verify_n_objects_in_table_rows(0, 'tmsdevice-matches')
         self.verify_n_objects_in_table_rows(0, 'tmsdevicesetting-matches')
         self.verify_n_objects_in_table_rows(0, 'tmssetting-matches')
@@ -508,7 +539,9 @@ class SearchTest(FunctionalTest):
         # brain_area_name field, one of them associated with a TMSSetting
         # object, and other two associated with another TMSSetting object
         # she sees two rows in Search Results list
-        self.verify_n_objects_in_table_rows(3, 'tmsdata-matches')
+        self.wait_for(lambda: self.verify_n_objects_in_table_rows(
+            3, 'tmsdata-matches'
+        ))
         self.verify_n_objects_in_table_rows(0, 'coilmodel-matches')
         self.verify_n_objects_in_table_rows(0, 'tmsdevice-matches')
         self.verify_n_objects_in_table_rows(0, 'tmsdevicesetting-matches')
@@ -530,7 +563,9 @@ class SearchTest(FunctionalTest):
         # As there is three EEGSetting objects with that name,
         # one associated to an experiment, and the other two associated with
         # another experiment, she sees three rows in Search Results list
-        self.verify_n_objects_in_table_rows(3, 'eegsetting-matches')
+        self.wait_for(lambda: self.verify_n_objects_in_table_rows(
+            3, 'eegsetting-matches'
+        ))
         self.verify_n_objects_in_table_rows(0, 'tmsdata-matches')
         self.verify_n_objects_in_table_rows(0, 'coilmodel-matches')
         self.verify_n_objects_in_table_rows(0, 'tmsdevice-matches')
@@ -545,6 +580,50 @@ class SearchTest(FunctionalTest):
         ).text
         self.assertIn('eegsettingname', eegsetting_text)
 
+    def test_search_emgsetting_returns_correct_objects(self):
+        ##
+        # Create objects needed
+        ##
+        experiment1 = create_experiment(1, status=Experiment.APPROVED)
+        create_emg_setting(experiment1)
+        experiment2 = create_experiment(1, status=Experiment.APPROVED)
+        create_emg_setting(experiment2)
+        create_emg_setting(experiment2)
+        for emg_setting in EMGSetting.objects.all():
+            emg_setting.name = 'emgsettingname'
+            emg_setting.save()
+
+        ##
+        # Rebuild haystack index
+        ##
+        haystack.connections.reload('default')
+        self.haystack_index('rebuild_index')
+
+        # Joselina wants to search for experiments whose EMGSetting name is
+        # 'emgsettingname'
+        self.search_for('emgsettingname')
+
+        # As there is three EMGSetting objects with that name,
+        # one associated to an experiment, and the other two associated with
+        # another experiment, she sees three rows in Search Results list
+        self.wait_for(lambda: self.verify_n_objects_in_table_rows(
+            3, 'emgsetting-matches'
+        ))
+        self.verify_n_objects_in_table_rows(0, 'eegsetting-matches')
+        self.verify_n_objects_in_table_rows(0, 'tmsdata-matches')
+        self.verify_n_objects_in_table_rows(0, 'coilmodel-matches')
+        self.verify_n_objects_in_table_rows(0, 'tmsdevice-matches')
+        self.verify_n_objects_in_table_rows(0, 'tmsdevicesetting-matches')
+        self.verify_n_objects_in_table_rows(0, 'tmssetting-matches')
+        self.verify_n_objects_in_table_rows(0, 'experiment-matches')
+        self.verify_n_objects_in_table_rows(0, 'study-matches')
+        self.verify_n_objects_in_table_rows(0, 'group-matches')
+        self.verify_n_objects_in_table_rows(0, 'experimentalprotocol-matches')
+        emgsetting_text = self.browser.find_element_by_class_name(
+            'emgsetting-matches'
+        ).text
+        self.assertIn('emgsettingname', emgsetting_text)
+
     def test_search_questionnaire_data_returns_correct_objects_1(self):
         # Joselina wants to search for experiments that contains some
         # questionnaire data
@@ -554,7 +633,9 @@ class SearchTest(FunctionalTest):
         # they are displayed in search results
         # TODO: we verify for 3 objects because test is catching invalid
         # TODO: questionnaires. See note 'Backlog' in notebook, 09/28/2017
-        self.verify_n_objects_in_table_rows(1, 'questionnaire-matches')
+        self.wait_for(lambda: self.verify_n_objects_in_table_rows(
+            1, 'questionnaire-matches'
+        ))
         self.verify_n_objects_in_table_rows(0, 'eegsetting-matches')
         self.verify_n_objects_in_table_rows(0, 'tmsdata-matches')
         self.verify_n_objects_in_table_rows(0, 'coilmodel-matches')
@@ -580,7 +661,9 @@ class SearchTest(FunctionalTest):
         # they are displayed in search results
         # TODO: we verify for 3 objects because test is catching invalid
         # TODO: questionnaires. See note 'Backlog' in notebook, 09/28/2017
-        self.verify_n_objects_in_table_rows(1, 'questionnaire-matches')
+        self.wait_for(lambda: self.verify_n_objects_in_table_rows(
+            1, 'questionnaire-matches'
+        ))
         self.verify_n_objects_in_table_rows(0, 'eegsetting-matches')
         self.verify_n_objects_in_table_rows(0, 'tmsdata-matches')
         self.verify_n_objects_in_table_rows(0, 'coilmodel-matches')
@@ -605,7 +688,9 @@ class SearchTest(FunctionalTest):
         # it is displayed in search results
         # TODO: we verify for 3 objects because test is catching invalid
         # TODO: questionnaires. See note 'Backlog' in notebook, 09/28/2017
-        self.verify_n_objects_in_table_rows(1, 'questionnaire-matches')
+        self.wait_for(lambda: self.verify_n_objects_in_table_rows(
+            1, 'questionnaire-matches'
+        ))
         self.verify_n_objects_in_table_rows(0, 'eegsetting-matches')
         self.verify_n_objects_in_table_rows(0, 'tmsdata-matches')
         self.verify_n_objects_in_table_rows(0, 'coilmodel-matches')
@@ -633,7 +718,9 @@ class SearchTest(FunctionalTest):
         # they are displayed in search results
         # TODO: we verify for 3 objects because test is catching invalid
         # TODO: questionnaires. See note 'Backlog' in notebook, 09/28/2017
-        self.verify_n_objects_in_table_rows(2, 'questionnaire-matches')
+        self.wait_for(lambda: self.verify_n_objects_in_table_rows(
+            2, 'questionnaire-matches'
+        ))
         self.verify_n_objects_in_table_rows(0, 'eegsetting-matches')
         self.verify_n_objects_in_table_rows(0, 'tmsdata-matches')
         self.verify_n_objects_in_table_rows(0, 'coilmodel-matches')
@@ -680,7 +767,9 @@ class SearchTest(FunctionalTest):
         # Joselina sees one search result displaying the experiment that
         # publication belongs to, and any other search result of other
         # possible objects
-        self.verify_n_objects_in_table_rows(1, 'publication-matches')
+        self.wait_for(lambda: self.verify_n_objects_in_table_rows(
+            1, 'publication-matches'
+        ))
         self.verify_n_objects_in_table_rows(0, 'questionnaire-matches')
         self.verify_n_objects_in_table_rows(0, 'eegsetting-matches')
         self.verify_n_objects_in_table_rows(0, 'tmsdata-matches')
