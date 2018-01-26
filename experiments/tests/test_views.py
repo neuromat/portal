@@ -360,7 +360,7 @@ class ChangeExperimentSlugTest(TestCase):
         )
         self.assertEqual(found.func, change_slug)
 
-    def test_POSTing_returns_redirect_to_experiment_detail_page(self):
+    def test_POSTing_new_slug_returns_redirect_to_experiment_detail_page(self):
         experiment = Experiment.objects.first()
 
         response = self.client.post(
@@ -444,6 +444,23 @@ class ChangeExperimentSlugTest(TestCase):
             'The slug entered is not allowed. Please enter a valid slug. '
             'Type only letters without accents, numbers, dash, '
             'and underscore signs'
+        )
+        self.assertEqual(message.tags, "error")
+    
+    def test_POSTing_slug_with_less_than_three_characters_returns_error_message(self):
+        experiment_before = Experiment.objects.first()
+        response = self.client.post(
+            '/experiments/' + str(experiment_before.id) + '/change_slug/',
+            {'slug': 'ab'}, follow=True
+        )
+        experiment_after = Experiment.objects.first()
+        self.assertEqual(experiment_before.slug, experiment_after.slug)
+
+        message = list(response.context['messages'])[0]
+        self.assertEqual(
+            message.message,
+            'The slug entered is two small. Please enter at least 3 '
+            'characters'
         )
         self.assertEqual(message.tags, "error")
 
