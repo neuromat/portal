@@ -20,7 +20,7 @@ from experiments.tests.tests_helper import global_setup_ut, apply_setup, \
     create_stimulus_step, create_experimental_protocol, create_tms_setting, \
     create_tms_data, create_participant, create_genders, create_eeg_data, \
     create_eeg_step, create_emg_step, create_emg_setting, create_emg_data, \
-    create_goal_keeper_game_step, create_goal_keeper_game_data, \
+    create_goalkeepergame_step, create_goalkeeper_game_data, \
     create_generic_data_collection_step, create_generic_data_collection_data, \
     create_additional_data, create_emg_electrode_placement
 
@@ -605,10 +605,10 @@ class GoalkeeperGameDataModel(TestCase):
     def test_delete_instance_deletes_related_instances_and_files(self):
         model_instances_dict = create_model_instances_to_test_step_type_data()
         context_tree = create_context_tree(model_instances_dict['experiment'])
-        goal_keeper_game_step = create_goal_keeper_game_step(
+        goal_keeper_game_step = create_goalkeepergame_step(
             model_instances_dict['group'], context_tree
         )
-        goal_keeper_game_data = create_goal_keeper_game_data(
+        goal_keeper_game_data = create_goalkeeper_game_data(
             goal_keeper_game_step, model_instances_dict['participant']
         )
 

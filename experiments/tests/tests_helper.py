@@ -354,6 +354,22 @@ def create_emg_step(group, emg_setting):
     )
 
 
+def create_goalkeepergame_step(group, context_tree):
+    """
+    :param group: Group model instance
+    :param context_tree: Context Tree model instance
+    :return: GoalkeeperGame model instance
+    """
+    faker = Factory.create()
+
+    return GoalkeeperGame.objects.create(
+        software_name=faker.word(), software_description=faker.text(),
+        software_version=faker.word(), context_tree=context_tree,
+        group=group, identification=faker.word(), numeration=faker.ssn(),
+        type=Step.GOALKEEPER, order=randint(1, 20)
+    )
+
+
 def create_emg_data(emg_setting, emg_step, participant):
     """
     :param emg_setting: EMGSetting model instance
@@ -582,21 +598,7 @@ def create_eegsetting_objects_to_test_search():
     tmss3.save()
 
 
-def create_goal_keeper_game_step(group, context_tree):
-    """
-    :param group: Group model instance
-    :param context_tree: ContextTree model instance
-    """
-    faker = Factory.create()
-
-    return GoalkeeperGame.objects.create(
-        group=group, context_tree=context_tree,
-        identification=faker.word(), numeration=faker.ssn(),
-        type=Step.GOALKEEPER, order=randint(1, 20)
-    )
-
-
-def create_goal_keeper_game_data(gkg_step, participant):
+def create_goalkeeper_game_data(gkg_step, participant):
     """
     :param gkg_step: GoalkeeperGame(Step) model instance
     :param participant: Participant model instance
@@ -721,6 +723,7 @@ def create_context_tree(experiment):
     fake = Factory.create()
 
     return ContextTree.objects.create(
+        setting_text=fake.text(),
         experiment=experiment,
         name=fake.word(),
         description=fake.text()

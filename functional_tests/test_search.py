@@ -4,9 +4,11 @@ import sys
 import haystack
 from django.core.management import call_command
 
-from experiments.models import Study, Experiment, Group, Step, EMGSetting
+from experiments.models import Study, Experiment, Group, Step, EMGSetting, \
+    GoalkeeperGame
 from experiments.tests.tests_helper import create_experiment, \
-    create_emg_setting
+    create_emg_setting, create_group, create_goalkeepergame_step, \
+    create_context_tree
 from functional_tests.base import FunctionalTest
 
 import time
@@ -46,6 +48,61 @@ class SearchTest(FunctionalTest):
         search_box.clear()
         search_box.send_keys(string)
         self.browser.find_element_by_id('submit_terms').click()
+
+    @staticmethod
+    def create_objects_to_test_search_emgsetting():
+        experiment1 = create_experiment(1, status=Experiment.APPROVED)
+        create_emg_setting(experiment1)
+        experiment2 = create_experiment(1, status=Experiment.APPROVED)
+        create_emg_setting(experiment2)
+        create_emg_setting(experiment2)
+        for emg_setting in EMGSetting.objects.all():
+            emg_setting.name = 'emgsettingname'
+            emg_setting.save()
+
+    @staticmethod
+    def create_objects_to_test_search_goalkeepergame_step():
+        experiment1 = create_experiment(1, status=Experiment.APPROVED)
+        group1 = create_group(1, experiment1)
+        group2 = create_group(1, experiment1)
+        context_tree1 = create_context_tree(experiment1)
+        create_goalkeepergame_step(group1, context_tree1)
+        create_goalkeepergame_step(group2, context_tree1)
+        experiment2 = create_experiment(1, status=Experiment.APPROVED)
+        group = create_group(1, experiment2)
+        context_tree2 = create_context_tree(experiment2)
+        create_goalkeepergame_step(group, context_tree2)
+        for goalkeepergame in GoalkeeperGame.objects.all():
+            goalkeepergame.software_name = 'goalkeepergame'
+            goalkeepergame.save()
+
+    def test_click_in_a_search_result_display_experiment_detail_page(self):
+        # TODO: the test tests for some match types, not all. Wold be better
+        # TODO: to test for each and all match types.
+
+        # The researcher searches for 'brachial' term
+        self.search_for('brachial')
+
+        # She obtains some results. She clicks in on A result link randomly
+        # and is redirected to experiment detail page
+        self.wait_for(
+            lambda:
+            self.browser.find_element_by_id('search_table')
+        )
+
+        links = self.browser.find_element_by_id(
+            'search_table'
+        ).find_elements_by_tag_name('a')
+        random_link = random.choice(links)
+        random_link.click()
+
+        self.wait_for(
+            lambda:
+            self.assertEqual(
+                self.browser.find_element_by_tag_name('h2').text,
+                'Open Database for Experiments in Neuroscience'
+            )
+        )
 
     def test_search_two_words_returns_correct_objects(self):
         # Joselina, a neuroscience researcher at Numec is delighted with the
@@ -137,7 +194,7 @@ class SearchTest(FunctionalTest):
         # study_rows = \
         #     self.browser.find_elements_by_class_name('study-matches')
         # self.assertTrue(any('Pero Vaz' in row.text for row in study_rows))
-        
+
         self.wait_for(
             lambda: self.assertTrue(
                 any('Pero Vaz' in row.text for row in self.browser
@@ -581,22 +638,8 @@ class SearchTest(FunctionalTest):
         self.assertIn('eegsettingname', eegsetting_text)
 
     def test_search_emgsetting_returns_correct_objects(self):
-        ##
-        # Create objects needed
-        ##
-        experiment1 = create_experiment(1, status=Experiment.APPROVED)
-        create_emg_setting(experiment1)
-        experiment2 = create_experiment(1, status=Experiment.APPROVED)
-        create_emg_setting(experiment2)
-        create_emg_setting(experiment2)
-        for emg_setting in EMGSetting.objects.all():
-            emg_setting.name = 'emgsettingname'
-            emg_setting.save()
+        self.create_objects_to_test_search_emgsetting()
 
-        ##
-        # Rebuild haystack index
-        ##
-        haystack.connections.reload('default')
         self.haystack_index('rebuild_index')
 
         # Joselina wants to search for experiments whose EMGSetting name is
@@ -772,6 +815,7 @@ class SearchTest(FunctionalTest):
         ))
         self.verify_n_objects_in_table_rows(0, 'questionnaire-matches')
         self.verify_n_objects_in_table_rows(0, 'eegsetting-matches')
+        self.verify_n_objects_in_table_rows(0, 'emgsetting-matches')
         self.verify_n_objects_in_table_rows(0, 'tmsdata-matches')
         self.verify_n_objects_in_table_rows(0, 'coilmodel-matches')
         self.verify_n_objects_in_table_rows(0, 'tmsdevice-matches')
@@ -787,31 +831,36 @@ class SearchTest(FunctionalTest):
         ).text
         self.assertIn('Verletzung des Plexus Brachialis', publication_text)
 
-    def test_click_in_a_search_result_display_experiment_detail_page(self):
-        # TODO: the test tests for some match types, not all. Wold be better
-        # TODO: to test for each and all match types.
+    def test_search_goalkeepergame_step_returns_correct_objects(self):
+        self.create_objects_to_test_search_goalkeepergame_step()
+        self.haystack_index('rebuild_index')
 
-        # The researcher searches for 'brachial' term
-        self.search_for('brachial')
+        # Joselina wants to search for a given context tree of a Goal Keeper
+        # Game Phase
+        self.search_for('goalkeepergame')
 
-        # She obtains some results. She clicks in on A result link randomly
-        # and is redirected to experiment detail page
-        self.wait_for(
-            lambda:
-            self.browser.find_element_by_id('search_table')
-        )
+        # As there are three context trees with that string, two from two
+        # goalkeeper game phase steps bounded to two groups of one experiment,
+        # and one from other goalkeeper step bounded to another group,
+        # she sees three results
+        self.wait_for(lambda: self.verify_n_objects_in_table_rows(
+            3, 'goalkeepergame-matches'
+        ))
+        self.verify_n_objects_in_table_rows(0, 'questionnaire-matches')
+        self.verify_n_objects_in_table_rows(0, 'publication-matches')
+        self.verify_n_objects_in_table_rows(0, 'eegsetting-matches')
+        self.verify_n_objects_in_table_rows(0, 'emgsetting-matches')
+        self.verify_n_objects_in_table_rows(0, 'tmsdata-matches')
+        self.verify_n_objects_in_table_rows(0, 'coilmodel-matches')
+        self.verify_n_objects_in_table_rows(0, 'tmsdevice-matches')
+        self.verify_n_objects_in_table_rows(0, 'tmsdevicesetting-matches')
+        self.verify_n_objects_in_table_rows(0, 'tmssetting-matches')
+        self.verify_n_objects_in_table_rows(0, 'experiment-matches')
+        self.verify_n_objects_in_table_rows(0, 'study-matches')
+        self.verify_n_objects_in_table_rows(0, 'group-matches')
+        self.verify_n_objects_in_table_rows(0, 'experimentalprotocol-matches')
 
-        links = self.browser.find_element_by_id(
-            'search_table'
-        ).find_elements_by_tag_name('a')
-        random_link = random.choice(links)
-        random_link.click()
-
-        self.wait_for(
-            lambda:
-            self.assertEqual(
-                self.browser.find_element_by_tag_name('h2').text,
-                'Open Database for Experiments in Neuroscience'
-            )
-        )
-
+        goalkeepergame_text = self.browser.find_element_by_class_name(
+            'goalkeepergame-matches'
+        ).text
+        self.assertIn('goalkeepergame', goalkeepergame_text)

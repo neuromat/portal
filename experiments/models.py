@@ -519,8 +519,10 @@ class EMGNeedlePlacement(EMGElectrodePlacement):
 
 
 class EMGElectrodePlacementSetting(models.Model):
-    emg_electrode_setting = models.OneToOneField(EMGElectrodeSetting,
-                                                 primary_key=True, related_name='emg_electrode_placement_setting')
+    emg_electrode_setting = models.OneToOneField(
+        EMGElectrodeSetting, primary_key=True,
+        related_name='emg_electrode_placement_setting'
+    )
     emg_electrode_placement = models.ForeignKey(EMGElectrodePlacement)
     muscle_side = models.CharField(max_length=150, null=True, blank=True)
     muscle_name = models.CharField(max_length=150, null=True, blank=True)
@@ -536,7 +538,9 @@ class TMSDevice(Equipment):
         ("monophase", "Monophase"),
         ("biphase", "Biphase"),
     )
-    pulse_type = models.CharField(null=True, blank=True, max_length=50, choices=PULSE_TYPES)
+    pulse_type = models.CharField(
+        null=True, blank=True, max_length=50, choices=PULSE_TYPES
+    )
 
 
 class CoilModel(models.Model):
@@ -615,9 +619,15 @@ class Step(models.Model):
     type = models.CharField(max_length=30, choices=STEP_TYPES)
     parent = models.ForeignKey('self', null=True, related_name='children')
     order = models.IntegerField()
-    number_of_repetitions = models.IntegerField(null=True, blank=True, default=1)
-    interval_between_repetitions_value = models.IntegerField(null=True, blank=True)
-    interval_between_repetitions_unit = models.CharField(null=True, blank=True, max_length=15)
+    number_of_repetitions = models.IntegerField(
+        null=True, blank=True, default=1
+    )
+    interval_between_repetitions_value = models.IntegerField(
+        null=True, blank=True
+    )
+    interval_between_repetitions_unit = models.CharField(
+        null=True, blank=True, max_length=15
+    )
     random_position = models.NullBooleanField(blank=True)
 
     def __str__(self):
@@ -780,31 +790,47 @@ class TMSData(DataCollection):
     # main data
     tms_setting = models.ForeignKey(TMSSetting)
     resting_motor_threshold = models.FloatField(null=True, blank=True)
-    test_pulse_intensity_of_simulation = models.FloatField(null=True, blank=True)
+    test_pulse_intensity_of_simulation = models.FloatField(
+        null=True, blank=True
+    )
     second_test_pulse_intensity = models.FloatField(null=True, blank=True)
     interval_between_pulses = models.IntegerField(null=True, blank=True)
-    interval_between_pulses_unit = models.CharField(null=True, blank=True, max_length=15)
+    interval_between_pulses_unit = models.CharField(
+        null=True, blank=True, max_length=15
+    )
     time_between_mep_trials = models.IntegerField(null=True, blank=True)
-    time_between_mep_trials_unit = models.CharField(null=True, blank=True, max_length=15)
+    time_between_mep_trials_unit = models.CharField(
+        null=True, blank=True, max_length=15
+    )
     repetitive_pulse_frequency = models.IntegerField(null=True, blank=True)
     coil_orientation = models.CharField(null=True, blank=True, max_length=150)
     coil_orientation_angle = models.IntegerField(null=True, blank=True)
-    direction_of_induced_current = models.CharField(null=True, blank=True, max_length=150)
+    direction_of_induced_current = models.CharField(
+        null=True, blank=True, max_length=150
+    )
     description = models.TextField(null=False, blank=False)
     # hotspot data
     hotspot_name = models.CharField(max_length=50)
     coordinate_x = models.IntegerField(null=True, blank=True)
     coordinate_y = models.IntegerField(null=True, blank=True)
-    hot_spot_map = models.FileField(upload_to='uploads/%Y/%m/%d/', null=True, blank=True)
+    hot_spot_map = models.FileField(
+        upload_to='uploads/%Y/%m/%d/', null=True, blank=True
+    )
     # localization system info
-    localization_system_name = models.CharField(null=False, max_length=50, blank=False)
+    localization_system_name = models.CharField(
+        null=False, max_length=50, blank=False
+    )
     localization_system_description = models.TextField(null=True, blank=True)
-    localization_system_image = models.FileField(upload_to='uploads/%Y/%m/%d/', null=True, blank=True)
+    localization_system_image = models.FileField(
+        upload_to='uploads/%Y/%m/%d/', null=True, blank=True
+    )
     # brain area info
     brain_area_name = models.CharField(null=False, max_length=50, blank=False)
     brain_area_description = models.TextField(null=True, blank=True)
     # brain area system info
-    brain_area_system_name = models.CharField(null=False, max_length=50, blank=False)
+    brain_area_system_name = models.CharField(
+        null=False, max_length=50, blank=False
+    )
     brain_area_system_description = models.TextField(null=True, blank=True)
 
 
