@@ -19,12 +19,12 @@ from haystack.query import SearchQuerySet
 from experiments import views
 from experiments.forms import ChangeSlugForm
 from experiments.models import Experiment, Step, Questionnaire, \
-    QuestionnaireDefaultLanguage, QuestionnaireLanguage, Group
+    QuestionnaireDefaultLanguage, QuestionnaireLanguage, Group, EMGSetting
 from experiments.tests.tests_helper import apply_setup, global_setup_ut, \
     create_experiment_related_objects, \
     create_download_dir_structure_and_files, \
     remove_selected_subdir, create_experiment, create_trustee_users, \
-    create_experiment_versions, random_utf8_string
+    create_experiment_versions, random_utf8_string, create_emg_setting
 from experiments.views import change_slug
 from nep import settings
 
@@ -537,6 +537,26 @@ class SearchTest(TestCase):
     def test_search_eegsetting_returns_matchings_containing_search_strings(self):
         pass
         # TODO!
+
+    def test_search_emgsetting_returns_correct_number_of_objects(self):
+        # create objects needed
+        experiment1 = create_experiment(1, status=Experiment.APPROVED)
+        create_emg_setting(experiment1)
+        experiment2 = create_experiment(1, status=Experiment.APPROVED)
+        create_emg_setting(experiment2)
+        create_emg_setting(experiment2)
+        for emg_setting in EMGSetting.objects.all():
+            emg_setting.name = 'emgsettingname'
+            emg_setting.save()
+
+        # rebuild haystack index
+        haystack.connections.reload('default')
+        self.haystack_index('rebuild_index')
+
+        response = self.client.get('/search/', {'q': 'emgsettingname'})
+        self.assertEqual(response.status_code, 200)
+        # because in search results templates it's '<tr class ...>'
+        self.assertContains(response, '<tr', 3)
 
     def test_search_questionnaire_returns_correct_number_of_objects(self):
         response = self.client.get('/search/', {
