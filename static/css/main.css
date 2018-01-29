@@ -83,6 +83,11 @@ i#new_experiments {
   color: white;
 }
 
+#experiment_url {
+    clear:both;
+    margin: 0 5px;
+}
+
 /*
   ========================================
   Buttons
@@ -305,11 +310,11 @@ a:hover.nep-return {
 
 .detail-title {
   float: left;
-  margin: 10px 5px;
+  margin: 10px 5px 0 5px;
 }
 .detail-back-search {
   float: right;
-  margin: 10px 5px;
+  margin: 10px 5px 0 5px;
 }
 
 .detail-description {

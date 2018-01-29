@@ -11,18 +11,27 @@ from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.common.keys import Keys
 
 from downloads.views import DOWNLOAD_ERROR_MESSAGE
-from experiments.models import Experiment, Questionnaire, Step, Group, Gender, \
-    Study
+from experiments.models import Experiment, Questionnaire, Step, Group, Gender
 from experiments.tests.tests_helper import create_experiment, create_group, \
     create_participant, create_download_dir_structure_and_files, \
-    remove_selected_subdir, create_data_collection, \
-    create_experiment_protocol, \
-    create_questionnaire, create_questionnaire_language, create_study
+    remove_selected_subdir, create_experimental_protocol, \
+    create_questionnaire, create_questionnaire_language, create_study, \
+    create_eeg_data, create_eeg_setting, create_eeg_step
 from functional_tests.base import FunctionalTest
 from nep import settings
 
 
 class ExperimentDetailTest(FunctionalTest):
+
+    def _access_experiment_detail_page(self, experiment):
+        # The new visitor is in home page and see the list of experiments.
+        # She clicks in a "View" link and is redirected to experiment
+        # detail page
+        link = self.browser.find_element_by_xpath(
+            "//a[@href='/experiments/" + experiment.slug + "/']"
+        )
+        link.click()
+
 
     # TODO: break by tabs
     def test_can_view_detail_page(self):
@@ -30,14 +39,7 @@ class ExperimentDetailTest(FunctionalTest):
             status=Experiment.APPROVED
         ).last()
 
-        # The new visitor is in home page and see the list of experiments.
-        # She clicks in second "View" link and is redirected to experiment
-        # detail page
-        # TODO: frequently fails to catch second link (see if it's solved)
-        link = self.browser.find_element_by_xpath(
-            "//a[@href='/experiments/" + experiment.slug + "/']"
-        )
-        link.click()
+        self._access_experiment_detail_page(experiment)
 
         # She sees a new page with a header title: Open Database
         # for Experiments in Neuroscience.
@@ -434,7 +436,7 @@ class ExperimentDetailTest(FunctionalTest):
         ).last()
 
         # When the new visitor visits an experiment that has questionnaires,
-        # in right side of each questionnaire title that is a 'Detail'
+        # in right side of each questionnaire title is a 'Detail'
         # button. When she clicks on it, the questionnaire expand to display
         # the questions and answers.
         self.browser.find_element_by_xpath(
@@ -447,10 +449,7 @@ class ExperimentDetailTest(FunctionalTest):
         button_details = self.browser.find_element_by_id(
             'questionnaires_tab'
         ).find_element_by_link_text('Details')
-        button_details.click()
-        time.sleep(1)
-        button_details.click()
-        time.sleep(1)  # just to see better on the browser, before page closes
+        button_details.send_keys(Keys.ENTER)
 
         self.assertEqual(button_details.text, 'Details')
 
@@ -553,7 +552,9 @@ class ExperimentDetailTest(FunctionalTest):
         # of columns, when the new visitor clicks in Questionnaires tab she
         # sees a message telling her that something is wrong with that
         # questionnaire.
-        self.browser.find_element_by_link_text('Questionnaires').click()
+        self.browser.find_element_by_link_text('Questionnaires').send_keys(
+            Keys.ENTER
+        )
 
         questionnaires_content = self.browser.find_element_by_id(
             'questionnaires_tab'
@@ -795,6 +796,19 @@ class ExperimentDetailTest(FunctionalTest):
             'Keywords:',
             self.browser.find_element_by_id('keywords').text
         )
+
+    def test_can_see_url_text_for_experiments_approved(self):
+
+        experiment = Experiment.objects.filter(
+            status=Experiment.APPROVED
+        ).first()
+        self._access_experiment_detail_page(experiment)
+
+        # TODO: see if we can get current url not just self.live_server_url
+        self.wait_for(lambda: self.assertIn(
+            'url: ' + self.live_server_url + '/experiments/' + experiment.slug,
+            self.browser.find_element_by_class_name('detail-header').text
+        ))
 
 
 class DownloadExperimentTest(FunctionalTest):
@@ -1069,7 +1083,7 @@ class DownloadExperimentTest(FunctionalTest):
         ))
 
     @override_settings(MEDIA_ROOT=TEMP_MEDIA_ROOT)
-    def test_if_there_is_not_a_subdir_in_temp_download_dir_structure_return_message(self):
+    def test_if_there_is_not_a_subdir_in_download_dir_structure_return_message(self):
         ##
         # Last approved experiment created in tests helper has the objects that
         # we need for all groups, besides questionnaires and experimental
@@ -1082,7 +1096,7 @@ class DownloadExperimentTest(FunctionalTest):
             try:
                 group.experimental_protocol
             except ObjectDoesNotExist:
-                create_experiment_protocol(group)
+                create_experimental_protocol(group)
             if not group.steps.filter(type=Step.QUESTIONNAIRE):
                 create_questionnaire(1, 'code', group)
                 q = Questionnaire.objects.last()
@@ -1098,9 +1112,9 @@ class DownloadExperimentTest(FunctionalTest):
         ##
         for group in experiment.groups.all():
             for participant in group.participants.all():
-                create_data_collection(
-                    participant, 'eeg', self.TEMP_MEDIA_ROOT
-                )
+                eeg_setting = create_eeg_setting(1, experiment)
+                eeg_step = create_eeg_step(group, eeg_setting)
+                create_eeg_data(eeg_setting, eeg_step, participant)
 
         create_download_dir_structure_and_files(
             experiment, self.TEMP_MEDIA_ROOT

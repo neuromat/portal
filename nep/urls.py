@@ -35,6 +35,8 @@ urlpatterns = [
         views.experiment_detail, name='experiment-detail'),
     url(r'^experiments/(?P<experiment_id>[0-9]+)/change_status',
         views.change_status, name='change-status'),
+    url(r'^experiments/(?P<experiment_id>[0-9]+)/change_slug',
+        views.change_slug, name='change-slug'),
     url(r'^media/(?P<path>.*)$', serve,
         {'document_root': settings.MEDIA_ROOT, }),
     url(r'^language/change/(?P<language_code>(?:(?:\w{2})|(?:\w{2}\-\w{'

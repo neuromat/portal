@@ -4,6 +4,8 @@ from django import forms
 from django.utils.translation import ugettext_lazy as _
 from haystack.forms import SearchForm
 
+from experiments.models import Experiment
+
 
 class NepSearchForm(SearchForm):
     q = forms.CharField(
@@ -93,3 +95,22 @@ class NepSearchForm(SearchForm):
                 return result
 
         return result
+
+
+EMPTY_SLUG_ERROR = 'Please give a non-blank experiment slug'
+
+
+class ChangeSlugForm(forms.models.ModelForm):
+
+    class Meta:
+        model = Experiment
+        fields = ('slug',)
+        widgets = {
+            'slug': forms.fields.TextInput(attrs={
+                'placeholder': 'Type new slug',
+                'class': 'form-control input-lg',
+            }),
+        }
+        error_messages = {
+            'slug': {'required': EMPTY_SLUG_ERROR}
+        }

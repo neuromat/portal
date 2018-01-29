@@ -26,6 +26,7 @@
 
         <!-- Tab panes -->
         <div class="tab-content portal-tab-content">
+            {# TODO: commented by now as requested by customer #}
             <!-- Statistics tab -->
 {#            <div role="tabpanel" class="tab-pane active" id="statistics_tab">#}
 {#                <div class="row">#}
@@ -410,6 +411,21 @@
     <script src="{% static 'js/jquery-ui.min.js' %}"></script>
     <script src="{% static 'js/jquery.fileDownload.js' %}"></script>
     <script src="{% static 'js/download.js' %}"></script>
+
+    {# Prevent submit and prohibited chars in change url modal #}
+    <script>
+        $("#id_slug").keyup(function () {
+            // slug has to be at least 3 characters length
+            $("#submit").prop("disabled", $(this).val().length < 3);
+            }).keypress(function (event) {
+                // slug has to be only letters without accents, numbers, dashes and
+                // underscores
+                const regex = new RegExp("^[a-zA-Z0-9_-]+$");
+                const is_invisible = (event.which === 0 || event.which === 8 || event.which === 13);
+                let key = String.fromCharCode(event.which);
+                return (regex.test(key) || is_invisible);
+        });
+    </script>
 
     {##}
     {# Script related to experiments/top.html #}

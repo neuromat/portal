@@ -1,16 +1,69 @@
-from random import randint
+import tempfile
+from random import randint, choice
 
+import os
+
+import shutil
 from django.template.defaultfilters import slugify
-from django.test import TestCase
+from django.test import TestCase, override_settings
 from django.core.exceptions import ValidationError
 from django.contrib.auth.models import User
 from datetime import datetime
 from faker import Factory
 
 from experiments.models import Experiment, Study, Group, Researcher, \
-    Collaborator, RejectJustification, Publication, ExperimentalProtocol
+    Collaborator, RejectJustification, Publication, ExperimentalProtocol, Step, \
+    StepAdditionalFile, Gender, File
 from experiments.tests.tests_helper import global_setup_ut, apply_setup, \
-    create_experiment, create_group
+    create_experiment, create_group, create_binary_file, create_eeg_setting, \
+    create_eeg_electrode_localization_system, create_context_tree, create_step, \
+    create_stimulus_step, create_experimental_protocol, create_tms_setting, \
+    create_tms_data, create_participant, create_genders, create_eeg_data, \
+    create_eeg_step, create_emg_step, create_emg_setting, create_emg_data, \
+    create_goal_keeper_game_step, create_goal_keeper_game_data, \
+    create_generic_data_collection_step, create_generic_data_collection_data, \
+    create_additional_data, create_emg_electrode_placement
+
+
+def add_temporary_file_to_file_instance(file_instance):
+    """
+    Create temporary file to add to file instance
+    :param file_instance:  model related file instance to add a file
+    """
+    with tempfile.TemporaryDirectory() as tmpdirname:
+        bin_file = create_binary_file(tmpdirname)
+        with open(bin_file.name, 'rb') as f:
+            file_instance.save('file.bin', f)
+
+
+def create_model_instances_to_test_step_type_data():
+    experiment = create_experiment(1)
+    group = create_group(1, experiment)
+    create_genders()
+    participant = create_participant(
+        1, group, Gender.objects.order_by('?').first()
+    )
+    return {
+        'experiment': experiment, 'group': group, 'participant': participant
+    }
+
+
+def create_file_collected(qtty, step_type):
+    """
+    Return object if qtty = 1 or list of objects if qtty > 1
+    :param qtty: number of files collected to be created
+    :param step_type: DataCollection Step type to wich files are collected
+    :return: object or list
+    """
+    files_collected = []
+    for i in range(qtty):
+        file_collected = File.objects.create()
+        add_temporary_file_to_file_instance(file_collected.file)
+        step_type.files.add(file_collected)
+        files_collected.append(file_collected)
+    if len(files_collected) == 1:
+        return files_collected[0]
+    return files_collected
 
 
 @apply_setup(global_setup_ut)
@@ -69,9 +122,15 @@ class StudyModelTest(TestCase):
 
 @apply_setup(global_setup_ut)
 class ExperimentModelTest(TestCase):
+    TEMP_MEDIA_ROOT = tempfile.mkdtemp()
 
     def setUp(self):
         global_setup_ut()
+
+    def tearDown(self):
+        # used only when testing deleting files
+        if os.path.exists(self.TEMP_MEDIA_ROOT):
+            shutil.rmtree(self.TEMP_MEDIA_ROOT)
 
     def test_default_attributes(self):
         experiment = Experiment()
@@ -94,8 +153,9 @@ class ExperimentModelTest(TestCase):
         # version=17: large number to avoid conflicts with global setup
         experiment = Experiment(
             nes_id=1, title='', description='', owner=owner,
-            version=17, sent_date=datetime.utcnow()
+            version=17, slug='', sent_date=datetime.utcnow()
         )
+        # TODO: slug='' does not raises ValidationError
         with self.assertRaises(ValidationError):
             experiment.save()
             experiment.full_clean()
@@ -259,6 +319,20 @@ class ExperimentModelTest(TestCase):
         self.assertEqual(slugify(e7.title), e7.slug)
 
 
+    def test_delete_instance_deletes_its_files(self):
+        experiment = create_experiment(1)
+
+        file_instance = experiment.ethics_committee_file
+        add_temporary_file_to_file_instance(file_instance)
+
+        experiment.delete()
+        self.assertFalse(
+            os.path.exists(os.path.join(
+                self.TEMP_MEDIA_ROOT, file_instance.name
+            ))
+        )
+
+
 @apply_setup(global_setup_ut)
 class GroupModelTest(TestCase):
 
@@ -382,9 +456,13 @@ class PublicationModel(TestCase):
 
 @apply_setup(global_setup_ut)
 class ExperimentalProtocolModel(TestCase):
+    TEMP_MEDIA_ROOT = tempfile.mkdtemp()
 
     def setUp(self):
         global_setup_ut()
+
+    def tearDown(self):
+        shutil.rmtree(self.TEMP_MEDIA_ROOT)
 
     def test_cannot_save_empty_attributes(self):
         owner = User.objects.create_user(
@@ -399,3 +477,310 @@ class ExperimentalProtocolModel(TestCase):
         with self.assertRaises(ValidationError):
             experimental_protocol.save()
             experimental_protocol.full_clean()
+
+    @override_settings(MEDIA_ROOT=TEMP_MEDIA_ROOT)
+    def test_delete_instance_deletes_related_files(self):
+        experiment = create_experiment(1)
+        group = create_group(1, experiment)
+        experimental_protocol = create_experimental_protocol(group)
+
+        file_instance = experimental_protocol.image
+        add_temporary_file_to_file_instance(file_instance)
+
+        experimental_protocol.delete()
+        self.assertFalse(
+            os.path.exists(os.path.join(
+                self.TEMP_MEDIA_ROOT, file_instance.name
+            ))
+        )
+
+
+class EEGElectrodeLocalizationSystemModel(TestCase):
+    TEMP_MEDIA_ROOT = tempfile.mkdtemp()
+
+    def tearDown(self):
+        shutil.rmtree(self.TEMP_MEDIA_ROOT)
+
+    @override_settings(MEDIA_ROOT=TEMP_MEDIA_ROOT)
+    def test_delete_instance_deletes_related_files(self):
+        experiment = create_experiment(1)
+        eeg_setting = create_eeg_setting(1, experiment)
+        eeg_electrode_localization_system = \
+            create_eeg_electrode_localization_system(eeg_setting)
+
+        file_instance = eeg_electrode_localization_system.map_image_file
+        add_temporary_file_to_file_instance(file_instance)
+
+        eeg_electrode_localization_system.delete()
+        self.assertFalse(
+            os.path.exists(os.path.join(
+                self.TEMP_MEDIA_ROOT, file_instance.name
+            ))
+        )
+
+
+class EEGDataModel(TestCase):
+    TEMP_MEDIA_ROOT = tempfile.mkdtemp()
+
+    def tearDown(self):
+        shutil.rmtree(self.TEMP_MEDIA_ROOT)
+
+    @override_settings(MEDIA_ROOT=TEMP_MEDIA_ROOT)
+    def test_delete_instance_deletes_related_instances_and_files(self):
+        model_instances_dict = create_model_instances_to_test_step_type_data()
+        eeg_setting = create_eeg_setting(1, model_instances_dict['experiment'])
+        eeg_step = create_eeg_step(model_instances_dict['group'], eeg_setting)
+        eeg_data = create_eeg_data(
+            eeg_setting, eeg_step, model_instances_dict['participant']
+        )
+
+        files_collected = create_file_collected(2, eeg_data)
+
+        eeg_data.delete()
+        self.assertFalse(File.objects.exists())
+        for file_collected in files_collected:
+            self.assertFalse(
+                os.path.exists(os.path.join(
+                    self.TEMP_MEDIA_ROOT, file_collected.file.name
+                ))
+            )
+
+
+class EMGDataModel(TestCase):
+    TEMP_MEDIA_ROOT = tempfile.mkdtemp()
+
+    def tearDown(self):
+        shutil.rmtree(self.TEMP_MEDIA_ROOT)
+
+    @override_settings(MEDIA_ROOT=TEMP_MEDIA_ROOT)
+    def test_delete_instance_deletes_related_instances_and_files(self):
+        model_instances_dict = create_model_instances_to_test_step_type_data()
+        emg_setting = create_emg_setting(model_instances_dict['experiment'])
+        emg_step = create_emg_step(model_instances_dict['group'], emg_setting)
+        emg_data = create_emg_data(
+            emg_setting, emg_step, model_instances_dict['participant']
+        )
+
+        files_collected = create_file_collected(2, emg_data)
+
+        emg_data.delete()
+        self.assertFalse(File.objects.exists())
+        for file_collected in files_collected:
+            self.assertFalse(
+                os.path.exists(os.path.join(
+                    self.TEMP_MEDIA_ROOT, file_collected.file.name
+                ))
+            )
+
+
+class EMGElectrodePlacementModelTest(TestCase):
+    TEMP_MEDIA_ROOT = tempfile.mkdtemp()
+
+    def tearDown(self):
+        if os.path.exists(self.TEMP_MEDIA_ROOT):
+            shutil.rmtree(self.TEMP_MEDIA_ROOT)
+
+    @override_settings(MEDIA_ROOT=TEMP_MEDIA_ROOT)
+    def test_delete_instance_deletes_its_files(self):
+        emg_electrode_placement = create_emg_electrode_placement()
+
+        file_instance = emg_electrode_placement.photo
+        add_temporary_file_to_file_instance(file_instance)
+
+        emg_electrode_placement.delete()
+        self.assertFalse(
+            os.path.exists(os.path.join(
+                self.TEMP_MEDIA_ROOT, file_instance.name
+            ))
+        )
+
+
+class GoalkeeperGameDataModel(TestCase):
+    TEMP_MEDIA_ROOT = tempfile.mkdtemp()
+
+    def tearDown(self):
+        shutil.rmtree(self.TEMP_MEDIA_ROOT)
+
+    @override_settings(MEDIA_ROOT=TEMP_MEDIA_ROOT)
+    def test_delete_instance_deletes_related_instances_and_files(self):
+        model_instances_dict = create_model_instances_to_test_step_type_data()
+        context_tree = create_context_tree(model_instances_dict['experiment'])
+        goal_keeper_game_step = create_goal_keeper_game_step(
+            model_instances_dict['group'], context_tree
+        )
+        goal_keeper_game_data = create_goal_keeper_game_data(
+            goal_keeper_game_step, model_instances_dict['participant']
+        )
+
+        files_collected = create_file_collected(2, goal_keeper_game_data)
+
+        goal_keeper_game_data.delete()
+        self.assertFalse(File.objects.exists())
+        for file_collected in files_collected:
+            self.assertFalse(
+                os.path.exists(os.path.join(
+                    self.TEMP_MEDIA_ROOT, file_collected.file.name
+                ))
+            )
+
+
+class GenericDataCollectionDataModel(TestCase):
+    TEMP_MEDIA_ROOT = tempfile.mkdtemp()
+
+    def tearDown(self):
+        shutil.rmtree(self.TEMP_MEDIA_ROOT)
+
+    @override_settings(MEDIA_ROOT=TEMP_MEDIA_ROOT)
+    def test_delete_instance_deletes_related_instances_and_files(self):
+        model_instances_dict = create_model_instances_to_test_step_type_data()
+        generic_data_collection_step = create_generic_data_collection_step(
+            group=model_instances_dict['group']
+        )
+        generic_data_collection_data = create_generic_data_collection_data(
+            generic_data_collection_step, model_instances_dict['participant']
+        )
+
+        files_collected = create_file_collected(2, generic_data_collection_data)
+
+        generic_data_collection_data.delete()
+        self.assertFalse(File.objects.exists())
+        for file_collected in files_collected:
+            self.assertFalse(
+                os.path.exists(os.path.join(
+                    self.TEMP_MEDIA_ROOT, file_collected.file.name
+                ))
+            )
+
+
+class AdditionalDataModelTest(TestCase):
+    TEMP_MEDIA_ROOT = tempfile.mkdtemp()
+
+    def tearDown(self):
+        shutil.rmtree(self.TEMP_MEDIA_ROOT)
+
+    @override_settings(MEDIA_ROOT=TEMP_MEDIA_ROOT)
+    def test_delete_instance_deletes_related_instances_and_files(self):
+        model_instances_dict = create_model_instances_to_test_step_type_data()
+        # we random select a step type because additional data can be any step
+        some_step = create_step(
+            1, model_instances_dict['group'], choice(Step.STEP_TYPES)
+        )
+        # Additional data can have step=None, that refers to whole
+        # experimental protocol.
+        additional_data = create_additional_data(
+            choice([some_step, None]), model_instances_dict['participant']
+        )
+
+        files_collected = create_file_collected(2, additional_data)
+
+        additional_data.delete()
+        self.assertFalse(File.objects.exists())
+        for file_collected in files_collected:
+            self.assertFalse(
+                os.path.exists(os.path.join(
+                    self.TEMP_MEDIA_ROOT, file_collected.file.name
+                ))
+            )
+
+
+class TMSDataModel(TestCase):
+    TEMP_MEDIA_ROOT = tempfile.mkdtemp()
+
+    def tearDown(self):
+        shutil.rmtree(self.TEMP_MEDIA_ROOT)
+
+    @override_settings(MEDIA_ROOT=TEMP_MEDIA_ROOT)
+    def test_delete_instance_deletes_related_files(self):
+        model_instances_dict = create_model_instances_to_test_step_type_data()
+        tms_setting = create_tms_setting(1, model_instances_dict['experiment'])
+        tms_data = create_tms_data(
+            1, tms_setting, model_instances_dict['participant']
+        )
+
+        file_instance_1 = tms_data.hot_spot_map
+        add_temporary_file_to_file_instance(file_instance_1)
+        file_instance_2 = tms_data.localization_system_image
+        add_temporary_file_to_file_instance(file_instance_2)
+
+        tms_data.delete()
+        self.assertFalse(
+            os.path.exists(os.path.join(
+                self.TEMP_MEDIA_ROOT, file_instance_1.name
+            ))
+        )
+        self.assertFalse(
+            os.path.exists(os.path.join(
+                self.TEMP_MEDIA_ROOT, file_instance_2.name
+            ))
+        )
+
+
+class ContextTreeModel(TestCase):
+    TEMP_MEDIA_ROOT = tempfile.mkdtemp()
+
+    def tearDown(self):
+        shutil.rmtree(self.TEMP_MEDIA_ROOT)
+
+    @override_settings(MEDIA_ROOT=TEMP_MEDIA_ROOT)
+    def test_delete_instance_deletes_related_files(self):
+        experiment = create_experiment(1)
+        context_tree = create_context_tree(experiment)
+
+        file_instance = context_tree.setting_file
+        add_temporary_file_to_file_instance(file_instance)
+
+        context_tree.delete()
+        self.assertFalse(
+            os.path.exists(os.path.join(
+                self.TEMP_MEDIA_ROOT, file_instance.name
+            ))
+        )
+
+
+class StepAdditionalFileModel(TestCase):
+    TEMP_MEDIA_ROOT = tempfile.mkdtemp()
+
+    def tearDown(self):
+        shutil.rmtree(self.TEMP_MEDIA_ROOT)
+
+    @override_settings(MEDIA_ROOT=TEMP_MEDIA_ROOT)
+    def test_delete_instance_deletes_related_files(self):
+        experiment = create_experiment(1)
+        group = create_group(1, experiment)
+        step = create_step(1, group, Step.EEG)
+        step_additional_file = StepAdditionalFile.objects.create(
+            step=step
+        )
+
+        file_instance = step_additional_file.file
+        add_temporary_file_to_file_instance(file_instance)
+
+        step_additional_file.delete()
+        self.assertFalse(
+            os.path.exists(os.path.join(
+                self.TEMP_MEDIA_ROOT, file_instance.name
+            ))
+        )
+
+
+class StimulusModel(TestCase):
+    TEMP_MEDIA_ROOT = tempfile.mkdtemp()
+
+    def tearDown(self):
+        shutil.rmtree(self.TEMP_MEDIA_ROOT)
+
+    @override_settings(MEDIA_ROOT=TEMP_MEDIA_ROOT)
+    def test_delete_instance_deletes_related_files(self):
+        experiment = create_experiment(1)
+        group = create_group(1, experiment)
+        stimulus = create_stimulus_step(1, group)
+
+        file_instance = stimulus.media_file
+        add_temporary_file_to_file_instance(file_instance)
+
+        stimulus.delete()
+        self.assertFalse(
+            os.path.exists(os.path.join(
+                self.TEMP_MEDIA_ROOT, file_instance.name
+            ))
+        )

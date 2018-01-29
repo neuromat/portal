@@ -796,7 +796,8 @@ class EEGDataSerializer(serializers.ModelSerializer):
             description=validated_data['description'],
             file_format=validated_data['file_format'],
             eeg_setting=validated_data['eeg_setting'],
-            eeg_setting_reason_for_change=validated_data['eeg_setting_reason_for_change'],
+            eeg_setting_reason_for_change=
+            validated_data['eeg_setting_reason_for_change'],
             eeg_cap_size=validated_data['eeg_cap_size'])
 
         if 'files' in self.initial_data:

@@ -3,7 +3,15 @@ from os import path
 from django.db import models
 from django.db.models import Max, Q
 from django.contrib.auth.models import User
+from django.db.models.signals import post_delete, pre_delete
+from django.dispatch import receiver
 from django.template.defaultfilters import slugify
+
+
+def _delete_file_instance(instance):
+    for file in instance.files.all():
+        file.file.delete()
+        file.delete()
 
 
 # custom managers
@@ -42,7 +50,7 @@ def _create_slug(experiment):
     )
     # if it is not first version
     if older_versions.count() > 0:
-        # adds '-v#' to the end of slugified title, where '#' is the
+        # adds '-v#' to the end of slugfield title, where '#' is the
         # version number of the new experiment
         experiment.slug = older_versions.first().slug + '-v' + \
                           str(older_versions.count() + 1)
@@ -53,7 +61,7 @@ def _create_slug(experiment):
         # 2) <slug>-<#>
         # 3) <slug>-<#>-v<#>
         # we're filter and counting 1º and 2º form of slugs. Those
-        # forms determine if slug base, <slug>, conflicts with a new
+        # forms determine if slug base, <slug>, conflicts with slug from a new
         # experiment created.
         slugs = Experiment.objects.filter(
             slug__regex=r'^' + slugify(experiment.title) + '($|-[0-9]+$)'
@@ -89,6 +97,7 @@ class Experiment(models.Model):
     data_acquisition_done = models.BooleanField(default=False)
     sent_date = models.DateField(auto_now=True)
     project_url = models.CharField(max_length=255, blank=True, null=True)
+    # TODO: remove this attribute. It's not necessary anymore
     download_url = models.FileField(
         upload_to=get_data_file_dir, null=True, blank=True
     )
@@ -104,10 +113,8 @@ class Experiment(models.Model):
     )
     trustee = models.ForeignKey(User, null=True,
                                 blank=True, related_name='experiments')
-    # TODO: We want slug field do not save empty string, but in console we
-    # TODO: do can save an experiment with empty string, even when we set
-    # TODO: blank=False. By the way, when doing this makemigrations doesn't
-    # TODO: detect the change. This implies that the experiments are being
+    # TODO: We want slug field do not save empty string.
+    # TODO: This implies that the experiments are being
     # TODO: saved in tests, with slug='', what we don't want. The tests should
     # TODO: regret when saving experiments with slug=''.
     slug = models.SlugField(max_length=100, unique=True)
@@ -124,6 +131,13 @@ class Experiment(models.Model):
             _create_slug(self)
 
         super(Experiment, self).save()
+
+
+# TODO: delete parent subdirs if they are empty after post_delete. Example:
+# TODO: uploads/2018/01/10
+@receiver(post_delete, sender=Experiment)
+def experiment_delete(instance, **kwargs):
+    instance.ethics_committee_file.delete(save=False)
 
 
 class ClassificationOfDiseases(models.Model):
@@ -295,10 +309,20 @@ class EEGElectrodeNet(Equipment):
 
 
 class EEGElectrodeLocalizationSystem(models.Model):
-    eeg_setting = models.OneToOneField(EEGSetting, primary_key=True, related_name='eeg_electrode_localization_system')
+    eeg_setting = models.OneToOneField(
+        EEGSetting, primary_key=True,
+        related_name='eeg_electrode_localization_system'
+    )
     name = models.CharField(max_length=150)
     description = models.TextField(null=True, blank=True)
-    map_image_file = models.FileField(upload_to="uploads/%Y/%m/%d/", null=True, blank=True)
+    map_image_file = models.FileField(
+        upload_to="uploads/%Y/%m/%d/", null=True, blank=True
+    )
+
+
+@receiver(post_delete, sender=EEGElectrodeLocalizationSystem)
+def eeg_electrode_localization_system_delete(instance, **kwargs):
+    instance.map_image_file.delete(save=False)
 
 
 class ElectrodeModel(models.Model):
@@ -343,8 +367,10 @@ class SurfaceElectrode(ElectrodeModel):
 
 
 class EEGElectrodePosition(models.Model):
-    eeg_electrode_localization_system = models.ForeignKey(EEGElectrodeLocalizationSystem,
-                                                          related_name="electrode_positions")
+    eeg_electrode_localization_system = models.ForeignKey(
+        EEGElectrodeLocalizationSystem,
+        related_name="electrode_positions"
+    )
     electrode_model = models.ForeignKey(ElectrodeModel)
     name = models.CharField(max_length=150)
     coordinate_x = models.IntegerField(null=True, blank=True)
@@ -448,19 +474,31 @@ class EMGAnalogFilterSetting(models.Model):
 
 
 class EMGElectrodePlacement(models.Model):
+    SURFACE = 'surface'
+    INTRAMUSCULAR = "intramuscular"
+    NEEDLE = "needle"
     PLACEMENT_TYPES = (
-        ("surface", "Surface"),
-        ("intramuscular", "Intramuscular"),
-        ("needle", "Needle"),
+        (SURFACE, "Surface"),
+        (INTRAMUSCULAR, "Intramuscular"),
+        (NEEDLE, "Needle"),
     )
     standardization_system_name = models.CharField(max_length=150)
-    standardization_system_description = models.TextField(null=True, blank=True)
+    standardization_system_description = models.TextField(
+        null=True, blank=True
+    )
     muscle_anatomy_origin = models.TextField(null=True, blank=True)
     muscle_anatomy_insertion = models.TextField(null=True, blank=True)
     muscle_anatomy_function = models.TextField(null=True, blank=True)
-    photo = models.FileField(upload_to='uploads/%Y/%m/%d/', null=True, blank=True)
+    photo = models.FileField(
+        upload_to='uploads/%Y/%m/%d/', null=True, blank=True
+    )
     location = models.TextField(null=True, blank=True)
     placement_type = models.CharField(max_length=50, choices=PLACEMENT_TYPES)
+
+
+@receiver(post_delete, sender=EMGElectrodePlacement)
+def emg_electrode_placement(instance, **kwargs):
+    instance.photo.delete(save=False)
 
 
 class EMGSurfacePlacement(EMGElectrodePlacement):
@@ -531,7 +569,14 @@ class TMSDeviceSetting(models.Model):
 
 class ContextTree(ExperimentSetting):
     setting_text = models.TextField(null=True, blank=True)
-    setting_file = models.FileField(upload_to='uploads/%Y/%m/%d/', null=True, blank=True)
+    setting_file = models.FileField(
+        upload_to='uploads/%Y/%m/%d/', null=True, blank=True
+    )
+
+
+@receiver(post_delete, sender=ContextTree)
+def context_tree_delete(instance, **kwargs):
+    instance.setting_file.delete(save=False)
 
 
 class Step(models.Model):
@@ -584,6 +629,11 @@ class StepAdditionalFile(models.Model):
     file = models.FileField(upload_to='uploads/%Y/%m/%d/')
 
 
+@receiver(post_delete, sender=StepAdditionalFile)
+def step_additional_file_delete(instance, **kwargs):
+    instance.file.delete(save=False)
+
+
 class EEG(Step):
     eeg_setting = models.ForeignKey(EEGSetting)
 
@@ -622,8 +672,17 @@ class Instruction(Step):
 
 
 class Stimulus(Step):
-    stimulus_type_name = models.CharField(null=False, blank=False, max_length=30)
-    media_file = models.FileField(null=True, blank=True, upload_to='uploads/%Y/%m/%d/')
+    stimulus_type_name = models.CharField(
+        null=False, blank=False, max_length=30
+    )
+    media_file = models.FileField(
+        null=True, blank=True, upload_to='uploads/%Y/%m/%d/'
+    )
+
+
+@receiver(post_delete, sender=Stimulus)
+def stimulus_delete(instance, **kwargs):
+    instance.media_file.delete(save=False)
 
 
 class GoalkeeperGame(Step):
@@ -663,7 +722,14 @@ class ExperimentalProtocol(models.Model):
     root_step = models.ForeignKey(Step, null=True, blank=True)
 
 
+@receiver(post_delete, sender=ExperimentalProtocol)
+def experimental_protocol_delete(instance, **kwargs):
+    instance.image.delete(save=False)
+
+
 class DataCollection(models.Model):
+    # step == null means data collection is associated to whole experimental
+    # protocol.
     step = models.ForeignKey(Step, null=True, blank=True)
     participant = models.ForeignKey(Participant)
     date = models.DateField()
@@ -694,10 +760,20 @@ class EEGData(DataCollection, DataFile):
     files = models.ManyToManyField(File, related_name='eeg_data_list')
 
 
-class EMGData(DataFile, DataCollection):
+@receiver(pre_delete, sender=EEGData)
+def eeg_data_delete(instance, **kwargs):
+    _delete_file_instance(instance)
+
+
+class EMGData(DataCollection, DataFile):
     emg_setting = models.ForeignKey(EMGSetting)
     emg_setting_reason_for_change = models.TextField(null=True, blank=True, default='')
     files = models.ManyToManyField(File, related_name='emg_data_list')
+
+
+@receiver(pre_delete, sender=EMGData)
+def emg_data_delete(instance, **kwargs):
+    _delete_file_instance(instance)
 
 
 class TMSData(DataCollection):
@@ -732,9 +808,22 @@ class TMSData(DataCollection):
     brain_area_system_description = models.TextField(null=True, blank=True)
 
 
+@receiver(post_delete, sender=TMSData)
+def tms_data_delete(instance, **kwargs):
+    instance.hot_spot_map.delete(save=False)
+    instance.localization_system_image.delete(save=False)
+
+
 class GoalkeeperGameData(DataCollection, DataFile):
     sequence_used_in_context_tree = models.TextField(null=True, blank=True)
-    files = models.ManyToManyField(File, related_name='goalkeeper_game_data_list')
+    files = models.ManyToManyField(
+        File, related_name='goalkeeper_game_data_list'
+    )
+
+
+@receiver(pre_delete, sender=GoalkeeperGameData)
+def gkg_data_delete(instance, **kwargs):
+    _delete_file_instance(instance)
 
 
 class RejectJustification(models.Model):
@@ -747,9 +836,21 @@ class QuestionnaireResponse(DataCollection):
     limesurvey_response = models.TextField()
 
 
-class GenericDataCollectionData(DataFile, DataCollection):
-    files = models.ManyToManyField(File, related_name='generic_data_collection_data_list')
+class GenericDataCollectionData(DataCollection, DataFile):
+    files = models.ManyToManyField(
+        File, related_name='generic_data_collection_data_list'
+    )
 
 
-class AdditionalData(DataFile, DataCollection):
+@receiver(pre_delete, sender=GenericDataCollectionData)
+def gdc_data_delete(instance, **kwargs):
+    _delete_file_instance(instance)
+
+
+class AdditionalData(DataCollection, DataFile):
     files = models.ManyToManyField(File, related_name='additional_data_list')
+
+
+@receiver(pre_delete, sender=AdditionalData)
+def additional_data_delete(instance, **kwargs):
+    _delete_file_instance(instance)

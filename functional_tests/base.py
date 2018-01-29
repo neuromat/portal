@@ -85,17 +85,18 @@ class FunctionalTestTrustee(StaticLiveServerTestCase):
 
         # Trustee Claudia visit the home page and click in "Log In"
         self.browser.get(self.live_server_url)
-        self.browser.find_element_by_link_text('Log In').click()
-        time.sleep(1)
+        self.wait_for(
+            lambda: self.browser.find_element_by_link_text('Log In').click()
+        )
 
         # The trustee Claudia log in Portal
-        inputbox_username = self.browser.find_element_by_id('id_username')
-        inputbox_username.send_keys('claudia')
-        inputbox_password = self.browser.find_element_by_id('id_password')
-        inputbox_password.send_keys('passwd')
-        login_button = self.browser.find_element_by_id('id_submit')
-        login_button.send_keys(Keys.ENTER)
-        time.sleep(1)
+        self.wait_for(
+            lambda: self.browser.find_element_by_id(
+                'id_username'
+            ).send_keys('claudia')
+        )
+        self.browser.find_element_by_id('id_password').send_keys('passwd')
+        self.browser.find_element_by_id('id_submit').click()
 
     def tearDown(self):
         self.browser.quit()
