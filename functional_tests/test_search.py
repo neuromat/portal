@@ -8,7 +8,8 @@ from experiments.models import Study, Experiment, Group, Step, EMGSetting, \
     GoalkeeperGame, ContextTree, EEGSetting
 from experiments.tests.tests_helper import create_experiment, \
     create_emg_setting, create_group, create_goalkeepergame_step, \
-    create_context_tree, create_eeg_setting, create_eeg_electrodenet
+    create_context_tree, create_eeg_setting, create_eeg_electrodenet, \
+    create_eeg_solution
 from functional_tests.base import FunctionalTest
 
 import time
@@ -674,23 +675,24 @@ class SearchTest(FunctionalTest):
         # As there is three EMGSetting objects with that name,
         # one associated to an experiment, and the other two associated with
         # another experiment, she sees three rows in Search Results list
-        self.wait_for(lambda: self.verify_n_objects_in_table_rows(
-            3, 'emgsetting-matches'
-        ))
-        self.verify_n_objects_in_table_rows(0, 'eegsetting-matches')
-        self.verify_n_objects_in_table_rows(0, 'tmsdata-matches')
-        self.verify_n_objects_in_table_rows(0, 'coilmodel-matches')
-        self.verify_n_objects_in_table_rows(0, 'tmsdevice-matches')
-        self.verify_n_objects_in_table_rows(0, 'tmsdevicesetting-matches')
-        self.verify_n_objects_in_table_rows(0, 'tmssetting-matches')
-        self.verify_n_objects_in_table_rows(0, 'experiment-matches')
-        self.verify_n_objects_in_table_rows(0, 'study-matches')
-        self.verify_n_objects_in_table_rows(0, 'group-matches')
-        self.verify_n_objects_in_table_rows(0, 'experimentalprotocol-matches')
-        emgsetting_text = self.browser.find_element_by_class_name(
-            'emgsetting-matches'
-        ).text
-        self.assertIn('emgsettingname', emgsetting_text)
+        self.check_matches(3, 'emgsetting-matches', 'emgsettingname')
+
+    def test_search_eegsolution_returns_correct_objects(self):
+        self.create_objects_to_test_search_eeg_setting()
+
+        for eeg_setting in EEGSetting.objects.all():
+            eeg_solution = create_eeg_solution(eeg_setting)
+            eeg_solution.manufacturer_name = 'Hersteller'
+            eeg_solution.save()
+
+        self.haystack_index('rebuild_index')
+
+        # Severino wants to search for experiments that has certain
+        # equipment associated to an EEG solution
+        self.search_for('Hersteller')
+
+        # There are three maches craeted above
+        self.check_matches(3, 'eeg_solution-matches', 'Hersteller')
 
     def test_search_questionnaire_data_returns_correct_objects_1(self):
         # Joselina wants to search for experiments that contains some

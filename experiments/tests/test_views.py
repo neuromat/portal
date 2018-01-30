@@ -26,7 +26,7 @@ from experiments.tests.tests_helper import apply_setup, global_setup_ut, \
     create_download_dir_structure_and_files, \
     remove_selected_subdir, create_experiment, create_trustee_users, \
     create_experiment_versions, random_utf8_string, create_context_tree, \
-    create_eeg_electrodenet
+    create_eeg_electrodenet, create_eeg_solution
 from experiments.views import change_slug
 from functional_tests import test_search
 from nep import settings
@@ -589,6 +589,17 @@ class SearchTest(TestCase):
             eeg_electrode_net = create_eeg_electrodenet(eeg_setting)
             eeg_electrode_net.manufacturer_name = 'Hersteller'
             eeg_electrode_net.save()
+
+        self.haystack_index('rebuild_index')
+        self.check_matches_on_response(3, 'Hersteller')
+
+    def test_search_eegsolution_returns_correct_objects(self):
+        test_search.SearchTest().create_objects_to_test_search_eeg_setting()
+
+        for eeg_setting in EEGSetting.objects.all():
+            eeg_solution = create_eeg_solution(eeg_setting)
+            eeg_solution.manufacturer_name = 'Hersteller'
+            eeg_solution.save()
 
         self.haystack_index('rebuild_index')
         self.check_matches_on_response(3, 'Hersteller')

@@ -74,7 +74,7 @@ def _create_slug(experiment):
 
 
 # models
-class Experiment(models.Model):
+class Experiment(models.Model):  # indexed for search
     RECEIVING = 'receiving'
     TO_BE_ANALYSED = 'to_be_analysed'
     UNDER_ANALYSIS = 'under_analysis'
@@ -140,7 +140,7 @@ def experiment_delete(instance, **kwargs):
     instance.ethics_committee_file.delete(save=False)
 
 
-class ClassificationOfDiseases(models.Model):
+class ClassificationOfDiseases(models.Model):  # indirectly indexed for search
     code = models.CharField(max_length=10)
     description = models.CharField(max_length=300)
     abbreviated_description = models.CharField(max_length=190)
@@ -150,14 +150,14 @@ class ClassificationOfDiseases(models.Model):
         return self.abbreviated_description
 
 
-class Keyword(models.Model):
+class Keyword(models.Model):  # indirectly indexed for search
     name = models.CharField(max_length=50, primary_key=True)
 
     def __str__(self):
         return self.name
 
 
-class Study(models.Model):
+class Study(models.Model):  # indexed for search
     experiment = models.OneToOneField(Experiment, related_name='study')
 
     title = models.CharField(max_length=150)
@@ -167,7 +167,7 @@ class Study(models.Model):
     keywords = models.ManyToManyField(Keyword, blank=True)
 
 
-class Researcher(models.Model):
+class Researcher(models.Model):  # indirectly indexed for search
     study = models.OneToOneField(Study, related_name='researcher')
     name = models.CharField(max_length=200)
     email = models.EmailField()
@@ -176,7 +176,7 @@ class Researcher(models.Model):
         return self.name
 
 
-class Collaborator(models.Model):
+class Collaborator(models.Model):  # indirectly indexed for search
     name = models.CharField(max_length=200)
     team = models.CharField(max_length=200)
     coordinator = models.BooleanField(default=False)
@@ -186,7 +186,7 @@ class Collaborator(models.Model):
         return self.name
 
 
-class Group(models.Model):
+class Group(models.Model):  # indexed for search
     experiment = models.ForeignKey(Experiment, related_name='groups')
     title = models.CharField(max_length=50)
     description = models.TextField()
@@ -194,14 +194,14 @@ class Group(models.Model):
         models.ManyToManyField(ClassificationOfDiseases, blank=True)
 
 
-class Gender(models.Model):
+class Gender(models.Model):  # not indexed for search
     name = models.CharField(max_length=50, primary_key=True)
 
     def __str__(self):
         return self.name
 
 
-class Participant(models.Model):
+class Participant(models.Model):  # not indexed for search
     group = models.ForeignKey(Group, related_name='participants')
     code = models.CharField(max_length=150)
     gender = models.ForeignKey(Gender)
@@ -222,14 +222,14 @@ class Participant(models.Model):
             return False
 
 
-class Publication(models.Model):
+class Publication(models.Model):  # indexed for search
     title = models.CharField(max_length=255)
     citation = models.TextField()
     url = models.URLField(null=True, blank=True)
     experiment = models.ForeignKey(Experiment, related_name='publications')
 
 
-class Equipment(models.Model):
+class Equipment(models.Model):  # not indexed for search (abstract)
     EQUIPMENT_TYPES = (
         ("amplifier", "Amplifier"),
         ("eeg_solution", "EEG Solution"),
@@ -249,7 +249,7 @@ class Equipment(models.Model):
         abstract = True
 
 
-class ExperimentSetting(models.Model):
+class ExperimentSetting(models.Model):  # not indexed for search (abastract)
     experiment = models.ForeignKey(Experiment)
     name = models.CharField(max_length=150)
     description = models.TextField()
@@ -261,11 +261,11 @@ class ExperimentSetting(models.Model):
         return self.name
 
 
-class EEGSetting(ExperimentSetting):
+class EEGSetting(ExperimentSetting):  # indexed for search
     pass
 
 
-class Amplifier(Equipment):
+class Amplifier(Equipment):  # not indexed for search
     gain = models.FloatField(null=True, blank=True)
     number_of_channels = models.IntegerField(null=True, blank=True)
     common_mode_rejection_ratio = models.FloatField(null=True, blank=True)
@@ -275,7 +275,7 @@ class Amplifier(Equipment):
     tethering_system_name = models.CharField(null=True, blank=True, max_length=150)
 
 
-class EEGAmplifierSetting(models.Model):
+class EEGAmplifierSetting(models.Model):  # not indexed for search
     eeg_setting = models.OneToOneField(EEGSetting, primary_key=True, related_name='eeg_amplifier_setting')
     eeg_amplifier = models.ForeignKey(Amplifier)
     gain = models.FloatField(null=True, blank=True)
@@ -284,7 +284,9 @@ class EEGAmplifierSetting(models.Model):
 
 
 class EEGSolution(models.Model):
-    eeg_setting = models.OneToOneField(EEGSetting, primary_key=True, related_name='eeg_solution')
+    eeg_setting = models.OneToOneField(
+        EEGSetting, primary_key=True, related_name='eeg_solution'
+    )
     manufacturer_name = models.CharField(max_length=150)
     name = models.CharField(max_length=150)
     components = models.TextField(null=True, blank=True)
@@ -303,7 +305,7 @@ class EEGFilterSetting(models.Model):
     order = models.IntegerField(null=True, blank=True)
 
 
-class EEGElectrodeNet(Equipment):
+class EEGElectrodeNet(Equipment):  # indexed for search
     eeg_setting = models.OneToOneField(
         EEGSetting, primary_key=True, related_name='eeg_electrode_net'
     )
@@ -327,7 +329,7 @@ def eeg_electrode_localization_system_delete(instance, **kwargs):
     instance.map_image_file.delete(save=False)
 
 
-class ElectrodeModel(models.Model):
+class ElectrodeModel(models.Model):  # not indexed for search (parent)
     USABILITY_TYPES = (
         ("disposable", "Disposable"),
         ("reusable", "Reusable"),
@@ -368,7 +370,7 @@ class SurfaceElectrode(ElectrodeModel):
     electrode_shape_measure_unit = models.CharField(max_length=150, null=True, blank=True)
 
 
-class EEGElectrodePosition(models.Model):
+class EEGElectrodePosition(models.Model):  # not indexed for search
     eeg_electrode_localization_system = models.ForeignKey(
         EEGElectrodeLocalizationSystem,
         related_name="electrode_positions"
@@ -402,7 +404,7 @@ class NeedleElectrode(ElectrodeModel):
     size_of_conductive_contact_points_at_the_tip = models.FloatField(null=True, blank=True)
 
 
-class EMGSetting(ExperimentSetting):
+class EMGSetting(ExperimentSetting):  # indexed for search
     acquisition_software_version = models.CharField(max_length=150)
 
 
@@ -419,31 +421,31 @@ class EMGDigitalFilterSetting(models.Model):
     order = models.IntegerField(null=True, blank=True)
 
 
-class ADConverter(Equipment):
+class ADConverter(Equipment):  # not indexed for search
     signal_to_noise_rate = models.FloatField(null=True, blank=True)
     sampling_rate = models.FloatField(null=True, blank=True)
     resolution = models.FloatField(null=True, blank=True)
 
 
-class EMGADConverterSetting(models.Model):
+class EMGADConverterSetting(models.Model):  # not indexed for search
     emg_setting = models.OneToOneField(EMGSetting, primary_key=True, related_name='emg_ad_converter_setting')
     ad_converter = models.ForeignKey(ADConverter)
     sampling_rate = models.FloatField(null=True, blank=True)
 
 
-class EMGElectrodeSetting(models.Model):
+class EMGElectrodeSetting(models.Model):  # not indexed for search
     emg_setting = models.ForeignKey(EMGSetting, related_name='emg_electrode_settings')
     electrode_model = models.ForeignKey(ElectrodeModel)
 
 
-class EMGPreamplifierSetting(models.Model):
+class EMGPreamplifierSetting(models.Model):  # not indexed for search
     emg_electrode_setting = models.OneToOneField(EMGElectrodeSetting,
                                                  primary_key=True, related_name='emg_preamplifier_setting')
     amplifier = models.ForeignKey(Amplifier)
     gain = models.FloatField(null=True, blank=True)
 
 
-class EMGPreamplifierFilterSetting(models.Model):
+class EMGPreamplifierFilterSetting(models.Model):  # not indexed for search
     emg_preamplifier_setting = models.OneToOneField(EMGPreamplifierSetting,
                                                     primary_key=True,
                                                     related_name='emg_preamplifier_filter_setting')
@@ -456,14 +458,14 @@ class EMGPreamplifierFilterSetting(models.Model):
     order = models.IntegerField(null=True, blank=True)
 
 
-class EMGAmplifierSetting(models.Model):
+class EMGAmplifierSetting(models.Model):  # not indexed for search
     emg_electrode_setting = models.OneToOneField(EMGElectrodeSetting,
                                                  primary_key=True, related_name='emg_amplifier_setting')
     amplifier = models.ForeignKey(Amplifier)
     gain = models.FloatField(null=True, blank=True)
 
 
-class EMGAnalogFilterSetting(models.Model):
+class EMGAnalogFilterSetting(models.Model):  # not indexed for search
     emg_amplifier_setting = models.OneToOneField(EMGAmplifierSetting,
                                                  primary_key=True, related_name='emg_analog_filter_setting')
     low_pass = models.FloatField(null=True, blank=True)
@@ -475,7 +477,7 @@ class EMGAnalogFilterSetting(models.Model):
     order = models.IntegerField(null=True, blank=True)
 
 
-class EMGElectrodePlacement(models.Model):
+class EMGElectrodePlacement(models.Model):  # not indexed for search (parent)
     SURFACE = 'surface'
     INTRAMUSCULAR = "intramuscular"
     NEEDLE = "needle"
@@ -531,11 +533,11 @@ class EMGElectrodePlacementSetting(models.Model):
     remarks = models.TextField(null=True, blank=True)
 
 
-class TMSSetting(ExperimentSetting):
+class TMSSetting(ExperimentSetting):  # indexed for search
     pass
 
 
-class TMSDevice(Equipment):
+class TMSDevice(Equipment):  # indexed for search
     PULSE_TYPES = (
         ("monophase", "Monophase"),
         ("biphase", "Biphase"),
@@ -545,7 +547,7 @@ class TMSDevice(Equipment):
     )
 
 
-class CoilModel(models.Model):
+class CoilModel(models.Model):  # indexed for search
     COIL_DESIGN_OPTIONS = (
         ("air_core_coil", "Air core coil"),
         ("solid_core_coil", "Solid core coil"),
@@ -558,7 +560,7 @@ class CoilModel(models.Model):
     coil_design = models.CharField(null=True, blank=True, max_length=50, choices=COIL_DESIGN_OPTIONS)
 
 
-class TMSDeviceSetting(models.Model):
+class TMSDeviceSetting(models.Model):  # indexed for search
     PULSE_STIMULUS_TYPES = (
         ("single_pulse", "Single pulse"),
         ("paired_pulse", "Paired pulse"),
@@ -577,7 +579,7 @@ class TMSDeviceSetting(models.Model):
                                    related_name='tms_device_settings')
 
 
-class ContextTree(ExperimentSetting):
+class ContextTree(ExperimentSetting):  # indexed for search
     setting_text = models.TextField(null=True, blank=True)
     setting_file = models.FileField(
         upload_to='uploads/%Y/%m/%d/', null=True, blank=True
@@ -640,7 +642,7 @@ class Step(models.Model):
         return self.type
 
 
-class StepAdditionalFile(models.Model):
+class StepAdditionalFile(models.Model):  # not indexed for search
     step = models.ForeignKey(Step, related_name="step_additional_files")
     file = models.FileField(upload_to='uploads/%Y/%m/%d/')
 
@@ -650,23 +652,23 @@ def step_additional_file_delete(instance, **kwargs):
     instance.file.delete(save=False)
 
 
-class EEG(Step):
+class EEG(Step):  # not indexed for search (indexed Step)
     eeg_setting = models.ForeignKey(EEGSetting)
 
 
-class EMG(Step):
+class EMG(Step):  # not indexed for search (indexed Step)
     emg_setting = models.ForeignKey(EMGSetting)
 
 
-class TMS(Step):
+class TMS(Step):  # not indexed for search (indexed Step)
     tms_setting = models.ForeignKey(TMSSetting)
 
 
-class Questionnaire(Step):
+class Questionnaire(Step):  # not indexed for search (indexed Step)
     code = models.CharField(max_length=150)
 
 
-class QuestionnaireLanguage(models.Model):
+class QuestionnaireLanguage(models.Model):  # indexed for search
     questionnaire = models.ForeignKey(
         Questionnaire, related_name='q_languages'
     )
@@ -678,12 +680,12 @@ class QuestionnaireLanguage(models.Model):
         unique_together = ('questionnaire', 'language_code')
 
 
-class QuestionnaireDefaultLanguage(models.Model):
+class QuestionnaireDefaultLanguage(models.Model):  # indexed for search
     questionnaire = models.OneToOneField(Questionnaire, related_name='questionnaire_default_language')
     questionnaire_language = models.ForeignKey(QuestionnaireLanguage)
 
 
-class Instruction(Step):
+class Instruction(Step):  # not indexed for search (indexed Step)
     text = models.TextField(null=False, blank=False)
 
 
@@ -701,7 +703,7 @@ def stimulus_delete(instance, **kwargs):
     instance.media_file.delete(save=False)
 
 
-class GoalkeeperGame(Step):
+class GoalkeeperGame(Step):  # indexed for search
     software_name = models.CharField(max_length=150)
     software_description = models.TextField(null=True, blank=True)
     software_version = models.CharField(max_length=150)
@@ -713,24 +715,24 @@ class GenericDataCollection(Step):
     information_type_description = models.TextField(null=True, blank=True)
 
 
-class Pause(Step):
+class Pause(Step):  # not indexed for search (indexed Step)
     pass
 
 
-class Task(Step):
+class Task(Step):  # not indexed for search (indexed Step)
     pass
 
 
-class TaskForTheExperimenter(Step):
+class TaskForTheExperimenter(Step):  # not indexed for search (indexed Step)
     pass
 
 
-class SetOfStep(Step):
+class SetOfStep(Step):  # not indexed for search
     number_of_mandatory_steps = models.IntegerField(null=True, blank=True)
     is_sequential = models.BooleanField(default=False)
 
 
-class ExperimentalProtocol(models.Model):
+class ExperimentalProtocol(models.Model):  # indexed for search
     group = models.OneToOneField(Group, related_name='experimental_protocol')
     image = models.FileField(null=True, blank=True,
                              upload_to='uploads/%Y/%m/%d/')
@@ -743,7 +745,7 @@ def experimental_protocol_delete(instance, **kwargs):
     instance.image.delete(save=False)
 
 
-class DataCollection(models.Model):
+class DataCollection(models.Model):  # not indexed for search
     # step == null means data collection is associated to whole experimental
     # protocol.
     step = models.ForeignKey(Step, null=True, blank=True)
@@ -755,11 +757,11 @@ class DataCollection(models.Model):
         abstract = True
 
 
-class File(models.Model):
+class File(models.Model):  # not indexed for search
     file = models.FileField(upload_to='uploads/%Y/%m/%d/')
 
 
-class DataFile(models.Model):
+class DataFile(models.Model):  # not indexed for search (abstract)
     description = models.TextField()
     file_format = models.CharField(max_length=50)
 
@@ -767,7 +769,7 @@ class DataFile(models.Model):
         abstract = True
 
 
-class EEGData(DataCollection, DataFile):
+class EEGData(DataCollection, DataFile):  # not indexed for search
     eeg_setting = models.ForeignKey(EEGSetting)
     eeg_setting_reason_for_change = models.TextField(
         null=True, blank=True, default=''
@@ -781,7 +783,7 @@ def eeg_data_delete(instance, **kwargs):
     _delete_file_instance(instance)
 
 
-class EMGData(DataCollection, DataFile):
+class EMGData(DataCollection, DataFile):  # not indexed for search
     emg_setting = models.ForeignKey(EMGSetting)
     emg_setting_reason_for_change = models.TextField(null=True, blank=True, default='')
     files = models.ManyToManyField(File, related_name='emg_data_list')
@@ -792,7 +794,7 @@ def emg_data_delete(instance, **kwargs):
     _delete_file_instance(instance)
 
 
-class TMSData(DataCollection):
+class TMSData(DataCollection):  # indexed for search
     # main data
     tms_setting = models.ForeignKey(TMSSetting)
     resting_motor_threshold = models.FloatField(null=True, blank=True)
@@ -846,7 +848,7 @@ def tms_data_delete(instance, **kwargs):
     instance.localization_system_image.delete(save=False)
 
 
-class GoalkeeperGameData(DataCollection, DataFile):
+class GoalkeeperGameData(DataCollection, DataFile):  # not indexed for search
     sequence_used_in_context_tree = models.TextField(null=True, blank=True)
     files = models.ManyToManyField(
         File, related_name='goalkeeper_game_data_list'
@@ -858,16 +860,17 @@ def gkg_data_delete(instance, **kwargs):
     _delete_file_instance(instance)
 
 
-class RejectJustification(models.Model):
+class RejectJustification(models.Model):  # not indexed for search
     message = models.CharField(max_length=500)
     experiment = models.OneToOneField(Experiment,
                                       related_name='justification')
 
 
-class QuestionnaireResponse(DataCollection):
+class QuestionnaireResponse(DataCollection):  # not indexed for search
     limesurvey_response = models.TextField()
 
 
+# not indexed for search
 class GenericDataCollectionData(DataCollection, DataFile):
     files = models.ManyToManyField(
         File, related_name='generic_data_collection_data_list'
@@ -879,7 +882,7 @@ def gdc_data_delete(instance, **kwargs):
     _delete_file_instance(instance)
 
 
-class AdditionalData(DataCollection, DataFile):
+class AdditionalData(DataCollection, DataFile): # not indexed for search
     files = models.ManyToManyField(File, related_name='additional_data_list')
 
 

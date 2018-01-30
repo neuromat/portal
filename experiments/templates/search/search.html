@@ -70,6 +70,9 @@
                 {% if result.model_name == 'eegelectrodenet' %}
                     {% include 'search/eegelectrodenet.html' %}
                 {% endif %}
+                {% if result.model_name == 'eegsolution' %}
+                    {% include 'search/eegsolution.html' %}
+                {% endif %}
                 {% if result.model_name == 'questionnairelanguage' %}
                     {% include 'search/questionnaires_languages.html' %}
                 {% endif %}

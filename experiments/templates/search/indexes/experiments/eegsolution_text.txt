@@ -1,0 +1,4 @@
+{{ object.manufacturer_name }}
+{{ object.name }}
+{{ object.components }}
+{{ object.eeg_setting }}

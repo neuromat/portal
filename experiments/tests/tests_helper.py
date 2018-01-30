@@ -21,7 +21,7 @@ from experiments.models import Experiment, Study, Group, Researcher, \
     EEGElectrodeLocalizationSystem, ContextTree, Stimulus, EEG, EMG, \
     EMGSetting, EMGData, GoalkeeperGame, GoalkeeperGameData, \
     GenericDataCollection, GenericDataCollectionData, AdditionalData, \
-    EMGElectrodePlacement, EEGElectrodeNet
+    EMGElectrodePlacement, EEGElectrodeNet, EEGSolution
 from experiments.views import _get_q_default_language_or_first
 
 
@@ -588,6 +588,15 @@ def create_eeg_electrodenet(eeg_setting):
         eeg_setting=eeg_setting, manufacturer_name=faker.word(),
         equipment_type='eeg_electrode_net', identification=faker.text(),
         description=faker.text(), serial_number=faker.ssn()
+    )
+
+
+def create_eeg_solution(eeg_setting):
+    faker = Factory.create()
+
+    return EEGSolution.objects.create(
+        eeg_setting=eeg_setting, manufacturer_name=faker.word(),
+        name=faker.word(), components=faker.text()
     )
 
 
