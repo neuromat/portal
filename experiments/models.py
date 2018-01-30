@@ -283,7 +283,7 @@ class EEGAmplifierSetting(models.Model):  # not indexed for search
     number_of_channels_used = models.IntegerField(null=True)
 
 
-class EEGSolution(models.Model):
+class EEGSolution(models.Model):  # indexed for search
     eeg_setting = models.OneToOneField(
         EEGSetting, primary_key=True, related_name='eeg_solution'
     )
@@ -292,7 +292,7 @@ class EEGSolution(models.Model):
     components = models.TextField(null=True, blank=True)
 
 
-class EEGFilterSetting(models.Model):
+class EEGFilterSetting(models.Model):  # indexed for search
     eeg_setting = models.OneToOneField(EEGSetting, primary_key=True, related_name='eeg_filter_setting')
     eeg_filter_type_name = models.CharField(max_length=150)
     eeg_filter_type_description = models.TextField(null=True, blank=True)
@@ -312,7 +312,7 @@ class EEGElectrodeNet(Equipment):  # indexed for search
     pass
 
 
-class EEGElectrodeLocalizationSystem(models.Model):
+class EEGElectrodeLocalizationSystem(models.Model):  # indexed for search
     eeg_setting = models.OneToOneField(
         EEGSetting, primary_key=True,
         related_name='eeg_electrode_localization_system'

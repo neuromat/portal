@@ -76,6 +76,9 @@
                 {% if result.model_name == 'eegfiltersetting' %}
                     {% include 'search/eegfiltersetting.html' %}
                 {% endif %}
+                {% if result.model_name == 'eegelectrodelocalizationsystem' %}
+                    {% include 'search/eegelectrodelocalizationsystem.html' %}
+                {% endif %}
                 {% if result.model_name == 'questionnairelanguage' %}
                     {% include 'search/questionnaires_languages.html' %}
                 {% endif %}

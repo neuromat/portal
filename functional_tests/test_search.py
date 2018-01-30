@@ -9,7 +9,8 @@ from experiments.models import Study, Experiment, Group, Step, EMGSetting, \
 from experiments.tests.tests_helper import create_experiment, \
     create_emg_setting, create_group, create_goalkeepergame_step, \
     create_context_tree, create_eeg_setting, create_eeg_electrodenet, \
-    create_eeg_solution, create_eeg_filter_setting
+    create_eeg_solution, create_eeg_filter_setting, \
+    create_eeg_electrode_localization_system
 from functional_tests.base import FunctionalTest
 
 import time
@@ -710,6 +711,28 @@ class SearchTest(FunctionalTest):
 
         # There are three maches craeted above
         self.check_matches(3, 'eeg_filter_setting-matches', 'FilterTyp')
+
+    def test_search_eegelectrodelocalizationsystem_returns_correct_objects(
+            self):
+        self.create_objects_to_test_search_eeg_setting()
+
+        for eeg_setting in EEGSetting.objects.all():
+            eeg_electrode_localization_system = \
+                create_eeg_electrode_localization_system(eeg_setting)
+            eeg_electrode_localization_system.name = 'Elektrodenlokalisierung'
+            eeg_electrode_localization_system.save()
+
+        self.haystack_index('rebuild_index')
+
+        # Severino wants to search for experiments that has certain
+        # equipment associated to an EEG solution
+        self.search_for('Elektrodenlokalisierung')
+
+        # There are three maches craeted above
+        self.check_matches(
+            3, 'eeg_electrode_localiation_system-matches',
+            'Elektrodenlokalisierung'
+        )
 
     def test_search_questionnaire_data_returns_correct_objects_1(self):
         # Joselina wants to search for experiments that contains some

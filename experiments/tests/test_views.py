@@ -26,7 +26,8 @@ from experiments.tests.tests_helper import apply_setup, global_setup_ut, \
     create_download_dir_structure_and_files, \
     remove_selected_subdir, create_experiment, create_trustee_users, \
     create_experiment_versions, random_utf8_string, create_context_tree, \
-    create_eeg_electrodenet, create_eeg_solution, create_eeg_filter_setting
+    create_eeg_electrodenet, create_eeg_solution, create_eeg_filter_setting, \
+    create_eeg_electrode_localization_system
 from experiments.views import change_slug
 from functional_tests import test_search
 from nep import settings
@@ -614,6 +615,19 @@ class SearchTest(TestCase):
 
         self.haystack_index('rebuild_index')
         self.check_matches_on_response(3, 'FilterTyp')
+
+    def test_search_eegelectrodelocalizationsystem_returns_correct_objects(
+            self):
+        test_search.SearchTest().create_objects_to_test_search_eeg_setting()
+
+        for eeg_setting in EEGSetting.objects.all():
+            eeg_electrode_localization_system = \
+                create_eeg_electrode_localization_system(eeg_setting)
+            eeg_electrode_localization_system.name = 'Elektrodenlokalisierung'
+            eeg_electrode_localization_system.save()
+
+        self.haystack_index('rebuild_index')
+        self.check_matches_on_response(3, 'Elektrodenlokalisierung')
 
     def test_search_questionnaire_returns_correct_number_of_objects(self):
         response = self.client.get('/search/', {
