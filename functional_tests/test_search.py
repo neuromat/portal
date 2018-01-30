@@ -74,6 +74,7 @@ class SearchTest(FunctionalTest):
         create_goalkeepergame_step(group, context_tree2)
         for goalkeepergame in GoalkeeperGame.objects.all():
             goalkeepergame.software_name = 'goalkeepergame'
+            goalkeepergame.software_description = 'Ein Beschreibung'
             goalkeepergame.save()
 
     def test_click_in_a_search_result_display_experiment_detail_page(self):
@@ -846,20 +847,19 @@ class SearchTest(FunctionalTest):
         self.wait_for(lambda: self.verify_n_objects_in_table_rows(
             3, 'goalkeepergame-matches'
         ))
-        self.verify_n_objects_in_table_rows(0, 'questionnaire-matches')
-        self.verify_n_objects_in_table_rows(0, 'publication-matches')
-        self.verify_n_objects_in_table_rows(0, 'eegsetting-matches')
-        self.verify_n_objects_in_table_rows(0, 'emgsetting-matches')
-        self.verify_n_objects_in_table_rows(0, 'tmsdata-matches')
-        self.verify_n_objects_in_table_rows(0, 'coilmodel-matches')
-        self.verify_n_objects_in_table_rows(0, 'tmsdevice-matches')
-        self.verify_n_objects_in_table_rows(0, 'tmsdevicesetting-matches')
-        self.verify_n_objects_in_table_rows(0, 'tmssetting-matches')
-        self.verify_n_objects_in_table_rows(0, 'experiment-matches')
-        self.verify_n_objects_in_table_rows(0, 'study-matches')
-        self.verify_n_objects_in_table_rows(0, 'group-matches')
-        self.verify_n_objects_in_table_rows(0, 'experimentalprotocol-matches')
+        goalkeepergame_text = self.browser.find_element_by_class_name(
+            'goalkeepergame-matches'
+        ).text
+        self.assertIn('goalkeepergame', goalkeepergame_text)
 
+        # Now Joselina searchs for 'Ein Beschreibung' that is exactly what
+        # is in software description field of GoalkeeperGame model
+        self.search_for('Ein Beschreibung')
+
+        # Again that is three matches
+        self.wait_for(lambda: self.verify_n_objects_in_table_rows(
+            3, 'goalkeepergame-matches'
+        ))
         goalkeepergame_text = self.browser.find_element_by_class_name(
             'goalkeepergame-matches'
         ).text

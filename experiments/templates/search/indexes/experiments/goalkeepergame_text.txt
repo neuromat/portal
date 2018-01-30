@@ -1,2 +1,5 @@
+{{ object.identification }}
 {{ object.software_name }}
+{{ object.software_description }}
 {{ object.group }}
+{{ object.context_tree }}

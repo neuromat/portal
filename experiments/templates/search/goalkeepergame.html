@@ -14,12 +14,16 @@
         </h5>
         <strong>{% trans "identification" %}: </strong>
         {% highlight result.object.identification with query %}&nbsp;
-        <strong>{% trans "description" %}: </strong>
-        {% highlight result.object.description with query %}&nbsp;
+        {% if result.object.description %}
+            <strong>{% trans "description" %}: </strong>
+            {% highlight result.object.description with query %}&nbsp;
+        {% endif %}
         <strong>{% trans "software name" %}: </strong>
         {% highlight result.object.software_name with query %}&nbsp;
-        <strong>{% trans "software description" %}: </strong>
-        {% highlight result.object.software_description with query %}&nbsp;
+        {% if result.object.software_description %}
+            <strong>{% trans "software description" %}: </strong>
+            {% highlight result.object.software_description with query %}&nbsp;
+        {% endif %}
         <strong>{% trans "software_version" %}: </strong>
         {% highlight result.object.software_version with query %}&nbsp;
         <strong>{% trans "context tree" %}: </strong>
