@@ -98,18 +98,9 @@ class StepIndex(indexes.SearchIndex, indexes.Indexable):
 
 
 class GoalkeeperGameIndex(StepIndex):
-    text = indexes.CharField(document=True, use_template=True)
-    group = indexes.CharField(model_attr='group__id')
 
     def get_model(self):
         return GoalkeeperGame
-
-    def index_queryset(self, using=None):
-        experiments = Experiment.lastversion_objects.filter(
-            status=Experiment.APPROVED
-        )
-        groups = Group.objects.filter(experiment__in=experiments)
-        return self.get_model().objects.filter(group__in=groups)
 
 
 class TMSSettingIndex(indexes.SearchIndex, indexes.Indexable):
