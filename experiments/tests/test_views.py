@@ -19,12 +19,12 @@ from haystack.query import SearchQuerySet
 from experiments import views
 from experiments.forms import ChangeSlugForm
 from experiments.models import Experiment, Step, Questionnaire, \
-    QuestionnaireDefaultLanguage, QuestionnaireLanguage, Group
+    QuestionnaireDefaultLanguage, QuestionnaireLanguage, Group, ContextTree
 from experiments.tests.tests_helper import apply_setup, global_setup_ut, \
     create_experiment_related_objects, \
     create_download_dir_structure_and_files, \
     remove_selected_subdir, create_experiment, create_trustee_users, \
-    create_experiment_versions, random_utf8_string
+    create_experiment_versions, random_utf8_string, create_context_tree
 from experiments.views import change_slug
 from functional_tests import test_search
 from nep import settings
@@ -491,6 +491,12 @@ class SearchTest(TestCase):
         sys.stderr.close()
         sys.stderr = stderr_backup
 
+    def check_matches_on_response(self, matches, text):
+        response = self.client.get('/search/', {'q': text})
+        self.assertEqual(response.status_code, 200)
+        # because in search results templates it's '<tr class ...>'
+        self.assertContains(response, '<tr', matches)
+
     def test_search_redirects_to_homepage_with_search_results(self):
         response = self.client.get('/search/', {'q': 'plexus'})
         self.assertEqual(response.status_code, 200)
@@ -559,6 +565,20 @@ class SearchTest(TestCase):
         self.assertEqual(response.status_code, 200)
         # because in search results templates it's '<tr class ...>'
         self.assertContains(response, '<tr', 3)
+
+    def test_search_context_tree_returns_correct_objects(self):
+        # create objects needed
+        experiment1 = create_experiment(1, status=Experiment.APPROVED)
+        create_context_tree(experiment1)
+        create_context_tree(experiment1)
+        experiment2 = create_experiment(1, status=Experiment.APPROVED)
+        create_context_tree(experiment2)
+        for context_tree in ContextTree.objects.all():
+            context_tree.setting_text = 'wunderbarcontexttree'
+            context_tree.save()
+
+        self.haystack_index('rebuild_index')
+        self.check_matches_on_response(3, 'wunderbarcontexttree')
 
     def test_search_questionnaire_returns_correct_number_of_objects(self):
         response = self.client.get('/search/', {

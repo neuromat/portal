@@ -64,6 +64,9 @@
                 {% if result.model_name == 'emgsetting' %}
                     {% include 'search/emgsetting.html' %}
                 {% endif %}
+                {% if result.model_name == 'contexttree' %}
+                    {% include 'search/contexttree.html' %}
+                {% endif %}
                 {% if result.model_name == 'questionnairelanguage' %}
                     {% include 'search/questionnaires_languages.html' %}
                 {% endif %}

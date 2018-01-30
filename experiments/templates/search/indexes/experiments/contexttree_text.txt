@@ -1,0 +1,5 @@
+{{ object.name }}
+{{ object.description }}
+{{ object.experiment }}
+{{ object.experiment }}
+{{ object.setting_text }}

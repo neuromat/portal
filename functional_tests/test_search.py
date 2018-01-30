@@ -5,7 +5,7 @@ import haystack
 from django.core.management import call_command
 
 from experiments.models import Study, Experiment, Group, Step, EMGSetting, \
-    GoalkeeperGame
+    GoalkeeperGame, ContextTree
 from experiments.tests.tests_helper import create_experiment, \
     create_emg_setting, create_group, create_goalkeepergame_step, \
     create_context_tree
@@ -76,6 +76,15 @@ class SearchTest(FunctionalTest):
             goalkeepergame.software_name = 'goalkeepergame'
             goalkeepergame.software_description = 'Ein Beschreibung'
             goalkeepergame.save()
+
+    def check_matches(self, matches, css_selector, text):
+        self.wait_for(lambda: self.verify_n_objects_in_table_rows(
+            matches, css_selector
+        ))
+        element_text = self.browser.find_element_by_class_name(
+            css_selector
+        ).text
+        self.assertIn(text, element_text)
 
     def test_click_in_a_search_result_display_experiment_detail_page(self):
         # TODO: the test tests for some match types, not all. Wold be better
@@ -844,23 +853,33 @@ class SearchTest(FunctionalTest):
         # goalkeeper game phase steps bounded to two groups of one experiment,
         # and one from other goalkeeper step bounded to another group,
         # she sees three results
-        self.wait_for(lambda: self.verify_n_objects_in_table_rows(
-            3, 'goalkeepergame-matches'
-        ))
-        goalkeepergame_text = self.browser.find_element_by_class_name(
-            'goalkeepergame-matches'
-        ).text
-        self.assertIn('goalkeepergame', goalkeepergame_text)
+        self.check_matches(3, 'goalkeepergame-matches', 'goalkeepergame')
 
         # Now Joselina searchs for 'Ein Beschreibung' that is exactly what
         # is in software description field of GoalkeeperGame model
         self.search_for('Ein Beschreibung')
 
         # Again that is three matches
-        self.wait_for(lambda: self.verify_n_objects_in_table_rows(
-            3, 'goalkeepergame-matches'
-        ))
-        goalkeepergame_text = self.browser.find_element_by_class_name(
-            'goalkeepergame-matches'
-        ).text
-        self.assertIn('goalkeepergame', goalkeepergame_text)
+        self.check_matches(3, 'goalkeepergame-matches', 'Ein Beschreibung')
+
+    def test_search_context_tree_returns_correct_objects(self):
+        ##
+        # Create objects needed
+        ##
+        experiment1 = create_experiment(1, status=Experiment.APPROVED)
+        create_context_tree(experiment1)
+        create_context_tree(experiment1)
+        experiment2 = create_experiment(1, status=Experiment.APPROVED)
+        create_context_tree(experiment2)
+        for context_tree in ContextTree.objects.all():
+            context_tree.setting_text = 'wunderbarcontexttree'
+            context_tree.save()
+
+        self.haystack_index('rebuild_index')
+
+        # Edson searchs for a given context tree experiment setting
+        self.search_for('wunderbarcontexttree')
+
+        # there are three matches (as we created them above)
+        self.check_matches(3, 'context_tree-matches', 'wunderbarcontexttree')
+
