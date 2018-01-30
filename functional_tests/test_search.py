@@ -5,10 +5,10 @@ import haystack
 from django.core.management import call_command
 
 from experiments.models import Study, Experiment, Group, Step, EMGSetting, \
-    GoalkeeperGame, ContextTree
+    GoalkeeperGame, ContextTree, EEGSetting
 from experiments.tests.tests_helper import create_experiment, \
     create_emg_setting, create_group, create_goalkeepergame_step, \
-    create_context_tree
+    create_context_tree, create_eeg_setting, create_eeg_electrodenet
 from functional_tests.base import FunctionalTest
 
 import time
@@ -76,6 +76,17 @@ class SearchTest(FunctionalTest):
             goalkeepergame.software_name = 'goalkeepergame'
             goalkeepergame.software_description = 'Ein Beschreibung'
             goalkeepergame.save()
+
+    @staticmethod
+    def create_objects_to_test_search_eeg_setting():
+        experiment1 = create_experiment(1, status=Experiment.APPROVED)
+        experiment2 = create_experiment(1, status=Experiment.APPROVED)
+        create_eeg_setting(1, experiment1)
+        create_eeg_setting(1, experiment1)
+        create_eeg_setting(1, experiment2)
+        for eeg_setting in EEGSetting.objects.all():
+            eeg_setting.name = 'eegsettingname'
+            eeg_setting.save()
 
     def check_matches(self, matches, css_selector, text):
         self.wait_for(lambda: self.verify_n_objects_in_table_rows(
@@ -623,33 +634,37 @@ class SearchTest(FunctionalTest):
         self.assertIn('cerebral cortex', tmsdevicesetting_text)
 
     def test_search_eegsetting_returns_correct_objects(self):
+        self.create_objects_to_test_search_eeg_setting()
+        self.haystack_index('rebuild_index')
+
         # Joselina wants to search for experiments whose EEGSetting name is
         # 'eegsettingname'
         self.search_for('eegsettingname')
 
-        # As there is three EEGSetting objects with that name,
+        # As there are three EEGSetting objects with that name,
         # one associated to an experiment, and the other two associated with
         # another experiment, she sees three rows in Search Results list
-        self.wait_for(lambda: self.verify_n_objects_in_table_rows(
-            3, 'eegsetting-matches'
-        ))
-        self.verify_n_objects_in_table_rows(0, 'tmsdata-matches')
-        self.verify_n_objects_in_table_rows(0, 'coilmodel-matches')
-        self.verify_n_objects_in_table_rows(0, 'tmsdevice-matches')
-        self.verify_n_objects_in_table_rows(0, 'tmsdevicesetting-matches')
-        self.verify_n_objects_in_table_rows(0, 'tmssetting-matches')
-        self.verify_n_objects_in_table_rows(0, 'experiment-matches')
-        self.verify_n_objects_in_table_rows(0, 'study-matches')
-        self.verify_n_objects_in_table_rows(0, 'group-matches')
-        self.verify_n_objects_in_table_rows(0, 'experimentalprotocol-matches')
-        eegsetting_text = self.browser.find_element_by_class_name(
-            'eegsetting-matches'
-        ).text
-        self.assertIn('eegsettingname', eegsetting_text)
+        self.check_matches(3, 'eegsetting-matches', 'eegsettingname')
+
+    def test_search_eegelectrodenet_equipment_returns_correct_objects(self):
+        self.create_objects_to_test_search_eeg_setting()
+
+        for eeg_setting in EEGSetting.objects.all():
+            eeg_electrode_net = create_eeg_electrodenet(eeg_setting)
+            eeg_electrode_net.manufacturer_name = 'Hersteller'
+            eeg_electrode_net.save()
+
+        self.haystack_index('rebuild_index')
+
+        # Severino wants to search for experiments that has certain
+        # equipment associated to an experiment setting
+        self.search_for('Hersteller')
+
+        # There are three maches craeted above
+        self.check_matches(3, 'eeg_electrode_net-matches', 'Hersteller')
 
     def test_search_emgsetting_returns_correct_objects(self):
         self.create_objects_to_test_search_emgsetting()
-
         self.haystack_index('rebuild_index')
 
         # Joselina wants to search for experiments whose EMGSetting name is

@@ -1,0 +1,5 @@
+{{ object.manufacturer_name }}
+{{ object.identification }}
+{{ object.description }}
+{{ object.serial_number }}
+{{ object.eeg_setting }}

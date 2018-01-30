@@ -304,7 +304,9 @@ class EEGFilterSetting(models.Model):
 
 
 class EEGElectrodeNet(Equipment):
-    eeg_setting = models.OneToOneField(EEGSetting, primary_key=True, related_name='eeg_electrode_net')
+    eeg_setting = models.OneToOneField(
+        EEGSetting, primary_key=True, related_name='eeg_electrode_net'
+    )
     pass
 
 

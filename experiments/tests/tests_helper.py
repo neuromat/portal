@@ -21,7 +21,7 @@ from experiments.models import Experiment, Study, Group, Researcher, \
     EEGElectrodeLocalizationSystem, ContextTree, Stimulus, EEG, EMG, \
     EMGSetting, EMGData, GoalkeeperGame, GoalkeeperGameData, \
     GenericDataCollection, GenericDataCollectionData, AdditionalData, \
-    EMGElectrodePlacement
+    EMGElectrodePlacement, EEGElectrodeNet
 from experiments.views import _get_q_default_language_or_first
 
 
@@ -581,21 +581,14 @@ def create_eeg_electrode_localization_system(eeg_setting):
     )
 
 
-def create_eegsetting_objects_to_test_search():
-    experiment1 = Experiment.objects.filter(status=Experiment.APPROVED).first()
-    experiment2 = Experiment.objects.filter(status=Experiment.APPROVED).last()
+def create_eeg_electrodenet(eeg_setting):
+    faker = Factory.create()
 
-    create_eeg_setting(2, experiment1)
-    tmss1 = EEGSetting.objects.first()
-    tmss1.name = 'eegsettingname'
-    tmss1.save()
-    tmss2 = EEGSetting.objects.last()
-    tmss2.name = 'eegsettingname'
-    tmss2.save()
-    create_eeg_setting(1, experiment2)
-    tmss3 = EEGSetting.objects.last()
-    tmss3.name = 'eegsettingname'
-    tmss3.save()
+    return EEGElectrodeNet.objects.create(
+        eeg_setting=eeg_setting, manufacturer_name=faker.word(),
+        equipment_type='eeg_electrode_net', identification=faker.text(),
+        description=faker.text(), serial_number=faker.ssn()
+    )
 
 
 def create_goalkeeper_game_data(gkg_step, participant):
@@ -1247,9 +1240,6 @@ def global_setup_ft():
     # Create TMSData objects to test search
     create_tmsdata_objects_to_test_search()
 
-    # Create EEGSetting object to test search
-    create_eegsetting_objects_to_test_search()
-
     # Create Questionnaire objects
     # (requires valid files 'questionnaire1.csv', 'questionnaire2.csv',
     # 'questionnaire3.csv', and their language variations in
@@ -1411,9 +1401,6 @@ def global_setup_ut():
         name='Colaborador 2', team='Numec', coordinator=False,
         study=study1
     )
-
-    # To test search
-    create_eegsetting_objects_to_test_search()
 
     # Create valid Questionnaire objects
     # (requires the files 'questionnaire1.csv', 'questionnaire2.csv' and

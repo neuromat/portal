@@ -19,12 +19,14 @@ from haystack.query import SearchQuerySet
 from experiments import views
 from experiments.forms import ChangeSlugForm
 from experiments.models import Experiment, Step, Questionnaire, \
-    QuestionnaireDefaultLanguage, QuestionnaireLanguage, Group, ContextTree
+    QuestionnaireDefaultLanguage, QuestionnaireLanguage, Group, ContextTree, \
+    EEGSetting
 from experiments.tests.tests_helper import apply_setup, global_setup_ut, \
     create_experiment_related_objects, \
     create_download_dir_structure_and_files, \
     remove_selected_subdir, create_experiment, create_trustee_users, \
-    create_experiment_versions, random_utf8_string, create_context_tree
+    create_experiment_versions, random_utf8_string, create_context_tree, \
+    create_eeg_electrodenet
 from experiments.views import change_slug
 from functional_tests import test_search
 from nep import settings
@@ -536,10 +538,10 @@ class SearchTest(TestCase):
 
     # TODO: test other searched objects
     def test_search_eegsetting_returns_correct_number_of_objects(self):
-        response = self.client.get('/search/', {'q': 'eegsettingname'})
-        self.assertEqual(response.status_code, 200)
-        # because in search results templates it's '<tr class ...>'
-        self.assertContains(response, '<tr', 3)
+        test_search.SearchTest().create_objects_to_test_search_eeg_setting()
+
+        self.haystack_index('rebuild_index')
+        self.check_matches_on_response(3, 'eegsettingname')
 
     def test_search_eegsetting_returns_matchings_containing_search_strings(self):
         pass
@@ -579,6 +581,17 @@ class SearchTest(TestCase):
 
         self.haystack_index('rebuild_index')
         self.check_matches_on_response(3, 'wunderbarcontexttree')
+
+    def test_search_eegelectrodenet_equipment_returns_correct_objects(self):
+        test_search.SearchTest().create_objects_to_test_search_eeg_setting()
+
+        for eeg_setting in EEGSetting.objects.all():
+            eeg_electrode_net = create_eeg_electrodenet(eeg_setting)
+            eeg_electrode_net.manufacturer_name = 'Hersteller'
+            eeg_electrode_net.save()
+
+        self.haystack_index('rebuild_index')
+        self.check_matches_on_response(3, 'Hersteller')
 
     def test_search_questionnaire_returns_correct_number_of_objects(self):
         response = self.client.get('/search/', {
