@@ -1,0 +1,19 @@
+{% load highlight %}
+{% load i18n %}
+<tr class="eeg_filter_setting-matches">
+    <td>
+        <h5 class="match">
+            <a href="{% url 'experiment-detail' result.object.eeg_setting.experiment.slug %}"><strong
+            >{% trans "Experiment" %}: </strong>{{ result.object.eeg_setting.experiment.title }}
+                <strong>> {% trans "EEG Setting" %}: </strong>
+                {{ result.object.eeg_setting.name }}
+                <strong>> {% trans "EEG Filter Setting" %}: </strong>
+                {{ result.object.eeg_filter_type_name }}
+            </a><br><br>
+        </h5>
+        <strong>{% trans "filter type name" %}: </strong>
+        {% highlight result.object.eeg_filter_type_name with query %}&nbsp;
+        <strong>{% trans "filter type description" %}: </strong>
+        {% highlight result.object.eeg_filter_type_description with query %}&nbsp;
+    </td>
+</tr>

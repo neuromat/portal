@@ -4,7 +4,7 @@ from experiments.models import Experiment, Study, Group, \
     ExperimentalProtocol, TMSSetting, TMSDeviceSetting, TMSDevice, \
     CoilModel, TMSData, EEGSetting, Questionnaire, Step, \
     QuestionnaireLanguage, Publication, EMGSetting, GoalkeeperGame, \
-    ContextTree, EEGElectrodeNet, EEGSolution
+    ContextTree, EEGElectrodeNet, EEGSolution, EEGFilterSetting
 
 
 class ExperimentIndex(indexes.SearchIndex, indexes.Indexable):
@@ -241,6 +241,12 @@ class EEGSolutionIndex(EEGElectrodeNetIndex):
 
     def get_model(self):
         return EEGSolution
+
+
+class EEGFilterSettingIndex(EEGElectrodeNetIndex):
+
+    def get_model(self):
+        return EEGFilterSetting
 
 
 class EMGSettingIndex(indexes.SearchIndex, indexes.Indexable):

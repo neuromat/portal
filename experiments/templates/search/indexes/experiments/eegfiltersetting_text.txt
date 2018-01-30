@@ -1,0 +1,2 @@
+{{ object.eeg_filter_type_name }}
+{{ object.eeg_filter_type_description }}
