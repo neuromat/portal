@@ -414,7 +414,7 @@ class EMGSetting(ExperimentSetting):  # indexed for search
     acquisition_software_version = models.CharField(max_length=150)
 
 
-class EMGDigitalFilterSetting(models.Model):
+class EMGDigitalFilterSetting(models.Model):  # indexed for search
     emg_setting = models.OneToOneField(EMGSetting, primary_key=True, related_name='emg_digital_filter_setting')
     filter_type_name = models.CharField(max_length=150)
     filter_type_description = models.TextField(null=True, blank=True)
@@ -530,7 +530,7 @@ class EMGNeedlePlacement(EMGElectrodePlacement):
     depth_of_insertion = models.TextField(null=True, blank=True)
 
 
-class EMGElectrodePlacementSetting(models.Model):
+class EMGElectrodePlacementSetting(models.Model):  # indexed for search
     emg_electrode_setting = models.OneToOneField(
         EMGElectrodeSetting, primary_key=True,
         related_name='emg_electrode_placement_setting'
@@ -718,7 +718,7 @@ class GoalkeeperGame(Step):  # indexed for search
     context_tree = models.ForeignKey(ContextTree)
 
 
-class GenericDataCollection(Step):
+class GenericDataCollection(Step):  # indexed for search
     information_type_name = models.CharField(max_length=150)
     information_type_description = models.TextField(null=True, blank=True)
 

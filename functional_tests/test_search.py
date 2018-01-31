@@ -5,14 +5,17 @@ import haystack
 from django.core.management import call_command
 
 from experiments.models import Study, Experiment, Group, Step, EMGSetting, \
-    GoalkeeperGame, ContextTree, EEGSetting, Stimulus, GenericDataCollection
+    GoalkeeperGame, ContextTree, EEGSetting, Stimulus, GenericDataCollection, \
+    EMGElectrodePlacementSetting
 from experiments.tests.tests_helper import create_experiment, \
     create_emg_setting, create_group, create_goalkeepergame_step, \
     create_context_tree, create_eeg_setting, create_eeg_electrodenet, \
     create_eeg_solution, create_eeg_filter_setting, \
     create_eeg_electrode_localization_system, \
     create_emg_digital_filter_setting, create_stimulus_step, \
-    create_generic_data_collection_step
+    create_generic_data_collection_step, create_electrode_model, \
+    create_emg_electrode_setting, create_emg_electrode_placement, \
+    create_emg_electrode_placement_setting
 from functional_tests.base import FunctionalTest
 
 import time
@@ -120,6 +123,23 @@ class SearchTest(FunctionalTest):
         for eeg_setting in EEGSetting.objects.all():
             eeg_setting.name = 'eegsettingname'
             eeg_setting.save()
+
+    @staticmethod
+    def create_objects_to_test_search_emgelectrodeplacementsetting(type):
+        experiment1 = create_experiment(1, status=Experiment.APPROVED)
+        emg_setting = create_emg_setting(experiment1)
+        electrode_model = create_electrode_model()
+        emg_electrode_setting = create_emg_electrode_setting(
+            emg_setting, electrode_model
+        )
+        emg_electrode_placement = create_emg_electrode_placement()
+        create_emg_electrode_placement_setting(
+            emg_electrode_setting, emg_electrode_placement
+        )
+        for emg_electrode_placement_setting in \
+                EMGElectrodePlacementSetting.objects.all():
+            emg_electrode_placement_setting.muscle_name = 'quadrizeps'
+            emg_electrode_placement_setting.save()
 
     def check_matches(self, matches, css_selector, text):
         self.wait_for(lambda: self.verify_n_objects_in_table_rows(
@@ -1017,3 +1037,17 @@ class SearchTest(FunctionalTest):
         # there are three matches (as we created them above)
         self.check_matches(3, 'context_tree-matches', 'wunderbarcontexttree')
 
+    def test_search_emgelectrodeplacementsetting_returns_correct_objects(
+            self):
+        self.create_objects_to_test_search_emgelectrodeplacementsetting()
+        self.haystack_index('rebuild_index')
+
+        # Joselina wants to search for a given stimulus step
+        self.search_for('quadrizeps')
+
+        # As there are three stimulus steps with that string, two from
+        # groups of one experiment, and one from other group of another
+        # experiment, she sees three results
+        self.check_matches(
+            1, 'emg_electrode_placement_setting-matches', 'quadrizeps'
+        )

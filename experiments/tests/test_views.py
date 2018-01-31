@@ -569,6 +569,13 @@ class SearchTest(TestCase):
         self.haystack_index('rebuild_index')
         self.check_matches_on_response(3, 'generischedatensammlung')
 
+    def test_search_emgelectrodeplacementsetting_returns_correct_objects(self):
+        test_search.SearchTest(). \
+            create_objects_to_test_search_emgelectrodeplacementsetting(
+            'electrode_placement')
+        self.haystack_index('rebuild_index')
+        self.check_matches_on_response(1, 'quadrizeps')
+
     def test_search_goalkeepergame_step_returns_correct_objects(self):
         test_search.SearchTest()\
             .create_objects_to_test_search_goalkeepergame_step()

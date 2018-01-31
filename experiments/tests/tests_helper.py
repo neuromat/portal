@@ -22,7 +22,8 @@ from experiments.models import Experiment, Study, Group, Researcher, \
     EMGSetting, EMGData, GoalkeeperGame, GoalkeeperGameData, \
     GenericDataCollection, GenericDataCollectionData, AdditionalData, \
     EMGElectrodePlacement, EEGElectrodeNet, EEGSolution, EEGFilterSetting, \
-    EMGDigitalFilterSetting
+    EMGDigitalFilterSetting, ElectrodeModel, EMGElectrodeSetting, \
+    EMGElectrodePlacementSetting
 from experiments.views import _get_q_default_language_or_first
 
 
@@ -396,6 +397,14 @@ def create_emg_electrode_placement():
     )
 
 
+def create_emg_electrode_placement_setting(emg_electrode_setting,
+                                           emg_electrode_placement):
+    return EMGElectrodePlacementSetting.objects.create(
+        emg_electrode_setting=emg_electrode_setting,
+        emg_electrode_placement=emg_electrode_placement
+    )
+
+
 def create_stimulus_step(group):
     """
     :param group: Group model instance
@@ -635,6 +644,23 @@ def create_generic_data_collection_step(group):
         group=group,
         identification=faker.word(), numeration=faker.ssn(),
         type=Step.GENERIC, order=randint(1, 20)
+    )
+
+
+def create_electrode_model():
+    faker = Factory.create()
+
+    return ElectrodeModel.objects.create(
+        name=faker.word(), description=faker.text(), material=faker.word(),
+        usability=choice(['disposable', 'reusable']),
+        electrode_configuration_name=faker.word(),
+        electrode_type=choice(['surface', 'intramuscular', 'needle'])
+    )
+
+
+def create_emg_electrode_setting(emg_setting, electrode_model):
+    return EMGElectrodeSetting.objects.create(
+        emg_setting=emg_setting, electrode_model=electrode_model
     )
 
 

@@ -1,0 +1,5 @@
+{{ object.muscle_side }}
+{{ object.muscle_name }}
+{{ object.remarks }}
+{{ object.emg_electrode_setting }}
+{{ object.emg_electrode_placement }}

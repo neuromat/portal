@@ -1,0 +1,26 @@
+{% load highlight %}
+{% load i18n %}
+<tr class="emg_electrode_placement_setting-matches">
+    <td>
+        <h5 class="match">
+            <a href="{% url 'experiment-detail' result.object.emg_electrode_setting.emg_setting.experiment.slug %}"><strong
+            >{% trans "Experiment" %}: </strong>{{ result.object.emg_electrode_setting.emg_setting.experiment.title }}
+                <strong>> {% trans "EMG Setting" %}: </strong>
+                {{ result.object.emg_electrode_setting.emg_setting.name }}
+                <strong>> {% trans "EMG Electrode Model" %}: </strong>
+                {{ result.object.emg_electrode_setting.electrode_model.name }}
+                <strong>> {% trans "EMG Electrode Placement Setting" %}: </strong>
+                {{ result.object.muscle_name }}
+            </a>
+            <br><br>
+        </h5>
+        {% if result.object.muscle_name %}
+            <strong>{% trans "muscle name" %}: </strong>
+            {% highlight result.object.muscle_name with query %}&nbsp;
+        {% endif %}
+        {% if result.object.muscle_side %}
+            <strong>{% trans "muscle side" %}: </strong>
+            {% highlight result.object.muscle_side with query %}&nbsp;
+        {% endif %}
+    </td>
+</tr>

@@ -6,7 +6,7 @@ from experiments.models import Experiment, Study, Group, \
     QuestionnaireLanguage, Publication, EMGSetting, GoalkeeperGame, \
     ContextTree, EEGElectrodeNet, EEGSolution, EEGFilterSetting, \
     EEGElectrodeLocalizationSystem, EMGDigitalFilterSetting, Stimulus, \
-    GenericDataCollection
+    GenericDataCollection, EMGElectrodePlacementSetting, EMGElectrodeSetting
 
 
 class ExperimentIndex(indexes.SearchIndex, indexes.Indexable):
@@ -130,6 +130,32 @@ class ContextTreeIndex(indexes.SearchIndex, indexes.Indexable):
             status=Experiment.APPROVED
         )
         return self.get_model().objects.filter(experiment__in=experiments)
+
+
+class EMGElectrodePlacementSettingIndex(indexes.SearchIndex,
+                                        indexes.Indexable):
+    text = indexes.CharField(document=True, use_template=True)
+    emg_electrode_setting = indexes.CharField(
+        model_attr='emg_electrode_setting__id'
+    )
+    emg_electrode_placement = indexes.CharField(
+        model_attr='emg_electrode_placement__id'
+    )
+
+    def get_model(self):
+        return EMGElectrodePlacementSetting
+
+    def index_queryset(self, using=None):
+        experiments = Experiment.lastversion_objects.filter(
+            status=Experiment.APPROVED
+        )
+        emg_settings = EMGSetting.objects.filter(experiment__in=experiments)
+        emg_electrode_settings = EMGElectrodeSetting.objects.filter(
+            emg_setting__in=emg_settings
+        )
+        return self.get_model().objects.filter(
+            emg_electrode_setting__in=emg_electrode_settings
+        )
 
 
 class TMSSettingIndex(indexes.SearchIndex, indexes.Indexable):

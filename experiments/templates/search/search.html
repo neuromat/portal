@@ -94,6 +94,9 @@
                 {% if result.model_name == 'publication' %}
                     {% include 'search/publications.html' %}
                 {% endif %}
+                {% if result.model_name == 'emgelectrodeplacementsetting' %}
+                    {% include 'search/emgelectrodeplacementsetting.html' %}
+                {% endif %}
             {% empty %}
                 <p>{% trans "No results found" %}.</p>
             {% endfor %}
