@@ -563,6 +563,12 @@ class SearchTest(TestCase):
         self.haystack_index('rebuild_index')
         self.check_matches_on_response(3, 'stimulusschritt')
 
+    def test_search_genericdatacollection_step_returns_correct_objects(self):
+        test_search.SearchTest().\
+            create_objects_to_test_search_genericdatacollection_step()
+        self.haystack_index('rebuild_index')
+        self.check_matches_on_response(3, 'generischedatensammlung')
+
     def test_search_goalkeepergame_step_returns_correct_objects(self):
         test_search.SearchTest()\
             .create_objects_to_test_search_goalkeepergame_step()

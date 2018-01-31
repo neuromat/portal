@@ -46,6 +46,9 @@
                 {% if result.model_name == 'stimulus' %}
                     {% include 'search/stimulus.html' %}
                 {% endif %}
+                {% if result.model_name == 'genericdatacollection' %}
+                    {% include 'search/genericdatacollection.html' %}
+                {% endif %}
                 {% if result.model_name == 'tmssetting' %}
                     {% include 'search/tmssetting.html' %}
                 {% endif %}

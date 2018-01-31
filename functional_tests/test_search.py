@@ -5,13 +5,14 @@ import haystack
 from django.core.management import call_command
 
 from experiments.models import Study, Experiment, Group, Step, EMGSetting, \
-    GoalkeeperGame, ContextTree, EEGSetting, Stimulus
+    GoalkeeperGame, ContextTree, EEGSetting, Stimulus, GenericDataCollection
 from experiments.tests.tests_helper import create_experiment, \
     create_emg_setting, create_group, create_goalkeepergame_step, \
     create_context_tree, create_eeg_setting, create_eeg_electrodenet, \
     create_eeg_solution, create_eeg_filter_setting, \
     create_eeg_electrode_localization_system, \
-    create_emg_digital_filter_setting, create_stimulus_step
+    create_emg_digital_filter_setting, create_stimulus_step, \
+    create_generic_data_collection_step
 from functional_tests.base import FunctionalTest
 
 import time
@@ -76,6 +77,21 @@ class SearchTest(FunctionalTest):
         for stimulus_step in Stimulus.objects.all():
             stimulus_step.stimulus_type_name = 'stimulusschritt'
             stimulus_step.save()
+
+    @staticmethod
+    def create_objects_to_test_search_genericdatacollection_step():
+        experiment1 = create_experiment(1, status=Experiment.APPROVED)
+        group1 = create_group(1, experiment1)
+        group2 = create_group(1, experiment1)
+        create_generic_data_collection_step(group1)
+        create_generic_data_collection_step(group2)
+        experiment2 = create_experiment(1, status=Experiment.APPROVED)
+        group = create_group(1, experiment2)
+        create_generic_data_collection_step(group)
+        for generic_data_collection in GenericDataCollection.objects.all():
+            generic_data_collection.information_type_name = \
+                'generischedatensammlung'
+            generic_data_collection.save()
 
     @staticmethod
     def create_objects_to_test_search_goalkeepergame_step():
@@ -943,6 +959,21 @@ class SearchTest(FunctionalTest):
         # groups of one experiment, and one from other group of another
         # experiment, she sees three results
         self.check_matches(3, 'stimulus_step-matches', 'stimulusschritt')
+
+    def test_search_genericdatacollection_step_returns_correct_objects(self):
+        self.create_objects_to_test_search_genericdatacollection_step()
+        self.haystack_index('rebuild_index')
+
+        # Joselina wants to search for a given stimulus step
+        self.search_for('generischedatensammlung')
+
+        # As there are three stimulus steps with that string, two from
+        # groups of one experiment, and one from other group of another
+        # experiment, she sees three results
+        self.check_matches(
+            3, 'generic_data_colletiong_step-matches',
+            'generischedatensammlung'
+        )
 
     def test_search_goalkeepergame_step_returns_correct_objects(self):
         self.create_objects_to_test_search_goalkeepergame_step()

@@ -5,7 +5,8 @@ from experiments.models import Experiment, Study, Group, \
     CoilModel, TMSData, EEGSetting, Questionnaire, Step, \
     QuestionnaireLanguage, Publication, EMGSetting, GoalkeeperGame, \
     ContextTree, EEGElectrodeNet, EEGSolution, EEGFilterSetting, \
-    EEGElectrodeLocalizationSystem, EMGDigitalFilterSetting, Stimulus
+    EEGElectrodeLocalizationSystem, EMGDigitalFilterSetting, Stimulus, \
+    GenericDataCollection
 
 
 class ExperimentIndex(indexes.SearchIndex, indexes.Indexable):
@@ -109,6 +110,12 @@ class StimulusIndex(StepIndex):
 
     def get_model(self):
         return Stimulus
+
+
+class GenericDataCollectionIndex(StepIndex):
+
+    def get_model(self):
+        return GenericDataCollection
 
 
 class ContextTreeIndex(indexes.SearchIndex, indexes.Indexable):
