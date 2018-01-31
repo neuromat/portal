@@ -20,14 +20,14 @@ from experiments import views
 from experiments.forms import ChangeSlugForm
 from experiments.models import Experiment, Step, Questionnaire, \
     QuestionnaireDefaultLanguage, QuestionnaireLanguage, Group, ContextTree, \
-    EEGSetting
+    EEGSetting, EMGSetting
 from experiments.tests.tests_helper import apply_setup, global_setup_ut, \
     create_experiment_related_objects, \
     create_download_dir_structure_and_files, \
     remove_selected_subdir, create_experiment, create_trustee_users, \
     create_experiment_versions, random_utf8_string, create_context_tree, \
     create_eeg_electrodenet, create_eeg_solution, create_eeg_filter_setting, \
-    create_eeg_electrode_localization_system
+    create_eeg_electrode_localization_system, create_emg_digital_filter_setting
 from experiments.views import change_slug
 from functional_tests import test_search
 from nep import settings
@@ -558,16 +558,16 @@ class SearchTest(TestCase):
         # because in search results templates it's '<tr class ...>'
         self.assertContains(response, '<tr', 3)
 
+    def test_search_stimulus_step_returns_correct_objects(self):
+        test_search.SearchTest().create_objects_to_test_search_stimulus_step()
+        self.haystack_index('rebuild_index')
+        self.check_matches_on_response(3, 'stimulusschritt')
+
     def test_search_goalkeepergame_step_returns_correct_objects(self):
         test_search.SearchTest()\
             .create_objects_to_test_search_goalkeepergame_step()
-
         self.haystack_index('rebuild_index')
-
-        response = self.client.get('/search/', {'q': 'goalkeepergame'})
-        self.assertEqual(response.status_code, 200)
-        # because in search results templates it's '<tr class ...>'
-        self.assertContains(response, '<tr', 3)
+        self.check_matches_on_response(3, 'goalkeepergame')
 
     def test_search_context_tree_returns_correct_objects(self):
         # create objects needed
@@ -612,6 +612,19 @@ class SearchTest(TestCase):
             eeg_filter_setting = create_eeg_filter_setting(eeg_setting)
             eeg_filter_setting.eeg_filter_type_name = 'FilterTyp'
             eeg_filter_setting.save()
+
+        self.haystack_index('rebuild_index')
+        self.check_matches_on_response(3, 'FilterTyp')
+
+    def test_search_emgdigitalfiltersetting_returns_correct_objects(self):
+        test_search.SearchTest().create_objects_to_test_search_emgsetting()
+
+        for emg_setting in EMGSetting.objects.all():
+            emg_ditital_filter_setting = create_emg_digital_filter_setting(
+                emg_setting
+            )
+            emg_ditital_filter_setting.filter_type_name = 'FilterTyp'
+            emg_ditital_filter_setting.save()
 
         self.haystack_index('rebuild_index')
         self.check_matches_on_response(3, 'FilterTyp')

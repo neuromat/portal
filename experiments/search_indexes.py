@@ -5,7 +5,7 @@ from experiments.models import Experiment, Study, Group, \
     CoilModel, TMSData, EEGSetting, Questionnaire, Step, \
     QuestionnaireLanguage, Publication, EMGSetting, GoalkeeperGame, \
     ContextTree, EEGElectrodeNet, EEGSolution, EEGFilterSetting, \
-    EEGElectrodeLocalizationSystem
+    EEGElectrodeLocalizationSystem, EMGDigitalFilterSetting, Stimulus
 
 
 class ExperimentIndex(indexes.SearchIndex, indexes.Indexable):
@@ -103,6 +103,12 @@ class GoalkeeperGameIndex(StepIndex):
 
     def get_model(self):
         return GoalkeeperGame
+
+
+class StimulusIndex(StepIndex):
+
+    def get_model(self):
+        return Stimulus
 
 
 class ContextTreeIndex(indexes.SearchIndex, indexes.Indexable):
@@ -268,6 +274,21 @@ class EMGSettingIndex(indexes.SearchIndex, indexes.Indexable):
             status=Experiment.APPROVED
         )
         return self.get_model().objects.filter(experiment__in=experiments)
+
+
+class EMGDigitalFilterSettingIndex(indexes.SearchIndex, indexes.Indexable):
+    text = indexes.CharField(document=True, use_template=True)
+    emg_setting = indexes.CharField(model_attr='emg_setting__id')
+
+    def get_model(self):
+        return EMGDigitalFilterSetting
+
+    def index_queryset(self, using=None):
+        experiments = Experiment.lastversion_objects.filter(
+            status=Experiment.APPROVED
+        )
+        emg_settings = EMGSetting.objects.filter(experiment__in=experiments)
+        return self.get_model().objects.filter(emg_setting__in=emg_settings)
 
 
 class QuestionnaireLanguageIndex(indexes.SearchIndex, indexes.Indexable):

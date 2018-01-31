@@ -21,7 +21,8 @@ from experiments.models import Experiment, Study, Group, Researcher, \
     EEGElectrodeLocalizationSystem, ContextTree, Stimulus, EEG, EMG, \
     EMGSetting, EMGData, GoalkeeperGame, GoalkeeperGameData, \
     GenericDataCollection, GenericDataCollectionData, AdditionalData, \
-    EMGElectrodePlacement, EEGElectrodeNet, EEGSolution, EEGFilterSetting
+    EMGElectrodePlacement, EEGElectrodeNet, EEGSolution, EEGFilterSetting, \
+    EMGDigitalFilterSetting
 from experiments.views import _get_q_default_language_or_first
 
 
@@ -395,25 +396,19 @@ def create_emg_electrode_placement():
     )
 
 
-def create_stimulus_step(qtty, group):
+def create_stimulus_step(group):
     """
-    :param qtty: number of Stimulus model instances
     :param group: Group model instance
+    :return: Stimulus model instance
     """
     fake = Factory.create()
 
-    stimuli = []
-    for i in range(qtty):
-        stimulus = Stimulus.objects.create(
-            group=group,
-            identification=fake.word(), numeration=fake.ssn(),
-            type=Step.STIMULUS, order=randint(1, 20), stimulus_type_name=fake.word()
-        )
-        stimuli.append(stimulus)
-
-    if len(stimuli) == 1:
-        return stimuli[0]
-    return stimuli
+    return Stimulus.objects.create(
+        group=group,
+        identification=fake.word(), numeration=fake.ssn(),
+        type=Step.STIMULUS, order=randint(1, 20),
+        stimulus_type_name=fake.word()
+    )
 
 
 def create_tms_setting(qtty, experiment):
@@ -606,6 +601,15 @@ def create_eeg_filter_setting(eeg_setting):
     return EEGFilterSetting(
         eeg_setting=eeg_setting, eeg_filter_type_name=faker.word(),
         eeg_filter_type_description=faker.text(),
+    )
+
+
+def create_emg_digital_filter_setting(emg_setting):
+    faker = Factory.create()
+
+    return EMGDigitalFilterSetting(
+        emg_setting=emg_setting, filter_type_name=faker.word(),
+        filter_type_description=faker.text(),
     )
 
 

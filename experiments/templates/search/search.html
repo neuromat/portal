@@ -43,6 +43,9 @@
                 {% if result.model_name == 'goalkeepergame' %}
                     {% include 'search/goalkeepergame.html' %}
                 {% endif %}
+                {% if result.model_name == 'stimulus' %}
+                    {% include 'search/stimulus.html' %}
+                {% endif %}
                 {% if result.model_name == 'tmssetting' %}
                     {% include 'search/tmssetting.html' %}
                 {% endif %}
@@ -78,6 +81,9 @@
                 {% endif %}
                 {% if result.model_name == 'eegelectrodelocalizationsystem' %}
                     {% include 'search/eegelectrodelocalizationsystem.html' %}
+                {% endif %}
+                {% if result.model_name == 'emgdigitalfiltersetting' %}
+                    {% include 'search/emgdigitalfiltersetting.html' %}
                 {% endif %}
                 {% if result.model_name == 'questionnairelanguage' %}
                     {% include 'search/questionnaires_languages.html' %}

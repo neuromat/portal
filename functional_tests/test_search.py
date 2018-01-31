@@ -5,12 +5,13 @@ import haystack
 from django.core.management import call_command
 
 from experiments.models import Study, Experiment, Group, Step, EMGSetting, \
-    GoalkeeperGame, ContextTree, EEGSetting
+    GoalkeeperGame, ContextTree, EEGSetting, Stimulus
 from experiments.tests.tests_helper import create_experiment, \
     create_emg_setting, create_group, create_goalkeepergame_step, \
     create_context_tree, create_eeg_setting, create_eeg_electrodenet, \
     create_eeg_solution, create_eeg_filter_setting, \
-    create_eeg_electrode_localization_system
+    create_eeg_electrode_localization_system, \
+    create_emg_digital_filter_setting, create_stimulus_step
 from functional_tests.base import FunctionalTest
 
 import time
@@ -61,6 +62,20 @@ class SearchTest(FunctionalTest):
         for emg_setting in EMGSetting.objects.all():
             emg_setting.name = 'emgsettingname'
             emg_setting.save()
+
+    @staticmethod
+    def create_objects_to_test_search_stimulus_step():
+        experiment1 = create_experiment(1, status=Experiment.APPROVED)
+        group1 = create_group(1, experiment1)
+        group2 = create_group(1, experiment1)
+        create_stimulus_step(group1)
+        create_stimulus_step(group2)
+        experiment2 = create_experiment(1, status=Experiment.APPROVED)
+        group = create_group(1, experiment2)
+        create_stimulus_step(group)
+        for stimulus_step in Stimulus.objects.all():
+            stimulus_step.stimulus_type_name = 'stimulusschritt'
+            stimulus_step.save()
 
     @staticmethod
     def create_objects_to_test_search_goalkeepergame_step():
@@ -706,11 +721,30 @@ class SearchTest(FunctionalTest):
         self.haystack_index('rebuild_index')
 
         # Severino wants to search for experiments that has certain
-        # equipment associated to an EEG solution
+        # equipment associated to an EEG filter setting
         self.search_for('FilterTyp')
 
         # There are three maches craeted above
         self.check_matches(3, 'eeg_filter_setting-matches', 'FilterTyp')
+
+    def test_search_emgdigitalfiltersetting_returns_correct_objects(self):
+        self.create_objects_to_test_search_emgsetting()
+
+        for emg_setting in EMGSetting.objects.all():
+            emg_ditital_filter_setting = create_emg_digital_filter_setting(
+                emg_setting
+            )
+            emg_ditital_filter_setting.filter_type_name = 'FilterTyp'
+            emg_ditital_filter_setting.save()
+
+        self.haystack_index('rebuild_index')
+
+        # Severino wants to search for experiments that has certain
+        # equipment associated to an EMG digital filter setting
+        self.search_for('FilterTyp')
+
+        # There are three maches craeted above
+        self.check_matches(3, 'emg_dgital_filter_setting-matches', 'FilterTyp')
 
     def test_search_eegelectrodelocalizationsystem_returns_correct_objects(
             self):
@@ -897,6 +931,18 @@ class SearchTest(FunctionalTest):
             'publication-matches'
         ).text
         self.assertIn('Verletzung des Plexus Brachialis', publication_text)
+
+    def test_search_stimulus_step_returns_correct_objects(self):
+        self.create_objects_to_test_search_stimulus_step()
+        self.haystack_index('rebuild_index')
+
+        # Joselina wants to search for a given stimulus step
+        self.search_for('stimulusschritt')
+
+        # As there are three stimulus steps with that string, two from
+        # groups of one experiment, and one from other group of another
+        # experiment, she sees three results
+        self.check_matches(3, 'stimulus_step-matches', 'stimulusschritt')
 
     def test_search_goalkeepergame_step_returns_correct_objects(self):
         self.create_objects_to_test_search_goalkeepergame_step()

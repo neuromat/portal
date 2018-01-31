@@ -1,0 +1,24 @@
+{% load highlight %}
+{% load i18n %}
+<tr class="stimulus_step-matches">
+    <td>
+        <h5 class="match">
+            <a href="{% url 'experiment-detail' result.object.group.experiment.slug %}"><strong
+            >{% trans "Experiment" %}: </strong>{{ result.object.group.experiment.title }}
+                <strong>> {% trans "Group" %}: </strong>
+                {{ result.object.group.title }}
+                <strong>> {% trans "Stimulus step" %}: </strong>
+                {{ result.object.identification }}
+            </a>
+            <br><br>
+        </h5>
+        <strong>{% trans "identification" %}: </strong>
+        {% highlight result.object.identification with query %}&nbsp;
+        {% if result.object.description %}
+            <strong>{% trans "description" %}: </strong>
+            {% highlight result.object.description with query %}&nbsp;
+        {% endif %}
+        <strong>{% trans "name" %}: </strong>
+        {% highlight result.object.stimulus_type_name with query %}&nbsp;
+    </td>
+</tr>

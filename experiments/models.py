@@ -342,12 +342,18 @@ class ElectrodeModel(models.Model):  # not indexed for search (parent)
     name = models.CharField(max_length=150)
     description = models.TextField(null=True, blank=True)
     material = models.CharField(null=True, blank=True, max_length=150)
-    usability = models.CharField(null=True, blank=True, max_length=50, choices=USABILITY_TYPES)
+    usability = models.CharField(
+        null=True, blank=True, max_length=50, choices=USABILITY_TYPES
+    )
     impedance = models.FloatField(null=True, blank=True)
     impedance_unit = models.CharField(null=True, blank=True, max_length=15)
     inter_electrode_distance = models.FloatField(null=True, blank=True)
-    inter_electrode_distance_unit = models.CharField(null=True, blank=True, max_length=10)
-    electrode_configuration_name = models.CharField(max_length=150, null=True, blank=True)
+    inter_electrode_distance_unit = models.CharField(
+        null=True, blank=True, max_length=10
+    )
+    electrode_configuration_name = models.CharField(
+        max_length=150, null=True, blank=True
+    )
     electrode_type = models.CharField(max_length=50, choices=ELECTRODE_TYPES)
 
     def __str__(self):
@@ -434,7 +440,9 @@ class EMGADConverterSetting(models.Model):  # not indexed for search
 
 
 class EMGElectrodeSetting(models.Model):  # not indexed for search
-    emg_setting = models.ForeignKey(EMGSetting, related_name='emg_electrode_settings')
+    emg_setting = models.ForeignKey(
+        EMGSetting, related_name='emg_electrode_settings'
+    )
     electrode_model = models.ForeignKey(ElectrodeModel)
 
 
@@ -591,7 +599,7 @@ def context_tree_delete(instance, **kwargs):
     instance.setting_file.delete(save=False)
 
 
-class Step(models.Model):
+class Step(models.Model):  # not indexed for search
     BLOCK = 'block'
     INSTRUCTION = 'instruction'
     PAUSE = 'pause'
