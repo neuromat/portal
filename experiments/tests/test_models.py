@@ -773,7 +773,7 @@ class StimulusModel(TestCase):
     def test_delete_instance_deletes_related_files(self):
         experiment = create_experiment(1)
         group = create_group(1, experiment)
-        stimulus = create_stimulus_step(1, group)
+        stimulus = create_stimulus_step(group)
 
         file_instance = stimulus.media_file
         add_temporary_file_to_file_instance(file_instance)

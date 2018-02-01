@@ -393,7 +393,13 @@ def create_emg_electrode_placement():
     faker = Factory.create()
 
     return EMGElectrodePlacement.objects.create(
-        standardization_system_name=faker.word()
+        standardization_system_name=faker.word(),
+        standardization_system_description=faker.text(),
+        muscle_anatomy_origin=faker.text(),
+        muscle_anatomy_insertion=faker.text(),
+        muscle_anatomy_function=faker.text(),
+        location=faker.text(),
+        placement_type=faker.word()
     )
 
 

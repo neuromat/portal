@@ -2,4 +2,9 @@
 {{ object.muscle_name }}
 {{ object.remarks }}
 {{ object.emg_electrode_setting }}
-{{ object.emg_electrode_placement }}
+{{ object.emg_electrode_placement.standardization_system_name }}
+{{ object.emg_electrode_placement.muscle_anatomy_origin }}
+{{ object.emg_electrode_placement.muscle_anatomy_insertion }}
+{{ object.emg_electrode_placement.muscle_anatomy_function }}
+{{ object.emg_electrode_placement.location }}
+{{ object.emg_electrode_placement.placement_type }}

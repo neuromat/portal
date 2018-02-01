@@ -249,7 +249,7 @@ class Equipment(models.Model):  # not indexed for search (abstract)
         abstract = True
 
 
-class ExperimentSetting(models.Model):  # not indexed for search (abastract)
+class ExperimentSetting(models.Model):  # not indexed for search (abstract)
     experiment = models.ForeignKey(Experiment)
     name = models.CharField(max_length=150)
     description = models.TextField()
@@ -697,7 +697,7 @@ class Instruction(Step):  # not indexed for search (indexed Step)
     text = models.TextField(null=False, blank=False)
 
 
-class Stimulus(Step):
+class Stimulus(Step):  # indexed for search
     stimulus_type_name = models.CharField(
         null=False, blank=False, max_length=30
     )

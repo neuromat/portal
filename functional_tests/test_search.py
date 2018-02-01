@@ -6,7 +6,7 @@ from django.core.management import call_command
 
 from experiments.models import Study, Experiment, Group, Step, EMGSetting, \
     GoalkeeperGame, ContextTree, EEGSetting, Stimulus, GenericDataCollection, \
-    EMGElectrodePlacementSetting
+    EMGElectrodePlacementSetting, EMGElectrodePlacement
 from experiments.tests.tests_helper import create_experiment, \
     create_emg_setting, create_group, create_goalkeepergame_step, \
     create_context_tree, create_eeg_setting, create_eeg_electrodenet, \
@@ -125,7 +125,7 @@ class SearchTest(FunctionalTest):
             eeg_setting.save()
 
     @staticmethod
-    def create_objects_to_test_search_emgelectrodeplacementsetting(type):
+    def create_objects_to_test_search_emgelectrodeplacementsetting():
         experiment1 = create_experiment(1, status=Experiment.APPROVED)
         emg_setting = create_emg_setting(experiment1)
         electrode_model = create_electrode_model()
@@ -140,6 +140,14 @@ class SearchTest(FunctionalTest):
                 EMGElectrodePlacementSetting.objects.all():
             emg_electrode_placement_setting.muscle_name = 'quadrizeps'
             emg_electrode_placement_setting.save()
+
+    def create_objects_to_test_search_emgelectrodeplacementsetting_with_emg_electrode_placement(
+            self, search_text):
+        self.create_objects_to_test_search_emgelectrodeplacementsetting()
+        # TODO: should test for all attributes
+        for emg_electrode_placement in EMGElectrodePlacement.objects.all():
+            emg_electrode_placement.standardization_system_name = search_text
+            emg_electrode_placement.save()
 
     def check_matches(self, matches, css_selector, text):
         self.wait_for(lambda: self.verify_n_objects_in_table_rows(
@@ -1050,4 +1058,21 @@ class SearchTest(FunctionalTest):
         # experiment, she sees three results
         self.check_matches(
             1, 'emg_electrode_placement_setting-matches', 'quadrizeps'
+        )
+
+    def test_search_emgelectrodeplacementsetting_returns_correct_related_objects_1(self):
+        search_text = 'standardisierung'
+        self.create_objects_to_test_search_emgelectrodeplacementsetting_with_emg_electrode_placement(
+            search_text
+        )
+        self.haystack_index('rebuild_index')
+
+        # Joselina wants to search for a given stimulus step
+        self.search_for(search_text)
+
+        # As there are three stimulus steps with that string, two from
+        # groups of one experiment, and one from other group of another
+        # experiment, she sees three results
+        self.check_matches(
+            1, 'emg_electrode_placement_setting-matches', search_text
         )
