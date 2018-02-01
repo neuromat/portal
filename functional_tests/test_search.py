@@ -6,7 +6,7 @@ from django.core.management import call_command
 
 from experiments.models import Study, Experiment, Group, Step, EMGSetting, \
     GoalkeeperGame, ContextTree, EEGSetting, Stimulus, GenericDataCollection, \
-    EMGElectrodePlacementSetting, EMGElectrodePlacement
+    EMGElectrodePlacementSetting, EMGElectrodePlacement, EMGSurfacePlacement
 from experiments.tests.tests_helper import create_experiment, \
     create_emg_setting, create_group, create_goalkeepergame_step, \
     create_context_tree, create_eeg_setting, create_eeg_electrodenet, \
@@ -15,7 +15,7 @@ from experiments.tests.tests_helper import create_experiment, \
     create_emg_digital_filter_setting, create_stimulus_step, \
     create_generic_data_collection_step, create_electrode_model, \
     create_emg_electrode_setting, create_emg_electrode_placement, \
-    create_emg_electrode_placement_setting
+    create_emg_electrode_placement_setting, create_emg_surface_placement
 from functional_tests.base import FunctionalTest
 
 import time
@@ -125,16 +125,19 @@ class SearchTest(FunctionalTest):
             eeg_setting.save()
 
     @staticmethod
-    def create_objects_to_test_search_emgelectrodeplacementsetting():
+    def create_objects_to_test_search_emgelectrodeplacementsetting(type):
         experiment1 = create_experiment(1, status=Experiment.APPROVED)
         emg_setting = create_emg_setting(experiment1)
         electrode_model = create_electrode_model()
         emg_electrode_setting = create_emg_electrode_setting(
             emg_setting, electrode_model
         )
-        emg_electrode_placement = create_emg_electrode_placement()
+        if type == 'emg_electrode_placement':
+            emg_type_placement = create_emg_electrode_placement()
+        elif type == 'emg_surface_placement':
+            emg_type_placement = create_emg_surface_placement()
         create_emg_electrode_placement_setting(
-            emg_electrode_setting, emg_electrode_placement
+            emg_electrode_setting, emg_type_placement
         )
         for emg_electrode_placement_setting in \
                 EMGElectrodePlacementSetting.objects.all():
@@ -143,11 +146,22 @@ class SearchTest(FunctionalTest):
 
     def create_objects_to_test_search_emgelectrodeplacementsetting_with_emg_electrode_placement(
             self, search_text):
-        self.create_objects_to_test_search_emgelectrodeplacementsetting()
+        self.create_objects_to_test_search_emgelectrodeplacementsetting(
+            'emg_electrode_placement')
         # TODO: should test for all attributes
         for emg_electrode_placement in EMGElectrodePlacement.objects.all():
             emg_electrode_placement.standardization_system_name = search_text
             emg_electrode_placement.save()
+
+    def create_objects_to_test_search_emgelectrodeplacementsetting_with_emg_surface_placement(
+            self, search_text):
+        self.create_objects_to_test_search_emgelectrodeplacementsetting(
+            'emg_surface_placement'
+        )
+        # TODO: should test for all attributes
+        for emg_surface_placement in EMGSurfacePlacement.objects.all():
+            emg_surface_placement.start_posture = search_text
+            emg_surface_placement.save()
 
     def check_matches(self, matches, css_selector, text):
         self.wait_for(lambda: self.verify_n_objects_in_table_rows(
@@ -1047,7 +1061,8 @@ class SearchTest(FunctionalTest):
 
     def test_search_emgelectrodeplacementsetting_returns_correct_objects(
             self):
-        self.create_objects_to_test_search_emgelectrodeplacementsetting()
+        self.create_objects_to_test_search_emgelectrodeplacementsetting(
+            'emg_electrode_placement')
         self.haystack_index('rebuild_index')
 
         # Joselina wants to search for a given stimulus step
@@ -1063,6 +1078,23 @@ class SearchTest(FunctionalTest):
     def test_search_emgelectrodeplacementsetting_returns_correct_related_objects_1(self):
         search_text = 'standardisierung'
         self.create_objects_to_test_search_emgelectrodeplacementsetting_with_emg_electrode_placement(
+            search_text
+        )
+        self.haystack_index('rebuild_index')
+
+        # Joselina wants to search for a given stimulus step
+        self.search_for(search_text)
+
+        # As there are three stimulus steps with that string, two from
+        # groups of one experiment, and one from other group of another
+        # experiment, she sees three results
+        self.check_matches(
+            1, 'emg_electrode_placement_setting-matches', search_text
+        )
+
+    def test_search_emgelectrodeplacementsetting_returns_correct_related_objects_2(self):
+        search_text = 'starthaltung'
+        self.create_objects_to_test_search_emgelectrodeplacementsetting_with_emg_surface_placement(
             search_text
         )
         self.haystack_index('rebuild_index')

@@ -8,3 +8,8 @@
 {{ object.emg_electrode_placement.muscle_anatomy_function }}
 {{ object.emg_electrode_placement.location }}
 {{ object.emg_electrode_placement.placement_type }}
+{{ object.emg_electrode_placement.emgsurfaceplacement.start_posture }}
+{{ object.emg_electrode_placement.emgsurfaceplacement.orientation }}
+{{ object.emg_electrode_placement.emgsurfaceplacement.fixation_on_the_skin }}
+{{ object.emg_electrode_placement.emgsurfaceplacement.reference_electrode }}
+{{ object.emg_electrode_placement.emgsurfaceplacement.clinical_test }}

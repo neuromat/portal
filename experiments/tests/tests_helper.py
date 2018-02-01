@@ -23,7 +23,7 @@ from experiments.models import Experiment, Study, Group, Researcher, \
     GenericDataCollection, GenericDataCollectionData, AdditionalData, \
     EMGElectrodePlacement, EEGElectrodeNet, EEGSolution, EEGFilterSetting, \
     EMGDigitalFilterSetting, ElectrodeModel, EMGElectrodeSetting, \
-    EMGElectrodePlacementSetting
+    EMGElectrodePlacementSetting, EMGSurfacePlacement
 from experiments.views import _get_q_default_language_or_first
 
 
@@ -400,6 +400,19 @@ def create_emg_electrode_placement():
         muscle_anatomy_function=faker.text(),
         location=faker.text(),
         placement_type=faker.word()
+    )
+
+
+def create_emg_surface_placement():
+    faker = Factory.create()
+
+    return EMGSurfacePlacement.objects.create(
+        standardization_system_name=faker.word(),
+        start_posture=faker.text(),
+        orientation=faker.text(),
+        fixation_on_the_skin=faker.text(),
+        reference_electrode=faker.text(),
+        clinical_test=faker.text()
     )
 
 

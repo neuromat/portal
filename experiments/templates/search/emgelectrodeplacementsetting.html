@@ -48,5 +48,25 @@
             <strong>{% trans 'placement type' %}: </strong>
             {% highlight result.object.emg_electrode_placement.placement_type with query %}&nbsp;
         {% endif %}
+        {% if result.object.emg_electrode_placement.emgsurfaceplacement.start_posture %}
+            <strong>{% trans 'start posture' %}: </strong>
+            {% highlight result.object.emg_electrode_placement.emgsurfaceplacement.start_posture with query %}&nbsp;
+        {% endif %}
+        {% if result.object.emg_electrode_placement.emgsurfaceplacement.orientation %}
+            <strong>{% trans 'orientation' %}: </strong>
+            {% highlight result.object.emg_electrode_placement.emgsurfaceplacement.orientation with query %}&nbsp;
+        {% endif %}
+        {% if result.object.emg_electrode_placement.emgsurfaceplacement.fixation_on_the_skin %}
+            <strong>{% trans 'fixation on the skin' %}: </strong>
+            {% highlight result.object.emg_electrode_placement.emgsurfaceplacement.fixation_on_the_skin with query %}&nbsp;
+        {% endif %}
+        {% if result.object.emg_electrode_placement.emgsurfaceplacement.reference_electrode %}
+            <strong>{% trans 'reference electrode' %}: </strong>
+            {% highlight result.object.emg_electrode_placement.emgsurfaceplacement.reference_electrode with query %}&nbsp;
+        {% endif %}
+        {% if result.object.emg_electrode_placement.emgsurfaceplacement.clinical_test %}
+            <strong>{% trans 'clinical test' %}: </strong>
+            {% highlight result.object.emg_electrode_placement.emgsurfaceplacement.clinical_test with query %}&nbsp;
+        {% endif %}
     </td>
 </tr>
