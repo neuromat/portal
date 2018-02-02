@@ -20,7 +20,7 @@ from experiments import views
 from experiments.forms import ChangeSlugForm
 from experiments.models import Experiment, Step, Questionnaire, \
     QuestionnaireDefaultLanguage, QuestionnaireLanguage, Group, ContextTree, \
-    EEGSetting, EMGSetting
+    EEGSetting, EMGSetting, EEGElectrodePosition, ElectrodeModel
 from experiments.tests.tests_helper import apply_setup, global_setup_ut, \
     create_experiment_related_objects, \
     create_download_dir_structure_and_files, \
@@ -578,8 +578,23 @@ class SearchTest(TestCase):
     def test_search_eeg_electrode_position(self):
         search_text = 'elektrodenposition'
         test_search.SearchTest(). \
-            create_objects_to_test_search_eegelectrodeposition(
-            'electrode_model', search_text)
+            create_objects_to_test_search_eegelectrodeposition()
+        self.haystack_index('rebuild_index')
+        self.check_matches_on_response(1, search_text)
+        for eeg_electrode_position in EEGElectrodePosition.objects.all():
+            eeg_electrode_position.name = search_text
+            eeg_electrode_position.save()
+
+    # TODO: This test pass when it wouldn't
+    def test_search_eeg_electrode_position_returns_correct_related_objects_1(self):
+        search_text = 'elektrodenmodell'
+        test_search.SearchTest(
+        ).create_objects_to_test_search_eegelectrodeposition()
+
+        # TODO: should test for all attributes
+        for electrode_model in ElectrodeModel.objects.all():
+            electrode_model.name = search_text
+            electrode_model.save()
         self.haystack_index('rebuild_index')
         self.check_matches_on_response(1, search_text)
 

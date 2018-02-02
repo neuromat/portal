@@ -9,7 +9,7 @@
                 {{ result.object.eeg_electrode_localization_system.eeg_setting.name }}
                 <strong>> {% trans "EEG Electrode Localization System" %}: </strong>
                 {{ result.object.eeg_electrode_localization_system.name }}
-                <strong>> {% trans "EMG Electrode Position" %}: </strong>
+                <strong>> {% trans "EEG Electrode Position" %}: </strong>
                 {{ result.object.name }}
             </a>
             <br><br>
@@ -24,5 +24,11 @@
             <strong>{% trans "coordinate y" %}: </strong>
             {% highlight result.object.coordinate_y with query %}&nbsp;
         {% endif %}
+        {% if result.object.coordinate_y %}
+            <strong>{% trans "coordinate y" %}: </strong>
+            {% highlight result.object.coordinate_y with query %}&nbsp;
+        {% endif %}
+        <strong>{%  trans "electrode model name" %}</strong>
+        {% highlight result.object.electrode_model.name with query %}&nbsp;
     </td>
 </tr>

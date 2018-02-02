@@ -7,7 +7,8 @@ from django.core.management import call_command
 from experiments.models import Study, Experiment, Group, Step, EMGSetting, \
     GoalkeeperGame, ContextTree, EEGSetting, Stimulus, GenericDataCollection, \
     EMGElectrodePlacementSetting, EMGElectrodePlacement, EMGSurfacePlacement, \
-    EMGIntramuscularPlacement, EMGNeedlePlacement, EEGElectrodePosition
+    EMGIntramuscularPlacement, EMGNeedlePlacement, EEGElectrodePosition, \
+    ElectrodeModel
 from experiments.tests.tests_helper import create_experiment, \
     create_emg_setting, create_group, create_goalkeepergame_step, \
     create_context_tree, create_eeg_setting, create_eeg_electrodenet, \
@@ -154,8 +155,8 @@ class SearchTest(FunctionalTest):
             emg_electrode_placement_setting.save()
 
     @staticmethod
-    def create_objects_to_test_search_eegelectrodeposition(type,
-                                                           search_text):
+    def create_objects_to_test_search_eegelectrodeposition(
+            type='electrode_model'):
         experiment1 = create_experiment(1, status=Experiment.APPROVED)
         eeg_setting = create_eeg_setting(1, experiment1)
         eeg_electrode_localization_system = \
@@ -165,9 +166,6 @@ class SearchTest(FunctionalTest):
         create_eeg_electrode_position(
             eeg_electrode_localization_system, electrode_model
         )
-        for eeg_electrode_position in EEGElectrodePosition.objects.all():
-            eeg_electrode_position.name = search_text
-            eeg_electrode_position.save()
 
     def create_objects_to_test_search_emgelectrodeplacementsetting_with_emg_electrode_placement(
             self, search_text):
@@ -207,6 +205,16 @@ class SearchTest(FunctionalTest):
         for emg_needle_placement in EMGNeedlePlacement.objects.all():
             emg_needle_placement.depth_of_insertion = search_text
             emg_needle_placement.save()
+
+    def create_objects_to_test_search_eeg_electrode_position_with_electrode_model(
+            self, search_text):
+        self.create_objects_to_test_search_eegelectrodeposition(
+            'electrode_model'
+        )
+        # TODO: should test for all attributes
+        for electrode_model in ElectrodeModel.objects.all():
+            electrode_model.name = search_text
+            electrode_model.save()
 
     def check_matches(self, matches, css_selector, text):
         self.wait_for(lambda: self.verify_n_objects_in_table_rows(
@@ -1191,9 +1199,10 @@ class SearchTest(FunctionalTest):
 
     def test_search_eeg_electrode_position(self):
         search_text = 'elektrodenposition'
-        self.create_objects_to_test_search_eegelectrodeposition(
-            'electrode_model', search_text
-        )
+        self.create_objects_to_test_search_eegelectrodeposition()
+        for eeg_electrode_position in EEGElectrodePosition.objects.all():
+            eeg_electrode_position.name = search_text
+            eeg_electrode_position.save()
 
         self.haystack_index('rebuild_index')
 
@@ -1202,6 +1211,31 @@ class SearchTest(FunctionalTest):
 
         # As there are one electrode position name with that string she sees
         # one result
+        self.check_matches(
+            1, 'eeg_electrode_position-matches', search_text
+        )
+
+    def test_search_eeg_electrode_position_returns_correct_related_objects_1(
+            self):
+        search_text = 'elektrodenmodell'
+        self.create_objects_to_test_search_eegelectrodeposition(
+            'electrode_model'
+        )
+        # TODO: should test for all attributes
+        for electrode_model in ElectrodeModel.objects.all():
+            electrode_model.name = search_text
+            electrode_model.save()
+
+        self.haystack_index('rebuild_index')
+
+        # Joselina wants to search for a given electrode model
+        self.search_for(search_text)
+
+        # As there are one electrode model with that string, she sees one
+        # result
+        # TODO: the assertion inside this method is passing when it
+        # TODO: wouldn't. Apparenttly the result come with empty string.
+        # TODO: Verify!
         self.check_matches(
             1, 'eeg_electrode_position-matches', search_text
         )

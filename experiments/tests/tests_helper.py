@@ -700,7 +700,9 @@ def create_electrode_model():
 
     return ElectrodeModel.objects.create(
         name=faker.word(), description=faker.text(), material=faker.word(),
-        usability=choice(['disposable', 'reusable']),
+        usability=choice(['disposable', 'reusable']), impedance=13,
+        impedance_unit='ohm', inter_electrode_distance=13,
+        inter_electrode_distance_unit='cm',
         electrode_configuration_name=faker.word(),
         electrode_type=choice(['surface', 'intramuscular', 'needle'])
     )
