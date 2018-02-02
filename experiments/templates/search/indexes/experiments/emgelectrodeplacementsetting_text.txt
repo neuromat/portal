@@ -15,3 +15,4 @@
 {{ object.emg_electrode_placement.emgsurfaceplacement.clinical_test }}
 {{ object.emg_electrode_placement.emgintramuscularplacement.method_of_insertion }}
 {{ object.emg_electrode_placement.emgintramuscularplacement.depth_of_insertion }}
+{{ object.emg_electrode_placement.emgneedleplacement.depth_of_insertion }}

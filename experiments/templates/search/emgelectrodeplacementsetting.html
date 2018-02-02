@@ -73,8 +73,12 @@
             {% highlight result.object.emg_electrode_placement.emgintramuscularplacement.method_of_insertion with query %}&nbsp;
         {% endif %}
         {% if result.object.emg_electrode_placement.emgintramuscularplacement.depth_of_insertion %}
-            <strong>{% trans 'depth of insertion' %}: </strong>
+            <strong>{% trans 'depth of insertion (intramuscular placement)' %}: </strong>
             {% highlight result.object.emg_electrode_placement.emgintramuscularplacement.depth_of_insertion with query %}&nbsp;
+        {% endif %}
+        {% if result.object.emg_electrode_placement.emgneedleplacement.depth_of_insertion %}
+            <strong>{% trans 'depth of insertion (needle placement)' %}: </strong>
+            {% highlight result.object.emg_electrode_placement.emgneedleplacement.depth_of_insertion with query %}&nbsp;
         {% endif %}
     </td>
 </tr>

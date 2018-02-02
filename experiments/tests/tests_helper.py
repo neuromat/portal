@@ -24,7 +24,7 @@ from experiments.models import Experiment, Study, Group, Researcher, \
     EMGElectrodePlacement, EEGElectrodeNet, EEGSolution, EEGFilterSetting, \
     EMGDigitalFilterSetting, ElectrodeModel, EMGElectrodeSetting, \
     EMGElectrodePlacementSetting, EMGSurfacePlacement, \
-    EMGIntramuscularPlacement
+    EMGIntramuscularPlacement, EMGNeedlePlacement
 from experiments.views import _get_q_default_language_or_first
 
 
@@ -423,6 +423,15 @@ def create_emg_intramuscular_placement():
     return EMGIntramuscularPlacement.objects.create(
         standardization_system_name=faker.word(),
         method_of_insertion=faker.text(),
+        depth_of_insertion=faker.text()
+    )
+
+
+def create_emg_needle_placement():
+    faker = Factory.create()
+
+    return EMGNeedlePlacement.objects.create(
+        standardization_system_name=faker.word(),
         depth_of_insertion=faker.text()
     )
 

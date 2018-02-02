@@ -7,7 +7,7 @@ from django.core.management import call_command
 from experiments.models import Study, Experiment, Group, Step, EMGSetting, \
     GoalkeeperGame, ContextTree, EEGSetting, Stimulus, GenericDataCollection, \
     EMGElectrodePlacementSetting, EMGElectrodePlacement, EMGSurfacePlacement, \
-    EMGIntramuscularPlacement
+    EMGIntramuscularPlacement, EMGNeedlePlacement
 from experiments.tests.tests_helper import create_experiment, \
     create_emg_setting, create_group, create_goalkeepergame_step, \
     create_context_tree, create_eeg_setting, create_eeg_electrodenet, \
@@ -17,7 +17,7 @@ from experiments.tests.tests_helper import create_experiment, \
     create_generic_data_collection_step, create_electrode_model, \
     create_emg_electrode_setting, create_emg_electrode_placement, \
     create_emg_electrode_placement_setting, create_emg_surface_placement, \
-    create_emg_intramuscular_placement
+    create_emg_intramuscular_placement, create_emg_needle_placement
 from functional_tests.base import FunctionalTest
 
 import time
@@ -140,6 +140,8 @@ class SearchTest(FunctionalTest):
             emg_type_placement = create_emg_surface_placement()
         elif type == 'emg_intramuscular_placement':
             emg_type_placement = create_emg_intramuscular_placement()
+        elif type == 'emg_needle_placement':
+            emg_type_placement = create_emg_needle_placement()
 
         create_emg_electrode_placement_setting(
             emg_electrode_setting, emg_type_placement
@@ -177,6 +179,16 @@ class SearchTest(FunctionalTest):
         for emg_intramuscular_placement in EMGIntramuscularPlacement.objects.all():
             emg_intramuscular_placement.method_of_insertion = search_text
             emg_intramuscular_placement.save()
+
+    def create_objects_to_test_search_emgelectrodeplacementsetting_with_emg_needle_placement(
+            self, search_text):
+        self.create_objects_to_test_search_emgelectrodeplacementsetting(
+            'emg_needle_placement'
+        )
+        # TODO: should test for all attributes
+        for emg_needle_placement in EMGNeedlePlacement.objects.all():
+            emg_needle_placement.depth_of_insertion = search_text
+            emg_needle_placement.save()
 
     def check_matches(self, matches, css_selector, text):
         self.wait_for(lambda: self.verify_n_objects_in_table_rows(
@@ -1127,6 +1139,23 @@ class SearchTest(FunctionalTest):
     def test_search_emgelectrodeplacementsetting_returns_correct_related_objects_3(self):
         search_text = 'einfügung'
         self.create_objects_to_test_search_emgelectrodeplacementsetting_with_emg_intramuscular_placement(
+            search_text
+        )
+        self.haystack_index('rebuild_index')
+
+        # Joselina wants to search for a given stimulus step
+        self.search_for(search_text)
+
+        # As there are three stimulus steps with that string, two from
+        # groups of one experiment, and one from other group of another
+        # experiment, she sees three results
+        self.check_matches(
+            1, 'emg_electrode_placement_setting-matches', search_text
+        )
+
+    def test_search_emgelectrodeplacementsetting_returns_correct_related_objects_4(self):
+        search_text = 'nadelplatzierung'
+        self.create_objects_to_test_search_emgelectrodeplacementsetting_with_emg_needle_placement(
             search_text
         )
         self.haystack_index('rebuild_index')
