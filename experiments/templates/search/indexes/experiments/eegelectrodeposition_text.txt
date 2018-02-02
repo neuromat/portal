@@ -1,3 +1,8 @@
 {{ object.name }}
 {{ object.eeg_electrode_localization_system }}
 {{ object.electrode_model.name }}
+{{ object.electrode_model.description }}
+{{ object.electrode_model.material }}
+{{ object.electrode_model.usability }}
+{{ object.electrode_model.electrode_configuration_name }}
+{{ object.electrode_model.electrode_type }}

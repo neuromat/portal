@@ -28,7 +28,27 @@
             <strong>{% trans "coordinate y" %}: </strong>
             {% highlight result.object.coordinate_y with query %}&nbsp;
         {% endif %}
-        <strong>{%  trans "electrode model name" %}</strong>
+        <strong>{%  trans "electrode model name" %}: </strong>
         {% highlight result.object.electrode_model.name with query %}&nbsp;
+        {% if result.object.electrode_model.description %}
+            <strong>{% trans "electrode model description" %}: </strong>
+            {% highlight result.object.electrode_model.description with query %}&nbsp;
+        {% endif %}
+        {% if result.object.electrode_model.material %}
+            <strong>{% trans "electrode model material" %}: </strong>
+            {% highlight result.object.electrode_model.material with query %}&nbsp;
+        {% endif %}
+        {% if result.object.electrode_model.usability %}
+            <strong>{% trans "electrode model usability" %}: </strong>
+            {% highlight result.object.electrode_model.usability with query %}&nbsp;
+        {% endif %}
+        {% if result.object.electrode_model.electrode_configuration_name %}
+            <strong>{% trans "electrode model configuration" %}: </strong>
+            {% highlight result.object.electrode_model.electrode_configuration_name with query %}&nbsp;
+        {% endif %}
+        {% if result.object.electrode_model.electrode_type %}
+            <strong>{% trans "electrode type" %}: </strong>
+            {% highlight result.object.electrode_model.electrode_type with query %}&nbsp;
+        {% endif %}
     </td>
 </tr>
