@@ -1,0 +1,36 @@
+{% load highlight %}
+{% load i18n %}
+<tr class="goalkeepergame-matches">
+    <td>
+        <h5 class="match">
+            <a href="{% url 'experiment-detail' result.object.group.experiment.slug %}"><strong
+            >{% trans "Experiment" %}: </strong>{{ result.object.group.experiment.title }}
+                <strong>> {% trans "Group" %}: </strong>
+                {{ result.object.group.title }}
+                <strong>> {% trans "Goalkeeper game step" %}: </strong>
+                {{ result.object.identification }}
+            </a>
+            <br><br>
+        </h5>
+        <strong>{% trans "identification" %}: </strong>
+        {% highlight result.object.identification with query %}&nbsp;
+        {% if result.object.description %}
+            <strong>{% trans "description" %}: </strong>
+            {% highlight result.object.description with query %}&nbsp;
+        {% endif %}
+        <strong>{% trans "software name" %}: </strong>
+        {% highlight result.object.software_name with query %}&nbsp;
+        {% if result.object.software_description %}
+            <strong>{% trans "software description" %}: </strong>
+            {% highlight result.object.software_description with query %}&nbsp;
+        {% endif %}
+        <strong>{% trans "software_version" %}: </strong>
+        {% highlight result.object.software_version with query %}&nbsp;
+        <strong>{% trans "context tree" %}: </strong>
+        {% if result.object.context_tree.setting_text %}
+            {% highlight result.object.context_tree.setting_text with query %}&nbsp;
+        {% else %}
+            {% trans 'not defined' %}
+        {% endif %}
+    </td>
+</tr>

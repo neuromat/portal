@@ -1,0 +1,34 @@
+{% load highlight %}
+{% load i18n %}
+<tr class="eeg_electrode_position-matches">
+    <td>
+        <h5 class="match">
+            <a href="{% url 'experiment-detail' result.object.eeg_electrode_localization_system.eeg_setting.experiment.slug %}"><strong
+            >{% trans "Experiment" %}: </strong>{{ result.object.eeg_electrode_localization_system.eeg_setting.experiment.title }}
+                <strong>> {% trans "EEG Setting" %}: </strong>
+                {{ result.object.eeg_electrode_localization_system.eeg_setting.name }}
+                <strong>> {% trans "EEG Electrode Localization System" %}: </strong>
+                {{ result.object.eeg_electrode_localization_system.name }}
+                <strong>> {% trans "EEG Electrode Position" %}: </strong>
+                {{ result.object.name }}
+            </a>
+            <br><br>
+        </h5>
+        <strong>{% trans "name" %}: </strong>
+            {% highlight result.object.name with query %}&nbsp;
+        {% if result.object.coordinate_x %}
+            <strong>{% trans "coordinate x" %}: </strong>
+            {% highlight result.object.coordinate_x with query %}&nbsp;
+        {% endif %}
+        {% if result.object.coordinate_y %}
+            <strong>{% trans "coordinate y" %}: </strong>
+            {% highlight result.object.coordinate_y with query %}&nbsp;
+        {% endif %}
+        {% if result.object.coordinate_y %}
+            <strong>{% trans "coordinate y" %}: </strong>
+            {% highlight result.object.coordinate_y with query %}&nbsp;
+        {% endif %}
+        <strong>{%  trans "electrode model name" %}</strong>
+        {% highlight result.object.electrode_model.name with query %}&nbsp;
+    </td>
+</tr>

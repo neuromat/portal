@@ -1,4 +1,4 @@
-{{ object.type }}
 {{ object.identification }}
 {{ object.description }}
+{{ object.stimulus_type_name }}
 {{ object.group }}

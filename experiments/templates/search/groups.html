@@ -8,7 +8,8 @@
                 <strong>> {% trans "Group" %}: </strong>
                 {{ result.object.title }}</a><br><br>
         </h5>
-        <strong>{% trans "title" %}: </strong>{% highlight result.object.title with query %}&nbsp;
+        <strong>{% trans "title" %}: </strong>
+        {% highlight result.object.title with query %}&nbsp;
         <strong>{% trans "description" %}: </strong>
         {% highlight result.object.description with query %}&nbsp;
         <strong>{% trans "inclusion criteria" %}: </strong>
