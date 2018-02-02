@@ -19,13 +19,17 @@ from haystack.query import SearchQuerySet
 from experiments import views
 from experiments.forms import ChangeSlugForm
 from experiments.models import Experiment, Step, Questionnaire, \
-    QuestionnaireDefaultLanguage, QuestionnaireLanguage, Group, EMGSetting
+    QuestionnaireDefaultLanguage, QuestionnaireLanguage, Group, ContextTree, \
+    EEGSetting, EMGSetting, EEGElectrodePosition, ElectrodeModel
 from experiments.tests.tests_helper import apply_setup, global_setup_ut, \
     create_experiment_related_objects, \
     create_download_dir_structure_and_files, \
     remove_selected_subdir, create_experiment, create_trustee_users, \
-    create_experiment_versions, random_utf8_string, create_emg_setting
+    create_experiment_versions, random_utf8_string, create_context_tree, \
+    create_eeg_electrodenet, create_eeg_solution, create_eeg_filter_setting, \
+    create_eeg_electrode_localization_system, create_emg_digital_filter_setting
 from experiments.views import change_slug
+from functional_tests import test_search
 from nep import settings
 
 
@@ -490,6 +494,12 @@ class SearchTest(TestCase):
         sys.stderr.close()
         sys.stderr = stderr_backup
 
+    def check_matches_on_response(self, matches, text):
+        response = self.client.get('/search/', {'q': text})
+        self.assertEqual(response.status_code, 200)
+        # because in search results templates it's '<tr class ...>'
+        self.assertContains(response, '<tr', matches)
+
     def test_search_redirects_to_homepage_with_search_results(self):
         response = self.client.get('/search/', {'q': 'plexus'})
         self.assertEqual(response.status_code, 200)
@@ -529,34 +539,181 @@ class SearchTest(TestCase):
 
     # TODO: test other searched objects
     def test_search_eegsetting_returns_correct_number_of_objects(self):
-        response = self.client.get('/search/', {'q': 'eegsettingname'})
-        self.assertEqual(response.status_code, 200)
-        # because in search results templates it's '<tr class ...>'
-        self.assertContains(response, '<tr', 3)
+        test_search.SearchTest().create_objects_to_test_search_eeg_setting()
+
+        self.haystack_index('rebuild_index')
+        self.check_matches_on_response(3, 'eegsettingname')
 
     def test_search_eegsetting_returns_matchings_containing_search_strings(self):
         pass
         # TODO!
 
     def test_search_emgsetting_returns_correct_number_of_objects(self):
-        # create objects needed
-        experiment1 = create_experiment(1, status=Experiment.APPROVED)
-        create_emg_setting(experiment1)
-        experiment2 = create_experiment(1, status=Experiment.APPROVED)
-        create_emg_setting(experiment2)
-        create_emg_setting(experiment2)
-        for emg_setting in EMGSetting.objects.all():
-            emg_setting.name = 'emgsettingname'
-            emg_setting.save()
+        test_search.SearchTest().create_objects_to_test_search_emgsetting()
 
-        # rebuild haystack index
-        haystack.connections.reload('default')
         self.haystack_index('rebuild_index')
 
         response = self.client.get('/search/', {'q': 'emgsettingname'})
         self.assertEqual(response.status_code, 200)
         # because in search results templates it's '<tr class ...>'
         self.assertContains(response, '<tr', 3)
+
+    def test_search_stimulus_step_returns_correct_objects(self):
+        test_search.SearchTest().create_objects_to_test_search_stimulus_step()
+        self.haystack_index('rebuild_index')
+        self.check_matches_on_response(3, 'stimulusschritt')
+
+    def test_search_genericdatacollection_step_returns_correct_objects(self):
+        test_search.SearchTest().\
+            create_objects_to_test_search_genericdatacollection_step()
+        self.haystack_index('rebuild_index')
+        self.check_matches_on_response(3, 'generischedatensammlung')
+
+    def test_search_emgelectrodeplacementsetting_returns_correct_objects(self):
+        test_search.SearchTest(). \
+            create_objects_to_test_search_emgelectrodeplacementsetting(
+            'emg_electrode_placement')
+        self.haystack_index('rebuild_index')
+        self.check_matches_on_response(1, 'quadrizeps')
+
+    def test_search_eeg_electrode_position(self):
+        search_text = 'elektrodenposition'
+        test_search.SearchTest(). \
+            create_objects_to_test_search_eegelectrodeposition()
+        for eeg_electrode_position in EEGElectrodePosition.objects.all():
+            eeg_electrode_position.name = search_text
+            eeg_electrode_position.save()
+
+        self.haystack_index('rebuild_index')
+        self.check_matches_on_response(1, search_text)
+
+    # TODO: This test pass when it wouldn't
+    def test_search_eeg_electrode_position_returns_correct_related_objects_1(self):
+        search_text = 'elektrodenmodell'
+        test_search.SearchTest(
+        ).create_objects_to_test_search_eegelectrodeposition()
+
+        # TODO: should test for all attributes
+        for electrode_model in ElectrodeModel.objects.all():
+            electrode_model.name = search_text
+            electrode_model.save()
+        self.haystack_index('rebuild_index')
+        self.check_matches_on_response(1, search_text)
+
+    def test_search_emgelectrodeplacementsetting_returns_correct_related_objects_1(self):
+        search_text = 'standardisierung'
+        test_search.SearchTest(). \
+            create_objects_to_test_search_emgelectrodeplacementsetting_with_emg_electrode_placement(
+            search_text
+        )
+        self.haystack_index('rebuild_index')
+        self.check_matches_on_response(1, search_text)
+
+    def test_search_emgelectrodeplacementsetting_returns_correct_related_objects_2(self):
+        search_text = 'starthaltung'
+        test_search.SearchTest(). \
+            create_objects_to_test_search_emgelectrodeplacementsetting_with_emg_surface_placement(
+            search_text
+        )
+        self.haystack_index('rebuild_index')
+        self.check_matches_on_response(1, search_text)
+
+    def test_search_emgelectrodeplacementsetting_returns_correct_related_objects_3(self):
+        search_text = 'einfügung'
+        test_search.SearchTest(). \
+            create_objects_to_test_search_emgelectrodeplacementsetting_with_emg_intramuscular_placement(
+            search_text
+        )
+        self.haystack_index('rebuild_index')
+        self.check_matches_on_response(1, search_text)
+
+    def test_search_emgelectrodeplacementsetting_returns_correct_related_objects_4(self):
+        search_text = 'nadelplatzierung'
+        test_search.SearchTest(). \
+            create_objects_to_test_search_emgelectrodeplacementsetting_with_emg_needle_placement(
+            search_text
+        )
+        self.haystack_index('rebuild_index')
+        self.check_matches_on_response(1, search_text)
+
+    def test_search_goalkeepergame_step_returns_correct_objects(self):
+        test_search.SearchTest()\
+            .create_objects_to_test_search_goalkeepergame_step()
+        self.haystack_index('rebuild_index')
+        self.check_matches_on_response(3, 'goalkeepergame')
+
+    def test_search_context_tree_returns_correct_objects(self):
+        # create objects needed
+        experiment1 = create_experiment(1, status=Experiment.APPROVED)
+        create_context_tree(experiment1)
+        create_context_tree(experiment1)
+        experiment2 = create_experiment(1, status=Experiment.APPROVED)
+        create_context_tree(experiment2)
+        for context_tree in ContextTree.objects.all():
+            context_tree.setting_text = 'wunderbarcontexttree'
+            context_tree.save()
+
+        self.haystack_index('rebuild_index')
+        self.check_matches_on_response(3, 'wunderbarcontexttree')
+
+    def test_search_eegelectrodenet_equipment_returns_correct_objects(self):
+        test_search.SearchTest().create_objects_to_test_search_eeg_setting()
+
+        for eeg_setting in EEGSetting.objects.all():
+            eeg_electrode_net = create_eeg_electrodenet(eeg_setting)
+            eeg_electrode_net.manufacturer_name = 'Hersteller'
+            eeg_electrode_net.save()
+
+        self.haystack_index('rebuild_index')
+        self.check_matches_on_response(3, 'Hersteller')
+
+    def test_search_eegsolution_returns_correct_objects(self):
+        test_search.SearchTest().create_objects_to_test_search_eeg_setting()
+
+        for eeg_setting in EEGSetting.objects.all():
+            eeg_solution = create_eeg_solution(eeg_setting)
+            eeg_solution.manufacturer_name = 'Hersteller'
+            eeg_solution.save()
+
+        self.haystack_index('rebuild_index')
+        self.check_matches_on_response(3, 'Hersteller')
+
+    def test_search_eegfiltersetting_returns_correct_objects(self):
+        test_search.SearchTest().create_objects_to_test_search_eeg_setting()
+
+        for eeg_setting in EEGSetting.objects.all():
+            eeg_filter_setting = create_eeg_filter_setting(eeg_setting)
+            eeg_filter_setting.eeg_filter_type_name = 'FilterTyp'
+            eeg_filter_setting.save()
+
+        self.haystack_index('rebuild_index')
+        self.check_matches_on_response(3, 'FilterTyp')
+
+    def test_search_emgdigitalfiltersetting_returns_correct_objects(self):
+        test_search.SearchTest().create_objects_to_test_search_emgsetting()
+
+        for emg_setting in EMGSetting.objects.all():
+            emg_ditital_filter_setting = create_emg_digital_filter_setting(
+                emg_setting
+            )
+            emg_ditital_filter_setting.filter_type_name = 'FilterTyp'
+            emg_ditital_filter_setting.save()
+
+        self.haystack_index('rebuild_index')
+        self.check_matches_on_response(3, 'FilterTyp')
+
+    def test_search_eegelectrodelocalizationsystem_returns_correct_objects(
+            self):
+        test_search.SearchTest().create_objects_to_test_search_eeg_setting()
+
+        for eeg_setting in EEGSetting.objects.all():
+            eeg_electrode_localization_system = \
+                create_eeg_electrode_localization_system(eeg_setting)
+            eeg_electrode_localization_system.name = 'Elektrodenlokalisierung'
+            eeg_electrode_localization_system.save()
+
+        self.haystack_index('rebuild_index')
+        self.check_matches_on_response(3, 'Elektrodenlokalisierung')
 
     def test_search_questionnaire_returns_correct_number_of_objects(self):
         response = self.client.get('/search/', {

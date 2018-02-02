@@ -1,0 +1,84 @@
+{% load highlight %}
+{% load i18n %}
+<tr class="emg_electrode_placement_setting-matches">
+    <td>
+        <h5 class="match">
+            <a href="{% url 'experiment-detail' result.object.emg_electrode_setting.emg_setting.experiment.slug %}"><strong
+            >{% trans "Experiment" %}: </strong>{{ result.object.emg_electrode_setting.emg_setting.experiment.title }}
+                <strong>> {% trans "EMG Setting" %}: </strong>
+                {{ result.object.emg_electrode_setting.emg_setting.name }}
+                <strong>> {% trans "EMG Electrode Model" %}: </strong>
+                {{ result.object.emg_electrode_setting.electrode_model.name }}
+                <strong>> {% trans "EMG Electrode Placement Setting" %}: </strong>
+                {{ result.object.muscle_name }}
+            </a>
+            <br><br>
+        </h5>
+        {% if result.object.muscle_name %}
+            <strong>{% trans "muscle name" %}: </strong>
+            {% highlight result.object.muscle_name with query %}&nbsp;
+        {% endif %}
+        {% if result.object.muscle_side %}
+            <strong>{% trans "muscle side" %}: </strong>
+            {% highlight result.object.muscle_side with query %}&nbsp;
+        {% endif %}
+        <strong>{% trans 'standardization system name' %}: </strong>
+        {% highlight result.object.emg_electrode_placement.standardization_system_name with query %}&nbsp;
+        {% if result.object.emg_electrode_placement.standardization_system_description %}
+            <strong>{% trans 'standardization system description' %}: </strong>
+            {% highlight result.object.emg_electrode_placement.standardization_system_description with query %}&nbsp;
+        {% endif %}
+        {% if result.object.emg_electrode_placement.muscle_anatomy_origin %}
+            <strong>{% trans 'muscle anatomy origin' %}: </strong>
+            {% highlight result.object.emg_electrode_placement.muscle_anatomy_origin with query %}&nbsp;
+        {% endif %}
+        {% if result.object.emg_electrode_placement.muscle_anatomy_insertion %}
+            <strong>{% trans 'muscle anatomy insertion' %}: </strong>
+            {% highlight result.object.emg_electrode_placement.muscle_anatomy_insertion with query %}&nbsp;
+        {% endif %}
+        {% if result.object.emg_electrode_placement.muscle_anatomy_function %}
+            <strong>{% trans 'muscle anatomy function' %}: </strong>
+            {% highlight result.object.emg_electrode_placement.muscle_anatomy_function with query %}&nbsp;
+        {% endif %}
+        {% if result.object.emg_electrode_placement.location %}
+            <strong>{% trans 'location' %}: </strong>
+            {% highlight result.object.emg_electrode_placement.location with query %}&nbsp;
+        {% endif %}
+        {% if result.object.emg_electrode_placement.placement_type %}
+            <strong>{% trans 'placement type' %}: </strong>
+            {% highlight result.object.emg_electrode_placement.placement_type with query %}&nbsp;
+        {% endif %}
+        {% if result.object.emg_electrode_placement.emgsurfaceplacement.start_posture %}
+            <strong>{% trans 'start posture' %}: </strong>
+            {% highlight result.object.emg_electrode_placement.emgsurfaceplacement.start_posture with query %}&nbsp;
+        {% endif %}
+        {% if result.object.emg_electrode_placement.emgsurfaceplacement.orientation %}
+            <strong>{% trans 'orientation' %}: </strong>
+            {% highlight result.object.emg_electrode_placement.emgsurfaceplacement.orientation with query %}&nbsp;
+        {% endif %}
+        {% if result.object.emg_electrode_placement.emgsurfaceplacement.fixation_on_the_skin %}
+            <strong>{% trans 'fixation on the skin' %}: </strong>
+            {% highlight result.object.emg_electrode_placement.emgsurfaceplacement.fixation_on_the_skin with query %}&nbsp;
+        {% endif %}
+        {% if result.object.emg_electrode_placement.emgsurfaceplacement.reference_electrode %}
+            <strong>{% trans 'reference electrode' %}: </strong>
+            {% highlight result.object.emg_electrode_placement.emgsurfaceplacement.reference_electrode with query %}&nbsp;
+        {% endif %}
+        {% if result.object.emg_electrode_placement.emgsurfaceplacement.clinical_test %}
+            <strong>{% trans 'clinical test' %}: </strong>
+            {% highlight result.object.emg_electrode_placement.emgsurfaceplacement.clinical_test with query %}&nbsp;
+        {% endif %}
+        {% if result.object.emg_electrode_placement.emgintramuscularplacement.method_of_insertion %}
+            <strong>{% trans 'method of insertion' %}: </strong>
+            {% highlight result.object.emg_electrode_placement.emgintramuscularplacement.method_of_insertion with query %}&nbsp;
+        {% endif %}
+        {% if result.object.emg_electrode_placement.emgintramuscularplacement.depth_of_insertion %}
+            <strong>{% trans 'depth of insertion (intramuscular placement)' %}: </strong>
+            {% highlight result.object.emg_electrode_placement.emgintramuscularplacement.depth_of_insertion with query %}&nbsp;
+        {% endif %}
+        {% if result.object.emg_electrode_placement.emgneedleplacement.depth_of_insertion %}
+            <strong>{% trans 'depth of insertion (needle placement)' %}: </strong>
+            {% highlight result.object.emg_electrode_placement.emgneedleplacement.depth_of_insertion with query %}&nbsp;
+        {% endif %}
+    </td>
+</tr>

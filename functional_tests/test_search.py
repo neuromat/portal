@@ -4,9 +4,22 @@ import sys
 import haystack
 from django.core.management import call_command
 
-from experiments.models import Study, Experiment, Group, Step, EMGSetting
+from experiments.models import Study, Experiment, Group, Step, EMGSetting, \
+    GoalkeeperGame, ContextTree, EEGSetting, Stimulus, GenericDataCollection, \
+    EMGElectrodePlacementSetting, EMGElectrodePlacement, EMGSurfacePlacement, \
+    EMGIntramuscularPlacement, EMGNeedlePlacement, EEGElectrodePosition, \
+    ElectrodeModel
 from experiments.tests.tests_helper import create_experiment, \
-    create_emg_setting
+    create_emg_setting, create_group, create_goalkeepergame_step, \
+    create_context_tree, create_eeg_setting, create_eeg_electrodenet, \
+    create_eeg_solution, create_eeg_filter_setting, \
+    create_eeg_electrode_localization_system, \
+    create_emg_digital_filter_setting, create_stimulus_step, \
+    create_generic_data_collection_step, create_electrode_model, \
+    create_emg_electrode_setting, create_emg_electrode_placement, \
+    create_emg_electrode_placement_setting, create_emg_surface_placement, \
+    create_emg_intramuscular_placement, create_emg_needle_placement, \
+    create_eeg_electrode_position
 from functional_tests.base import FunctionalTest
 
 import time
@@ -46,6 +59,199 @@ class SearchTest(FunctionalTest):
         search_box.clear()
         search_box.send_keys(string)
         self.browser.find_element_by_id('submit_terms').click()
+
+    @staticmethod
+    def create_objects_to_test_search_emgsetting():
+        experiment1 = create_experiment(1, status=Experiment.APPROVED)
+        create_emg_setting(experiment1)
+        experiment2 = create_experiment(1, status=Experiment.APPROVED)
+        create_emg_setting(experiment2)
+        create_emg_setting(experiment2)
+        for emg_setting in EMGSetting.objects.all():
+            emg_setting.name = 'emgsettingname'
+            emg_setting.save()
+
+    @staticmethod
+    def create_objects_to_test_search_stimulus_step():
+        experiment1 = create_experiment(1, status=Experiment.APPROVED)
+        group1 = create_group(1, experiment1)
+        group2 = create_group(1, experiment1)
+        create_stimulus_step(group1)
+        create_stimulus_step(group2)
+        experiment2 = create_experiment(1, status=Experiment.APPROVED)
+        group = create_group(1, experiment2)
+        create_stimulus_step(group)
+        for stimulus_step in Stimulus.objects.all():
+            stimulus_step.stimulus_type_name = 'stimulusschritt'
+            stimulus_step.save()
+
+    @staticmethod
+    def create_objects_to_test_search_genericdatacollection_step():
+        experiment1 = create_experiment(1, status=Experiment.APPROVED)
+        group1 = create_group(1, experiment1)
+        group2 = create_group(1, experiment1)
+        create_generic_data_collection_step(group1)
+        create_generic_data_collection_step(group2)
+        experiment2 = create_experiment(1, status=Experiment.APPROVED)
+        group = create_group(1, experiment2)
+        create_generic_data_collection_step(group)
+        for generic_data_collection in GenericDataCollection.objects.all():
+            generic_data_collection.information_type_name = \
+                'generischedatensammlung'
+            generic_data_collection.save()
+
+    @staticmethod
+    def create_objects_to_test_search_goalkeepergame_step():
+        experiment1 = create_experiment(1, status=Experiment.APPROVED)
+        group1 = create_group(1, experiment1)
+        group2 = create_group(1, experiment1)
+        context_tree1 = create_context_tree(experiment1)
+        create_goalkeepergame_step(group1, context_tree1)
+        create_goalkeepergame_step(group2, context_tree1)
+        experiment2 = create_experiment(1, status=Experiment.APPROVED)
+        group = create_group(1, experiment2)
+        context_tree2 = create_context_tree(experiment2)
+        create_goalkeepergame_step(group, context_tree2)
+        for goalkeepergame in GoalkeeperGame.objects.all():
+            goalkeepergame.software_name = 'goalkeepergame'
+            goalkeepergame.software_description = 'Ein Beschreibung'
+            goalkeepergame.save()
+
+    @staticmethod
+    def create_objects_to_test_search_eeg_setting():
+        experiment1 = create_experiment(1, status=Experiment.APPROVED)
+        experiment2 = create_experiment(1, status=Experiment.APPROVED)
+        create_eeg_setting(1, experiment1)
+        create_eeg_setting(1, experiment1)
+        create_eeg_setting(1, experiment2)
+        for eeg_setting in EEGSetting.objects.all():
+            eeg_setting.name = 'eegsettingname'
+            eeg_setting.save()
+
+    @staticmethod
+    def create_objects_to_test_search_emgelectrodeplacementsetting(type):
+        experiment1 = create_experiment(1, status=Experiment.APPROVED)
+        emg_setting = create_emg_setting(experiment1)
+        electrode_model = create_electrode_model()
+        emg_electrode_setting = create_emg_electrode_setting(
+            emg_setting, electrode_model
+        )
+        if type == 'emg_electrode_placement':
+            emg_type_placement = create_emg_electrode_placement()
+        elif type == 'emg_surface_placement':
+            emg_type_placement = create_emg_surface_placement()
+        elif type == 'emg_intramuscular_placement':
+            emg_type_placement = create_emg_intramuscular_placement()
+        elif type == 'emg_needle_placement':
+            emg_type_placement = create_emg_needle_placement()
+
+        create_emg_electrode_placement_setting(
+            emg_electrode_setting, emg_type_placement
+        )
+        for emg_electrode_placement_setting in \
+                EMGElectrodePlacementSetting.objects.all():
+            # TODO: make search_term = 'quadrizeps' and put in method argument
+            emg_electrode_placement_setting.muscle_name = 'quadrizeps'
+            emg_electrode_placement_setting.save()
+
+    @staticmethod
+    def create_objects_to_test_search_eegelectrodeposition(
+            type='electrode_model'):
+        experiment1 = create_experiment(1, status=Experiment.APPROVED)
+        eeg_setting = create_eeg_setting(1, experiment1)
+        eeg_electrode_localization_system = \
+            create_eeg_electrode_localization_system(eeg_setting)
+        if type == 'electrode_model':
+            electrode_model = create_electrode_model()
+        create_eeg_electrode_position(
+            eeg_electrode_localization_system, electrode_model
+        )
+
+    def create_objects_to_test_search_emgelectrodeplacementsetting_with_emg_electrode_placement(
+            self, search_text):
+        self.create_objects_to_test_search_emgelectrodeplacementsetting(
+            'emg_electrode_placement')
+        # TODO: should test for all attributes
+        for emg_electrode_placement in EMGElectrodePlacement.objects.all():
+            emg_electrode_placement.standardization_system_name = search_text
+            emg_electrode_placement.save()
+
+    def create_objects_to_test_search_emgelectrodeplacementsetting_with_emg_surface_placement(
+            self, search_text):
+        self.create_objects_to_test_search_emgelectrodeplacementsetting(
+            'emg_surface_placement'
+        )
+        # TODO: should test for all attributes
+        for emg_surface_placement in EMGSurfacePlacement.objects.all():
+            emg_surface_placement.start_posture = search_text
+            emg_surface_placement.save()
+
+    def create_objects_to_test_search_emgelectrodeplacementsetting_with_emg_intramuscular_placement(
+            self, search_text):
+        self.create_objects_to_test_search_emgelectrodeplacementsetting(
+            'emg_intramuscular_placement'
+        )
+        # TODO: should test for all attributes
+        for emg_intramuscular_placement in EMGIntramuscularPlacement.objects.all():
+            emg_intramuscular_placement.method_of_insertion = search_text
+            emg_intramuscular_placement.save()
+
+    def create_objects_to_test_search_emgelectrodeplacementsetting_with_emg_needle_placement(
+            self, search_text):
+        self.create_objects_to_test_search_emgelectrodeplacementsetting(
+            'emg_needle_placement'
+        )
+        # TODO: should test for all attributes
+        for emg_needle_placement in EMGNeedlePlacement.objects.all():
+            emg_needle_placement.depth_of_insertion = search_text
+            emg_needle_placement.save()
+
+    def create_objects_to_test_search_eeg_electrode_position_with_electrode_model(
+            self, search_text):
+        self.create_objects_to_test_search_eegelectrodeposition(
+            'electrode_model'
+        )
+        # TODO: should test for all attributes
+        for electrode_model in ElectrodeModel.objects.all():
+            electrode_model.name = search_text
+            electrode_model.save()
+
+    def check_matches(self, matches, css_selector, text):
+        self.wait_for(lambda: self.verify_n_objects_in_table_rows(
+            matches, css_selector
+        ))
+        element_text = self.browser.find_element_by_class_name(
+            css_selector
+        ).text
+        self.assertIn(text, element_text)
+
+    def test_click_in_a_search_result_display_experiment_detail_page(self):
+        # TODO: the test tests for some match types, not all. Wold be better
+        # TODO: to test for each and all match types.
+
+        # The researcher searches for 'brachial' term
+        self.search_for('brachial')
+
+        # She obtains some results. She clicks in on A result link randomly
+        # and is redirected to experiment detail page
+        self.wait_for(
+            lambda:
+            self.browser.find_element_by_id('search_table')
+        )
+
+        links = self.browser.find_element_by_id(
+            'search_table'
+        ).find_elements_by_tag_name('a')
+        random_link = random.choice(links)
+        random_link.click()
+
+        self.wait_for(
+            lambda:
+            self.assertEqual(
+                self.browser.find_element_by_tag_name('h2').text,
+                'Open Database for Experiments in Neuroscience'
+            )
+        )
 
     def test_search_two_words_returns_correct_objects(self):
         # Joselina, a neuroscience researcher at Numec is delighted with the
@@ -137,7 +343,7 @@ class SearchTest(FunctionalTest):
         # study_rows = \
         #     self.browser.find_elements_by_class_name('study-matches')
         # self.assertTrue(any('Pero Vaz' in row.text for row in study_rows))
-        
+
         self.wait_for(
             lambda: self.assertTrue(
                 any('Pero Vaz' in row.text for row in self.browser
@@ -556,47 +762,37 @@ class SearchTest(FunctionalTest):
         self.assertIn('cerebral cortex', tmsdevicesetting_text)
 
     def test_search_eegsetting_returns_correct_objects(self):
+        self.create_objects_to_test_search_eeg_setting()
+        self.haystack_index('rebuild_index')
+
         # Joselina wants to search for experiments whose EEGSetting name is
         # 'eegsettingname'
         self.search_for('eegsettingname')
 
-        # As there is three EEGSetting objects with that name,
+        # As there are three EEGSetting objects with that name,
         # one associated to an experiment, and the other two associated with
         # another experiment, she sees three rows in Search Results list
-        self.wait_for(lambda: self.verify_n_objects_in_table_rows(
-            3, 'eegsetting-matches'
-        ))
-        self.verify_n_objects_in_table_rows(0, 'tmsdata-matches')
-        self.verify_n_objects_in_table_rows(0, 'coilmodel-matches')
-        self.verify_n_objects_in_table_rows(0, 'tmsdevice-matches')
-        self.verify_n_objects_in_table_rows(0, 'tmsdevicesetting-matches')
-        self.verify_n_objects_in_table_rows(0, 'tmssetting-matches')
-        self.verify_n_objects_in_table_rows(0, 'experiment-matches')
-        self.verify_n_objects_in_table_rows(0, 'study-matches')
-        self.verify_n_objects_in_table_rows(0, 'group-matches')
-        self.verify_n_objects_in_table_rows(0, 'experimentalprotocol-matches')
-        eegsetting_text = self.browser.find_element_by_class_name(
-            'eegsetting-matches'
-        ).text
-        self.assertIn('eegsettingname', eegsetting_text)
+        self.check_matches(3, 'eegsetting-matches', 'eegsettingname')
+
+    def test_search_eegelectrodenet_equipment_returns_correct_objects(self):
+        self.create_objects_to_test_search_eeg_setting()
+
+        for eeg_setting in EEGSetting.objects.all():
+            eeg_electrode_net = create_eeg_electrodenet(eeg_setting)
+            eeg_electrode_net.manufacturer_name = 'Hersteller'
+            eeg_electrode_net.save()
+
+        self.haystack_index('rebuild_index')
+
+        # Severino wants to search for experiments that has certain
+        # equipment associated to an experiment setting
+        self.search_for('Hersteller')
+
+        # There are three maches craeted above
+        self.check_matches(3, 'eeg_electrode_net-matches', 'Hersteller')
 
     def test_search_emgsetting_returns_correct_objects(self):
-        ##
-        # Create objects needed
-        ##
-        experiment1 = create_experiment(1, status=Experiment.APPROVED)
-        create_emg_setting(experiment1)
-        experiment2 = create_experiment(1, status=Experiment.APPROVED)
-        create_emg_setting(experiment2)
-        create_emg_setting(experiment2)
-        for emg_setting in EMGSetting.objects.all():
-            emg_setting.name = 'emgsettingname'
-            emg_setting.save()
-
-        ##
-        # Rebuild haystack index
-        ##
-        haystack.connections.reload('default')
+        self.create_objects_to_test_search_emgsetting()
         self.haystack_index('rebuild_index')
 
         # Joselina wants to search for experiments whose EMGSetting name is
@@ -606,23 +802,82 @@ class SearchTest(FunctionalTest):
         # As there is three EMGSetting objects with that name,
         # one associated to an experiment, and the other two associated with
         # another experiment, she sees three rows in Search Results list
-        self.wait_for(lambda: self.verify_n_objects_in_table_rows(
-            3, 'emgsetting-matches'
-        ))
-        self.verify_n_objects_in_table_rows(0, 'eegsetting-matches')
-        self.verify_n_objects_in_table_rows(0, 'tmsdata-matches')
-        self.verify_n_objects_in_table_rows(0, 'coilmodel-matches')
-        self.verify_n_objects_in_table_rows(0, 'tmsdevice-matches')
-        self.verify_n_objects_in_table_rows(0, 'tmsdevicesetting-matches')
-        self.verify_n_objects_in_table_rows(0, 'tmssetting-matches')
-        self.verify_n_objects_in_table_rows(0, 'experiment-matches')
-        self.verify_n_objects_in_table_rows(0, 'study-matches')
-        self.verify_n_objects_in_table_rows(0, 'group-matches')
-        self.verify_n_objects_in_table_rows(0, 'experimentalprotocol-matches')
-        emgsetting_text = self.browser.find_element_by_class_name(
-            'emgsetting-matches'
-        ).text
-        self.assertIn('emgsettingname', emgsetting_text)
+        self.check_matches(3, 'emgsetting-matches', 'emgsettingname')
+
+    def test_search_eegsolution_returns_correct_objects(self):
+        self.create_objects_to_test_search_eeg_setting()
+
+        for eeg_setting in EEGSetting.objects.all():
+            eeg_solution = create_eeg_solution(eeg_setting)
+            eeg_solution.manufacturer_name = 'Hersteller'
+            eeg_solution.save()
+
+        self.haystack_index('rebuild_index')
+
+        # Severino wants to search for experiments that has certain
+        # equipment associated to an EEG solution
+        self.search_for('Hersteller')
+
+        # There are three maches craeted above
+        self.check_matches(3, 'eeg_solution-matches', 'Hersteller')
+
+    def test_search_eegfiltersetting_returns_correct_objects(self):
+        self.create_objects_to_test_search_eeg_setting()
+
+        for eeg_setting in EEGSetting.objects.all():
+            eeg_filter_setting = create_eeg_filter_setting(eeg_setting)
+            eeg_filter_setting.eeg_filter_type_name = 'FilterTyp'
+            eeg_filter_setting.save()
+
+        self.haystack_index('rebuild_index')
+
+        # Severino wants to search for experiments that has certain
+        # equipment associated to an EEG filter setting
+        self.search_for('FilterTyp')
+
+        # There are three maches craeted above
+        self.check_matches(3, 'eeg_filter_setting-matches', 'FilterTyp')
+
+    def test_search_emgdigitalfiltersetting_returns_correct_objects(self):
+        self.create_objects_to_test_search_emgsetting()
+
+        for emg_setting in EMGSetting.objects.all():
+            emg_ditital_filter_setting = create_emg_digital_filter_setting(
+                emg_setting
+            )
+            emg_ditital_filter_setting.filter_type_name = 'FilterTyp'
+            emg_ditital_filter_setting.save()
+
+        self.haystack_index('rebuild_index')
+
+        # Severino wants to search for experiments that has certain
+        # equipment associated to an EMG digital filter setting
+        self.search_for('FilterTyp')
+
+        # There are three maches craeted above
+        self.check_matches(3, 'emg_dgital_filter_setting-matches', 'FilterTyp')
+
+    def test_search_eegelectrodelocalizationsystem_returns_correct_objects(
+            self):
+        self.create_objects_to_test_search_eeg_setting()
+
+        for eeg_setting in EEGSetting.objects.all():
+            eeg_electrode_localization_system = \
+                create_eeg_electrode_localization_system(eeg_setting)
+            eeg_electrode_localization_system.name = 'Elektrodenlokalisierung'
+            eeg_electrode_localization_system.save()
+
+        self.haystack_index('rebuild_index')
+
+        # Severino wants to search for experiments that has certain
+        # equipment associated to an EEG solution
+        self.search_for('Elektrodenlokalisierung')
+
+        # There are three maches craeted above
+        self.check_matches(
+            3, 'eeg_electrode_localiation_system-matches',
+            'Elektrodenlokalisierung'
+        )
 
     def test_search_questionnaire_data_returns_correct_objects_1(self):
         # Joselina wants to search for experiments that contains some
@@ -772,6 +1027,7 @@ class SearchTest(FunctionalTest):
         ))
         self.verify_n_objects_in_table_rows(0, 'questionnaire-matches')
         self.verify_n_objects_in_table_rows(0, 'eegsetting-matches')
+        self.verify_n_objects_in_table_rows(0, 'emgsetting-matches')
         self.verify_n_objects_in_table_rows(0, 'tmsdata-matches')
         self.verify_n_objects_in_table_rows(0, 'coilmodel-matches')
         self.verify_n_objects_in_table_rows(0, 'tmsdevice-matches')
@@ -787,31 +1043,199 @@ class SearchTest(FunctionalTest):
         ).text
         self.assertIn('Verletzung des Plexus Brachialis', publication_text)
 
-    def test_click_in_a_search_result_display_experiment_detail_page(self):
-        # TODO: the test tests for some match types, not all. Wold be better
-        # TODO: to test for each and all match types.
+    def test_search_stimulus_step_returns_correct_objects(self):
+        self.create_objects_to_test_search_stimulus_step()
+        self.haystack_index('rebuild_index')
 
-        # The researcher searches for 'brachial' term
-        self.search_for('brachial')
+        # Joselina wants to search for a given stimulus step
+        self.search_for('stimulusschritt')
 
-        # She obtains some results. She clicks in on A result link randomly
-        # and is redirected to experiment detail page
-        self.wait_for(
-            lambda:
-            self.browser.find_element_by_id('search_table')
+        # As there are three stimulus steps with that string, two from
+        # groups of one experiment, and one from other group of another
+        # experiment, she sees three results
+        self.check_matches(3, 'stimulus_step-matches', 'stimulusschritt')
+
+    def test_search_genericdatacollection_step_returns_correct_objects(self):
+        self.create_objects_to_test_search_genericdatacollection_step()
+        self.haystack_index('rebuild_index')
+
+        # Joselina wants to search for a given stimulus step
+        self.search_for('generischedatensammlung')
+
+        # As there are three stimulus steps with that string, two from
+        # groups of one experiment, and one from other group of another
+        # experiment, she sees three results
+        self.check_matches(
+            3, 'generic_data_colletiong_step-matches',
+            'generischedatensammlung'
         )
 
-        links = self.browser.find_element_by_id(
-            'search_table'
-        ).find_elements_by_tag_name('a')
-        random_link = random.choice(links)
-        random_link.click()
+    def test_search_goalkeepergame_step_returns_correct_objects(self):
+        self.create_objects_to_test_search_goalkeepergame_step()
+        self.haystack_index('rebuild_index')
 
-        self.wait_for(
-            lambda:
-            self.assertEqual(
-                self.browser.find_element_by_tag_name('h2').text,
-                'Open Database for Experiments in Neuroscience'
-            )
+        # Joselina wants to search for a given context tree of a Goal Keeper
+        # Game Phase
+        self.search_for('goalkeepergame')
+
+        # As there are three context trees with that string, two from two
+        # goalkeeper game phase steps bounded to two groups of one experiment,
+        # and one from other goalkeeper step bounded to another group,
+        # she sees three results
+        self.check_matches(3, 'goalkeepergame-matches', 'goalkeepergame')
+
+        # Now Joselina searchs for 'Ein Beschreibung' that is exactly what
+        # is in software description field of GoalkeeperGame model
+        self.search_for('Ein Beschreibung')
+
+        # Again that is three matches
+        self.check_matches(3, 'goalkeepergame-matches', 'Ein Beschreibung')
+
+    def test_search_context_tree_returns_correct_objects(self):
+        ##
+        # Create objects needed
+        ##
+        experiment1 = create_experiment(1, status=Experiment.APPROVED)
+        create_context_tree(experiment1)
+        create_context_tree(experiment1)
+        experiment2 = create_experiment(1, status=Experiment.APPROVED)
+        create_context_tree(experiment2)
+        for context_tree in ContextTree.objects.all():
+            context_tree.setting_text = 'wunderbarcontexttree'
+            context_tree.save()
+
+        self.haystack_index('rebuild_index')
+
+        # Edson searchs for a given context tree experiment setting
+        self.search_for('wunderbarcontexttree')
+
+        # there are three matches (as we created them above)
+        self.check_matches(3, 'context_tree-matches', 'wunderbarcontexttree')
+
+    def test_search_emgelectrodeplacementsetting_returns_correct_objects(
+            self):
+        self.create_objects_to_test_search_emgelectrodeplacementsetting(
+            'emg_electrode_placement'
+        )
+        self.haystack_index('rebuild_index')
+
+        # Joselina wants to search for a given stimulus step
+        self.search_for('quadrizeps')
+
+        # As there are three stimulus steps with that string, two from
+        # groups of one experiment, and one from other group of another
+        # experiment, she sees three results
+        self.check_matches(
+            1, 'emg_electrode_placement_setting-matches', 'quadrizeps'
         )
 
+    def test_search_emgelectrodeplacementsetting_returns_correct_related_objects_1(self):
+        search_text = 'standardisierung'
+        self.create_objects_to_test_search_emgelectrodeplacementsetting_with_emg_electrode_placement(
+            search_text
+        )
+        self.haystack_index('rebuild_index')
+
+        # Joselina wants to search for a given stimulus step
+        self.search_for(search_text)
+
+        # As there are three stimulus steps with that string, two from
+        # groups of one experiment, and one from other group of another
+        # experiment, she sees three results
+        self.check_matches(
+            1, 'emg_electrode_placement_setting-matches', search_text
+        )
+
+    def test_search_emgelectrodeplacementsetting_returns_correct_related_objects_2(self):
+        search_text = 'starthaltung'
+        self.create_objects_to_test_search_emgelectrodeplacementsetting_with_emg_surface_placement(
+            search_text
+        )
+        self.haystack_index('rebuild_index')
+
+        # Joselina wants to search for a given stimulus step
+        self.search_for(search_text)
+
+        # As there are three stimulus steps with that string, two from
+        # groups of one experiment, and one from other group of another
+        # experiment, she sees three results
+        self.check_matches(
+            1, 'emg_electrode_placement_setting-matches', search_text
+        )
+
+    def test_search_emgelectrodeplacementsetting_returns_correct_related_objects_3(self):
+        search_text = 'einfügung'
+        self.create_objects_to_test_search_emgelectrodeplacementsetting_with_emg_intramuscular_placement(
+            search_text
+        )
+        self.haystack_index('rebuild_index')
+
+        # Joselina wants to search for a given stimulus step
+        self.search_for(search_text)
+
+        # As there are three stimulus steps with that string, two from
+        # groups of one experiment, and one from other group of another
+        # experiment, she sees three results
+        self.check_matches(
+            1, 'emg_electrode_placement_setting-matches', search_text
+        )
+
+    def test_search_emgelectrodeplacementsetting_returns_correct_related_objects_4(self):
+        search_text = 'nadelplatzierung'
+        self.create_objects_to_test_search_emgelectrodeplacementsetting_with_emg_needle_placement(
+            search_text
+        )
+        self.haystack_index('rebuild_index')
+
+        # Joselina wants to search for a given stimulus step
+        self.search_for(search_text)
+
+        # As there are three stimulus steps with that string, two from
+        # groups of one experiment, and one from other group of another
+        # experiment, she sees three results
+        self.check_matches(
+            1, 'emg_electrode_placement_setting-matches', search_text
+        )
+
+    def test_search_eeg_electrode_position(self):
+        search_text = 'elektrodenposition'
+        self.create_objects_to_test_search_eegelectrodeposition()
+        for eeg_electrode_position in EEGElectrodePosition.objects.all():
+            eeg_electrode_position.name = search_text
+            eeg_electrode_position.save()
+
+        self.haystack_index('rebuild_index')
+
+        # Joselina wants to search for a give electrode position name
+        self.search_for(search_text)
+
+        # As there are one electrode position name with that string she sees
+        # one result
+        self.check_matches(
+            1, 'eeg_electrode_position-matches', search_text
+        )
+
+    def test_search_eeg_electrode_position_returns_correct_related_objects_1(
+            self):
+        search_text = 'elektrodenmodell'
+        self.create_objects_to_test_search_eegelectrodeposition(
+            'electrode_model'
+        )
+        # TODO: should test for all attributes
+        for electrode_model in ElectrodeModel.objects.all():
+            electrode_model.name = search_text
+            electrode_model.save()
+
+        self.haystack_index('rebuild_index')
+
+        # Joselina wants to search for a given electrode model
+        self.search_for(search_text)
+
+        # As there are one electrode model with that string, she sees one
+        # result
+        # TODO: the assertion inside this method is passing when it
+        # TODO: wouldn't. Apparenttly the result come with empty string.
+        # TODO: Verify!
+        self.check_matches(
+            1, 'eeg_electrode_position-matches', search_text
+        )

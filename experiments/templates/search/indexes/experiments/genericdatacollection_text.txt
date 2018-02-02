@@ -1,0 +1,5 @@
+{{ object.identification }}
+{{ object.description }}
+{{ object.information_type_name }}
+{{ object.information_type_description }}
+{{ object.group }}

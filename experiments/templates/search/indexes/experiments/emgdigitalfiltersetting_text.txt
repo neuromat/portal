@@ -1,0 +1,2 @@
+{{ object.filter_type_name }}
+{{ object.filter_type_description }}

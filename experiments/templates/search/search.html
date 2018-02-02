@@ -40,6 +40,15 @@
                 {% if result.model_name == 'step' %}
                     {% include 'search/step.html' %}
                 {% endif %}
+                {% if result.model_name == 'goalkeepergame' %}
+                    {% include 'search/goalkeepergame.html' %}
+                {% endif %}
+                {% if result.model_name == 'stimulus' %}
+                    {% include 'search/stimulus.html' %}
+                {% endif %}
+                {% if result.model_name == 'genericdatacollection' %}
+                    {% include 'search/genericdatacollection.html' %}
+                {% endif %}
                 {% if result.model_name == 'tmssetting' %}
                     {% include 'search/tmssetting.html' %}
                 {% endif %}
@@ -61,11 +70,35 @@
                 {% if result.model_name == 'emgsetting' %}
                     {% include 'search/emgsetting.html' %}
                 {% endif %}
+                {% if result.model_name == 'contexttree' %}
+                    {% include 'search/contexttree.html' %}
+                {% endif %}
+                {% if result.model_name == 'eegelectrodenet' %}
+                    {% include 'search/eegelectrodenet.html' %}
+                {% endif %}
+                {% if result.model_name == 'eegsolution' %}
+                    {% include 'search/eegsolution.html' %}
+                {% endif %}
+                {% if result.model_name == 'eegfiltersetting' %}
+                    {% include 'search/eegfiltersetting.html' %}
+                {% endif %}
+                {% if result.model_name == 'eegelectrodelocalizationsystem' %}
+                    {% include 'search/eegelectrodelocalizationsystem.html' %}
+                {% endif %}
+                {% if result.model_name == 'emgdigitalfiltersetting' %}
+                    {% include 'search/emgdigitalfiltersetting.html' %}
+                {% endif %}
                 {% if result.model_name == 'questionnairelanguage' %}
                     {% include 'search/questionnaires_languages.html' %}
                 {% endif %}
                 {% if result.model_name == 'publication' %}
                     {% include 'search/publications.html' %}
+                {% endif %}
+                {% if result.model_name == 'emgelectrodeplacementsetting' %}
+                    {% include 'search/emgelectrodeplacementsetting.html' %}
+                {% endif %}
+                {% if result.model_name == 'eegelectrodeposition' %}
+                    {% include 'search/eegelectrodeposition.html' %}
                 {% endif %}
             {% empty %}
                 <p>{% trans "No results found" %}.</p>

@@ -21,7 +21,10 @@ from experiments.models import Experiment, Study, Group, Researcher, \
     EEGElectrodeLocalizationSystem, ContextTree, Stimulus, EEG, EMG, \
     EMGSetting, EMGData, GoalkeeperGame, GoalkeeperGameData, \
     GenericDataCollection, GenericDataCollectionData, AdditionalData, \
-    EMGElectrodePlacement
+    EMGElectrodePlacement, EEGElectrodeNet, EEGSolution, EEGFilterSetting, \
+    EMGDigitalFilterSetting, ElectrodeModel, EMGElectrodeSetting, \
+    EMGElectrodePlacementSetting, EMGSurfacePlacement, \
+    EMGIntramuscularPlacement, EMGNeedlePlacement, EEGElectrodePosition
 from experiments.views import _get_q_default_language_or_first
 
 
@@ -354,6 +357,22 @@ def create_emg_step(group, emg_setting):
     )
 
 
+def create_goalkeepergame_step(group, context_tree):
+    """
+    :param group: Group model instance
+    :param context_tree: Context Tree model instance
+    :return: GoalkeeperGame model instance
+    """
+    faker = Factory.create()
+
+    return GoalkeeperGame.objects.create(
+        software_name=faker.word(), software_description=faker.text(),
+        software_version=faker.word(), context_tree=context_tree,
+        group=group, identification=faker.word(), numeration=faker.ssn(),
+        type=Step.GOALKEEPER, order=randint(1, 20)
+    )
+
+
 def create_emg_data(emg_setting, emg_step, participant):
     """
     :param emg_setting: EMGSetting model instance
@@ -375,29 +394,78 @@ def create_emg_electrode_placement():
     faker = Factory.create()
 
     return EMGElectrodePlacement.objects.create(
-        standardization_system_name=faker.word()
+        standardization_system_name=faker.word(),
+        standardization_system_description=faker.text(),
+        muscle_anatomy_origin=faker.text(),
+        muscle_anatomy_insertion=faker.text(),
+        muscle_anatomy_function=faker.text(),
+        location=faker.text(),
+        placement_type=faker.word()
     )
 
 
-def create_stimulus_step(qtty, group):
+def create_emg_surface_placement():
+    faker = Factory.create()
+
+    return EMGSurfacePlacement.objects.create(
+        standardization_system_name=faker.word(),
+        start_posture=faker.text(),
+        orientation=faker.text(),
+        fixation_on_the_skin=faker.text(),
+        reference_electrode=faker.text(),
+        clinical_test=faker.text()
+    )
+
+
+def create_emg_intramuscular_placement():
+    faker = Factory.create()
+
+    return EMGIntramuscularPlacement.objects.create(
+        standardization_system_name=faker.word(),
+        method_of_insertion=faker.text(),
+        depth_of_insertion=faker.text()
+    )
+
+
+def create_emg_needle_placement():
+    faker = Factory.create()
+
+    return EMGNeedlePlacement.objects.create(
+        standardization_system_name=faker.word(),
+        depth_of_insertion=faker.text()
+    )
+
+
+def create_emg_electrode_placement_setting(emg_electrode_setting,
+                                           emg_electrode_placement):
+    return EMGElectrodePlacementSetting.objects.create(
+        emg_electrode_setting=emg_electrode_setting,
+        emg_electrode_placement=emg_electrode_placement
+    )
+
+
+def create_eeg_electrode_position(eeg_electrode_localization_system,
+                                  electrode_model):
+    return EEGElectrodePosition.objects.create(
+        eeg_electrode_localization_system=eeg_electrode_localization_system,
+        electrode_model=electrode_model,
+        channel_index=13
+    )
+
+
+def create_stimulus_step(group):
     """
-    :param qtty: number of Stimulus model instances
     :param group: Group model instance
+    :return: Stimulus model instance
     """
     fake = Factory.create()
 
-    stimuli = []
-    for i in range(qtty):
-        stimulus = Stimulus.objects.create(
-            group=group,
-            identification=fake.word(), numeration=fake.ssn(),
-            type=Step.STIMULUS, order=randint(1, 20), stimulus_type_name=fake.word()
-        )
-        stimuli.append(stimulus)
-
-    if len(stimuli) == 1:
-        return stimuli[0]
-    return stimuli
+    return Stimulus.objects.create(
+        group=group,
+        identification=fake.word(), numeration=fake.ssn(),
+        type=Step.STIMULUS, order=randint(1, 20),
+        stimulus_type_name=fake.word()
+    )
 
 
 def create_tms_setting(qtty, experiment):
@@ -565,38 +633,44 @@ def create_eeg_electrode_localization_system(eeg_setting):
     )
 
 
-def create_eegsetting_objects_to_test_search():
-    experiment1 = Experiment.objects.filter(status=Experiment.APPROVED).first()
-    experiment2 = Experiment.objects.filter(status=Experiment.APPROVED).last()
-
-    create_eeg_setting(2, experiment1)
-    tmss1 = EEGSetting.objects.first()
-    tmss1.name = 'eegsettingname'
-    tmss1.save()
-    tmss2 = EEGSetting.objects.last()
-    tmss2.name = 'eegsettingname'
-    tmss2.save()
-    create_eeg_setting(1, experiment2)
-    tmss3 = EEGSetting.objects.last()
-    tmss3.name = 'eegsettingname'
-    tmss3.save()
-
-
-def create_goal_keeper_game_step(group, context_tree):
-    """
-    :param group: Group model instance
-    :param context_tree: ContextTree model instance
-    """
+def create_eeg_electrodenet(eeg_setting):
     faker = Factory.create()
 
-    return GoalkeeperGame.objects.create(
-        group=group, context_tree=context_tree,
-        identification=faker.word(), numeration=faker.ssn(),
-        type=Step.GOALKEEPER, order=randint(1, 20)
+    return EEGElectrodeNet.objects.create(
+        eeg_setting=eeg_setting, manufacturer_name=faker.word(),
+        equipment_type='eeg_electrode_net', identification=faker.text(),
+        description=faker.text(), serial_number=faker.ssn()
     )
 
 
-def create_goal_keeper_game_data(gkg_step, participant):
+def create_eeg_solution(eeg_setting):
+    faker = Factory.create()
+
+    return EEGSolution.objects.create(
+        eeg_setting=eeg_setting, manufacturer_name=faker.word(),
+        name=faker.word(), components=faker.text()
+    )
+
+
+def create_eeg_filter_setting(eeg_setting):
+    faker = Factory.create()
+
+    return EEGFilterSetting(
+        eeg_setting=eeg_setting, eeg_filter_type_name=faker.word(),
+        eeg_filter_type_description=faker.text(),
+    )
+
+
+def create_emg_digital_filter_setting(emg_setting):
+    faker = Factory.create()
+
+    return EMGDigitalFilterSetting(
+        emg_setting=emg_setting, filter_type_name=faker.word(),
+        filter_type_description=faker.text(),
+    )
+
+
+def create_goalkeeper_game_data(gkg_step, participant):
     """
     :param gkg_step: GoalkeeperGame(Step) model instance
     :param participant: Participant model instance
@@ -618,6 +692,25 @@ def create_generic_data_collection_step(group):
         group=group,
         identification=faker.word(), numeration=faker.ssn(),
         type=Step.GENERIC, order=randint(1, 20)
+    )
+
+
+def create_electrode_model():
+    faker = Factory.create()
+
+    return ElectrodeModel.objects.create(
+        name=faker.word(), description=faker.text(), material=faker.word(),
+        usability=choice(['disposable', 'reusable']), impedance=13,
+        impedance_unit='ohm', inter_electrode_distance=13,
+        inter_electrode_distance_unit='cm',
+        electrode_configuration_name=faker.word(),
+        electrode_type=choice(['surface', 'intramuscular', 'needle'])
+    )
+
+
+def create_emg_electrode_setting(emg_setting, electrode_model):
+    return EMGElectrodeSetting.objects.create(
+        emg_setting=emg_setting, electrode_model=electrode_model
     )
 
 
@@ -721,6 +814,7 @@ def create_context_tree(experiment):
     fake = Factory.create()
 
     return ContextTree.objects.create(
+        setting_text=fake.text(),
         experiment=experiment,
         name=fake.word(),
         description=fake.text()
@@ -1244,9 +1338,6 @@ def global_setup_ft():
     # Create TMSData objects to test search
     create_tmsdata_objects_to_test_search()
 
-    # Create EEGSetting object to test search
-    create_eegsetting_objects_to_test_search()
-
     # Create Questionnaire objects
     # (requires valid files 'questionnaire1.csv', 'questionnaire2.csv',
     # 'questionnaire3.csv', and their language variations in
@@ -1408,9 +1499,6 @@ def global_setup_ut():
         name='Colaborador 2', team='Numec', coordinator=False,
         study=study1
     )
-
-    # To test search
-    create_eegsetting_objects_to_test_search()
 
     # Create valid Questionnaire objects
     # (requires the files 'questionnaire1.csv', 'questionnaire2.csv' and
