@@ -329,7 +329,7 @@ def eeg_electrode_localization_system_delete(instance, **kwargs):
     instance.map_image_file.delete(save=False)
 
 
-class ElectrodeModel(models.Model):  # not indexed for search (parent)
+class ElectrodeModel(models.Model):  # indexed for search (as foreing key)
     USABILITY_TYPES = (
         ("disposable", "Disposable"),
         ("reusable", "Reusable"),

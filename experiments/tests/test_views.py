@@ -571,7 +571,8 @@ class SearchTest(TestCase):
 
     def test_search_emgelectrodeplacementsetting_returns_correct_objects(self):
         test_search.SearchTest(). \
-            create_objects_to_test_search_emgelectrodeplacementsetting()
+            create_objects_to_test_search_emgelectrodeplacementsetting(
+            'emg_electrode_placement')
         self.haystack_index('rebuild_index')
         self.check_matches_on_response(1, 'quadrizeps')
 
@@ -579,11 +580,12 @@ class SearchTest(TestCase):
         search_text = 'elektrodenposition'
         test_search.SearchTest(). \
             create_objects_to_test_search_eegelectrodeposition()
-        self.haystack_index('rebuild_index')
-        self.check_matches_on_response(1, search_text)
         for eeg_electrode_position in EEGElectrodePosition.objects.all():
             eeg_electrode_position.name = search_text
             eeg_electrode_position.save()
+
+        self.haystack_index('rebuild_index')
+        self.check_matches_on_response(1, search_text)
 
     # TODO: This test pass when it wouldn't
     def test_search_eeg_electrode_position_returns_correct_related_objects_1(self):
