@@ -7,7 +7,7 @@ from django.core.management import call_command
 from experiments.models import Study, Experiment, Group, Step, EMGSetting, \
     GoalkeeperGame, ContextTree, EEGSetting, Stimulus, GenericDataCollection, \
     EMGElectrodePlacementSetting, EMGElectrodePlacement, EMGSurfacePlacement, \
-    EMGIntramuscularPlacement, EMGNeedlePlacement
+    EMGIntramuscularPlacement, EMGNeedlePlacement, EEGElectrodePosition
 from experiments.tests.tests_helper import create_experiment, \
     create_emg_setting, create_group, create_goalkeepergame_step, \
     create_context_tree, create_eeg_setting, create_eeg_electrodenet, \
@@ -17,7 +17,8 @@ from experiments.tests.tests_helper import create_experiment, \
     create_generic_data_collection_step, create_electrode_model, \
     create_emg_electrode_setting, create_emg_electrode_placement, \
     create_emg_electrode_placement_setting, create_emg_surface_placement, \
-    create_emg_intramuscular_placement, create_emg_needle_placement
+    create_emg_intramuscular_placement, create_emg_needle_placement, \
+    create_eeg_electrode_position
 from functional_tests.base import FunctionalTest
 
 import time
@@ -148,8 +149,25 @@ class SearchTest(FunctionalTest):
         )
         for emg_electrode_placement_setting in \
                 EMGElectrodePlacementSetting.objects.all():
+            # TODO: make search_term = 'quadrizeps' and put in method argument
             emg_electrode_placement_setting.muscle_name = 'quadrizeps'
             emg_electrode_placement_setting.save()
+
+    @staticmethod
+    def create_objects_to_test_search_eegelectrodeposition(type,
+                                                           search_text):
+        experiment1 = create_experiment(1, status=Experiment.APPROVED)
+        eeg_setting = create_eeg_setting(1, experiment1)
+        eeg_electrode_localization_system = \
+            create_eeg_electrode_localization_system(eeg_setting)
+        if type == 'electrode_model':
+            electrode_model = create_electrode_model()
+        create_eeg_electrode_position(
+            eeg_electrode_localization_system, electrode_model
+        )
+        for eeg_electrode_position in EEGElectrodePosition.objects.all():
+            eeg_electrode_position.name = search_text
+            eeg_electrode_position.save()
 
     def create_objects_to_test_search_emgelectrodeplacementsetting_with_emg_electrode_placement(
             self, search_text):
@@ -1089,7 +1107,8 @@ class SearchTest(FunctionalTest):
     def test_search_emgelectrodeplacementsetting_returns_correct_objects(
             self):
         self.create_objects_to_test_search_emgelectrodeplacementsetting(
-            'emg_electrode_placement')
+            'emg_electrode_placement'
+        )
         self.haystack_index('rebuild_index')
 
         # Joselina wants to search for a given stimulus step
@@ -1168,4 +1187,21 @@ class SearchTest(FunctionalTest):
         # experiment, she sees three results
         self.check_matches(
             1, 'emg_electrode_placement_setting-matches', search_text
+        )
+
+    def test_search_eeg_electrode_position(self):
+        search_text = 'elektrodenposition'
+        self.create_objects_to_test_search_eegelectrodeposition(
+            'electrode_model', search_text
+        )
+
+        self.haystack_index('rebuild_index')
+
+        # Joselina wants to search for a give electrode position name
+        self.search_for(search_text)
+
+        # As there are one electrode position name with that string she sees
+        # one result
+        self.check_matches(
+            1, 'eeg_electrode_position-matches', search_text
         )

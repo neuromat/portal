@@ -97,6 +97,9 @@
                 {% if result.model_name == 'emgelectrodeplacementsetting' %}
                     {% include 'search/emgelectrodeplacementsetting.html' %}
                 {% endif %}
+                {% if result.model_name == 'eegelectrodeposition' %}
+                    {% include 'search/eegelectrodeposition.html' %}
+                {% endif %}
             {% empty %}
                 <p>{% trans "No results found" %}.</p>
             {% endfor %}

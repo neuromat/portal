@@ -1,0 +1,3 @@
+{{ object.name }}
+{{ object.eeg_electrode_localization_system }}
+{{ object.electrode_model }}

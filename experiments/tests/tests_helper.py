@@ -24,7 +24,7 @@ from experiments.models import Experiment, Study, Group, Researcher, \
     EMGElectrodePlacement, EEGElectrodeNet, EEGSolution, EEGFilterSetting, \
     EMGDigitalFilterSetting, ElectrodeModel, EMGElectrodeSetting, \
     EMGElectrodePlacementSetting, EMGSurfacePlacement, \
-    EMGIntramuscularPlacement, EMGNeedlePlacement
+    EMGIntramuscularPlacement, EMGNeedlePlacement, EEGElectrodePosition
 from experiments.views import _get_q_default_language_or_first
 
 
@@ -441,6 +441,15 @@ def create_emg_electrode_placement_setting(emg_electrode_setting,
     return EMGElectrodePlacementSetting.objects.create(
         emg_electrode_setting=emg_electrode_setting,
         emg_electrode_placement=emg_electrode_placement
+    )
+
+
+def create_eeg_electrode_position(eeg_electrode_localization_system,
+                                  electrode_model):
+    return EEGElectrodePosition.objects.create(
+        eeg_electrode_localization_system=eeg_electrode_localization_system,
+        electrode_model=electrode_model,
+        channel_index=13
     )
 
 

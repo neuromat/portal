@@ -369,14 +369,22 @@ class SurfaceElectrode(ElectrodeModel):
         ("active", "Active"),
         ("passive", "Passive"),
     )
-    conduction_type = models.CharField(max_length=20, choices=CONDUCTION_TYPES, null=True, blank=True)
-    electrode_mode = models.CharField(max_length=20, choices=MODE_OPTIONS, null=True, blank=True)
-    electrode_shape_name = models.CharField(max_length=150, null=True, blank=True)
+    conduction_type = models.CharField(
+        max_length=20, choices=CONDUCTION_TYPES, null=True, blank=True
+    )
+    electrode_mode = models.CharField(
+        max_length=20, choices=MODE_OPTIONS, null=True, blank=True
+    )
+    electrode_shape_name = models.CharField(
+        max_length=150, null=True, blank=True
+    )
     electrode_shape_measure_value = models.FloatField(null=True, blank=True)
-    electrode_shape_measure_unit = models.CharField(max_length=150, null=True, blank=True)
+    electrode_shape_measure_unit = models.CharField(
+        max_length=150, null=True, blank=True
+    )
 
 
-class EEGElectrodePosition(models.Model):  # not indexed for search
+class EEGElectrodePosition(models.Model):  # indexed for search
     eeg_electrode_localization_system = models.ForeignKey(
         EEGElectrodeLocalizationSystem,
         related_name="electrode_positions"

@@ -575,6 +575,14 @@ class SearchTest(TestCase):
         self.haystack_index('rebuild_index')
         self.check_matches_on_response(1, 'quadrizeps')
 
+    def test_search_eeg_electrode_position(self):
+        search_text = 'elektrodenposition'
+        test_search.SearchTest(). \
+            create_objects_to_test_search_eegelectrodeposition(
+            'electrode_model', search_text)
+        self.haystack_index('rebuild_index')
+        self.check_matches_on_response(1, search_text)
+
     def test_search_emgelectrodeplacementsetting_returns_correct_related_objects_1(self):
         search_text = 'standardisierung'
         test_search.SearchTest(). \

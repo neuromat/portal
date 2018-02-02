@@ -6,7 +6,8 @@ from experiments.models import Experiment, Study, Group, \
     QuestionnaireLanguage, Publication, EMGSetting, GoalkeeperGame, \
     ContextTree, EEGElectrodeNet, EEGSolution, EEGFilterSetting, \
     EEGElectrodeLocalizationSystem, EMGDigitalFilterSetting, Stimulus, \
-    GenericDataCollection, EMGElectrodePlacementSetting, EMGElectrodeSetting
+    GenericDataCollection, EMGElectrodePlacementSetting, EMGElectrodeSetting, \
+    EEGElectrodePosition
 
 
 class ExperimentIndex(indexes.SearchIndex, indexes.Indexable):
@@ -155,6 +156,31 @@ class EMGElectrodePlacementSettingIndex(indexes.SearchIndex,
         )
         return self.get_model().objects.filter(
             emg_electrode_setting__in=emg_electrode_settings
+        )
+
+
+class EEGElectrodePositionIndex(indexes.SearchIndex, indexes.Indexable):
+    text = indexes.CharField(document=True, use_template=True)
+    eeg_electrode_localization_system = indexes.CharField(
+        model_attr='eeg_electrode_localization_system__eeg_setting'
+    )
+    electrode_model = indexes.CharField(model_attr='electrode_model__id')
+
+    def get_model(self):
+        return EEGElectrodePosition
+
+    def index_queryset(self, using=None):
+        experiments = Experiment.lastversion_objects.filter(
+            status=Experiment.APPROVED
+        )
+        eeg_settings = EEGSetting.objects.filter(experiment__in=experiments)
+        eeg_electrode_localization_systems = \
+            EEGElectrodeLocalizationSystem.objects.filter(
+                eeg_setting__in=eeg_settings
+            )
+        return self.get_model().objects.filter(
+            eeg_electrode_localization_system__in
+            =eeg_electrode_localization_systems
         )
 
 
