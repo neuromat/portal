@@ -817,12 +817,14 @@ def create_questionnaire(qtty, code, group):
     testing)
     :param group: Group model instance
     """
+    faker = Factory.create()
 
     for i in range(qtty):
         Questionnaire.objects.create(
             code=code,
             group=group, order=randint(1, 10),
             identification='questionnaire',
+            numeration=faker.ssn(),
             type=Step.QUESTIONNAIRE,
         )
 

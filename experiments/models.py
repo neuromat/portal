@@ -628,7 +628,9 @@ def context_tree_delete(instance, **kwargs):
     instance.setting_file.delete(save=False)
 
 
-class Step(models.Model):  # not indexed for search (parent)
+# indexed for search (despite being parent, some children has only its
+# attributes besides on or other foreign key)
+class Step(models.Model):
     BLOCK = 'block'
     INSTRUCTION = 'instruction'
     PAUSE = 'pause'
@@ -679,7 +681,8 @@ class Step(models.Model):  # not indexed for search (parent)
         return self.type
 
 
-class StepAdditionalFile(models.Model):  # not indexed for search
+# not indexed for search (indexed Step)
+class StepAdditionalFile(models.Model):
     step = models.ForeignKey(Step, related_name="step_additional_files")
     file = models.FileField(upload_to='uploads/%Y/%m/%d/')
 
@@ -717,7 +720,7 @@ class QuestionnaireLanguage(models.Model):  # indexed for search
         unique_together = ('questionnaire', 'language_code')
 
 
-class QuestionnaireDefaultLanguage(models.Model):  # indexed for search
+class QuestionnaireDefaultLanguage(models.Model):  # not indexed for search
     questionnaire = models.OneToOneField(Questionnaire, related_name='questionnaire_default_language')
     questionnaire_language = models.ForeignKey(QuestionnaireLanguage)
 
@@ -764,7 +767,7 @@ class TaskForTheExperimenter(Step):  # not indexed for search (indexed Step)
     pass
 
 
-class SetOfStep(Step):  # not indexed for search
+class SetOfStep(Step):  # not indexed for search (indexed Step)
     number_of_mandatory_steps = models.IntegerField(null=True, blank=True)
     is_sequential = models.BooleanField(default=False)
 

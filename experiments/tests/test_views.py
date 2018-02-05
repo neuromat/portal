@@ -559,6 +559,18 @@ class SearchTest(TestCase):
         # because in search results templates it's '<tr class ...>'
         self.assertContains(response, '<tr', 3)
 
+    def test_search_step_returns_correct_objects(self):
+        search_text = 'schritt'
+        test_search.SearchTest().create_objects_to_test_search_step()
+        for step in Step.objects.all():
+            step.identification = search_text
+            step.save()
+        self.haystack_index('rebuild_index')
+        # TODO: it was craeted a total of 4 steps in global_setup_ut(). So,
+        # TODO: we add those to our checking. Eliminate global_setup_ut() and
+        # TODO: make model instances created by demand in each test.
+        self.check_matches_on_response(7, search_text)
+
     def test_search_stimulus_step_returns_correct_objects(self):
         test_search.SearchTest().create_objects_to_test_search_stimulus_step()
         self.haystack_index('rebuild_index')
