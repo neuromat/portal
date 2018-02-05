@@ -24,7 +24,8 @@ from experiments.models import Experiment, Study, Group, Researcher, \
     EMGElectrodePlacement, EEGElectrodeNet, EEGSolution, EEGFilterSetting, \
     EMGDigitalFilterSetting, ElectrodeModel, EMGElectrodeSetting, \
     EMGElectrodePlacementSetting, EMGSurfacePlacement, \
-    EMGIntramuscularPlacement, EMGNeedlePlacement, EEGElectrodePosition
+    EMGIntramuscularPlacement, EMGNeedlePlacement, EEGElectrodePosition, \
+    SurfaceElectrode
 from experiments.views import _get_q_default_language_or_first
 
 
@@ -446,7 +447,10 @@ def create_emg_electrode_placement_setting(emg_electrode_setting,
 
 def create_eeg_electrode_position(eeg_electrode_localization_system,
                                   electrode_model):
+    faker = Factory.create()
+
     return EEGElectrodePosition.objects.create(
+        name=faker.word(),
         eeg_electrode_localization_system=eeg_electrode_localization_system,
         electrode_model=electrode_model,
         channel_index=13
@@ -705,6 +709,23 @@ def create_electrode_model():
         inter_electrode_distance_unit='cm',
         electrode_configuration_name=faker.word(),
         electrode_type=choice(['surface', 'intramuscular', 'needle'])
+    )
+
+
+def create_surface_electrode():
+    faker = Factory.create()
+
+    return SurfaceElectrode.objects.create(
+        name=faker.word(), description=faker.text(), material=faker.word(),
+        usability=choice(ElectrodeModel.USABILITY_TYPES)[1], impedance=13,
+        impedance_unit='ohm', inter_electrode_distance=13,
+        inter_electrode_distance_unit='cm',
+        electrode_configuration_name=faker.word(),
+        electrode_type=choice(ElectrodeModel.ELECTRODE_TYPES)[1],
+        conduction_type=choice(SurfaceElectrode.CONDUCTION_TYPES)[1],
+        electrode_mode=choice(SurfaceElectrode.MODE_OPTIONS)[1],
+        electrode_shape_name=faker.word(), electrode_shape_measure_value=13,
+        electrode_shape_measure_unit='cm2'
     )
 
 

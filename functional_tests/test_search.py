@@ -8,7 +8,7 @@ from experiments.models import Study, Experiment, Group, Step, EMGSetting, \
     GoalkeeperGame, ContextTree, EEGSetting, Stimulus, GenericDataCollection, \
     EMGElectrodePlacementSetting, EMGElectrodePlacement, EMGSurfacePlacement, \
     EMGIntramuscularPlacement, EMGNeedlePlacement, EEGElectrodePosition, \
-    ElectrodeModel
+    ElectrodeModel, SurfaceElectrode
 from experiments.tests.tests_helper import create_experiment, \
     create_emg_setting, create_group, create_goalkeepergame_step, \
     create_context_tree, create_eeg_setting, create_eeg_electrodenet, \
@@ -19,7 +19,7 @@ from experiments.tests.tests_helper import create_experiment, \
     create_emg_electrode_setting, create_emg_electrode_placement, \
     create_emg_electrode_placement_setting, create_emg_surface_placement, \
     create_emg_intramuscular_placement, create_emg_needle_placement, \
-    create_eeg_electrode_position
+    create_eeg_electrode_position, create_surface_electrode
 from functional_tests.base import FunctionalTest
 
 import time
@@ -163,6 +163,9 @@ class SearchTest(FunctionalTest):
             create_eeg_electrode_localization_system(eeg_setting)
         if type == 'electrode_model':
             electrode_model = create_electrode_model()
+        elif type == 'surface_electrode':
+            electrode_model = create_surface_electrode()
+
         create_eeg_electrode_position(
             eeg_electrode_localization_system, electrode_model
         )
@@ -1236,6 +1239,24 @@ class SearchTest(FunctionalTest):
         # TODO: the assertion inside this method is passing when it
         # TODO: wouldn't. Apparenttly the result come with empty string.
         # TODO: Verify!
-        self.check_matches(
-            1, 'eeg_electrode_position-matches', search_text
+        self.check_matches(1, 'eeg_electrode_position-matches', search_text)
+
+    def test_search_eeg_electrode_position_returns_correct_related_objects_2(
+            self):
+        search_text = 'oberflächenelektrode'
+        self.create_objects_to_test_search_eegelectrodeposition(
+            'surface_electrode'
         )
+        # TODO: should test for all attributes
+        for surface_electrode in SurfaceElectrode.objects.all():
+            surface_electrode.electrode_shape_name = search_text
+            surface_electrode.save()
+
+        self.haystack_index('rebuild_index')
+
+        # Joselina wants to search for a given surface electrode
+        self.search_for(search_text)
+
+        # As there are one surface electrode with that string, she sees one
+        # result
+        self.check_matches(1, 'eeg_electrode_position-matches', search_text)

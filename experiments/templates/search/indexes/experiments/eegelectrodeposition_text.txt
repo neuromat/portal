@@ -6,3 +6,6 @@
 {{ object.electrode_model.usability }}
 {{ object.electrode_model.electrode_configuration_name }}
 {{ object.electrode_model.electrode_type }}
+{{ object.electrode_model.surfaceelectrode.conduction_type }}
+{{ object.electrode_model.surfaceelectrode.electrode_mode }}
+{{ object.electrode_model.surfaceelectrode.electrode_shape_name }}

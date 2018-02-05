@@ -15,7 +15,7 @@
             <br><br>
         </h5>
         <strong>{% trans "name" %}: </strong>
-            {% highlight result.object.name with query %}&nbsp;
+        {% highlight result.object.name with query %}&nbsp;
         {% if result.object.coordinate_x %}
             <strong>{% trans "coordinate x" %}: </strong>
             {% highlight result.object.coordinate_x with query %}&nbsp;
@@ -49,6 +49,26 @@
         {% if result.object.electrode_model.electrode_type %}
             <strong>{% trans "electrode type" %}: </strong>
             {% highlight result.object.electrode_model.electrode_type with query %}&nbsp;
+        {% endif %}
+        {% if result.object.electrode_model.surfaceelectrode.conduction_type %}
+            <strong>{% trans "conduction type" %}: </strong>
+            {% highlight result.object.electrode_model.surfaceelectrode.conduction_type with query %}&nbsp;
+        {% endif %}
+        {% if result.object.electrode_model.surfaceelectrode.electrode_mode %}
+            <strong>{% trans "electrode mode" %}: </strong>
+            {% highlight result.object.electrode_model.surfaceelectrode.electrode_mode with query %}&nbsp;
+        {% endif %}
+        {% if result.object.electrode_model.surfaceelectrode.electrode_shape_name %}
+            <strong>{% trans "electrode shape name" %}: </strong>
+            {% highlight result.object.electrode_model.surfaceelectrode.electrode_shape_name with query %}&nbsp;
+        {% endif %}
+        {% if result.object.electrode_model.surfaceelectrode.electrode_shape_measure_value %}
+            <strong>{% trans "electrode shape measure value" %}: </strong>
+            {% highlight result.object.electrode_model.surfaceelectrode.electrode_shape_measure_value with query %}&nbsp;
+        {% endif %}
+        {% if result.object.electrode_model.surfaceelectrode.electrode_shape_measure_unit %}
+            <strong>{% trans "electrode shape measure unit" %}: </strong>
+            {% highlight result.object.electrode_model.surfaceelectrode.electrode_shape_measure_unit with query %}&nbsp;
         {% endif %}
     </td>
 </tr>

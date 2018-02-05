@@ -20,7 +20,8 @@ from experiments import views
 from experiments.forms import ChangeSlugForm
 from experiments.models import Experiment, Step, Questionnaire, \
     QuestionnaireDefaultLanguage, QuestionnaireLanguage, Group, ContextTree, \
-    EEGSetting, EMGSetting, EEGElectrodePosition, ElectrodeModel
+    EEGSetting, EMGSetting, EEGElectrodePosition, ElectrodeModel, \
+    SurfaceElectrode
 from experiments.tests.tests_helper import apply_setup, global_setup_ut, \
     create_experiment_related_objects, \
     create_download_dir_structure_and_files, \
@@ -597,6 +598,20 @@ class SearchTest(TestCase):
         for electrode_model in ElectrodeModel.objects.all():
             electrode_model.name = search_text
             electrode_model.save()
+        self.haystack_index('rebuild_index')
+        self.check_matches_on_response(1, search_text)
+
+    def test_search_eeg_electrode_position_returns_correct_related_objects_2(self):
+        search_text = 'oberflächenelektrode'
+        test_search.SearchTest(
+        ).create_objects_to_test_search_eegelectrodeposition(
+            'surface_electrode'
+        )
+
+        # TODO: should test for all attributes
+        for surface_electrode in SurfaceElectrode.objects.all():
+            surface_electrode.name = search_text
+            surface_electrode.save()
         self.haystack_index('rebuild_index')
         self.check_matches_on_response(1, search_text)
 
