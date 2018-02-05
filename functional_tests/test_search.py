@@ -8,7 +8,7 @@ from experiments.models import Study, Experiment, Group, Step, EMGSetting, \
     GoalkeeperGame, ContextTree, EEGSetting, Stimulus, GenericDataCollection, \
     EMGElectrodePlacementSetting, EMGElectrodePlacement, EMGSurfacePlacement, \
     EMGIntramuscularPlacement, EMGNeedlePlacement, EEGElectrodePosition, \
-    ElectrodeModel, SurfaceElectrode
+    ElectrodeModel, SurfaceElectrode, IntramuscularElectrode
 from experiments.tests.tests_helper import create_experiment, \
     create_emg_setting, create_group, create_goalkeepergame_step, \
     create_context_tree, create_eeg_setting, create_eeg_electrodenet, \
@@ -19,7 +19,8 @@ from experiments.tests.tests_helper import create_experiment, \
     create_emg_electrode_setting, create_emg_electrode_placement, \
     create_emg_electrode_placement_setting, create_emg_surface_placement, \
     create_emg_intramuscular_placement, create_emg_needle_placement, \
-    create_eeg_electrode_position, create_surface_electrode
+    create_eeg_electrode_position, create_surface_electrode, \
+    create_intramuscular_electrode
 from functional_tests.base import FunctionalTest
 
 import time
@@ -165,6 +166,8 @@ class SearchTest(FunctionalTest):
             electrode_model = create_electrode_model()
         elif type == 'surface_electrode':
             electrode_model = create_surface_electrode()
+        elif type == 'intramuscular_electrode':
+            electrode_model = create_intramuscular_electrode()
 
         create_eeg_electrode_position(
             eeg_electrode_localization_system, electrode_model
@@ -1259,4 +1262,23 @@ class SearchTest(FunctionalTest):
 
         # As there are one surface electrode with that string, she sees one
         # result
+        self.check_matches(1, 'eeg_electrode_position-matches', search_text)
+
+    def test_search_eeg_electrode_position_returns_correct_related_objects_3(self):
+        search_text = 'intramuskuläre'
+        self.create_objects_to_test_search_eegelectrodeposition(
+            'intramuscular_electrode'
+        )
+        # TODO: should test for all attributes
+        for intramuscular_electrode in IntramuscularElectrode.objects.all():
+            intramuscular_electrode.strand = search_text
+            intramuscular_electrode.save()
+
+        self.haystack_index('rebuild_index')
+
+        # Joselina wants to search for a given intramuscular electrode
+        self.search_for(search_text)
+
+        # As there are one intramuscular electrode with that string, she sees
+        # one result
         self.check_matches(1, 'eeg_electrode_position-matches', search_text)

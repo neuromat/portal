@@ -25,7 +25,7 @@ from experiments.models import Experiment, Study, Group, Researcher, \
     EMGDigitalFilterSetting, ElectrodeModel, EMGElectrodeSetting, \
     EMGElectrodePlacementSetting, EMGSurfacePlacement, \
     EMGIntramuscularPlacement, EMGNeedlePlacement, EEGElectrodePosition, \
-    SurfaceElectrode
+    SurfaceElectrode, IntramuscularElectrode
 from experiments.views import _get_q_default_language_or_first
 
 
@@ -717,15 +717,32 @@ def create_surface_electrode():
 
     return SurfaceElectrode.objects.create(
         name=faker.word(), description=faker.text(), material=faker.word(),
-        usability=choice(ElectrodeModel.USABILITY_TYPES)[1], impedance=13,
+        usability=choice(ElectrodeModel.USABILITY_TYPES)[0], impedance=13,
         impedance_unit='ohm', inter_electrode_distance=13,
         inter_electrode_distance_unit='cm',
         electrode_configuration_name=faker.word(),
-        electrode_type=choice(ElectrodeModel.ELECTRODE_TYPES)[1],
-        conduction_type=choice(SurfaceElectrode.CONDUCTION_TYPES)[1],
-        electrode_mode=choice(SurfaceElectrode.MODE_OPTIONS)[1],
+        electrode_type=choice(ElectrodeModel.ELECTRODE_TYPES)[0],
+        conduction_type=choice(SurfaceElectrode.CONDUCTION_TYPES)[0],
+        electrode_mode=choice(SurfaceElectrode.MODE_OPTIONS)[0],
         electrode_shape_name=faker.word(), electrode_shape_measure_value=13,
         electrode_shape_measure_unit='cm2'
+    )
+
+
+def create_intramuscular_electrode():
+    faker = Factory.create()
+
+    return IntramuscularElectrode.objects.create(
+        name=faker.word(), description=faker.text(), material=faker.word(),
+        usability=choice(ElectrodeModel.USABILITY_TYPES)[0], impedance=13,
+        impedance_unit='ohm', inter_electrode_distance=13,
+        inter_electrode_distance_unit='cm',
+        electrode_configuration_name=faker.word(),
+        electrode_type=choice(ElectrodeModel.ELECTRODE_TYPES)[0],
+        strand=choice(IntramuscularElectrode.STRAND_TYPES)[0],
+        insulation_material_name=faker.word(),
+        insulation_material_description=faker.text(),
+        length_of_exposed_tip=21
     )
 
 

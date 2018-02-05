@@ -402,7 +402,9 @@ class IntramuscularElectrode(ElectrodeModel):
         ("multi", "Multi"),
     )
     strand = models.CharField(max_length=20, choices=STRAND_TYPES)
-    insulation_material_name = models.CharField(max_length=150, null=True, blank=True)
+    insulation_material_name = models.CharField(
+        max_length=150, null=True, blank=True
+    )
     insulation_material_description = models.TextField(null=True, blank=True)
     length_of_exposed_tip = models.FloatField(null=True, blank=True)
 

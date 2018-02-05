@@ -9,3 +9,6 @@
 {{ object.electrode_model.surfaceelectrode.conduction_type }}
 {{ object.electrode_model.surfaceelectrode.electrode_mode }}
 {{ object.electrode_model.surfaceelectrode.electrode_shape_name }}
+{{ object.electrode_model.intramuscularelectrode.strand }}
+{{ object.electrode_model.intramuscularelectrode.insulation_material_name }}
+{{ object.electrode_model.intramuscularelectrode.insulation_material_description }}

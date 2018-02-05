@@ -70,5 +70,19 @@
             <strong>{% trans "electrode shape measure unit" %}: </strong>
             {% highlight result.object.electrode_model.surfaceelectrode.electrode_shape_measure_unit with query %}&nbsp;
         {% endif %}
+        {% if result.object.electrode_model.intramuscularelectrode.strand %}
+            <strong>{% trans "intramuscular electrode strand" %}: </strong>
+            {% highlight result.object.electrode_model.intramuscularelectrode.strand with query %}&nbsp;
+        {% endif %}
+        {% if result.object.electrode_model.intramuscularelectrode.insulation_material_name %}
+            <strong>
+                {% trans "intramuscular electrode insulation material name" %}: </strong>
+            {% highlight result.object.electrode_model.intramuscularelectrode.insulation_material_name with query %}&nbsp;
+        {% endif %}
+        {% if result.object.electrode_model.intramuscularelectrode.insulation_material_description %}
+            <strong>
+                {% trans "intramuscular electrode insulation material description" %}: </strong>
+            {% highlight result.object.electrode_model.intramuscularelectrode.insulation_material_description with query %}&nbsp;
+        {% endif %}
     </td>
 </tr>

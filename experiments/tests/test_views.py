@@ -21,7 +21,7 @@ from experiments.forms import ChangeSlugForm
 from experiments.models import Experiment, Step, Questionnaire, \
     QuestionnaireDefaultLanguage, QuestionnaireLanguage, Group, ContextTree, \
     EEGSetting, EMGSetting, EEGElectrodePosition, ElectrodeModel, \
-    SurfaceElectrode
+    SurfaceElectrode, IntramuscularElectrode
 from experiments.tests.tests_helper import apply_setup, global_setup_ut, \
     create_experiment_related_objects, \
     create_download_dir_structure_and_files, \
@@ -612,6 +612,20 @@ class SearchTest(TestCase):
         for surface_electrode in SurfaceElectrode.objects.all():
             surface_electrode.name = search_text
             surface_electrode.save()
+        self.haystack_index('rebuild_index')
+        self.check_matches_on_response(1, search_text)
+
+    def test_search_eeg_electrode_position_returns_correct_related_objects_3(self):
+        search_text = 'intramuskuläre'
+        test_search.SearchTest(
+        ).create_objects_to_test_search_eegelectrodeposition(
+            'intramuscular_electrode'
+        )
+
+        # TODO: should test for all attributes
+        for intramuscular_electrode in IntramuscularElectrode.objects.all():
+            intramuscular_electrode.strand = search_text
+            intramuscular_electrode.save()
         self.haystack_index('rebuild_index')
         self.check_matches_on_response(1, search_text)
 
