@@ -1,0 +1,4 @@
+{{ object.identification }}
+{{ object.description }}
+{{ object.text }}
+{{ object.group }}

@@ -20,7 +20,8 @@ from experiments import views
 from experiments.forms import ChangeSlugForm
 from experiments.models import Experiment, Step, Questionnaire, \
     QuestionnaireDefaultLanguage, QuestionnaireLanguage, Group, ContextTree, \
-    EEGSetting, EMGSetting, EEGElectrodePosition, ElectrodeModel
+    EEGSetting, EMGSetting, EEGElectrodePosition, ElectrodeModel, \
+    SurfaceElectrode, IntramuscularElectrode, Instruction
 from experiments.tests.tests_helper import apply_setup, global_setup_ut, \
     create_experiment_related_objects, \
     create_download_dir_structure_and_files, \
@@ -558,10 +559,32 @@ class SearchTest(TestCase):
         # because in search results templates it's '<tr class ...>'
         self.assertContains(response, '<tr', 3)
 
+    def test_search_step_returns_correct_objects(self):
+        search_text = 'schritt'
+        test_search.SearchTest().create_objects_to_test_search_step()
+        for step in Step.objects.all():
+            step.identification = search_text
+            step.save()
+        self.haystack_index('rebuild_index')
+        # TODO: it was craeted a total of 4 steps in global_setup_ut(). So,
+        # TODO: we add those to our checking. Eliminate global_setup_ut() and
+        # TODO: make model instances created by demand in each test.
+        self.check_matches_on_response(7, search_text)
+
     def test_search_stimulus_step_returns_correct_objects(self):
         test_search.SearchTest().create_objects_to_test_search_stimulus_step()
         self.haystack_index('rebuild_index')
         self.check_matches_on_response(3, 'stimulusschritt')
+
+    def test_search_instruction_step_returns_correct_objects(self):
+        search_text = 'anweisungsschritt'
+        test_search.SearchTest().\
+            create_objects_to_test_search_instruction_step()
+        for instruction_step in Instruction.objects.all():
+            instruction_step.text = search_text
+            instruction_step.save()
+        self.haystack_index('rebuild_index')
+        self.check_matches_on_response(3, search_text)
 
     def test_search_genericdatacollection_step_returns_correct_objects(self):
         test_search.SearchTest().\
@@ -597,6 +620,34 @@ class SearchTest(TestCase):
         for electrode_model in ElectrodeModel.objects.all():
             electrode_model.name = search_text
             electrode_model.save()
+        self.haystack_index('rebuild_index')
+        self.check_matches_on_response(1, search_text)
+
+    def test_search_eeg_electrode_position_returns_correct_related_objects_2(self):
+        search_text = 'oberflächenelektrode'
+        test_search.SearchTest(
+        ).create_objects_to_test_search_eegelectrodeposition(
+            'surface_electrode'
+        )
+
+        # TODO: should test for all attributes
+        for surface_electrode in SurfaceElectrode.objects.all():
+            surface_electrode.name = search_text
+            surface_electrode.save()
+        self.haystack_index('rebuild_index')
+        self.check_matches_on_response(1, search_text)
+
+    def test_search_eeg_electrode_position_returns_correct_related_objects_3(self):
+        search_text = 'intramuskuläre'
+        test_search.SearchTest(
+        ).create_objects_to_test_search_eegelectrodeposition(
+            'intramuscular_electrode'
+        )
+
+        # TODO: should test for all attributes
+        for intramuscular_electrode in IntramuscularElectrode.objects.all():
+            intramuscular_electrode.strand = search_text
+            intramuscular_electrode.save()
         self.haystack_index('rebuild_index')
         self.check_matches_on_response(1, search_text)
 
