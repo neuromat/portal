@@ -25,7 +25,7 @@ from experiments.models import Experiment, Study, Group, Researcher, \
     EMGDigitalFilterSetting, ElectrodeModel, EMGElectrodeSetting, \
     EMGElectrodePlacementSetting, EMGSurfacePlacement, \
     EMGIntramuscularPlacement, EMGNeedlePlacement, EEGElectrodePosition, \
-    SurfaceElectrode, IntramuscularElectrode
+    SurfaceElectrode, IntramuscularElectrode, Instruction
 from experiments.views import _get_q_default_language_or_first
 
 
@@ -462,13 +462,29 @@ def create_stimulus_step(group):
     :param group: Group model instance
     :return: Stimulus model instance
     """
-    fake = Factory.create()
+    faker = Factory.create()
 
     return Stimulus.objects.create(
         group=group,
-        identification=fake.word(), numeration=fake.ssn(),
+        identification=faker.word(), numeration=faker.ssn(),
         type=Step.STIMULUS, order=randint(1, 20),
-        stimulus_type_name=fake.word()
+        stimulus_type_name=faker.word()
+    )
+
+
+def create_instruction_step(group):
+    faker = Factory.create()
+
+    return Instruction.objects.create(
+        group=group,
+        identification=faker.word(), description=faker.text(),
+        numeration=faker.ssn(), duration_value=randint(1, 20),
+        duration_unit='min', order=randint(1, 20),
+        number_of_repetitions=randint(1, 3),
+        interval_between_repetitions_value=randint(3, 8),
+        interval_between_repetitions_unit='min',
+        random_position=choice([True, False]), type=Step.INSTRUCTION,
+        text=faker.text()
     )
 
 

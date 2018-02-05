@@ -21,7 +21,7 @@ from experiments.forms import ChangeSlugForm
 from experiments.models import Experiment, Step, Questionnaire, \
     QuestionnaireDefaultLanguage, QuestionnaireLanguage, Group, ContextTree, \
     EEGSetting, EMGSetting, EEGElectrodePosition, ElectrodeModel, \
-    SurfaceElectrode, IntramuscularElectrode
+    SurfaceElectrode, IntramuscularElectrode, Instruction
 from experiments.tests.tests_helper import apply_setup, global_setup_ut, \
     create_experiment_related_objects, \
     create_download_dir_structure_and_files, \
@@ -563,6 +563,16 @@ class SearchTest(TestCase):
         test_search.SearchTest().create_objects_to_test_search_stimulus_step()
         self.haystack_index('rebuild_index')
         self.check_matches_on_response(3, 'stimulusschritt')
+
+    def test_search_instruction_step_returns_correct_objects(self):
+        search_text = 'anweisungsschritt'
+        test_search.SearchTest().\
+            create_objects_to_test_search_instruction_step()
+        for instruction_step in Instruction.objects.all():
+            instruction_step.text = search_text
+            instruction_step.save()
+        self.haystack_index('rebuild_index')
+        self.check_matches_on_response(3, search_text)
 
     def test_search_genericdatacollection_step_returns_correct_objects(self):
         test_search.SearchTest().\

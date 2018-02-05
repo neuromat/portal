@@ -265,18 +265,27 @@ class EEGSetting(ExperimentSetting):  # indexed for search
     pass
 
 
-class Amplifier(Equipment):  # not indexed for search
+# not indexed for search (objects that has ForeignKey for this model don't
+# have text type attributes)
+class Amplifier(Equipment):
     gain = models.FloatField(null=True, blank=True)
     number_of_channels = models.IntegerField(null=True, blank=True)
     common_mode_rejection_ratio = models.FloatField(null=True, blank=True)
     input_impedance = models.FloatField(null=True, blank=True)
     input_impedance_unit = models.CharField(null=True, blank=True, max_length=15)
-    amplifier_detection_type_name = models.CharField(null=True, blank=True, max_length=150)
-    tethering_system_name = models.CharField(null=True, blank=True, max_length=150)
+    amplifier_detection_type_name = models.CharField(
+        null=True, blank=True, max_length=150
+    )
+    tethering_system_name = models.CharField(
+        null=True, blank=True, max_length=150
+    )
 
 
-class EEGAmplifierSetting(models.Model):  # not indexed for search
-    eeg_setting = models.OneToOneField(EEGSetting, primary_key=True, related_name='eeg_amplifier_setting')
+# not indexed for search (no text type attributes)
+class EEGAmplifierSetting(models.Model):
+    eeg_setting = models.OneToOneField(
+        EEGSetting, primary_key=True, related_name='eeg_amplifier_setting'
+    )
     eeg_amplifier = models.ForeignKey(Amplifier)
     gain = models.FloatField(null=True, blank=True)
     sampling_rate = models.FloatField(null=True, blank=True)
@@ -360,7 +369,7 @@ class ElectrodeModel(models.Model):  # indexed for search (as foreing key)
         return self.name
 
 
-class SurfaceElectrode(ElectrodeModel):
+class SurfaceElectrode(ElectrodeModel):  # indexed for search
     CONDUCTION_TYPES = (
         ("gelled", "Gelled"),
         ("dry", "Dry"),
@@ -396,7 +405,7 @@ class EEGElectrodePosition(models.Model):  # indexed for search
     channel_index = models.IntegerField()
 
 
-class IntramuscularElectrode(ElectrodeModel):
+class IntramuscularElectrode(ElectrodeModel):  # indexed for search
     STRAND_TYPES = (
         ("single", "Single"),
         ("multi", "Multi"),
@@ -409,15 +418,21 @@ class IntramuscularElectrode(ElectrodeModel):
     length_of_exposed_tip = models.FloatField(null=True, blank=True)
 
 
-class NeedleElectrode(ElectrodeModel):
+class NeedleElectrode(ElectrodeModel):  # not indexed for search
     SIZE_UNIT = (
         ("mm", "millimeter(s)"),
         ("cm", "centimeter(s)"),
     )
     size = models.FloatField(null=True, blank=True)
-    size_unit = models.CharField(max_length=10, choices=SIZE_UNIT, null=True, blank=True)
-    number_of_conductive_contact_points_at_the_tip = models.IntegerField(null=True, blank=True)
-    size_of_conductive_contact_points_at_the_tip = models.FloatField(null=True, blank=True)
+    size_unit = models.CharField(
+        max_length=10, choices=SIZE_UNIT, null=True, blank=True
+    )
+    number_of_conductive_contact_points_at_the_tip = models.IntegerField(
+        null=True, blank=True
+    )
+    size_of_conductive_contact_points_at_the_tip = models.FloatField(
+        null=True, blank=True
+    )
 
 
 class EMGSetting(ExperimentSetting):  # indexed for search
@@ -449,7 +464,8 @@ class EMGADConverterSetting(models.Model):  # not indexed for search
     sampling_rate = models.FloatField(null=True, blank=True)
 
 
-class EMGElectrodeSetting(models.Model):  # not indexed for search
+# not indexed for search (only foreign keys)
+class EMGElectrodeSetting(models.Model):
     emg_setting = models.ForeignKey(
         EMGSetting, related_name='emg_electrode_settings'
     )
@@ -483,9 +499,12 @@ class EMGAmplifierSetting(models.Model):  # not indexed for search
     gain = models.FloatField(null=True, blank=True)
 
 
-class EMGAnalogFilterSetting(models.Model):  # not indexed for search
-    emg_amplifier_setting = models.OneToOneField(EMGAmplifierSetting,
-                                                 primary_key=True, related_name='emg_analog_filter_setting')
+# not indexed for search (only foreign key and number attributes)
+class EMGAnalogFilterSetting(models.Model):
+    emg_amplifier_setting = models.OneToOneField(
+        EMGAmplifierSetting, primary_key=True,
+        related_name='emg_analog_filter_setting'
+    )
     low_pass = models.FloatField(null=True, blank=True)
     high_pass = models.FloatField(null=True, blank=True)
     low_band_pass = models.FloatField(null=True, blank=True)
@@ -609,7 +628,7 @@ def context_tree_delete(instance, **kwargs):
     instance.setting_file.delete(save=False)
 
 
-class Step(models.Model):  # not indexed for search
+class Step(models.Model):  # not indexed for search (parent)
     BLOCK = 'block'
     INSTRUCTION = 'instruction'
     PAUSE = 'pause'
@@ -703,7 +722,7 @@ class QuestionnaireDefaultLanguage(models.Model):  # indexed for search
     questionnaire_language = models.ForeignKey(QuestionnaireLanguage)
 
 
-class Instruction(Step):  # not indexed for search (indexed Step)
+class Instruction(Step):  # indexed for search
     text = models.TextField(null=False, blank=False)
 
 

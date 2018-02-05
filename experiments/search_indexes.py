@@ -7,7 +7,7 @@ from experiments.models import Experiment, Study, Group, \
     ContextTree, EEGElectrodeNet, EEGSolution, EEGFilterSetting, \
     EEGElectrodeLocalizationSystem, EMGDigitalFilterSetting, Stimulus, \
     GenericDataCollection, EMGElectrodePlacementSetting, EMGElectrodeSetting, \
-    EEGElectrodePosition
+    EEGElectrodePosition, Instruction
 
 
 class ExperimentIndex(indexes.SearchIndex, indexes.Indexable):
@@ -111,6 +111,12 @@ class StimulusIndex(StepIndex):
 
     def get_model(self):
         return Stimulus
+
+
+class InstructionIndex(StepIndex):
+
+    def get_model(self):
+        return Instruction
 
 
 class GenericDataCollectionIndex(StepIndex):

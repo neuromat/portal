@@ -8,7 +8,7 @@ from experiments.models import Study, Experiment, Group, Step, EMGSetting, \
     GoalkeeperGame, ContextTree, EEGSetting, Stimulus, GenericDataCollection, \
     EMGElectrodePlacementSetting, EMGElectrodePlacement, EMGSurfacePlacement, \
     EMGIntramuscularPlacement, EMGNeedlePlacement, EEGElectrodePosition, \
-    ElectrodeModel, SurfaceElectrode, IntramuscularElectrode
+    ElectrodeModel, SurfaceElectrode, IntramuscularElectrode, Instruction
 from experiments.tests.tests_helper import create_experiment, \
     create_emg_setting, create_group, create_goalkeepergame_step, \
     create_context_tree, create_eeg_setting, create_eeg_electrodenet, \
@@ -20,7 +20,7 @@ from experiments.tests.tests_helper import create_experiment, \
     create_emg_electrode_placement_setting, create_emg_surface_placement, \
     create_emg_intramuscular_placement, create_emg_needle_placement, \
     create_eeg_electrode_position, create_surface_electrode, \
-    create_intramuscular_electrode
+    create_intramuscular_electrode, create_instruction_step
 from functional_tests.base import FunctionalTest
 
 import time
@@ -85,6 +85,17 @@ class SearchTest(FunctionalTest):
         for stimulus_step in Stimulus.objects.all():
             stimulus_step.stimulus_type_name = 'stimulusschritt'
             stimulus_step.save()
+
+    @staticmethod
+    def create_objects_to_test_search_instruction_step():
+        experiment1 = create_experiment(1, status=Experiment.APPROVED)
+        group1 = create_group(1, experiment1)
+        group2 = create_group(1, experiment1)
+        create_instruction_step(group1)
+        create_instruction_step(group2)
+        experiment2 = create_experiment(1, status=Experiment.APPROVED)
+        group = create_group(1, experiment2)
+        create_instruction_step(group)
 
     @staticmethod
     def create_objects_to_test_search_genericdatacollection_step():
@@ -1060,6 +1071,22 @@ class SearchTest(FunctionalTest):
         # groups of one experiment, and one from other group of another
         # experiment, she sees three results
         self.check_matches(3, 'stimulus_step-matches', 'stimulusschritt')
+
+    def test_search_instruction_step_returns_correct_objects(self):
+        search_text = 'anweisungsschritt'
+        self.create_objects_to_test_search_instruction_step()
+        for instruction_step in Instruction.objects.all():
+            instruction_step.text = search_text
+            instruction_step.save()
+        self.haystack_index('rebuild_index')
+
+        # Joselina wants to search for a given stimulus step
+        self.search_for(search_text)
+
+        # As there are three instruction steps with that string, two from
+        # groups of one experiment, and one from other group of another
+        # experiment, she sees three results
+        self.check_matches(3, 'instruction_step-matches', search_text)
 
     def test_search_genericdatacollection_step_returns_correct_objects(self):
         self.create_objects_to_test_search_genericdatacollection_step()
