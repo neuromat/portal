@@ -413,6 +413,8 @@ class ChangeExperimentSlugTest(TestCase):
             )
 
     def test_POSTing_empty_slug_returns_error_message(self):
+        # TODO: we want to display message as errors in form not as normal
+        # TODO: messages
         experiment_before = Experiment.objects.first()
 
         response = self.client.post(
@@ -427,6 +429,26 @@ class ChangeExperimentSlugTest(TestCase):
         self.assertEqual(
             message.message,
             'Empty slugs is not allowed. Please enter a valid slug'
+        )
+        self.assertEqual(message.tags, "error")
+
+    def test_submit_non_unique_slug_displays_error_message(self):
+        # TODO: we want to display message as errors in form not as normal
+        # TODO: messages; make test in test_forms too
+        experiment_before = Experiment.objects.first()
+        other_experiment = create_experiment(1)
+        response = self.client.post(
+            '/experiments/' + str(experiment_before.id) + '/change_slug/',
+            {'slug': other_experiment.slug}, follow=True
+        )
+        experiment_after = Experiment.objects.first()
+        self.assertEqual(experiment_before.slug, experiment_after.slug)
+
+        message = list(response.context['messages'])[0]
+        self.assertEqual(
+            message.message,
+            'The slug entered is equal to other experiment slug. Please try '
+            'again.'
         )
         self.assertEqual(message.tags, "error")
 

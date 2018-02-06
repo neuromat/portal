@@ -749,6 +749,31 @@ class TrusteeTest(FunctionalTestTrustee):
         submit_button = self.browser.find_element_by_id('submit')
         self.assertEqual('Save', submit_button.get_attribute('value'))
 
+    def test_submit_non_unique_slug_displays_error_message(self):
+        self._setup()
+
+        ##
+        # Get another experiment slug
+        ##
+        other_experiment = Experiment.objects.filter(
+            status=Experiment.TO_BE_ANALYSED
+        ).last()
+
+        # The trustee enter a slug that already exists
+        self.wait_for(
+            lambda: self.browser.find_element_by_id(
+                'id_slug'
+            ).send_keys(other_experiment.slug)
+        )
+        self.browser.find_element_by_id('id_slug').send_keys(Keys.ENTER)
+
+        # The page refreshes telling her that the slug already exists
+        self.wait_for(lambda: self.assertIn(
+            'The slug entered is equal to other experiment slug. Please try '
+            'again.',
+            self.browser.find_element_by_tag_name('body').text
+        ))
+
     def test_submit_empty_slug_displays_error_message(self):
         self._setup()
 
