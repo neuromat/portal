@@ -5,6 +5,7 @@ import tempfile
 
 from django.contrib import messages
 from django.contrib.auth.views import LoginView
+from django.core.exceptions import PermissionDenied
 from django.core.mail import send_mail
 from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import render
@@ -329,6 +330,10 @@ def change_status(request, experiment_id):
 
 
 def change_slug(request, experiment_id):
+
+    if not request.user.has_perm('experiments.change_slug'):
+        raise PermissionDenied
+
     # TODO: move validation logic to ChangeSlugForm form; implement
     # TODO: validation in model too
     experiment = Experiment.objects.get(pk=experiment_id)

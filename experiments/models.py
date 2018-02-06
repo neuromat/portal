@@ -124,6 +124,7 @@ class Experiment(models.Model):  # indexed for search
 
     class Meta:
         unique_together = ('nes_id', 'owner', 'version')
+        permissions = (('change_slug', 'Can change experiment slug'),)
 
     # save slug field if it's first time save
     def save(self, *args, **kwargs):
