@@ -492,7 +492,7 @@ class ChangeExperimentSlugTest(TestCase):
         self.assertEqual(
             message.message,
             'The slug entered is not allowed. Please enter a valid slug. '
-            'Type only letters without accents, numbers, dash, '
+            'Type only lowcase letters without accents, numbers, dash, '
             'and underscore signs'
         )
         self.assertEqual(message.tags, "error")

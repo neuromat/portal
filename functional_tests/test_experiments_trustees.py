@@ -733,8 +733,8 @@ class TrusteeTest(FunctionalTestTrustee):
 
         )
         self.assertIn(
-            'New slug (type only letters without accents, numbers, dash, '
-            'and underscore signs):',
+            'New slug (type only lowcase letters without accents, numbers, '
+            'dash, and underscore signs):',
             modal.text
         )
         self.assertEqual(
@@ -818,7 +818,7 @@ class TrusteeTest(FunctionalTestTrustee):
         # slug is invalid
         self.wait_for(lambda: self.assertIn(
             'The slug entered is not allowed. Please enter a valid slug. '
-            'Type only letters without accents, numbers, dash, '
+            'Type only lowcase letters without accents, numbers, dash, '
             'and underscore signs',
             self.browser.find_element_by_tag_name('body').text
         ))

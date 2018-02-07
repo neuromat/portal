@@ -21,7 +21,7 @@ class ChangeSlugFormTest(TestCase):
     @skip
     def test_form_validation_for_non_unique_slug(self):
         # TODO: resume chapter 15 of Obey The Testing Goat to test for
-        # TODO: non unique slug
+        # TODO: duplicate slug
         create_experiment(1)
         other_experiment = create_experiment(1)
 

@@ -348,7 +348,7 @@ def change_slug(request, experiment_id):
         messages.error(
             request,
             _('The slug entered is not allowed. Please enter a valid slug. '
-              'Type only letters without accents, numbers, dash, '
+              'Type only lowcase letters without accents, numbers, dash, '
               'and underscore signs')
         )
     elif len(new_slug) < 3:
