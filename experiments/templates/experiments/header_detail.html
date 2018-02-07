@@ -6,9 +6,11 @@
         <a href="{% url 'home' %}" class="nep-return"> <span class="glyphicon glyphicon-menu-left"> </span> {% trans "Back Home" %}</a>
     </div>
     <div id="experiment_url">
-        <strong>url:</strong>&nbsp;{{ request.build_absolute_uri }}&nbsp;&nbsp;<a
-            data-toggle="modal"
-            href="#change_url_modal"><i class="fa fa-pencil-square-o" aria-hidden="true"></i></a>
+        <strong>url:</strong>&nbsp;{{ request.build_absolute_uri }}&nbsp;&nbsp;
+        {% load experiment_extras %}
+        {% if user.is_authenticated and user|has_group:'trustees' %}
+            <a data-toggle="modal" href="#change_url_modal"><i class="fa fa-pencil-square-o" aria-hidden="true"></i></a>
+        {% endif %}
     </div>
     <div id="id_detail_description" class="detail-description">{{ experiment.description }}</div>
     {% if experiment.data_acquisition_done %}
@@ -73,10 +75,9 @@
                     <div class="modal-body">
                         <p><strong>Current url:</strong> {{ request.build_absolute_uri }}</p>
                         <p><strong>Current slug:</strong> {{ experiment.slug }}</p>
-                        <p><strong>New slug</strong> (type only letters without accents, numbers, dash, and underscore signs):</p>
+                        <p><strong>New slug</strong> (type only lowcase letters without accents, numbers, dash, and underscore signs):</p>
                         {{ form.slug }}
                         <br>
-{#                        <p>How will the new url be?</p>#}
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>

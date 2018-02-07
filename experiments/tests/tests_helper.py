@@ -150,11 +150,6 @@ def create_trustee_users():
     group.user_set.add(trustee1)
     group.user_set.add(trustee2)
 
-    trustees = list()
-    trustees.append(trustee1)
-    trustees.append(trustee2)
-    return trustees
-
 
 def create_researchers():
     fake = Factory.create()

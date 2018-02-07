@@ -9,7 +9,8 @@ import sys
 import io
 import os
 
-from django.contrib.auth.models import User
+from django.contrib import auth
+from django.contrib.auth.models import User, Permission
 from django.core.management import call_command
 from django.test import TestCase, override_settings
 from django.urls import reverse, resolve
@@ -352,10 +353,15 @@ class ExperimentDetailTest(TestCase):
 class ChangeExperimentSlugTest(TestCase):
 
     def setUp(self):
+        create_trustee_users()
+        group = auth.models.Group.objects.get(name='trustees')
+        permission = Permission.objects.get(codename='change_slug')
+        group.permissions.add(permission)
+
+        trustee_user = User.objects.get(username='claudia')
+        self.client.login(username=trustee_user.username, password='passwd')
+
         create_experiment(1)
-        trustee_users = create_trustee_users()
-        trustee = trustee_users[0]
-        self.client.login(username=trustee.username, password='passwd')
 
     def test_change_slug_url_resolves_to_change_slug_view(self):
         experiment = Experiment.objects.first()
@@ -373,6 +379,23 @@ class ChangeExperimentSlugTest(TestCase):
             {'slug': 'a-brand_new-slug'}
         )
         self.assertEqual(response.status_code, 302)
+
+    def test_cannot_POST_slug_if_not_in_staff(self):
+        # logout from the system, as we alread is logged in in setUp method
+        self.client.logout()
+
+        experiment_before = Experiment.objects.first()
+        new_slug = 'a-brand_new-slug'
+        response = self.client.post(
+            '/experiments/' + str(experiment_before.id) + '/change_slug/',
+            {'slug': new_slug}
+        )
+        self.assertEqual(response.status_code, 403)
+
+        # get the experiment after posting new slug without permission
+        experiment_after = Experiment.objects.first()
+
+        self.assertNotEqual(experiment_after.slug, new_slug)
 
     def test_POSTing_a_valid_first_version_slug_saves_new_slug_correctly(self):
         experiment = Experiment.objects.first()
@@ -413,6 +436,8 @@ class ChangeExperimentSlugTest(TestCase):
             )
 
     def test_POSTing_empty_slug_returns_error_message(self):
+        # TODO: we want to display message as errors in form not as normal
+        # TODO: messages
         experiment_before = Experiment.objects.first()
 
         response = self.client.post(
@@ -427,6 +452,26 @@ class ChangeExperimentSlugTest(TestCase):
         self.assertEqual(
             message.message,
             'Empty slugs is not allowed. Please enter a valid slug'
+        )
+        self.assertEqual(message.tags, "error")
+
+    def test_submit_non_unique_slug_displays_error_message(self):
+        # TODO: we want to display message as errors in form not as normal
+        # TODO: messages; make test in test_forms too
+        experiment_before = Experiment.objects.first()
+        other_experiment = create_experiment(1)
+        response = self.client.post(
+            '/experiments/' + str(experiment_before.id) + '/change_slug/',
+            {'slug': other_experiment.slug}, follow=True
+        )
+        experiment_after = Experiment.objects.first()
+        self.assertEqual(experiment_before.slug, experiment_after.slug)
+
+        message = list(response.context['messages'])[0]
+        self.assertEqual(
+            message.message,
+            'The slug entered is equal to other experiment slug. Please try '
+            'again.'
         )
         self.assertEqual(message.tags, "error")
 
@@ -447,7 +492,7 @@ class ChangeExperimentSlugTest(TestCase):
         self.assertEqual(
             message.message,
             'The slug entered is not allowed. Please enter a valid slug. '
-            'Type only letters without accents, numbers, dash, '
+            'Type only lowcase letters without accents, numbers, dash, '
             'and underscore signs'
         )
         self.assertEqual(message.tags, "error")

@@ -32,7 +32,6 @@ class ExperimentDetailTest(FunctionalTest):
         )
         link.click()
 
-
     # TODO: break by tabs
     def test_can_view_detail_page(self):
         experiment = Experiment.objects.filter(
@@ -809,6 +808,20 @@ class ExperimentDetailTest(FunctionalTest):
             'url: ' + self.live_server_url + '/experiments/' + experiment.slug,
             self.browser.find_element_by_class_name('detail-header').text
         ))
+
+    def test_cannot_see_link_to_change_slug_if_user_not_in_staff(self):
+        experiment = Experiment.objects.filter(
+            status=Experiment.APPROVED
+        ).first()
+        self._access_experiment_detail_page(experiment)
+        self.wait_for_detail_page_load()
+
+        # The user enters in experiment detail page and can't see the link
+        # to change experiment slug, as only staff people can change it
+        with self.assertRaises(NoSuchElementException):
+            self.browser.find_element_by_xpath(
+                "//a[@href='#change_url_modal']"
+            )
 
 
 class DownloadExperimentTest(FunctionalTest):

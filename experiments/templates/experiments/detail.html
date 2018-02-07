@@ -15,7 +15,6 @@
             {% include 'experiments/messages.html' %}
         {% endif %}
         <ul class="nav nav-tabs" role="tablist">
-{#            <li role="presentation" class="active"><a href="#statistics_tab" role="tab" data-toggle="tab">{% trans "Statistics" %}</a></li>#}
             <li role="presentation" class="active"><a href="#groups_tab" role="tab" data-toggle="tab">{% trans "Groups" %}</a></li>
             <li role="presentation"><a href="#settings_tab" role="tab" data-toggle="tab">{% trans "Settings" %}</a></li>
             {% if questionnaires %}
@@ -26,19 +25,6 @@
 
         <!-- Tab panes -->
         <div class="tab-content portal-tab-content">
-            {# TODO: commented by now as requested by customer #}
-            <!-- Statistics tab -->
-{#            <div role="tabpanel" class="tab-pane active" id="statistics_tab">#}
-{#                <div class="row">#}
-{#                    <div class="col-md-6">#}
-{#                        <div id="gender-chart" style="height: 300px;"></div>#}
-{#                    </div>#}
-{#                    <div class="col-md-6">#}
-{#                        <div id="age-chart" style="height: 300px;"></div>#}
-{#                    </div>#}
-{#                </div>#}
-{#            </div>#}
-            <!-- Groups tab -->
             <div role="tabpanel" class="tab-pane groups-tab active" id="groups_tab">
                 <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
                     {% for group in experiment.groups.all %}
