@@ -6,6 +6,7 @@ from django.contrib.auth.models import User
 from django.db.models.signals import post_delete, pre_delete
 from django.dispatch import receiver
 from django.template.defaultfilters import slugify
+from django.utils.translation import ugettext_lazy as _
 
 
 def _delete_file_instance(instance):
@@ -81,11 +82,11 @@ class Experiment(models.Model):  # indexed for search
     APPROVED = 'approved'
     NOT_APPROVED = 'not_approved'
     STATUS_OPTIONS = (
-        (RECEIVING, 'Receiving'),
-        (TO_BE_ANALYSED, 'To be analysed'),
-        (UNDER_ANALYSIS, 'Under analysis'),
-        (APPROVED, 'Approved'),
-        (NOT_APPROVED, 'Not approved'),
+        (RECEIVING, _('Receiving')),
+        (TO_BE_ANALYSED, _('To be analysed')),
+        (UNDER_ANALYSIS, _('Under analysis')),
+        (APPROVED, _('Approved')),
+        (NOT_APPROVED, _('Not approved')),
     )
 
     owner = models.ForeignKey(User)
@@ -722,7 +723,9 @@ class QuestionnaireLanguage(models.Model):  # indexed for search
 
 
 class QuestionnaireDefaultLanguage(models.Model):  # not indexed for search
-    questionnaire = models.OneToOneField(Questionnaire, related_name='questionnaire_default_language')
+    questionnaire = models.OneToOneField(
+        Questionnaire, related_name='questionnaire_default_language'
+    )
     questionnaire_language = models.ForeignKey(QuestionnaireLanguage)
 
 
