@@ -150,11 +150,11 @@ class TrusteeTest(FunctionalTestTrustee):
         # She sees a modal with "To be analysed" and "Under analysis" status
         # options
         self.wait_for(lambda: self.assertIn(
-            statuses[Experiment.TO_BE_ANALYSED],
+            str(statuses[Experiment.TO_BE_ANALYSED]),
             self.browser.find_element_by_id('id_status_choices').text
         ))
         self.wait_for(lambda: self.assertIn(
-            statuses[Experiment.UNDER_ANALYSIS],
+            str(statuses[Experiment.UNDER_ANALYSIS]),
             self.browser.find_element_by_id('id_status_choices').text
         ))
 
@@ -178,7 +178,7 @@ class TrusteeTest(FunctionalTestTrustee):
             "//a[@data-experiment_trustee='claudia']"
         ).click()
         self.wait_for(lambda: self.assertIn(
-            statuses[Experiment.TO_BE_ANALYSED],
+            str(statuses[Experiment.TO_BE_ANALYSED]),
             self.browser.find_element_by_id('id_status_choices').text
         ))
         ##
@@ -193,11 +193,12 @@ class TrusteeTest(FunctionalTestTrustee):
         )
 
         self.assertIn(
-            statuses[Experiment.UNDER_ANALYSIS], status_choices_form.text
+            str(statuses[Experiment.UNDER_ANALYSIS]), status_choices_form.text
         )
-        self.assertIn(statuses[Experiment.APPROVED], status_choices_form.text)
+        self.assertIn(str(statuses[Experiment.APPROVED]),
+                      status_choices_form.text)
         self.assertIn(
-            statuses[Experiment.NOT_APPROVED], status_choices_form.text
+            str(statuses[Experiment.NOT_APPROVED]), status_choices_form.text
         )
 
         # She press ESC to quit modal and clicks in an experiment status

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-02-08 14:38-0200\n"
+"POT-Creation-Date: 2018-02-08 15:33-0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -586,7 +586,7 @@ msgid "groups"
 msgstr ""
 
 #: experiments/templates/experiments/list_default.html:20
-#: experiments/templates/experiments/list_trustee.html:37
+#: experiments/templates/experiments/list_trustee.html:38
 msgid "View"
 msgstr ""
 
@@ -595,14 +595,15 @@ msgid "Status"
 msgstr ""
 
 #: experiments/templates/experiments/list_trustee.html:21
-msgid "group"
+#, python-format
+msgid "group%(experiment.groups.count|pluralize)s"
 msgstr ""
 
-#: experiments/templates/experiments/list_trustee.html:48
+#: experiments/templates/experiments/list_trustee.html:49
 msgid "Change status for"
 msgstr ""
 
-#: experiments/templates/experiments/list_trustee.html:52
+#: experiments/templates/experiments/list_trustee.html:53
 msgid "Please select an option"
 msgstr ""
 

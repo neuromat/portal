@@ -18,7 +18,8 @@
             <td>{{ experiment.title }}</td>
             <td>{{ experiment.description }}</td>
             <td>{{ experiment.total_participants }} {% trans "in" %}&nbsp;{{ experiment.groups.count }}
-                {% trans 'group' %}{{ experiment.groups.count|pluralize }} </td>
+                {% blocktrans %}group{{ experiment.groups.count|pluralize }}{% endblocktrans %}
+            </td>
             <td>{{ experiment.version }}</td>
             <td>{{ experiment.downloads }}</td>
             <td><a id="link_modal" href="#"
