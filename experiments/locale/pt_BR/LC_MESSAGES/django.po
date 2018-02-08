@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-02-07 09:57-0200\n"
+"POT-Creation-Date: 2018-02-08 14:38-0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -341,20 +341,14 @@ msgid "Select options"
 msgstr "Opções de seleção"
 
 #: experiments/templates/experiments/detail.html:336
-#, fuzzy
-#| msgid "Experimental Protocol"
 msgid "Experimental Protocol Data"
 msgstr "Protocolo experimental"
 
 #: experiments/templates/experiments/detail.html:339
-#, fuzzy
-#| msgid "Questionnaire"
 msgid "Per Questionnaire Data"
 msgstr "Questionário"
 
 #: experiments/templates/experiments/detail.html:343
-#, fuzzy
-#| msgid "Participants"
 msgid "Participant "
 msgstr "Participantes"
 
@@ -387,8 +381,8 @@ msgid "Graphical representation"
 msgstr "Representação gráfica"
 
 #: experiments/templates/experiments/detail.html:384
-#: experiments/templates/experiments/header_detail.html:153
-#: experiments/templates/experiments/header_detail.html:186
+#: experiments/templates/experiments/header_detail.html:155
+#: experiments/templates/experiments/header_detail.html:188
 msgid "Close"
 msgstr "Fechar"
 
@@ -397,8 +391,6 @@ msgid "Gender of the participants"
 msgstr "Gênero dos participantes"
 
 #: experiments/templates/experiments/detail.html:556
-#, fuzzy
-#| msgid "Total"
 msgid "total"
 msgstr "total"
 
@@ -495,55 +487,70 @@ msgid "From study"
 msgstr "Estudo"
 
 #: experiments/templates/experiments/header_detail.html:60
-#: experiments/templates/experiments/header_detail.html:167
+#: experiments/templates/experiments/header_detail.html:169
 msgid "Publications"
 msgstr "Publicações"
 
-#: experiments/templates/experiments/header_detail.html:104
+#: experiments/templates/experiments/header_detail.html:76
+msgid "Current url"
+msgstr "Url atual"
+
+#: experiments/templates/experiments/header_detail.html:78
+msgid "Current slug"
+msgstr "\"Slug\" atual"
+
+#: experiments/templates/experiments/header_detail.html:80
+msgid "New slug"
+msgstr "Novo \"slug\""
+
+#: experiments/templates/experiments/header_detail.html:80
+msgid ""
+"type only lowcase letters without accents, numbers, dash, and underscore "
+"signs"
+msgstr ""
+"digite apenas letras minúsculas sem acentos, números, traço e sublihado"
+
+#: experiments/templates/experiments/header_detail.html:106
 msgid "Researcher"
 msgstr "Pesquisador"
 
-#: experiments/templates/experiments/header_detail.html:107
+#: experiments/templates/experiments/header_detail.html:109
 msgid "Start date"
 msgstr "Data de inicio"
 
-#: experiments/templates/experiments/header_detail.html:110
+#: experiments/templates/experiments/header_detail.html:112
 msgid "End date"
 msgstr "Data de fim"
 
-#: experiments/templates/experiments/header_detail.html:114
-#, fuzzy
-#| msgid "end date"
+#: experiments/templates/experiments/header_detail.html:116
 msgid "No end date"
 msgstr "data de fim"
 
-#: experiments/templates/experiments/header_detail.html:121
+#: experiments/templates/experiments/header_detail.html:123
 msgid "Contributors"
 msgstr "Colaboradores"
 
-#: experiments/templates/experiments/header_detail.html:125
+#: experiments/templates/experiments/header_detail.html:127
 msgid "Person"
 msgstr "Pessoa"
 
-#: experiments/templates/experiments/header_detail.html:126
+#: experiments/templates/experiments/header_detail.html:128
 msgid "Team"
 msgstr "Equipe"
 
-#: experiments/templates/experiments/header_detail.html:127
+#: experiments/templates/experiments/header_detail.html:129
 msgid "Coordinator"
 msgstr "Coordenador"
 
-#: experiments/templates/experiments/header_detail.html:145
+#: experiments/templates/experiments/header_detail.html:147
 msgid "Keywords"
 msgstr "Paravras chave"
 
-#: experiments/templates/experiments/header_detail.html:174
-#, fuzzy
-#| msgid "identification"
+#: experiments/templates/experiments/header_detail.html:176
 msgid "Citation:"
-msgstr "identificação"
+msgstr "Citação:"
 
-#: experiments/templates/experiments/header_detail.html:178
+#: experiments/templates/experiments/header_detail.html:180
 msgid "URI:"
 msgstr ""
 
@@ -552,8 +559,6 @@ msgid "Open Platform for Experiments in Neuroscience"
 msgstr "Uma plataforma para experimentos em Neurociência"
 
 #: experiments/templates/experiments/header_home.html:17
-#, fuzzy
-#| msgid "Search"
 msgid "Search"
 msgstr "Pesquisar"
 
@@ -564,10 +569,6 @@ msgstr "Lista de Experimentos"
 #: experiments/templates/experiments/home.html:29
 msgid "There are no experiments"
 msgstr "Não existem experimentos"
-
-#: experiments/templates/experiments/home.html:139
-msgid "Please select an option:"
-msgstr "Por favor selecione uma opção"
 
 #: experiments/templates/experiments/list_default.html:5
 #: experiments/templates/experiments/list_trustee.html:5
@@ -609,8 +610,6 @@ msgid "Status"
 msgstr "Estado"
 
 #: experiments/templates/experiments/list_trustee.html:21
-#, fuzzy
-#| msgid "groups"
 msgid "group"
 msgstr "grupos"
 
@@ -646,8 +645,6 @@ msgid "The user enters a free text"
 msgstr "O usuário entra com um texto livre"
 
 #: experiments/templates/experiments/questionnaires/questionnaire_language.html:52
-#, fuzzy
-#| msgid "This questionnaire is in invalid format, and can't be displayed"
 msgid ""
 "The questionnaire in this language is in invalid format, and can't be "
 "displayed"
@@ -739,7 +736,7 @@ msgstr "Configurações de TMS"
 
 #: experiments/templates/search/coilmodel.html:12
 msgid "Coil Model"
-msgstr "Model da bobina"
+msgstr "Modelo da bobina"
 
 #: experiments/templates/search/coilmodel.html:16
 #: experiments/templates/search/contexttree.html:11
@@ -792,16 +789,12 @@ msgid "design"
 msgstr "desenho"
 
 #: experiments/templates/search/contexttree.html:8
-#, fuzzy
-#| msgid "Context trees"
 msgid "Context Tree"
 msgstr "Árvores de contexto"
 
 #: experiments/templates/search/contexttree.html:15
-#, fuzzy
-#| msgid "setting text: "
 msgid "setting text"
-msgstr "texto das configurações: "
+msgstr "texto das configurações "
 
 #: experiments/templates/search/eegelectrodelocalizationsystem.html:8
 #: experiments/templates/search/eegelectrodenet.html:8
@@ -814,19 +807,15 @@ msgstr "Configurações de EEG"
 
 #: experiments/templates/search/eegelectrodelocalizationsystem.html:10
 #: experiments/templates/search/eegelectrodeposition.html:10
-#, fuzzy
-#| msgid "Localization System Name"
 msgid "EEG Electrode Localization System"
 msgstr "Nome do sistema de localização"
 
 #: experiments/templates/search/eegelectrodenet.html:10
 msgid "EEG Electrode Net"
-msgstr ""
+msgstr "Rede de eletrodos de EEG"
 
 #: experiments/templates/search/eegelectrodenet.html:14
 #: experiments/templates/search/eegsolution.html:14
-#, fuzzy
-#| msgid "manufacturer"
 msgid "manufacturer name"
 msgstr "fabricante"
 
@@ -842,80 +831,72 @@ msgstr "identificação"
 
 #: experiments/templates/search/eegelectrodeposition.html:12
 msgid "EEG Electrode Position"
-msgstr ""
+msgstr "Posição dos eletrodos de EEG"
 
 #: experiments/templates/search/eegelectrodeposition.html:20
-#, fuzzy
-#| msgid "Coordinator"
 msgid "coordinate x"
 msgstr "Coordenador"
 
 #: experiments/templates/search/eegelectrodeposition.html:24
 #: experiments/templates/search/eegelectrodeposition.html:28
-#, fuzzy
-#| msgid "Coordinator"
 msgid "coordinate y"
 msgstr "Coordenador"
 
 #: experiments/templates/search/eegelectrodeposition.html:31
 msgid "electrode model name"
-msgstr ""
+msgstr "modelo do eletrodo"
 
 #: experiments/templates/search/eegelectrodeposition.html:34
-#, fuzzy
-#| msgid "filter type description: "
 msgid "electrode model description"
 msgstr "descrição textual: "
 
 #: experiments/templates/search/eegelectrodeposition.html:38
 msgid "electrode model material"
-msgstr ""
+msgstr "material do modelo de eletrodo"
 
 #: experiments/templates/search/eegelectrodeposition.html:42
 msgid "electrode model usability"
-msgstr ""
+msgstr "usabilidade do modelo de eletrodo"
 
 #: experiments/templates/search/eegelectrodeposition.html:46
 msgid "electrode model configuration"
-msgstr ""
+msgstr "configuração do modelo de eletrodo"
 
 #: experiments/templates/search/eegelectrodeposition.html:50
 msgid "electrode type"
-msgstr ""
+msgstr "tipo do eletrodo"
 
 #: experiments/templates/search/eegelectrodeposition.html:54
 msgid "conduction type"
-msgstr ""
+msgstr "tipo da condução"
 
 #: experiments/templates/search/eegelectrodeposition.html:58
 msgid "electrode mode"
-msgstr ""
+msgstr "modo do eletrodo"
 
 #: experiments/templates/search/eegelectrodeposition.html:62
-#, fuzzy
-#| msgid "shape name"
 msgid "electrode shape name"
 msgstr "nome da forma"
 
 #: experiments/templates/search/eegelectrodeposition.html:66
 msgid "electrode shape measure value"
-msgstr ""
+msgstr "medida de forma do eletrodo"
 
 #: experiments/templates/search/eegelectrodeposition.html:70
 msgid "electrode shape measure unit"
-msgstr ""
+msgstr "unidade de medida de forma do eletrodo"
 
 #: experiments/templates/search/eegelectrodeposition.html:74
 msgid "intramuscular electrode strand"
-msgstr ""
+msgstr "vertented o eletrodo intramuscular"
 
 #: experiments/templates/search/eegelectrodeposition.html:79
 msgid "intramuscular electrode insulation material name"
-msgstr ""
+msgstr "material de isolamento do eletrodo intramuscular"
 
 #: experiments/templates/search/eegelectrodeposition.html:84
 msgid "intramuscular electrode insulation material description"
-msgstr ""
+msgstr "descrição do material de isolamento do eletrodo muscular"
 
 #: experiments/templates/search/eegfiltersetting.html:10
 #, fuzzy
@@ -924,140 +905,114 @@ msgid "EEG Filter Setting"
 msgstr "Configurações de EEG"
 
 #: experiments/templates/search/eegfiltersetting.html:14
-#, fuzzy
-#| msgid "filter type name: "
 msgid "filter type name"
 msgstr "nome do tipo de filtro:"
 
 #: experiments/templates/search/eegfiltersetting.html:16
-#, fuzzy
-#| msgid "filter type description: "
 msgid "filter type description"
 msgstr "descrição textual: "
 
 #: experiments/templates/search/eegsolution.html:10
-#, fuzzy
-#| msgid "EEG Setting"
 msgid "EEG Solution"
 msgstr "Configurações de EEG"
 
 #: experiments/templates/search/eegsolution.html:18
 msgid "components"
-msgstr ""
+msgstr "componentes"
 
 #: experiments/templates/search/emgdigitalfiltersetting.html:8
 #: experiments/templates/search/emgelectrodeplacementsetting.html:8
 #: experiments/templates/search/emgsetting.html:8
-#, fuzzy
-#| msgid "EMG Settings"
 msgid "EMG Setting"
 msgstr "Configurações de EMG"
 
 #: experiments/templates/search/emgdigitalfiltersetting.html:10
-#, fuzzy
-#| msgid "Digital filter setting: "
 msgid "EMG Digital Filter Setting"
 msgstr "Configurações do filtro digital:"
 
 #: experiments/templates/search/emgdigitalfiltersetting.html:14
-#, fuzzy
-#| msgid "filter type name: "
 msgid "filter type"
 msgstr "nome do tipo de filtro:"
 
 #: experiments/templates/search/emgelectrodeplacementsetting.html:10
 msgid "EMG Electrode Model"
-msgstr ""
+msgstr "Modelo do eletrodo de EMG"
 
 #: experiments/templates/search/emgelectrodeplacementsetting.html:12
 msgid "EMG Electrode Placement Setting"
-msgstr ""
+msgstr "Configurações da localização do eletrodo de EMG"
 
 #: experiments/templates/search/emgelectrodeplacementsetting.html:18
-#, fuzzy
-#| msgid "shape name"
 msgid "muscle name"
-msgstr "nome da forma"
+msgstr "músculo"
 
 #: experiments/templates/search/emgelectrodeplacementsetting.html:22
 msgid "muscle side"
-msgstr ""
+msgstr "lado do músculo"
 
 #: experiments/templates/search/emgelectrodeplacementsetting.html:25
-#, fuzzy
-#| msgid "Localization System Name"
 msgid "standardization system name"
 msgstr "Nome do sistema de localização"
 
 #: experiments/templates/search/emgelectrodeplacementsetting.html:28
-#, fuzzy
-#| msgid "Localization System Description"
 msgid "standardization system description"
 msgstr "Descrição do sistema de localização"
 
 #: experiments/templates/search/emgelectrodeplacementsetting.html:32
 msgid "muscle anatomy origin"
-msgstr ""
+msgstr "origem anatômica do músculo"
 
 #: experiments/templates/search/emgelectrodeplacementsetting.html:36
 msgid "muscle anatomy insertion"
-msgstr ""
+msgstr "inserção anatômica do músculo"
 
 #: experiments/templates/search/emgelectrodeplacementsetting.html:40
 msgid "muscle anatomy function"
-msgstr ""
+msgstr "função anatômica do músculo"
 
 #: experiments/templates/search/emgelectrodeplacementsetting.html:44
-#, fuzzy
-#| msgid "identification"
 msgid "location"
 msgstr "identificação"
 
 #: experiments/templates/search/emgelectrodeplacementsetting.html:48
-#, fuzzy
-#| msgid "equipment type"
 msgid "placement type"
 msgstr "tipo de equipamento"
 
 #: experiments/templates/search/emgelectrodeplacementsetting.html:52
-#, fuzzy
-#| msgid "start date"
 msgid "start posture"
 msgstr "data de inicio"
 
 #: experiments/templates/search/emgelectrodeplacementsetting.html:56
-#, fuzzy
-#| msgid "identification"
 msgid "orientation"
 msgstr "identificação"
 
 #: experiments/templates/search/emgelectrodeplacementsetting.html:60
 msgid "fixation on the skin"
-msgstr ""
+msgstr "fixação na pele"
 
 #: experiments/templates/search/emgelectrodeplacementsetting.html:64
 msgid "reference electrode"
-msgstr ""
+msgstr "eletrodo de referência"
 
 #: experiments/templates/search/emgelectrodeplacementsetting.html:68
 msgid "clinical test"
-msgstr ""
+msgstr "teste clínico"
 
 #: experiments/templates/search/emgelectrodeplacementsetting.html:72
 msgid "method of insertion"
-msgstr ""
+msgstr "método de inserção"
 
 #: experiments/templates/search/emgelectrodeplacementsetting.html:76
 msgid "depth of insertion (intramuscular placement)"
-msgstr ""
+msgstr "profundidade de inserção (localização intramuscular)"
 
 #: experiments/templates/search/emgelectrodeplacementsetting.html:80
 msgid "depth of insertion (needle placement)"
-msgstr ""
+msgstr "profunidade de inserção (colocação da agulha)"
 
 #: experiments/templates/search/emgsetting.html:15
 msgid "acquisition software version"
-msgstr ""
+msgstr "versão do software adquirido"
 
 #: experiments/templates/search/experimental_protocol.html:8
 #: experiments/templates/search/genericdatacollection.html:8
@@ -1090,48 +1045,36 @@ msgid "sent date"
 msgstr "data de envio"
 
 #: experiments/templates/search/genericdatacollection.html:10
-#, fuzzy
-#| msgid "Select one or more data collection types"
 msgid "Generic data collection step"
 msgstr "Selecione um ou mais tipos de coleta de dados"
 
 #: experiments/templates/search/genericdatacollection.html:24
-#, fuzzy
-#| msgid "description"
 msgid "type description"
 msgstr "descrição"
 
 #: experiments/templates/search/goalkeepergame.html:10
-#, fuzzy
-#| msgid "Goalkeeper game phase"
 msgid "Goalkeeper game step"
 msgstr "Fase do Jogo do goleiro"
 
 #: experiments/templates/search/goalkeepergame.html:21
-#, fuzzy
-#| msgid "shape name"
 msgid "software name"
 msgstr "nome da forma"
 
 #: experiments/templates/search/goalkeepergame.html:24
-#, fuzzy
-#| msgid "Textual description"
 msgid "software description"
 msgstr "Descrição textual"
 
 #: experiments/templates/search/goalkeepergame.html:27
-msgid "software_version"
-msgstr ""
+msgid "software version"
+msgstr "Versão do software"
 
 #: experiments/templates/search/goalkeepergame.html:29
-#, fuzzy
-#| msgid "Context trees"
 msgid "context tree"
 msgstr "Árvores de contexto"
 
 #: experiments/templates/search/goalkeepergame.html:33
 msgid "not defined"
-msgstr ""
+msgstr "não definido"
 
 #: experiments/templates/search/groups.html:15
 msgid "inclusion criteria"
@@ -1143,48 +1086,44 @@ msgstr "Critérios de não inclusão"
 
 #: experiments/templates/search/instruction.html:10
 msgid "Instruction step"
-msgstr ""
+msgstr "Passo de instrução"
 
 #: experiments/templates/search/instruction.html:22
 #: experiments/templates/search/step.html:24
 msgid "duration value"
-msgstr ""
+msgstr "duração"
 
 #: experiments/templates/search/instruction.html:26
 #: experiments/templates/search/step.html:28
 msgid "duration unit"
-msgstr ""
+msgstr "duração (unidade)"
 
 #: experiments/templates/search/instruction.html:29
 #: experiments/templates/search/step.html:31
 msgid "numeration"
-msgstr ""
+msgstr "numeração"
 
 #: experiments/templates/search/instruction.html:32
 #: experiments/templates/search/step.html:34
-#, fuzzy
-#| msgid "order: "
 msgid "order"
-msgstr "ordem: "
+msgstr "ordem"
 
 #: experiments/templates/search/instruction.html:36
 #: experiments/templates/search/step.html:38
 msgid "number of repetitions"
-msgstr ""
+msgstr "número de repetições"
 
 #: experiments/templates/search/instruction.html:40
 #: experiments/templates/search/step.html:42
 msgid "interval between repetitions"
-msgstr ""
+msgstr "intervalo entre repetições"
 
 #: experiments/templates/search/instruction.html:47
 #: experiments/templates/search/step.html:49
 msgid "random position"
-msgstr ""
+msgstr "posição aleatória"
 
 #: experiments/templates/search/instruction.html:50
-#, fuzzy
-#| msgid "textual description"
 msgid "text instruction"
 msgstr "descrição textual"
 
@@ -1193,8 +1132,6 @@ msgid "Publication"
 msgstr "Publicação"
 
 #: experiments/templates/search/publications.html:12
-#, fuzzy
-#| msgid "identification"
 msgid "citation"
 msgstr "identificação"
 
@@ -1229,13 +1166,11 @@ msgstr "Próximo"
 
 #: experiments/templates/search/step.html:10
 msgid "Type"
-msgstr ""
+msgstr "Tipo"
 
 #: experiments/templates/search/stimulus.html:10
-#, fuzzy
-#| msgid "pulse stimulus type: "
 msgid "Stimulus step"
-msgstr "tipo do estímulo de pulso: "
+msgstr "Passo de estímulo "
 
 #: experiments/templates/search/studies.html:8
 msgid "Study"
@@ -1322,8 +1257,6 @@ msgid "TMS Device Setting"
 msgstr "Configurações de TMS"
 
 #: experiments/templates/search/tmssetting.html:16
-#, fuzzy
-#| msgid "pulse stimulus type: "
 msgid "pulse stimulus type"
 msgstr "tipo do estímulo de pulso: "
 
@@ -1445,35 +1378,28 @@ msgstr " foram disponibilizados para ser analizados por outros curadores."
 #: experiments/views.py:345
 msgid "Empty slugs is not allowed. Please enter a valid slug"
 msgstr ""
+"\"Slugs\" vazios não são permitidos. Por favor entre com um \"slug\" válido"
 
 #: experiments/views.py:350
 msgid ""
 "The slug entered is not allowed. Please enter a valid slug. Type only "
 "lowcase letters without accents, numbers, dash, and underscore signs"
 msgstr ""
+"O \"slug\" entrado não é permitido. Por favor entre com um \"slug\" válido. "
+"Digite somente letras minúsculas sem acentos, números, traços, e sublinhado"
 
 #: experiments/views.py:357
 msgid "The slug entered is two small. Please enter at least 3 characters"
 msgstr ""
+"O \"slug\" entrado é muito pequeno. Por favor entre com pelo menos 3 "
+"caracteres"
 
 #: experiments/views.py:363
 msgid "The slug entered is equal to other experiment slug. Please try again."
 msgstr ""
+"O \"slug\" entrado é igual ao de outro experimento. Por favor tente "
+"novamente."
 
 #: experiments/views.py:377
-#, fuzzy
-#| msgid "The experiment data "
 msgid "The experiment's slug was modified"
-msgstr "Os dados do experimento "
-
-#~ msgid "Statistics"
-#~ msgstr "Estatísticas"
-
-#~ msgid "We are preparing your download, please wait..."
-#~ msgstr "Estamos preparando os dados, por favor aguarde..."
-
-#~ msgid "There was a problem generating your download, please try again."
-#~ msgstr "Houve um problema ao gerar o seu download, tente novamente"
-
-#~ msgid "An Open Database for Experiments in Neuroscience"
-#~ msgstr "Um banco de dados aberto para experimentos em Neurociência"
+msgstr "O \"slug\" do experimento foi alterado"

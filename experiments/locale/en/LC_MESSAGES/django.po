@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-02-07 09:57-0200\n"
+"POT-Creation-Date: 2018-02-08 14:38-0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -367,8 +367,8 @@ msgid "Graphical representation"
 msgstr ""
 
 #: experiments/templates/experiments/detail.html:384
-#: experiments/templates/experiments/header_detail.html:153
-#: experiments/templates/experiments/header_detail.html:186
+#: experiments/templates/experiments/header_detail.html:155
+#: experiments/templates/experiments/header_detail.html:188
 msgid "Close"
 msgstr ""
 
@@ -473,51 +473,69 @@ msgid "From study"
 msgstr ""
 
 #: experiments/templates/experiments/header_detail.html:60
-#: experiments/templates/experiments/header_detail.html:167
+#: experiments/templates/experiments/header_detail.html:169
 msgid "Publications"
 msgstr ""
 
-#: experiments/templates/experiments/header_detail.html:104
+#: experiments/templates/experiments/header_detail.html:76
+msgid "Current url"
+msgstr ""
+
+#: experiments/templates/experiments/header_detail.html:78
+msgid "Current slug"
+msgstr ""
+
+#: experiments/templates/experiments/header_detail.html:80
+msgid "New slug"
+msgstr ""
+
+#: experiments/templates/experiments/header_detail.html:80
+msgid ""
+"type only lowcase letters without accents, numbers, dash, and underscore "
+"signs"
+msgstr ""
+
+#: experiments/templates/experiments/header_detail.html:106
 msgid "Researcher"
 msgstr ""
 
-#: experiments/templates/experiments/header_detail.html:107
+#: experiments/templates/experiments/header_detail.html:109
 msgid "Start date"
 msgstr ""
 
-#: experiments/templates/experiments/header_detail.html:110
+#: experiments/templates/experiments/header_detail.html:112
 msgid "End date"
 msgstr ""
 
-#: experiments/templates/experiments/header_detail.html:114
+#: experiments/templates/experiments/header_detail.html:116
 msgid "No end date"
 msgstr ""
 
-#: experiments/templates/experiments/header_detail.html:121
+#: experiments/templates/experiments/header_detail.html:123
 msgid "Contributors"
 msgstr ""
 
-#: experiments/templates/experiments/header_detail.html:125
+#: experiments/templates/experiments/header_detail.html:127
 msgid "Person"
 msgstr ""
 
-#: experiments/templates/experiments/header_detail.html:126
+#: experiments/templates/experiments/header_detail.html:128
 msgid "Team"
 msgstr ""
 
-#: experiments/templates/experiments/header_detail.html:127
+#: experiments/templates/experiments/header_detail.html:129
 msgid "Coordinator"
 msgstr ""
 
-#: experiments/templates/experiments/header_detail.html:145
+#: experiments/templates/experiments/header_detail.html:147
 msgid "Keywords"
 msgstr ""
 
-#: experiments/templates/experiments/header_detail.html:174
+#: experiments/templates/experiments/header_detail.html:176
 msgid "Citation:"
 msgstr ""
 
-#: experiments/templates/experiments/header_detail.html:178
+#: experiments/templates/experiments/header_detail.html:180
 msgid "URI:"
 msgstr ""
 
@@ -535,10 +553,6 @@ msgstr ""
 
 #: experiments/templates/experiments/home.html:29
 msgid "There are no experiments"
-msgstr ""
-
-#: experiments/templates/experiments/home.html:139
-msgid "Please select an option:"
 msgstr ""
 
 #: experiments/templates/experiments/list_default.html:5
@@ -1033,7 +1047,7 @@ msgid "software description"
 msgstr ""
 
 #: experiments/templates/search/goalkeepergame.html:27
-msgid "software_version"
+msgid "software version"
 msgstr ""
 
 #: experiments/templates/search/goalkeepergame.html:29
