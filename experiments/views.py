@@ -374,7 +374,7 @@ def change_slug(request, experiment_id):
             experiment.save()
         messages.success(
             request,
-            _("The experiment's slug was modified")
+            _('The experiment\'s slug was modified')
         )
 
     return HttpResponseRedirect('/experiments/' + experiment.slug + '/')

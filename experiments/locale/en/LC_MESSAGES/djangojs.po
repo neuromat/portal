@@ -1,0 +1,42 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2018-02-08 14:29-0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: static/js/change_status.js:73
+msgid "Please select an option:"
+msgstr ""
+
+#: static/js/change_status.js:81
+msgid ""
+"Justification is required to reject an experiment (this message will be sent "
+"to experiment researcher)"
+msgstr ""
+
+#: static/js/change_status.js:84
+msgid "Please write a justification for rejecting this experiment"
+msgstr ""
+
+#: static/tree-multiselect.js/jquery.tree-multiselect.js:117
+#: static/tree-multiselect.js/jquery.tree-multiselect.min.js:2
+msgid "Select All"
+msgstr ""
+
+#: static/tree-multiselect.js/jquery.tree-multiselect.js:118
+#: static/tree-multiselect.js/jquery.tree-multiselect.min.js:2
+msgid "Unselect All"
+msgstr ""
