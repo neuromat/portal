@@ -11,9 +11,8 @@ from experiments import api_urls
 from experiments.views import NepSearchView
 from downloads import urls
 
-# internationalization
+# internationalization in javascript
 js_info_dict = {
-    'domain': 'djangojs',
     'packages': ('experiments',),
 }
 
@@ -42,6 +41,8 @@ urlpatterns = [
     url(r'^language/change/(?P<language_code>(?:(?:\w{2})|(?:\w{2}\-\w{'
         r'2})))$', views.language_change,
         name='language_change'),
+
+    # javascript internationalization
     url(r'^jsi18n/$', javascript_catalog, js_info_dict,
         name='javascript-catalog'),
 
@@ -53,5 +54,3 @@ urlpatterns = [
     # haystack search
     url(r'^search/', NepSearchView.as_view(), name='search_view')
 ]
-
-

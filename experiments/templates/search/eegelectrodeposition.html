@@ -15,7 +15,7 @@
             <br><br>
         </h5>
         <strong>{% trans "name" %}: </strong>
-            {% highlight result.object.name with query %}&nbsp;
+        {% highlight result.object.name with query %}&nbsp;
         {% if result.object.coordinate_x %}
             <strong>{% trans "coordinate x" %}: </strong>
             {% highlight result.object.coordinate_x with query %}&nbsp;
@@ -28,7 +28,61 @@
             <strong>{% trans "coordinate y" %}: </strong>
             {% highlight result.object.coordinate_y with query %}&nbsp;
         {% endif %}
-        <strong>{%  trans "electrode model name" %}</strong>
+        <strong>{%  trans "electrode model name" %}: </strong>
         {% highlight result.object.electrode_model.name with query %}&nbsp;
+        {% if result.object.electrode_model.description %}
+            <strong>{% trans "electrode model description" %}: </strong>
+            {% highlight result.object.electrode_model.description with query %}&nbsp;
+        {% endif %}
+        {% if result.object.electrode_model.material %}
+            <strong>{% trans "electrode model material" %}: </strong>
+            {% highlight result.object.electrode_model.material with query %}&nbsp;
+        {% endif %}
+        {% if result.object.electrode_model.usability %}
+            <strong>{% trans "electrode model usability" %}: </strong>
+            {% highlight result.object.electrode_model.usability with query %}&nbsp;
+        {% endif %}
+        {% if result.object.electrode_model.electrode_configuration_name %}
+            <strong>{% trans "electrode model configuration" %}: </strong>
+            {% highlight result.object.electrode_model.electrode_configuration_name with query %}&nbsp;
+        {% endif %}
+        {% if result.object.electrode_model.electrode_type %}
+            <strong>{% trans "electrode type" %}: </strong>
+            {% highlight result.object.electrode_model.electrode_type with query %}&nbsp;
+        {% endif %}
+        {% if result.object.electrode_model.surfaceelectrode.conduction_type %}
+            <strong>{% trans "conduction type" %}: </strong>
+            {% highlight result.object.electrode_model.surfaceelectrode.conduction_type with query %}&nbsp;
+        {% endif %}
+        {% if result.object.electrode_model.surfaceelectrode.electrode_mode %}
+            <strong>{% trans "electrode mode" %}: </strong>
+            {% highlight result.object.electrode_model.surfaceelectrode.electrode_mode with query %}&nbsp;
+        {% endif %}
+        {% if result.object.electrode_model.surfaceelectrode.electrode_shape_name %}
+            <strong>{% trans "electrode shape name" %}: </strong>
+            {% highlight result.object.electrode_model.surfaceelectrode.electrode_shape_name with query %}&nbsp;
+        {% endif %}
+        {% if result.object.electrode_model.surfaceelectrode.electrode_shape_measure_value %}
+            <strong>{% trans "electrode shape measure value" %}: </strong>
+            {% highlight result.object.electrode_model.surfaceelectrode.electrode_shape_measure_value with query %}&nbsp;
+        {% endif %}
+        {% if result.object.electrode_model.surfaceelectrode.electrode_shape_measure_unit %}
+            <strong>{% trans "electrode shape measure unit" %}: </strong>
+            {% highlight result.object.electrode_model.surfaceelectrode.electrode_shape_measure_unit with query %}&nbsp;
+        {% endif %}
+        {% if result.object.electrode_model.intramuscularelectrode.strand %}
+            <strong>{% trans "intramuscular electrode strand" %}: </strong>
+            {% highlight result.object.electrode_model.intramuscularelectrode.strand with query %}&nbsp;
+        {% endif %}
+        {% if result.object.electrode_model.intramuscularelectrode.insulation_material_name %}
+            <strong>
+                {% trans "intramuscular electrode insulation material name" %}: </strong>
+            {% highlight result.object.electrode_model.intramuscularelectrode.insulation_material_name with query %}&nbsp;
+        {% endif %}
+        {% if result.object.electrode_model.intramuscularelectrode.insulation_material_description %}
+            <strong>
+                {% trans "intramuscular electrode insulation material description" %}: </strong>
+            {% highlight result.object.electrode_model.intramuscularelectrode.insulation_material_description with query %}&nbsp;
+        {% endif %}
     </td>
 </tr>

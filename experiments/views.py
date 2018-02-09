@@ -5,6 +5,7 @@ import tempfile
 
 from django.contrib import messages
 from django.contrib.auth.views import LoginView
+from django.core.exceptions import PermissionDenied
 from django.core.mail import send_mail
 from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import render
@@ -329,8 +330,12 @@ def change_status(request, experiment_id):
 
 
 def change_slug(request, experiment_id):
-    # TODO: move validation logic to ChangeSlugForm form
-    # TODO: implement validation in model too
+
+    if not request.user.has_perm('experiments.change_slug'):
+        raise PermissionDenied
+
+    # TODO: move validation logic to ChangeSlugForm form; implement
+    # TODO: validation in model too
     experiment = Experiment.objects.get(pk=experiment_id)
 
     new_slug = request.POST.get('slug')
@@ -343,7 +348,7 @@ def change_slug(request, experiment_id):
         messages.error(
             request,
             _('The slug entered is not allowed. Please enter a valid slug. '
-              'Type only letters without accents, numbers, dash, '
+              'Type only lowcase letters without accents, numbers, dash, '
               'and underscore signs')
         )
     elif len(new_slug) < 3:
@@ -351,6 +356,12 @@ def change_slug(request, experiment_id):
             request,
             _('The slug entered is two small. Please enter at least 3 '
               'characters')
+        )
+    elif Experiment.objects.filter(slug=new_slug).exists():
+        messages.error(
+            request,
+            _('The slug entered is equal to other experiment slug. Please try '
+              'again.')
         )
     else:
         experiment_versions = Experiment.objects.filter(
@@ -363,7 +374,7 @@ def change_slug(request, experiment_id):
             experiment.save()
         messages.success(
             request,
-            _("The experiment's slug was modified")
+            _('The experiment\'s slug was modified')
         )
 
     return HttpResponseRedirect('/experiments/' + experiment.slug + '/')

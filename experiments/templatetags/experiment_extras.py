@@ -3,6 +3,8 @@ from django.contrib.auth.models import Group
 import json
 
 from experiments.models import Experiment
+from django.utils.translation import ugettext as _
+
 
 register = template.Library()
 
@@ -15,9 +17,14 @@ def has_group(user, group_name):
 
 @register.filter(name='statuses_to_json')
 def statuses_to_json(statuses, experiment_status):
+    # We are 'eager' translating experiment statuses because it's breaking
+    # when json dumps statuses_dict on return because of lazy translation in
+    # Experiment model
+    statuses_dict = dict(statuses)
+    for key, value in statuses_dict.items():
+        statuses_dict[key] = _(statuses_dict[key])
     # First we remove receiving status because this is only used when
     # Portal is receiving experiment data from API clients
-    statuses_dict = dict(statuses)
     del statuses_dict[Experiment.RECEIVING]
     # Now, we render in template only the statuses allowed to be changed by
     # trustee based in current experiment status

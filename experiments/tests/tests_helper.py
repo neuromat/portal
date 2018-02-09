@@ -24,7 +24,8 @@ from experiments.models import Experiment, Study, Group, Researcher, \
     EMGElectrodePlacement, EEGElectrodeNet, EEGSolution, EEGFilterSetting, \
     EMGDigitalFilterSetting, ElectrodeModel, EMGElectrodeSetting, \
     EMGElectrodePlacementSetting, EMGSurfacePlacement, \
-    EMGIntramuscularPlacement, EMGNeedlePlacement, EEGElectrodePosition
+    EMGIntramuscularPlacement, EMGNeedlePlacement, EEGElectrodePosition, \
+    SurfaceElectrode, IntramuscularElectrode, Instruction
 from experiments.views import _get_q_default_language_or_first
 
 
@@ -148,11 +149,6 @@ def create_trustee_users():
     )
     group.user_set.add(trustee1)
     group.user_set.add(trustee2)
-
-    trustees = list()
-    trustees.append(trustee1)
-    trustees.append(trustee2)
-    return trustees
 
 
 def create_researchers():
@@ -446,7 +442,10 @@ def create_emg_electrode_placement_setting(emg_electrode_setting,
 
 def create_eeg_electrode_position(eeg_electrode_localization_system,
                                   electrode_model):
+    faker = Factory.create()
+
     return EEGElectrodePosition.objects.create(
+        name=faker.word(),
         eeg_electrode_localization_system=eeg_electrode_localization_system,
         electrode_model=electrode_model,
         channel_index=13
@@ -458,13 +457,29 @@ def create_stimulus_step(group):
     :param group: Group model instance
     :return: Stimulus model instance
     """
-    fake = Factory.create()
+    faker = Factory.create()
 
     return Stimulus.objects.create(
         group=group,
-        identification=fake.word(), numeration=fake.ssn(),
+        identification=faker.word(), numeration=faker.ssn(),
         type=Step.STIMULUS, order=randint(1, 20),
-        stimulus_type_name=fake.word()
+        stimulus_type_name=faker.word()
+    )
+
+
+def create_instruction_step(group):
+    faker = Factory.create()
+
+    return Instruction.objects.create(
+        group=group,
+        identification=faker.word(), description=faker.text(),
+        numeration=faker.ssn(), duration_value=randint(1, 20),
+        duration_unit='min', order=randint(1, 20),
+        number_of_repetitions=randint(1, 3),
+        interval_between_repetitions_value=randint(3, 8),
+        interval_between_repetitions_unit='min',
+        random_position=choice([True, False]), type=Step.INSTRUCTION,
+        text=faker.text()
     )
 
 
@@ -708,6 +723,40 @@ def create_electrode_model():
     )
 
 
+def create_surface_electrode():
+    faker = Factory.create()
+
+    return SurfaceElectrode.objects.create(
+        name=faker.word(), description=faker.text(), material=faker.word(),
+        usability=choice(ElectrodeModel.USABILITY_TYPES)[0], impedance=13,
+        impedance_unit='ohm', inter_electrode_distance=13,
+        inter_electrode_distance_unit='cm',
+        electrode_configuration_name=faker.word(),
+        electrode_type=choice(ElectrodeModel.ELECTRODE_TYPES)[0],
+        conduction_type=choice(SurfaceElectrode.CONDUCTION_TYPES)[0],
+        electrode_mode=choice(SurfaceElectrode.MODE_OPTIONS)[0],
+        electrode_shape_name=faker.word(), electrode_shape_measure_value=13,
+        electrode_shape_measure_unit='cm2'
+    )
+
+
+def create_intramuscular_electrode():
+    faker = Factory.create()
+
+    return IntramuscularElectrode.objects.create(
+        name=faker.word(), description=faker.text(), material=faker.word(),
+        usability=choice(ElectrodeModel.USABILITY_TYPES)[0], impedance=13,
+        impedance_unit='ohm', inter_electrode_distance=13,
+        inter_electrode_distance_unit='cm',
+        electrode_configuration_name=faker.word(),
+        electrode_type=choice(ElectrodeModel.ELECTRODE_TYPES)[0],
+        strand=choice(IntramuscularElectrode.STRAND_TYPES)[0],
+        insulation_material_name=faker.word(),
+        insulation_material_description=faker.text(),
+        length_of_exposed_tip=21
+    )
+
+
 def create_emg_electrode_setting(emg_setting, electrode_model):
     return EMGElectrodeSetting.objects.create(
         emg_setting=emg_setting, electrode_model=electrode_model
@@ -763,12 +812,14 @@ def create_questionnaire(qtty, code, group):
     testing)
     :param group: Group model instance
     """
+    faker = Factory.create()
 
     for i in range(qtty):
         Questionnaire.objects.create(
             code=code,
             group=group, order=randint(1, 10),
             identification='questionnaire',
+            numeration=faker.ssn(),
             type=Step.QUESTIONNAIRE,
         )
 

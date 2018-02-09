@@ -1,15 +1,13 @@
 {% load highlight %}
 {% load i18n %}
-<tr class="step-matches">
+<tr class="instruction_step-matches">
     <td>
         <h5 class="match">
             <a href="{% url 'experiment-detail' result.object.group.experiment.slug %}"><strong
             >{% trans "Experiment" %}: </strong>{{ result.object.group.experiment.title }}
                 <strong>> {% trans "Group" %}: </strong>
                 {{ result.object.group.title }}
-                <strong>> {% trans "Type" %}: </strong>
-                {{ result.object.type }}
-                <strong>> {% trans "Step" %}: </strong>
+                <strong>> {% trans "Instruction step" %}: </strong>
                 {{ result.object.identification }}
             </a>
             <br><br>
@@ -49,5 +47,7 @@
             <strong>{% trans "random position" %}: </strong>
             {{ result.object.random_position }}
         {% endif %}
+        <strong>{% trans "text instruction" %}: </strong>
+        {% highlight result.object.text with query %}&nbsp;
     </td>
 </tr>

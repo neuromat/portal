@@ -1,11 +1,12 @@
 import time
 
 import os
+
+from django.contrib.auth.models import Group, Permission
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 from django.test import override_settings
 from selenium import webdriver
 from selenium.common.exceptions import WebDriverException
-from selenium.webdriver.common.keys import Keys
 
 from experiments.tests.tests_helper import global_setup_ft, apply_setup
 
@@ -88,6 +89,13 @@ class FunctionalTestTrustee(StaticLiveServerTestCase):
         self.wait_for(
             lambda: self.browser.find_element_by_link_text('Log In').click()
         )
+
+        ##
+        # give trustees permission to change slug
+        ##
+        group = Group.objects.get(name='trustees')
+        permission = Permission.objects.get(codename='change_slug')
+        group.permissions.add(permission)
 
         # The trustee Claudia log in Portal
         self.wait_for(

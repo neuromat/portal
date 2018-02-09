@@ -26,7 +26,7 @@ class TrusteeTest(FunctionalTestTrustee):
             ).click()
         )
 
-    def _setup(self):
+    def _access_change_slug_modal(self):
         experiment = Experiment.objects.filter(
             status=Experiment.TO_BE_ANALYSED
         ).first()
@@ -150,11 +150,11 @@ class TrusteeTest(FunctionalTestTrustee):
         # She sees a modal with "To be analysed" and "Under analysis" status
         # options
         self.wait_for(lambda: self.assertIn(
-            statuses[Experiment.TO_BE_ANALYSED],
+            str(statuses[Experiment.TO_BE_ANALYSED]),
             self.browser.find_element_by_id('id_status_choices').text
         ))
         self.wait_for(lambda: self.assertIn(
-            statuses[Experiment.UNDER_ANALYSIS],
+            str(statuses[Experiment.UNDER_ANALYSIS]),
             self.browser.find_element_by_id('id_status_choices').text
         ))
 
@@ -178,7 +178,7 @@ class TrusteeTest(FunctionalTestTrustee):
             "//a[@data-experiment_trustee='claudia']"
         ).click()
         self.wait_for(lambda: self.assertIn(
-            statuses[Experiment.TO_BE_ANALYSED],
+            str(statuses[Experiment.TO_BE_ANALYSED]),
             self.browser.find_element_by_id('id_status_choices').text
         ))
         ##
@@ -193,11 +193,12 @@ class TrusteeTest(FunctionalTestTrustee):
         )
 
         self.assertIn(
-            statuses[Experiment.UNDER_ANALYSIS], status_choices_form.text
+            str(statuses[Experiment.UNDER_ANALYSIS]), status_choices_form.text
         )
-        self.assertIn(statuses[Experiment.APPROVED], status_choices_form.text)
+        self.assertIn(str(statuses[Experiment.APPROVED]),
+                      status_choices_form.text)
         self.assertIn(
-            statuses[Experiment.NOT_APPROVED], status_choices_form.text
+            str(statuses[Experiment.NOT_APPROVED]), status_choices_form.text
         )
 
         # She press ESC to quit modal and clicks in an experiment status
@@ -711,7 +712,7 @@ class TrusteeTest(FunctionalTestTrustee):
         )
 
     def test_url_editor_modal_displays_correct_content(self):
-        experiment = self._setup()
+        experiment = self._access_change_slug_modal()
 
         # In modal there are some content about the current url, a label for
         # an input text form that trustee type the new slug, a sentence
@@ -733,8 +734,8 @@ class TrusteeTest(FunctionalTestTrustee):
 
         )
         self.assertIn(
-            'New slug (type only letters without accents, numbers, dash, '
-            'and underscore signs):',
+            'New slug (type only lowcase letters without accents, numbers, '
+            'dash, and underscore signs):',
             modal.text
         )
         self.assertEqual(
@@ -743,14 +744,36 @@ class TrusteeTest(FunctionalTestTrustee):
                 'placeholder'
             )
         )
-        self.assertIn(
-            'How will the new url be?', modal.text
-        )
         submit_button = self.browser.find_element_by_id('submit')
         self.assertEqual('Save', submit_button.get_attribute('value'))
 
+    def test_submit_non_unique_slug_displays_error_message(self):
+        self._access_change_slug_modal()
+
+        ##
+        # Get another experiment slug
+        ##
+        other_experiment = Experiment.objects.filter(
+            status=Experiment.TO_BE_ANALYSED
+        ).last()
+
+        # The trustee enter a slug that already exists
+        self.wait_for(
+            lambda: self.browser.find_element_by_id(
+                'id_slug'
+            ).send_keys(other_experiment.slug)
+        )
+        self.browser.find_element_by_id('id_slug').send_keys(Keys.ENTER)
+
+        # The page refreshes telling her that the slug already exists
+        self.wait_for(lambda: self.assertIn(
+            'The slug entered is equal to other experiment slug. Please try '
+            'again.',
+            self.browser.find_element_by_tag_name('body').text
+        ))
+
     def test_submit_empty_slug_displays_error_message(self):
-        self._setup()
+        self._access_change_slug_modal()
 
         ##
         # Wait until element is visible, then remove element "required" from
@@ -782,7 +805,7 @@ class TrusteeTest(FunctionalTestTrustee):
         # TODO: chars works and the test fails. As we can't disable the
         # TODO: script code after DOM has render it. Tested mannualy without
         # TODO: javascript.
-        self._setup()
+        self._access_change_slug_modal()
 
         # The trustee tryes to enter some invalid slug and submit it
         self.wait_for(
@@ -796,13 +819,13 @@ class TrusteeTest(FunctionalTestTrustee):
         # slug is invalid
         self.wait_for(lambda: self.assertIn(
             'The slug entered is not allowed. Please enter a valid slug. '
-            'Type only letters without accents, numbers, dash, '
+            'Type only lowcase letters without accents, numbers, dash, '
             'and underscore signs',
             self.browser.find_element_by_tag_name('body').text
         ))
 
     def test_submit_slug_with_less_than_three_characters_displays_error_message(self):
-        self._setup()
+        self._access_change_slug_modal()
 
         # The trustee tryes to enter a slug with less than three characters
         self.wait_for(
@@ -824,7 +847,7 @@ class TrusteeTest(FunctionalTestTrustee):
         ))
 
     def test_submit_valid_slug_returns_redirect_with_success_message(self):
-        self._setup()
+        self._access_change_slug_modal()
 
         # The trustee enters a valid slug and submit it
         self.wait_for(

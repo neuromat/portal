@@ -9,7 +9,8 @@ import sys
 import io
 import os
 
-from django.contrib.auth.models import User
+from django.contrib import auth
+from django.contrib.auth.models import User, Permission
 from django.core.management import call_command
 from django.test import TestCase, override_settings
 from django.urls import reverse, resolve
@@ -20,7 +21,8 @@ from experiments import views
 from experiments.forms import ChangeSlugForm
 from experiments.models import Experiment, Step, Questionnaire, \
     QuestionnaireDefaultLanguage, QuestionnaireLanguage, Group, ContextTree, \
-    EEGSetting, EMGSetting, EEGElectrodePosition, ElectrodeModel
+    EEGSetting, EMGSetting, EEGElectrodePosition, ElectrodeModel, \
+    SurfaceElectrode, IntramuscularElectrode, Instruction
 from experiments.tests.tests_helper import apply_setup, global_setup_ut, \
     create_experiment_related_objects, \
     create_download_dir_structure_and_files, \
@@ -351,10 +353,15 @@ class ExperimentDetailTest(TestCase):
 class ChangeExperimentSlugTest(TestCase):
 
     def setUp(self):
+        create_trustee_users()
+        group = auth.models.Group.objects.get(name='trustees')
+        permission = Permission.objects.get(codename='change_slug')
+        group.permissions.add(permission)
+
+        trustee_user = User.objects.get(username='claudia')
+        self.client.login(username=trustee_user.username, password='passwd')
+
         create_experiment(1)
-        trustee_users = create_trustee_users()
-        trustee = trustee_users[0]
-        self.client.login(username=trustee.username, password='passwd')
 
     def test_change_slug_url_resolves_to_change_slug_view(self):
         experiment = Experiment.objects.first()
@@ -372,6 +379,23 @@ class ChangeExperimentSlugTest(TestCase):
             {'slug': 'a-brand_new-slug'}
         )
         self.assertEqual(response.status_code, 302)
+
+    def test_cannot_POST_slug_if_not_in_staff(self):
+        # logout from the system, as we alread is logged in in setUp method
+        self.client.logout()
+
+        experiment_before = Experiment.objects.first()
+        new_slug = 'a-brand_new-slug'
+        response = self.client.post(
+            '/experiments/' + str(experiment_before.id) + '/change_slug/',
+            {'slug': new_slug}
+        )
+        self.assertEqual(response.status_code, 403)
+
+        # get the experiment after posting new slug without permission
+        experiment_after = Experiment.objects.first()
+
+        self.assertNotEqual(experiment_after.slug, new_slug)
 
     def test_POSTing_a_valid_first_version_slug_saves_new_slug_correctly(self):
         experiment = Experiment.objects.first()
@@ -412,6 +436,8 @@ class ChangeExperimentSlugTest(TestCase):
             )
 
     def test_POSTing_empty_slug_returns_error_message(self):
+        # TODO: we want to display message as errors in form not as normal
+        # TODO: messages
         experiment_before = Experiment.objects.first()
 
         response = self.client.post(
@@ -426,6 +452,26 @@ class ChangeExperimentSlugTest(TestCase):
         self.assertEqual(
             message.message,
             'Empty slugs is not allowed. Please enter a valid slug'
+        )
+        self.assertEqual(message.tags, "error")
+
+    def test_submit_non_unique_slug_displays_error_message(self):
+        # TODO: we want to display message as errors in form not as normal
+        # TODO: messages; make test in test_forms too
+        experiment_before = Experiment.objects.first()
+        other_experiment = create_experiment(1)
+        response = self.client.post(
+            '/experiments/' + str(experiment_before.id) + '/change_slug/',
+            {'slug': other_experiment.slug}, follow=True
+        )
+        experiment_after = Experiment.objects.first()
+        self.assertEqual(experiment_before.slug, experiment_after.slug)
+
+        message = list(response.context['messages'])[0]
+        self.assertEqual(
+            message.message,
+            'The slug entered is equal to other experiment slug. Please try '
+            'again.'
         )
         self.assertEqual(message.tags, "error")
 
@@ -446,7 +492,7 @@ class ChangeExperimentSlugTest(TestCase):
         self.assertEqual(
             message.message,
             'The slug entered is not allowed. Please enter a valid slug. '
-            'Type only letters without accents, numbers, dash, '
+            'Type only lowcase letters without accents, numbers, dash, '
             'and underscore signs'
         )
         self.assertEqual(message.tags, "error")
@@ -558,10 +604,32 @@ class SearchTest(TestCase):
         # because in search results templates it's '<tr class ...>'
         self.assertContains(response, '<tr', 3)
 
+    def test_search_step_returns_correct_objects(self):
+        search_text = 'schritt'
+        test_search.SearchTest().create_objects_to_test_search_step()
+        for step in Step.objects.all():
+            step.identification = search_text
+            step.save()
+        self.haystack_index('rebuild_index')
+        # TODO: it was craeted a total of 4 steps in global_setup_ut(). So,
+        # TODO: we add those to our checking. Eliminate global_setup_ut() and
+        # TODO: make model instances created by demand in each test.
+        self.check_matches_on_response(7, search_text)
+
     def test_search_stimulus_step_returns_correct_objects(self):
         test_search.SearchTest().create_objects_to_test_search_stimulus_step()
         self.haystack_index('rebuild_index')
         self.check_matches_on_response(3, 'stimulusschritt')
+
+    def test_search_instruction_step_returns_correct_objects(self):
+        search_text = 'anweisungsschritt'
+        test_search.SearchTest().\
+            create_objects_to_test_search_instruction_step()
+        for instruction_step in Instruction.objects.all():
+            instruction_step.text = search_text
+            instruction_step.save()
+        self.haystack_index('rebuild_index')
+        self.check_matches_on_response(3, search_text)
 
     def test_search_genericdatacollection_step_returns_correct_objects(self):
         test_search.SearchTest().\
@@ -597,6 +665,34 @@ class SearchTest(TestCase):
         for electrode_model in ElectrodeModel.objects.all():
             electrode_model.name = search_text
             electrode_model.save()
+        self.haystack_index('rebuild_index')
+        self.check_matches_on_response(1, search_text)
+
+    def test_search_eeg_electrode_position_returns_correct_related_objects_2(self):
+        search_text = 'oberflächenelektrode'
+        test_search.SearchTest(
+        ).create_objects_to_test_search_eegelectrodeposition(
+            'surface_electrode'
+        )
+
+        # TODO: should test for all attributes
+        for surface_electrode in SurfaceElectrode.objects.all():
+            surface_electrode.name = search_text
+            surface_electrode.save()
+        self.haystack_index('rebuild_index')
+        self.check_matches_on_response(1, search_text)
+
+    def test_search_eeg_electrode_position_returns_correct_related_objects_3(self):
+        search_text = 'intramuskuläre'
+        test_search.SearchTest(
+        ).create_objects_to_test_search_eegelectrodeposition(
+            'intramuscular_electrode'
+        )
+
+        # TODO: should test for all attributes
+        for intramuscular_electrode in IntramuscularElectrode.objects.all():
+            intramuscular_electrode.strand = search_text
+            intramuscular_electrode.save()
         self.haystack_index('rebuild_index')
         self.check_matches_on_response(1, search_text)
 
