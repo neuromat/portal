@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-02-08 15:33-0200\n"
+"POT-Creation-Date: 2018-02-22 10:09-0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -237,7 +237,7 @@ msgstr "passe alto: "
 
 #: experiments/templates/experiments/detail.html:167
 msgid "low band pass: "
-msgstr "passe de banda baixa"
+msgstr "passe de banda baixa: "
 
 #: experiments/templates/experiments/detail.html:170
 msgid "high band pass: "
@@ -340,23 +340,41 @@ msgstr "Selecione itens do experimento para download"
 msgid "Select options"
 msgstr "Opções de seleção"
 
-#: experiments/templates/experiments/detail.html:336
+#: experiments/templates/experiments/detail.html:337
+#: experiments/templates/experiments/detail.html:341
+#: experiments/templates/experiments/detail.html:346
+#: experiments/templates/search/experimental_protocol.html:8
+#: experiments/templates/search/genericdatacollection.html:8
+#: experiments/templates/search/goalkeepergame.html:8
+#: experiments/templates/search/groups.html:8
+#: experiments/templates/search/instruction.html:8
+#: experiments/templates/search/questionnaires_languages.html:8
+#: experiments/templates/search/step.html:8
+#: experiments/templates/search/stimulus.html:8
+msgid "Group"
+msgstr "Grupo"
+
+#: experiments/templates/experiments/detail.html:337
 msgid "Experimental Protocol Data"
 msgstr "Protocolo experimental"
 
-#: experiments/templates/experiments/detail.html:339
+#: experiments/templates/experiments/detail.html:341
 msgid "Per Questionnaire Data"
-msgstr "Questionário"
+msgstr "Por dados de questionário"
 
-#: experiments/templates/experiments/detail.html:343
+#: experiments/templates/experiments/detail.html:346
+msgid "Per Participant Data"
+msgstr "Por dados de participantes"
+
+#: experiments/templates/experiments/detail.html:346
 msgid "Participant "
 msgstr "Participantes"
 
-#: experiments/templates/experiments/detail.html:351
+#: experiments/templates/experiments/detail.html:354
 msgid "There are not data for group"
 msgstr "Não há dado para o grupo"
 
-#: experiments/templates/experiments/detail.html:351
+#: experiments/templates/experiments/detail.html:354
 msgid ""
 "But there\\'s still basic Experiment data. Click in 'Download' button to "
 "download it."
@@ -364,7 +382,7 @@ msgstr ""
 "Mas ainda há dados básicos do Experimento. Clique no botão \\'Download\\' "
 "para baixar o arquivo."
 
-#: experiments/templates/experiments/detail.html:357
+#: experiments/templates/experiments/detail.html:360
 msgid ""
 "There are not experiment groups data for this experiment. Click in \"Download"
 "\" button to download basic experiment data"
@@ -372,37 +390,37 @@ msgstr ""
 "Não há dados de grupos do experimento. Clique no botão \"Download\" para "
 "baixar dados básicos do experimento"
 
-#: experiments/templates/experiments/detail.html:364
+#: experiments/templates/experiments/detail.html:367
 msgid "Download"
 msgstr ""
 
-#: experiments/templates/experiments/detail.html:378
+#: experiments/templates/experiments/detail.html:381
 msgid "Graphical representation"
 msgstr "Representação gráfica"
 
-#: experiments/templates/experiments/detail.html:384
+#: experiments/templates/experiments/detail.html:387
 #: experiments/templates/experiments/header_detail.html:155
 #: experiments/templates/experiments/header_detail.html:188
 msgid "Close"
 msgstr "Fechar"
 
-#: experiments/templates/experiments/detail.html:549
+#: experiments/templates/experiments/detail.html:552
 msgid "Gender of the participants"
 msgstr "Gênero dos participantes"
 
-#: experiments/templates/experiments/detail.html:556
+#: experiments/templates/experiments/detail.html:559
 msgid "total"
 msgstr "total"
 
-#: experiments/templates/experiments/detail.html:563
+#: experiments/templates/experiments/detail.html:566
 msgid "Age of the participants"
 msgstr "Idade dos participantes"
 
-#: experiments/templates/experiments/detail.html:566
+#: experiments/templates/experiments/detail.html:569
 msgid "Age (years)"
 msgstr "Idade (anos)"
 
-#: experiments/templates/experiments/detail.html:569
+#: experiments/templates/experiments/detail.html:572
 msgid "Total"
 msgstr "Total"
 
@@ -610,7 +628,7 @@ msgid "Status"
 msgstr "Estado"
 
 #: experiments/templates/experiments/list_trustee.html:21
-#| "%(experiment.groups.count)s group%(experiment.groups.count|pluralize)s"
+#, python-format
 msgid "group%(experiment.groups.count|pluralize)s"
 msgstr "grupo%(experiment.groups.count|pluralize)s"
 
@@ -1014,17 +1032,6 @@ msgstr "profunidade de inserção (colocação da agulha)"
 #: experiments/templates/search/emgsetting.html:15
 msgid "acquisition software version"
 msgstr "versão do software adquirido"
-
-#: experiments/templates/search/experimental_protocol.html:8
-#: experiments/templates/search/genericdatacollection.html:8
-#: experiments/templates/search/goalkeepergame.html:8
-#: experiments/templates/search/groups.html:8
-#: experiments/templates/search/instruction.html:8
-#: experiments/templates/search/questionnaires_languages.html:8
-#: experiments/templates/search/step.html:8
-#: experiments/templates/search/stimulus.html:8
-msgid "Group"
-msgstr "Grupos"
 
 #: experiments/templates/search/experimental_protocol.html:10
 msgid "Experimental Protocol"

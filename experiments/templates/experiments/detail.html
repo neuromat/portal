@@ -333,14 +333,17 @@
                                 <select name="download_selected" id="download_options" multiple>
                                     {% for group in experiment.groups.all %}
                                         {% if group.experimental_protocol %}
-                                            <option value="experimental_protocol_g{{ group.id }}" data-section="Group {{ group.title }}">{% trans 'Experimental Protocol Data' %}</option>
+                                            <option
+                                                    value="experimental_protocol_g{{ group.id }}" data-section="{% trans 'Group' %} {{ group.title }}">{% trans 'Experimental Protocol Data' %}</option>
                                         {% endif %}
                                         {% if group.title in questionnaires %}
-                                            <option value="questionnaires_g{{ group.id }}" data-section="Group {{ group.title }}">{% trans 'Per Questionnaire Data' %}</option>
+                                            <option
+                                                    value="questionnaires_g{{ group.id }}" data-section="{% trans 'Group' %} {{ group.title }}">{% trans 'Per Questionnaire Data' %}</option>
                                         {% endif %}
                                         {% for participant in group.participants.all %}
                                             {% if participant.has_data_collection %}
-                                                <option value="participant_p{{ participant.id }}_g{{ group.id }}" data-section="Group {{ group.title }}/Per Participant Data">{% trans 'Participant ' %}{{ participant.code }}</option>
+                                                <option
+                                                        value="participant_p{{ participant.id }}_g{{ group.id }}" data-section="{% trans 'Group' %} {{ group.title }}/{% trans 'Per Participant Data' %}">{% trans 'Participant ' %}{{ participant.code }}</option>
                                             {% endif %}
                                         {% endfor %}
                                     {% endfor %}
