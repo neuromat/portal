@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-02-22 10:09-0300\n"
+"POT-Creation-Date: 2018-02-22 13:11-0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -628,9 +628,10 @@ msgid "Status"
 msgstr "Estado"
 
 #: experiments/templates/experiments/list_trustee.html:21
-#, python-format
-msgid "group%(experiment.groups.count|pluralize)s"
-msgstr "grupo%(experiment.groups.count|pluralize)s"
+msgid "group"
+msgid_plural "groups"
+msgstr[0] "grupo"
+msgstr[1] "grupos"
 
 #: experiments/templates/experiments/list_trustee.html:49
 msgid "Change status for"
@@ -1411,3 +1412,6 @@ msgstr ""
 #: experiments/views.py:377
 msgid "The experiment's slug was modified"
 msgstr "O \"slug\" do experimento foi alterado"
+
+#~ msgid "group%(experiment.groups.count|pluralize)s"
+#~ msgstr "grupo%(experiment.groups.count|pluralize)s"
