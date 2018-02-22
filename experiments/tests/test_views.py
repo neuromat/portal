@@ -533,7 +533,7 @@ class SearchTest(TestCase):
         # "GET http://127.0.0.1:9200/haystack/_mapping"
         # during tests.
         # TODO: see:
-        # https://github.com/django-haystack/django-haystack/issues/1142
+        # TODO: https://github.com/django-haystack/django-haystack/issues/1142
         stderr_backup, sys.stderr = sys.stderr, \
                                     open('/tmp/haystack_errors.txt', 'w+')
         call_command(action, verbosity=0, interactive=False)
