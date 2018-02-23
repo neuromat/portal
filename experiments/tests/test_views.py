@@ -514,6 +514,14 @@ class ChangeExperimentSlugTest(TestCase):
         )
         self.assertEqual(message.tags, "error")
 
+    def test_POSTing_same_slug_returns_no_message(self):
+        experiment = Experiment.objects.first()
+        response = self.client.post(
+            '/experiments/' + str(experiment.id) + '/change_slug/',
+            {'slug': experiment.slug}, follow=True
+        )
+        self.assertFalse(response.context['messages'])
+
 
 @override_settings(HAYSTACK_CONNECTIONS=TEST_HAYSTACK_CONNECTIONS)
 @apply_setup(global_setup_ut)

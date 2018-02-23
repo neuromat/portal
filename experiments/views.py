@@ -339,7 +339,10 @@ def change_slug(request, experiment_id):
     experiment = Experiment.objects.get(pk=experiment_id)
 
     new_slug = request.POST.get('slug')
-    if not new_slug:
+
+    if experiment.slug == new_slug:
+        pass
+    elif not new_slug:
         messages.error(
             request,
             _('Empty slugs is not allowed. Please enter a valid slug')
