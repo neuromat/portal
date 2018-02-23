@@ -30,9 +30,10 @@ input_data_keys = [
     "questionnaire_list"
 ]
 
-patient_fields = [{"field": 'gender_id', "header": 'gender', "description": _("Gender")},
-                  {"field": 'age', "header": 'age (years)', "description": _("Age")},
+patient_fields = [
                   {"field": 'code', "header": 'participant code', "description": _("Participant code")},
+                  {"field": 'age', "header": 'age (years)', "description": _("Age")},
+                  {"field": 'gender_id', "header": 'gender', "description": _("Gender")},
                   ]
 
 classification_of_disease_fields = [
@@ -190,7 +191,8 @@ class ExportExecution:
         group_list = Group.objects.filter(experiment=experiment)
         for group in group_list:
             group_resume = "Group name: " + group.title + "\n" + "Group description: " + group.description + "\n"
-            group_directory_name = 'Group_' + group.title
+            group_title = '_'.join(slugify(group.title).split('-'))
+            group_directory_name = 'Group_' + group_title
 
             # group_directory = Users/.../qdc/media/download/experiment_id/Group_group.title
             error_msg, group_directory = create_directory(experiment_resume_directory, group_directory_name)
@@ -618,10 +620,11 @@ class ExportExecution:
                     participant_code = questionnaire.participant.code
                     # questionnaire response fields list
                     questionnaire_response_fields = json.loads(questionnaire.limesurvey_response)
-                    questionnaire_response_fields_list = questionnaire_response_fields['answers']
+                    questionnaire_response_list = questionnaire_response_fields['answers']
                     # add participant data to the questionnaire fields data
                     participant_data_list = self.process_participant_data([questionnaire.participant.id])
-                    questionnaire_response_fields_list.extend(participant_data_list[1])
+                    questionnaire_response_fields_list = participant_data_list[1]
+                    questionnaire_response_fields_list.extend(questionnaire_response_list)
                     # get questionnaire (survey)
                     survey = get_object_or_404(Questionnaire, pk=step_questionnaire.id)
                     questionnaire_code = survey.code
@@ -643,8 +646,9 @@ class ExportExecution:
 
                     # data per questionnaire_response
                     if questionnaire_code not in self.per_group_data[group_id]['questionnaire_data']:
-                        questionnaire_header_fields_list = questionnaire_response_fields['questions']
-                        questionnaire_header_fields_list.extend(participant_data_list[0])
+                        questionnaire_header_response_list = questionnaire_response_fields['questions']
+                        questionnaire_header_fields_list = participant_data_list[0]
+                        questionnaire_header_fields_list.extend(questionnaire_header_response_list)
                         self.per_group_data[group_id]['questionnaire_data'][questionnaire_code] = {
                             'questionnaire_title': questionnaire_title,
                             'questionnaire_filename': "%s_%s.csv" % ("Responses", str(questionnaire_code)),
