@@ -337,13 +337,12 @@ def change_slug(request, experiment_id):
     # TODO: move validation logic to ChangeSlugForm form; implement
     # TODO: validation in model too
     experiment = Experiment.objects.get(pk=experiment_id)
+
     new_slug = request.POST.get('slug')
 
-    # if slug is the same do nothing
     if experiment.slug == new_slug:
-        return HttpResponseRedirect('/experiments/' + experiment.slug + '/')
-
-    if not new_slug:
+        pass
+    elif not new_slug:
         messages.error(
             request,
             _('Empty slugs is not allowed. Please enter a valid slug')

@@ -7,6 +7,7 @@ from unittest import skip
 
 from django.core import mail
 from django.core.management import call_command
+from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.common.keys import Keys
 
 from experiments.models import Experiment
@@ -863,3 +864,21 @@ class TrusteeTest(FunctionalTestTrustee):
             "The experiment's slug was modified",
             self.browser.find_element_by_tag_name('body').text
         ))
+
+    def test_submit_same_slug_returns_redirect_with_no_message(self):
+        experiment = self._access_change_slug_modal()
+
+        # The trustee enters the same slug as current one
+        self.wait_for(
+            lambda: self.browser.find_element_by_id(
+                'id_slug'
+            ).send_keys(experiment.slug)
+        )
+        self.browser.find_element_by_id('id_slug').send_keys(Keys.ENTER)
+
+        # As the slug entered is the same as current one the page refreshes
+        # with no messages at all
+        with self.assertRaises(NoSuchElementException):
+            self.wait_for(lambda: self.browser.find_element_by_css_selector(
+                '.warning-message'
+            ))
