@@ -1,5 +1,6 @@
 import json
 import os
+import csv
 
 from decimal import Decimal
 from os import path, makedirs
@@ -9,6 +10,7 @@ from django.shortcuts import get_object_or_404
 from sys import modules
 from django.utils.encoding import smart_str
 from django.utils.translation import ugettext as _
+from django.template.defaultfilters import slugify
 
 from experiments.models import Experiment, Group, Participant, EEGData, EMGData, EEGSetting, EMGSetting, TMSData, \
     TMSSetting, AdditionalData, ContextTree, GenericDataCollectionData, GoalkeeperGameData, Step, \
@@ -48,7 +50,7 @@ def save_to_csv(complete_filename, rows_to_be_saved):
     :return:
     """
     with open(complete_filename.encode('utf-8'), 'w', newline='', encoding='UTF-8') as csv_file:
-        export_writer = writer(csv_file)
+        export_writer = csv.writer(csv_file, quotechar='"', quoting=csv.QUOTE_NONNUMERIC)
         for row in rows_to_be_saved:
             export_writer.writerow(row)
 
@@ -585,7 +587,8 @@ class ExportExecution:
                 'tms_default_setting_id': '',
                 'context_tree_default_id': ''
             }
-            group_name_directory = "Group_" + group.title
+            group_title = '_'.join(slugify(group.title).split('-'))
+            group_name_directory = "Group_" + group_title
             group_directory = path.join(self.get_export_directory(), group_name_directory)
             export_group_directory = path.join(self.get_input_data("base_directory"), group_name_directory)
             self.per_group_data[group_id]['group']['directory'] = group_directory
