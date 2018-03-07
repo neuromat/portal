@@ -1,5 +1,6 @@
 import json
 import os
+import csv
 
 from decimal import Decimal
 from os import path, makedirs
@@ -9,6 +10,7 @@ from django.shortcuts import get_object_or_404
 from sys import modules
 from django.utils.encoding import smart_str
 from django.utils.translation import ugettext as _
+from django.template.defaultfilters import slugify
 
 from experiments.models import Experiment, Group, Participant, EEGData, EMGData, EEGSetting, EMGSetting, TMSData, \
     TMSSetting, AdditionalData, ContextTree, GenericDataCollectionData, GoalkeeperGameData, Step, \
@@ -28,9 +30,10 @@ input_data_keys = [
     "questionnaire_list"
 ]
 
-patient_fields = [{"field": 'gender_id', "header": 'gender', "description": _("Gender")},
-                  {"field": 'age', "header": 'age (years)', "description": _("Age")},
+patient_fields = [
                   {"field": 'code', "header": 'participant code', "description": _("Participant code")},
+                  {"field": 'age', "header": 'age (years)', "description": _("Age")},
+                  {"field": 'gender_id', "header": 'gender', "description": _("Gender")},
                   ]
 
 classification_of_disease_fields = [
@@ -48,7 +51,7 @@ def save_to_csv(complete_filename, rows_to_be_saved):
     :return:
     """
     with open(complete_filename.encode('utf-8'), 'w', newline='', encoding='UTF-8') as csv_file:
-        export_writer = writer(csv_file)
+        export_writer = csv.writer(csv_file, quotechar='"', quoting=csv.QUOTE_NONNUMERIC)
         for row in rows_to_be_saved:
             export_writer.writerow(row)
 
@@ -188,7 +191,8 @@ class ExportExecution:
         group_list = Group.objects.filter(experiment=experiment)
         for group in group_list:
             group_resume = "Group name: " + group.title + "\n" + "Group description: " + group.description + "\n"
-            group_directory_name = 'Group_' + group.title
+            group_title = '_'.join(slugify(group.title).split('-'))
+            group_directory_name = 'Group_' + group_title
 
             # group_directory = Users/.../qdc/media/download/experiment_id/Group_group.title
             error_msg, group_directory = create_directory(experiment_resume_directory, group_directory_name)
@@ -585,7 +589,8 @@ class ExportExecution:
                 'tms_default_setting_id': '',
                 'context_tree_default_id': ''
             }
-            group_name_directory = "Group_" + group.title
+            group_title = '_'.join(slugify(group.title).split('-'))
+            group_name_directory = "Group_" + group_title
             group_directory = path.join(self.get_export_directory(), group_name_directory)
             export_group_directory = path.join(self.get_input_data("base_directory"), group_name_directory)
             self.per_group_data[group_id]['group']['directory'] = group_directory
@@ -615,10 +620,11 @@ class ExportExecution:
                     participant_code = questionnaire.participant.code
                     # questionnaire response fields list
                     questionnaire_response_fields = json.loads(questionnaire.limesurvey_response)
-                    questionnaire_response_fields_list = questionnaire_response_fields['answers']
+                    questionnaire_response_list = questionnaire_response_fields['answers']
                     # add participant data to the questionnaire fields data
                     participant_data_list = self.process_participant_data([questionnaire.participant.id])
-                    questionnaire_response_fields_list.extend(participant_data_list[1])
+                    questionnaire_response_fields_list = participant_data_list[1]
+                    questionnaire_response_fields_list.extend(questionnaire_response_list)
                     # get questionnaire (survey)
                     survey = get_object_or_404(Questionnaire, pk=step_questionnaire.id)
                     questionnaire_code = survey.code
@@ -640,8 +646,9 @@ class ExportExecution:
 
                     # data per questionnaire_response
                     if questionnaire_code not in self.per_group_data[group_id]['questionnaire_data']:
-                        questionnaire_header_fields_list = questionnaire_response_fields['questions']
-                        questionnaire_header_fields_list.extend(participant_data_list[0])
+                        questionnaire_header_response_list = questionnaire_response_fields['questions']
+                        questionnaire_header_fields_list = participant_data_list[0]
+                        questionnaire_header_fields_list.extend(questionnaire_header_response_list)
                         self.per_group_data[group_id]['questionnaire_data'][questionnaire_code] = {
                             'questionnaire_title': questionnaire_title,
                             'questionnaire_filename': "%s_%s.csv" % ("Responses", str(questionnaire_code)),

@@ -1,19 +1,18 @@
 import tempfile
-from random import randint, choice
-
 import os
-
 import shutil
+
 from django.template.defaultfilters import slugify
 from django.test import TestCase, override_settings
 from django.core.exceptions import ValidationError
 from django.contrib.auth.models import User
 from datetime import datetime
+from random import randint, choice
 from faker import Factory
 
 from experiments.models import Experiment, Study, Group, Researcher, \
     Collaborator, RejectJustification, Publication, ExperimentalProtocol, Step, \
-    StepAdditionalFile, Gender, File
+    StepAdditionalFile, Gender, File, Participant
 from experiments.tests.tests_helper import global_setup_ut, apply_setup, \
     create_experiment, create_group, create_binary_file, create_eeg_setting, \
     create_eeg_electrode_localization_system, create_context_tree, create_step, \
@@ -361,6 +360,26 @@ class GroupModelTest(TestCase):
         with self.assertRaises(ValidationError):
             group.save()
             group.full_clean()
+
+
+class ParticipantModelTest(TestCase):
+
+    def setUp(self):
+        experiment = create_experiment(1)
+        group = create_group(1, experiment)
+        create_genders()
+        create_participant(1, group)
+
+    def test_can_save_null_age_attribute(self):
+        group = Group.objects.last()
+
+        p = Participant.objects.create(
+            code='abc',
+            age=None,
+            gender=Gender.objects.get(pk='female'),
+            group=group
+        )
+        self.assertEqual(p.code, 'abc')
 
 
 @apply_setup(global_setup_ut)
