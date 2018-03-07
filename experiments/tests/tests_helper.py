@@ -170,10 +170,10 @@ def create_genders():
     Gender.objects.create(name='female')
 
 
-def create_participant(qtty, group, gender):
+def create_participant(qtty, group, gender=Gender.objects.get(pk='female')):
     """
-    :param gender:
-    :param qtty:
+    :param qtty: number of objects to create
+    :param gender: Gender model instance
     :param group: Group model instance
     """
     code = randint(1, 1000)
