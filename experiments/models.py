@@ -207,7 +207,7 @@ class Participant(models.Model):  # not indexed for search
     group = models.ForeignKey(Group, related_name='participants')
     code = models.CharField(max_length=150)
     gender = models.ForeignKey(Gender)
-    age = models.DecimalField(decimal_places=4, max_digits=8, null=True)
+    age = models.DecimalField(decimal_places=4, max_digits=8)
 
     class Meta:
         unique_together = ('group', 'code')
