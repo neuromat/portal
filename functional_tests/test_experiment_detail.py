@@ -106,11 +106,13 @@ class ExperimentDetailTest(FunctionalTest):
             'study_startdate').text
         self.assertIn('Start date:', study_start_date)
         ##
-        # Obs.: code line right below is only to conform to study_start_date
-        # format in browser
+        # to conform to study_start_date format in browser
         ##
-        self.assertIn(experiment.study.start_date.strftime("%b. %d, %Y")
+        self.assertIn(experiment.study.start_date.strftime("%B %d, %Y")
                       .lstrip("0").replace(" 0", " "), study_start_date)
+        # before
+        # self.assertIn(experiment.study.start_date.strftime("%b. %d, %Y")
+        #               .lstrip("0").replace(" 0", " "), study_start_date)
         study_end_date = self.browser.find_element_by_id(
             'study_enddate').text
         self.assertIn('End date:', study_end_date)
