@@ -1,195 +1,195 @@
-questionnaire_id,questionnaire_title,question_code,question_limesurvey_type,question_description,subquestion_code,subquestion_description,option_code,option_description,option_value,column_title
-599846,INDC - Input Entry,datlesao,D,Date of Injury:, , , , , , 
-599846,INDC - Input Entry,opcladolesao,L,What side of the injury?, , ,1,Right,0,
-599846,INDC - Input Entry,opcladolesao,L,What side of the injury?, , ,2,Left,1,
-599846,INDC - Input Entry,opcladolesao,L,What side of the injury?, , ,3,Both,1,
-599846,INDC - Input Entry,lislocalfisio,M,Local:,INDC,Institution of the Study, , , , 
-599846,INDC - Input Entry,opcfreqfisio,L,Weekly frequency:, , ,1,1 time,0,
-599846,INDC - Input Entry,opcfreqfisio,L,Weekly frequency:, , ,2,2 times,1,
-599846,INDC - Input Entry,opcfreqfisio,L,Weekly frequency:, , ,3,Three times,1,
-599846,INDC - Input Entry,opcfreqfisio,L,Weekly frequency:, , ,4,4 times,1,
-599846,INDC - Input Entry,opcfreqfisio,L,Weekly frequency:, , ,5,5 times,1,
-599846,INDC - Input Entry,opcfreqfisio,L,Weekly frequency:, , ,6,6 times,1,
-599846,INDC - Input Entry,opcfreqfisio,L,Weekly frequency:, , ,7,7 times or more,1,
-599846,INDC - Input Entry,texhistoriadoenca,T,History of the current disease:, , , , , , 
-599846,INDC - Input Entry,snTCE,L,Did you have TBI associated with the injury?, , ,A1,Yes,0,
-599846,INDC - Input Entry,snTCE,L,Did you have TBI associated with the injury?, , ,A2,No,1,
-599846,INDC - Input Entry,snTCE,L,Did you have TBI associated with the injury?, , ,A3,Uninformed,1,
-599846,INDC - Input Entry,sndreno,L,Did you use a chest drain?, , ,1,Yes,1,
-599846,INDC - Input Entry,sndreno,L,Did you use a chest drain?, , ,2,No,1,
-599846,INDC - Input Entry,sndreno,L,Did you use a chest drain?, , ,3,Uninformed,1,
-599846,INDC - Input Entry,snlesovascular,L,Have they had vascular lesions associated with brachial plexus injury?, , ,1,Yes,0,
-599846,INDC - Input Entry,snlesovascular,L,Have they had vascular lesions associated with brachial plexus injury?, , ,2,No,1,
-599846,INDC - Input Entry,snlesovascular,L,Have they had vascular lesions associated with brachial plexus injury?, , ,3,Uninformed,1,
-599846,INDC - Input Entry,lislesovascular3,M,Injury type (s):,SQ001,Break, , , , 
-599846,INDC - Input Entry,lislesovascular3,M,Injury type (s):,SQ002,Fistula, , , , 
-599846,INDC - Input Entry,lislesovascular3,M,Injury type (s):,SQ003,Thrombosis, , , , 
-599846,INDC - Input Entry,lislesovascular3,M,Injury type (s):,SQ004,Not specified, , , , 
-599846,INDC - Input Entry,texlesovascular4,T,Type of reconstruction (s):, , , , , , 
-599846,INDC - Input Entry,docexameTCE,|,Attach exams., , , , , , 
-599846,INDC - Input Entry,opsTO,L,Do you perform Occupational Therapy regularly?, , ,A1,Yes,0,
-599846,INDC - Input Entry,opsTO,L,Do you perform Occupational Therapy regularly?, , ,A2,No,1,
-599846,INDC - Input Entry,opsTO,L,Do you perform Occupational Therapy regularly?, , ,A3,Uninformed,1,
-599846,INDC - Input Entry,lislocalTO,M,Local:,SQ001,Institution of the Study, , , , 
-599846,INDC - Input Entry,opcfreqTO,L,Weekly frequency:, , ,1,1 time,1,
-599846,INDC - Input Entry,opcfreqTO,L,Weekly frequency:, , ,2,2 times,1,
-599846,INDC - Input Entry,opcfreqTO,L,Weekly frequency:, , ,3,Three times,1,
-599846,INDC - Input Entry,opcfreqTO,L,Weekly frequency:, , ,4,4 times,1,
-599846,INDC - Input Entry,opcfreqTO,L,Weekly frequency:, , ,5,5 times,1,
-599846,INDC - Input Entry,opcfreqTO,L,Weekly frequency:, , ,6,6 times,1,
-599846,INDC - Input Entry,opcfreqTO,L,Weekly frequency:, , ,7,7 times or more,1,
-599846,INDC - Input Entry,sndesacordado,L,Were you unconscious?, , ,1,Yes,1,
-599846,INDC - Input Entry,sndesacordado,L,Were you unconscious?, , ,2,No,1,
-599846,INDC - Input Entry,sndesacordado,L,Were you unconscious?, , ,3,Uninformed,1,
-599846,INDC - Input Entry,textempodesacordado,S,How long?, , , , , , 
-599846,INDC - Input Entry,opsmedicamentos,L,Do you use medication (s)?, , ,A1,Yes,0,
-599846,INDC - Input Entry,opsmedicamentos,L,Do you use medication (s)?, , ,A2,No,1,
-599846,INDC - Input Entry,opsmedicamentos,L,Do you use medication (s)?, , ,A3,Uninformed,1,
-599846,INDC - Input Entry,lismedicamentos,P,Which drug (s)?,1,Opioids, , , , 
-599846,INDC - Input Entry,lismedicamentos,P,Which drug (s)?,2,Antidepressants, , , , 
-599846,INDC - Input Entry,lismedicamentos,P,Which drug (s)?,3,Anticonvulsants, , , , 
-599846,INDC - Input Entry,lismedicamentos,P,Which drug (s)?,4,Neuroleptics, , , , 
-599846,INDC - Input Entry,lismedicamentos,P,Which drug (s)?,5,Supplements / Vitamins, , , , 
-599846,INDC - Input Entry,lismedicamentos,P,Which drug (s)?,6,Natural Substances / Teas, , , , 
-599846,INDC - Input Entry,lismedicamentos,P,Which drug (s)?,7,Do not know, , , , 
-599846,INDC - Input Entry,sncirurgiasanterio,Y,Have you ever had any brachial plexus surgery?, , , , , , 
-599846,INDC - Input Entry,texprocedimeanterior,T,Which procedure (s) were performed?, , , , , , 
-599846,INDC - Input Entry,sninspecao,F,Inspection,a, Glenoumeral Subluxation,n,No,1,
-599846,INDC - Input Entry,sninspecao,F,Inspection,a, Glenoumeral Subluxation,n1,Not Rated,1,
-599846,INDC - Input Entry,sninspecao,F,Inspection,a, Glenoumeral Subluxation,s,Yes,1,
-599846,INDC - Input Entry,sninspecao,F,Inspection,b, Scrotal posture,n,No,1,
-599846,INDC - Input Entry,sninspecao,F,Inspection,b, Scrotal posture,n1,Not Rated,1,
-599846,INDC - Input Entry,sninspecao,F,Inspection,b, Scrotal posture,s,Yes,1,
-599846,INDC - Input Entry,sninspecao,F,Inspection,c, Horner's Sign,n,No,1,
-599846,INDC - Input Entry,sninspecao,F,Inspection,c, Horner's Sign,n1,Not Rated,1,
-599846,INDC - Input Entry,sninspecao,F,Inspection,c, Horner's Sign,s,Yes,1,
-599846,INDC - Input Entry,sninspecao,F,Inspection,d, Edema,n,No,1,
-599846,INDC - Input Entry,sninspecao,F,Inspection,d, Edema,n1,Not Rated,1,
-599846,INDC - Input Entry,sninspecao,F,Inspection,d, Edema,s,Yes,1,
-599846,INDC - Input Entry,sninspecao,F,Inspection,f,Scar,n,No,1,
-599846,INDC - Input Entry,sninspecao,F,Inspection,f,Scar,n1,Not Rated,1,
-599846,INDC - Input Entry,sninspecao,F,Inspection,f,Scar,s,Yes,1,
-599846,INDC - Input Entry,sninspecao,F,Inspection,g,Trophic alteration,n,No,1,
-599846,INDC - Input Entry,sninspecao,F,Inspection,g,Trophic alteration,n1,Not Rated,1,
-599846,INDC - Input Entry,sninspecao,F,Inspection,g,Trophic alteration,s,Yes,1,
-599846,INDC - Input Entry,texlocalcicatriz,T,Description and location of scar (s):, , , , , , 
-599846,INDC - Input Entry,snsinaltinel,L,Does it have tinnitus signal?, , ,A1,Yes,0,
-599846,INDC - Input Entry,snsinaltinel,L,Does it have tinnitus signal?, , ,A2,No,1,
-599846,INDC - Input Entry,snsinaltinel,L,Does it have tinnitus signal?, , ,A3,Not Rated,1,
-599846,INDC - Input Entry,snrestricaoarticula,F,Articular Restriction,1, Shoulder,1,Yes,1,
-599846,INDC - Input Entry,snrestricaoarticula,F,Articular Restriction,1, Shoulder,2,No,1,
-599846,INDC - Input Entry,snrestricaoarticula,F,Articular Restriction,1, Shoulder,3,Not Rated,1,
-599846,INDC - Input Entry,snrestricaoarticula,F,Articular Restriction,2, Elbow,1,Yes,1,
-599846,INDC - Input Entry,snrestricaoarticula,F,Articular Restriction,2, Elbow,2,No,1,
-599846,INDC - Input Entry,snrestricaoarticula,F,Articular Restriction,2, Elbow,3,Not Rated,1,
-599846,INDC - Input Entry,snrestricaoarticula,F,Articular Restriction,3, Handle,1,Yes,1,
-599846,INDC - Input Entry,snrestricaoarticula,F,Articular Restriction,3, Handle,2,No,1,
-599846,INDC - Input Entry,snrestricaoarticula,F,Articular Restriction,3, Handle,3,Not Rated,1,
-599846,INDC - Input Entry,snrestricaoarticula,F,Articular Restriction,4, Fingers,1,Yes,1,
-599846,INDC - Input Entry,snrestricaoarticula,F,Articular Restriction,4, Fingers,2,No,1,
-599846,INDC - Input Entry,snrestricaoarticula,F,Articular Restriction,4, Fingers,3,Not Rated,1,
-599846,INDC - Input Entry,opcforcamuscular,F,Strength to manual muscle testing by segment.,SQ001,Shoulder Flexion,A1,0,0,
-599846,INDC - Input Entry,opcforcamuscular,F,Strength to manual muscle testing by segment.,SQ001,Shoulder Flexion,A2,1,1,
-599846,INDC - Input Entry,opcforcamuscular,F,Strength to manual muscle testing by segment.,SQ001,Shoulder Flexion,A3,2,1,
-599846,INDC - Input Entry,opcforcamuscular,F,Strength to manual muscle testing by segment.,SQ001,Shoulder Flexion,A4,3,1,
-599846,INDC - Input Entry,opcforcamuscular,F,Strength to manual muscle testing by segment.,SQ001,Shoulder Flexion,A5,4,1,
-599846,INDC - Input Entry,opcforcamuscular,F,Strength to manual muscle testing by segment.,SQ001,Shoulder Flexion,A6,5,1,
-599846,INDC - Input Entry,opcforcamuscular,F,Strength to manual muscle testing by segment.,SQ001,Shoulder Flexion,A7,Not Rated,1,
-599846,INDC - Input Entry,opcforcamuscular,F,Strength to manual muscle testing by segment.,SQ002,Shoulder Abduction,A1,0,0,
-599846,INDC - Input Entry,opcforcamuscular,F,Strength to manual muscle testing by segment.,SQ002,Shoulder Abduction,A2,1,1,
-599846,INDC - Input Entry,opcforcamuscular,F,Strength to manual muscle testing by segment.,SQ002,Shoulder Abduction,A3,2,1,
-599846,INDC - Input Entry,opcforcamuscular,F,Strength to manual muscle testing by segment.,SQ002,Shoulder Abduction,A4,3,1,
-599846,INDC - Input Entry,opcforcamuscular,F,Strength to manual muscle testing by segment.,SQ002,Shoulder Abduction,A5,4,1,
-599846,INDC - Input Entry,opcforcamuscular,F,Strength to manual muscle testing by segment.,SQ002,Shoulder Abduction,A6,5,1,
-599846,INDC - Input Entry,opcforcamuscular,F,Strength to manual muscle testing by segment.,SQ002,Shoulder Abduction,A7,Not Rated,1,
-599846,INDC - Input Entry,opcforcamuscular,F,Strength to manual muscle testing by segment.,SQ003,External Shoulder Rotation,A1,0,0,
-599846,INDC - Input Entry,opcforcamuscular,F,Strength to manual muscle testing by segment.,SQ003,External Shoulder Rotation,A2,1,1,
-599846,INDC - Input Entry,opcforcamuscular,F,Strength to manual muscle testing by segment.,SQ003,External Shoulder Rotation,A3,2,1,
-599846,INDC - Input Entry,opcforcamuscular,F,Strength to manual muscle testing by segment.,SQ003,External Shoulder Rotation,A4,3,1,
-599846,INDC - Input Entry,opcforcamuscular,F,Strength to manual muscle testing by segment.,SQ003,External Shoulder Rotation,A5,4,1,
-599846,INDC - Input Entry,opcforcamuscular,F,Strength to manual muscle testing by segment.,SQ003,External Shoulder Rotation,A6,5,1,
-599846,INDC - Input Entry,opcforcamuscular,F,Strength to manual muscle testing by segment.,SQ003,External Shoulder Rotation,A7,Not Rated,1,
-599846,INDC - Input Entry,opcforcamuscular,F,Strength to manual muscle testing by segment.,SQ004,Internal Shoulder Rotation,A1,0,0,
-599846,INDC - Input Entry,opcforcamuscular,F,Strength to manual muscle testing by segment.,SQ004,Internal Shoulder Rotation,A2,1,1,
-599846,INDC - Input Entry,opcforcamuscular,F,Strength to manual muscle testing by segment.,SQ004,Internal Shoulder Rotation,A3,2,1,
-599846,INDC - Input Entry,opcforcamuscular,F,Strength to manual muscle testing by segment.,SQ004,Internal Shoulder Rotation,A4,3,1,
-599846,INDC - Input Entry,opcforcamuscular,F,Strength to manual muscle testing by segment.,SQ004,Internal Shoulder Rotation,A5,4,1,
-599846,INDC - Input Entry,opcforcamuscular,F,Strength to manual muscle testing by segment.,SQ004,Internal Shoulder Rotation,A6,5,1,
-599846,INDC - Input Entry,opcforcamuscular,F,Strength to manual muscle testing by segment.,SQ004,Internal Shoulder Rotation,A7,Not Rated,1,
-599846,INDC - Input Entry,opcforcamuscular,F,Strength to manual muscle testing by segment.,SQ005,Elevation of the Scapula,A1,0,0,
-599846,INDC - Input Entry,opcforcamuscular,F,Strength to manual muscle testing by segment.,SQ005,Elevation of the Scapula,A2,1,1,
-599846,INDC - Input Entry,opcforcamuscular,F,Strength to manual muscle testing by segment.,SQ005,Elevation of the Scapula,A3,2,1,
-599846,INDC - Input Entry,opcforcamuscular,F,Strength to manual muscle testing by segment.,SQ005,Elevation of the Scapula,A4,3,1,
-599846,INDC - Input Entry,opcforcamuscular,F,Strength to manual muscle testing by segment.,SQ005,Elevation of the Scapula,A5,4,1,
-599846,INDC - Input Entry,opcforcamuscular,F,Strength to manual muscle testing by segment.,SQ005,Elevation of the Scapula,A6,5,1,
-599846,INDC - Input Entry,opcforcamuscular,F,Strength to manual muscle testing by segment.,SQ005,Elevation of the Scapula,A7,Not Rated,1,
-599846,INDC - Input Entry,opcforcamuscular,F,Strength to manual muscle testing by segment.,SQ006,Abduction and Upper Rotation of the Scapula,A1,0,0,
-599846,INDC - Input Entry,opcforcamuscular,F,Strength to manual muscle testing by segment.,SQ006,Abduction and Upper Rotation of the Scapula,A2,1,1,
-599846,INDC - Input Entry,opcforcamuscular,F,Strength to manual muscle testing by segment.,SQ006,Abduction and Upper Rotation of the Scapula,A3,2,1,
-599846,INDC - Input Entry,opcforcamuscular,F,Strength to manual muscle testing by segment.,SQ006,Abduction and Upper Rotation of the Scapula,A4,3,1,
-599846,INDC - Input Entry,opcforcamuscular,F,Strength to manual muscle testing by segment.,SQ006,Abduction and Upper Rotation of the Scapula,A5,4,1,
-599846,INDC - Input Entry,opcforcamuscular,F,Strength to manual muscle testing by segment.,SQ006,Abduction and Upper Rotation of the Scapula,A6,5,1,
-599846,INDC - Input Entry,opcforcamuscular,F,Strength to manual muscle testing by segment.,SQ006,Abduction and Upper Rotation of the Scapula,A7,Not Rated,1,
-599846,INDC - Input Entry,opcforcamuscular,F,Strength to manual muscle testing by segment.,SQ007,Elbow Flexion,A1,0,0,
-599846,INDC - Input Entry,opcforcamuscular,F,Strength to manual muscle testing by segment.,SQ007,Elbow Flexion,A2,1,1,
-599846,INDC - Input Entry,opcforcamuscular,F,Strength to manual muscle testing by segment.,SQ007,Elbow Flexion,A3,2,1,
-599846,INDC - Input Entry,opcforcamuscular,F,Strength to manual muscle testing by segment.,SQ007,Elbow Flexion,A4,3,1,
-599846,INDC - Input Entry,opcforcamuscular,F,Strength to manual muscle testing by segment.,SQ007,Elbow Flexion,A5,4,1,
-599846,INDC - Input Entry,opcforcamuscular,F,Strength to manual muscle testing by segment.,SQ007,Elbow Flexion,A6,5,1,
-599846,INDC - Input Entry,opcforcamuscular,F,Strength to manual muscle testing by segment.,SQ007,Elbow Flexion,A7,Not Rated,1,
-599846,INDC - Input Entry,opcforcamuscular,F,Strength to manual muscle testing by segment.,SQ008,Elbow Extension,A1,0,0,
-599846,INDC - Input Entry,opcforcamuscular,F,Strength to manual muscle testing by segment.,SQ008,Elbow Extension,A2,1,1,
-599846,INDC - Input Entry,opcforcamuscular,F,Strength to manual muscle testing by segment.,SQ008,Elbow Extension,A3,2,1,
-599846,INDC - Input Entry,opcforcamuscular,F,Strength to manual muscle testing by segment.,SQ008,Elbow Extension,A4,3,1,
-599846,INDC - Input Entry,opcforcamuscular,F,Strength to manual muscle testing by segment.,SQ008,Elbow Extension,A5,4,1,
-599846,INDC - Input Entry,opcforcamuscular,F,Strength to manual muscle testing by segment.,SQ008,Elbow Extension,A6,5,1,
-599846,INDC - Input Entry,opcforcamuscular,F,Strength to manual muscle testing by segment.,SQ008,Elbow Extension,A7,Not Rated,1,
-599846,INDC - Input Entry,opcforcamuscular,F,Strength to manual muscle testing by segment.,SQ009,Fist Extension,A1,0,0,
-599846,INDC - Input Entry,opcforcamuscular,F,Strength to manual muscle testing by segment.,SQ009,Fist Extension,A2,1,1,
-599846,INDC - Input Entry,opcforcamuscular,F,Strength to manual muscle testing by segment.,SQ009,Fist Extension,A3,2,1,
-599846,INDC - Input Entry,opcforcamuscular,F,Strength to manual muscle testing by segment.,SQ009,Fist Extension,A4,3,1,
-599846,INDC - Input Entry,opcforcamuscular,F,Strength to manual muscle testing by segment.,SQ009,Fist Extension,A5,4,1,
-599846,INDC - Input Entry,opcforcamuscular,F,Strength to manual muscle testing by segment.,SQ009,Fist Extension,A6,5,1,
-599846,INDC - Input Entry,opcforcamuscular,F,Strength to manual muscle testing by segment.,SQ009,Fist Extension,A7,Not Rated,1,
-599846,INDC - Input Entry,opcforcamuscular,F,Strength to manual muscle testing by segment.,SQ010,Fist Bending,A1,0,0,
-599846,INDC - Input Entry,opcforcamuscular,F,Strength to manual muscle testing by segment.,SQ010,Fist Bending,A2,1,1,
-599846,INDC - Input Entry,opcforcamuscular,F,Strength to manual muscle testing by segment.,SQ010,Fist Bending,A3,2,1,
-599846,INDC - Input Entry,opcforcamuscular,F,Strength to manual muscle testing by segment.,SQ010,Fist Bending,A4,3,1,
-599846,INDC - Input Entry,opcforcamuscular,F,Strength to manual muscle testing by segment.,SQ010,Fist Bending,A5,4,1,
-599846,INDC - Input Entry,opcforcamuscular,F,Strength to manual muscle testing by segment.,SQ010,Fist Bending,A6,5,1,
-599846,INDC - Input Entry,opcforcamuscular,F,Strength to manual muscle testing by segment.,SQ010,Fist Bending,A7,Not Rated,1,
-599846,INDC - Input Entry,opcforcamuscular,F,Strength to manual muscle testing by segment.,SQ011,Finger Bending,A1,0,0,
-599846,INDC - Input Entry,opcforcamuscular,F,Strength to manual muscle testing by segment.,SQ011,Finger Bending,A2,1,1,
-599846,INDC - Input Entry,opcforcamuscular,F,Strength to manual muscle testing by segment.,SQ011,Finger Bending,A3,2,1,
-599846,INDC - Input Entry,opcforcamuscular,F,Strength to manual muscle testing by segment.,SQ011,Finger Bending,A4,3,1,
-599846,INDC - Input Entry,opcforcamuscular,F,Strength to manual muscle testing by segment.,SQ011,Finger Bending,A5,4,1,
-599846,INDC - Input Entry,opcforcamuscular,F,Strength to manual muscle testing by segment.,SQ011,Finger Bending,A6,5,1,
-599846,INDC - Input Entry,opcforcamuscular,F,Strength to manual muscle testing by segment.,SQ011,Finger Bending,A7,Not Rated,1,
-599846,INDC - Input Entry,opcforcamuscular,F,Strength to manual muscle testing by segment.,SQ012,Finger Extension,A1,0,0,
-599846,INDC - Input Entry,opcforcamuscular,F,Strength to manual muscle testing by segment.,SQ012,Finger Extension,A2,1,1,
-599846,INDC - Input Entry,opcforcamuscular,F,Strength to manual muscle testing by segment.,SQ012,Finger Extension,A3,2,1,
-599846,INDC - Input Entry,opcforcamuscular,F,Strength to manual muscle testing by segment.,SQ012,Finger Extension,A4,3,1,
-599846,INDC - Input Entry,opcforcamuscular,F,Strength to manual muscle testing by segment.,SQ012,Finger Extension,A5,4,1,
-599846,INDC - Input Entry,opcforcamuscular,F,Strength to manual muscle testing by segment.,SQ012,Finger Extension,A6,5,1,
-599846,INDC - Input Entry,opcforcamuscular,F,Strength to manual muscle testing by segment.,SQ012,Finger Extension,A7,Not Rated,1,
-599846,INDC - Input Entry,opcforcamuscular,F,Strength to manual muscle testing by segment.,SQ013,Fingers Abduction,A1,0,0,
-599846,INDC - Input Entry,opcforcamuscular,F,Strength to manual muscle testing by segment.,SQ013,Fingers Abduction,A2,1,1,
-599846,INDC - Input Entry,opcforcamuscular,F,Strength to manual muscle testing by segment.,SQ013,Fingers Abduction,A3,2,1,
-599846,INDC - Input Entry,opcforcamuscular,F,Strength to manual muscle testing by segment.,SQ013,Fingers Abduction,A4,3,1,
-599846,INDC - Input Entry,opcforcamuscular,F,Strength to manual muscle testing by segment.,SQ013,Fingers Abduction,A5,4,1,
-599846,INDC - Input Entry,opcforcamuscular,F,Strength to manual muscle testing by segment.,SQ013,Fingers Abduction,A6,5,1,
-599846,INDC - Input Entry,opcforcamuscular,F,Strength to manual muscle testing by segment.,SQ013,Fingers Abduction,A7,Not Rated,1,
-599846,INDC - Input Entry,opcforcamuscular,F,Strength to manual muscle testing by segment.,SQ014,Adduction of Fingers,A1,0,0,
-599846,INDC - Input Entry,opcforcamuscular,F,Strength to manual muscle testing by segment.,SQ014,Adduction of Fingers,A2,1,1,
-599846,INDC - Input Entry,opcforcamuscular,F,Strength to manual muscle testing by segment.,SQ014,Adduction of Fingers,A3,2,1,
-599846,INDC - Input Entry,opcforcamuscular,F,Strength to manual muscle testing by segment.,SQ014,Adduction of Fingers,A4,3,1,
-599846,INDC - Input Entry,opcforcamuscular,F,Strength to manual muscle testing by segment.,SQ014,Adduction of Fingers,A5,4,1,
-599846,INDC - Input Entry,opcforcamuscular,F,Strength to manual muscle testing by segment.,SQ014,Adduction of Fingers,A6,5,1,
-599846,INDC - Input Entry,opcforcamuscular,F,Strength to manual muscle testing by segment.,SQ014,Adduction of Fingers,A7,Not Rated,1,
-599846,INDC - Input Entry,opcforcamuscular,F,Strength to manual muscle testing by segment.,SQ015,Opponence of Thumb,A1,0,0,
-599846,INDC - Input Entry,opcforcamuscular,F,Strength to manual muscle testing by segment.,SQ015,Opponence of Thumb,A2,1,1,
-599846,INDC - Input Entry,opcforcamuscular,F,Strength to manual muscle testing by segment.,SQ015,Opponence of Thumb,A3,2,1,
-599846,INDC - Input Entry,opcforcamuscular,F,Strength to manual muscle testing by segment.,SQ015,Opponence of Thumb,A4,3,1,
-599846,INDC - Input Entry,opcforcamuscular,F,Strength to manual muscle testing by segment.,SQ015,Opponence of Thumb,A5,4,1,
-599846,INDC - Input Entry,opcforcamuscular,F,Strength to manual muscle testing by segment.,SQ015,Opponence of Thumb,A6,5,1,
-599846,INDC - Input Entry,opcforcamuscular,F,Strength to manual muscle testing by segment.,SQ015,Opponence of Thumb,A7,Not Rated,1,
+questionnaire_code,questionnaire_title,question_type,question_type_description,question_index,question_code,question_description,subquestion_code,subquestion_description,question_scale,question_scale_label,option_code,option_description
+599846,INDC - Input Entry,D,Date,datlesao,datlesao,Date of Injury:, , ,,, , 
+599846,INDC - Input Entry,L,List (Radio),opcladolesao,opcladolesao,What side of the injury?, , ,,,1,Right
+599846,INDC - Input Entry,L,List (Radio),opcladolesao,opcladolesao,What side of the injury?, , ,,,2,Left
+599846,INDC - Input Entry,L,List (Radio),opcladolesao,opcladolesao,What side of the injury?, , ,,,3,Both
+599846,INDC - Input Entry,M,Multiple choice,lislocalfisio,lislocalfisio,Local:,INDC,Institution of the Study,,, , 
+599846,INDC - Input Entry,L,List (Radio),opcfreqfisio,opcfreqfisio,Weekly frequency:, , ,,,1,1 time
+599846,INDC - Input Entry,L,List (Radio),opcfreqfisio,opcfreqfisio,Weekly frequency:, , ,,,2,2 times
+599846,INDC - Input Entry,L,List (Radio),opcfreqfisio,opcfreqfisio,Weekly frequency:, , ,,,3,Three times
+599846,INDC - Input Entry,L,List (Radio),opcfreqfisio,opcfreqfisio,Weekly frequency:, , ,,,4,4 times
+599846,INDC - Input Entry,L,List (Radio),opcfreqfisio,opcfreqfisio,Weekly frequency:, , ,,,5,5 times
+599846,INDC - Input Entry,L,List (Radio),opcfreqfisio,opcfreqfisio,Weekly frequency:, , ,,,6,6 times
+599846,INDC - Input Entry,L,List (Radio),opcfreqfisio,opcfreqfisio,Weekly frequency:, , ,,,7,7 times or more
+599846,INDC - Input Entry,T,Long Free Text,texhistoriadoenca,texhistoriadoenca,History of the current disease:, , ,,, , 
+599846,INDC - Input Entry,L,List (Radio),snTCE,snTCE,Did you have TBI associated with the injury?, , ,,,A1,Yes
+599846,INDC - Input Entry,L,List (Radio),snTCE,snTCE,Did you have TBI associated with the injury?, , ,,,A2,No
+599846,INDC - Input Entry,L,List (Radio),snTCE,snTCE,Did you have TBI associated with the injury?, , ,,,A3,Uninformed
+599846,INDC - Input Entry,L,List (Radio),sndreno,sndreno,Did you use a chest drain?, , ,,,1,Yes
+599846,INDC - Input Entry,L,List (Radio),sndreno,sndreno,Did you use a chest drain?, , ,,,2,No
+599846,INDC - Input Entry,L,List (Radio),sndreno,sndreno,Did you use a chest drain?, , ,,,3,Uninformed
+599846,INDC - Input Entry,L,List (Radio),snlesovascular,snlesovascular,Have they had vascular lesions associated with brachial plexus injury?, , ,,,1,Yes
+599846,INDC - Input Entry,L,List (Radio),snlesovascular,snlesovascular,Have they had vascular lesions associated with brachial plexus injury?, , ,,,2,No
+599846,INDC - Input Entry,L,List (Radio),snlesovascular,snlesovascular,Have they had vascular lesions associated with brachial plexus injury?, , ,,,3,Uninformed
+599846,INDC - Input Entry,M,Multiple choice,lislesovascular3,lislesovascular3,Injury type (s):,SQ001,Break,,, , 
+599846,INDC - Input Entry,M,Multiple choice,lislesovascular3,lislesovascular3,Injury type (s):,SQ002,Fistula,,, , 
+599846,INDC - Input Entry,M,Multiple choice,lislesovascular3,lislesovascular3,Injury type (s):,SQ003,Thrombosis,,, , 
+599846,INDC - Input Entry,M,Multiple choice,lislesovascular3,lislesovascular3,Injury type (s):,SQ004,Not specified,,, , 
+599846,INDC - Input Entry,T,Long Free Text,texlesovascular4,texlesovascular4,Type of reconstruction (s):, , ,,, , 
+599846,INDC - Input Entry,|,File Upload,docexameTCE,docexameTCE,Attach exams., , ,,, , 
+599846,INDC - Input Entry,L,List (Radio),opsTO,opsTO,Do you perform Occupational Therapy regularly?, , ,,,A1,Yes
+599846,INDC - Input Entry,L,List (Radio),opsTO,opsTO,Do you perform Occupational Therapy regularly?, , ,,,A2,No
+599846,INDC - Input Entry,L,List (Radio),opsTO,opsTO,Do you perform Occupational Therapy regularly?, , ,,,A3,Uninformed
+599846,INDC - Input Entry,M,Multiple choice,lislocalTO,lislocalTO,Local:,SQ001,Institution of the Study,,, , 
+599846,INDC - Input Entry,L,List (Radio),opcfreqTO,opcfreqTO,Weekly frequency:, , ,,,1,1 time
+599846,INDC - Input Entry,L,List (Radio),opcfreqTO,opcfreqTO,Weekly frequency:, , ,,,2,2 times
+599846,INDC - Input Entry,L,List (Radio),opcfreqTO,opcfreqTO,Weekly frequency:, , ,,,3,Three times
+599846,INDC - Input Entry,L,List (Radio),opcfreqTO,opcfreqTO,Weekly frequency:, , ,,,4,4 times
+599846,INDC - Input Entry,L,List (Radio),opcfreqTO,opcfreqTO,Weekly frequency:, , ,,,5,5 times
+599846,INDC - Input Entry,L,List (Radio),opcfreqTO,opcfreqTO,Weekly frequency:, , ,,,6,6 times
+599846,INDC - Input Entry,L,List (Radio),opcfreqTO,opcfreqTO,Weekly frequency:, , ,,,7,7 times or more
+599846,INDC - Input Entry,L,List (Radio),sndesacordado,sndesacordado,Were you unconscious?, , ,,,1,Yes
+599846,INDC - Input Entry,L,List (Radio),sndesacordado,sndesacordado,Were you unconscious?, , ,,,2,No
+599846,INDC - Input Entry,L,List (Radio),sndesacordado,sndesacordado,Were you unconscious?, , ,,,3,Uninformed
+599846,INDC - Input Entry,S,Short Free Text,textempodesacordado,textempodesacordado,How long?, , ,,, , 
+599846,INDC - Input Entry,L,List (Radio),opsmedicamentos,opsmedicamentos,Do you use medication (s)?, , ,,,A1,Yes
+599846,INDC - Input Entry,L,List (Radio),opsmedicamentos,opsmedicamentos,Do you use medication (s)?, , ,,,A2,No
+599846,INDC - Input Entry,L,List (Radio),opsmedicamentos,opsmedicamentos,Do you use medication (s)?, , ,,,A3,Uninformed
+599846,INDC - Input Entry,P,Multiple choice with comments,lismedicamentos,lismedicamentos,Which drug (s)?,1,Opioids,,, , 
+599846,INDC - Input Entry,P,Multiple choice with comments,lismedicamentos,lismedicamentos,Which drug (s)?,2,Antidepressants,,, , 
+599846,INDC - Input Entry,P,Multiple choice with comments,lismedicamentos,lismedicamentos,Which drug (s)?,3,Anticonvulsants,,, , 
+599846,INDC - Input Entry,P,Multiple choice with comments,lismedicamentos,lismedicamentos,Which drug (s)?,4,Neuroleptics,,, , 
+599846,INDC - Input Entry,P,Multiple choice with comments,lismedicamentos,lismedicamentos,Which drug (s)?,5,Supplements / Vitamins,,, , 
+599846,INDC - Input Entry,P,Multiple choice with comments,lismedicamentos,lismedicamentos,Which drug (s)?,6,Natural Substances / Teas,,, , 
+599846,INDC - Input Entry,P,Multiple choice with comments,lismedicamentos,lismedicamentos,Which drug (s)?,7,Do not know,,, , 
+599846,INDC - Input Entry,Y,Yes/No,sncirurgiasanterio,sncirurgiasanterio,Have you ever had any brachial plexus surgery?, , ,,, , 
+599846,INDC - Input Entry,T,Long Free Text,texprocedimeanterior,texprocedimeanterior,Which procedure (s) were performed?, , ,,, , 
+599846,INDC - Input Entry,F,Array (Flexible Labels),sninspecao,sninspecao,Inspection,a, Glenoumeral Subluxation,,,n,No
+599846,INDC - Input Entry,F,Array (Flexible Labels),sninspecao,sninspecao,Inspection,a, Glenoumeral Subluxation,,,n1,Not Rated
+599846,INDC - Input Entry,F,Array (Flexible Labels),sninspecao,sninspecao,Inspection,a, Glenoumeral Subluxation,,,s,Yes
+599846,INDC - Input Entry,F,Array (Flexible Labels),sninspecao,sninspecao,Inspection,b, Scrotal posture,,,n,No
+599846,INDC - Input Entry,F,Array (Flexible Labels),sninspecao,sninspecao,Inspection,b, Scrotal posture,,,n1,Not Rated
+599846,INDC - Input Entry,F,Array (Flexible Labels),sninspecao,sninspecao,Inspection,b, Scrotal posture,,,s,Yes
+599846,INDC - Input Entry,F,Array (Flexible Labels),sninspecao,sninspecao,Inspection,c, Horner's Sign,,,n,No
+599846,INDC - Input Entry,F,Array (Flexible Labels),sninspecao,sninspecao,Inspection,c, Horner's Sign,,,n1,Not Rated
+599846,INDC - Input Entry,F,Array (Flexible Labels),sninspecao,sninspecao,Inspection,c, Horner's Sign,,,s,Yes
+599846,INDC - Input Entry,F,Array (Flexible Labels),sninspecao,sninspecao,Inspection,d, Edema,,,n,No
+599846,INDC - Input Entry,F,Array (Flexible Labels),sninspecao,sninspecao,Inspection,d, Edema,,,n1,Not Rated
+599846,INDC - Input Entry,F,Array (Flexible Labels),sninspecao,sninspecao,Inspection,d, Edema,,,s,Yes
+599846,INDC - Input Entry,F,Array (Flexible Labels),sninspecao,sninspecao,Inspection,f,Scar,,,n,No
+599846,INDC - Input Entry,F,Array (Flexible Labels),sninspecao,sninspecao,Inspection,f,Scar,,,n1,Not Rated
+599846,INDC - Input Entry,F,Array (Flexible Labels),sninspecao,sninspecao,Inspection,f,Scar,,,s,Yes
+599846,INDC - Input Entry,F,Array (Flexible Labels),sninspecao,sninspecao,Inspection,g,Trophic alteration,,,n,No
+599846,INDC - Input Entry,F,Array (Flexible Labels),sninspecao,sninspecao,Inspection,g,Trophic alteration,,,n1,Not Rated
+599846,INDC - Input Entry,F,Array (Flexible Labels),sninspecao,sninspecao,Inspection,g,Trophic alteration,,,s,Yes
+599846,INDC - Input Entry,T,Long Free Text,texlocalcicatriz,texlocalcicatriz,Description and location of scar (s):, , ,,, , 
+599846,INDC - Input Entry,L,List (Radio),snsinaltinel,snsinaltinel,Does it have tinnitus signal?, , ,,,A1,Yes
+599846,INDC - Input Entry,L,List (Radio),snsinaltinel,snsinaltinel,Does it have tinnitus signal?, , ,,,A2,No
+599846,INDC - Input Entry,L,List (Radio),snsinaltinel,snsinaltinel,Does it have tinnitus signal?, , ,,,A3,Not Rated
+599846,INDC - Input Entry,F,Array (Flexible Labels),snrestricaoarticula,snrestricaoarticula,Articular Restriction,1, Shoulder,,,1,Yes
+599846,INDC - Input Entry,F,Array (Flexible Labels),snrestricaoarticula,snrestricaoarticula,Articular Restriction,1, Shoulder,,,2,No
+599846,INDC - Input Entry,F,Array (Flexible Labels),snrestricaoarticula,snrestricaoarticula,Articular Restriction,1, Shoulder,,,3,Not Rated
+599846,INDC - Input Entry,F,Array (Flexible Labels),snrestricaoarticula,snrestricaoarticula,Articular Restriction,2, Elbow,,,1,Yes
+599846,INDC - Input Entry,F,Array (Flexible Labels),snrestricaoarticula,snrestricaoarticula,Articular Restriction,2, Elbow,,,2,No
+599846,INDC - Input Entry,F,Array (Flexible Labels),snrestricaoarticula,snrestricaoarticula,Articular Restriction,2, Elbow,,,3,Not Rated
+599846,INDC - Input Entry,F,Array (Flexible Labels),snrestricaoarticula,snrestricaoarticula,Articular Restriction,3, Handle,,,1,Yes
+599846,INDC - Input Entry,F,Array (Flexible Labels),snrestricaoarticula,snrestricaoarticula,Articular Restriction,3, Handle,,,2,No
+599846,INDC - Input Entry,F,Array (Flexible Labels),snrestricaoarticula,snrestricaoarticula,Articular Restriction,3, Handle,,,3,Not Rated
+599846,INDC - Input Entry,F,Array (Flexible Labels),snrestricaoarticula,snrestricaoarticula,Articular Restriction,4, Fingers,,,1,Yes
+599846,INDC - Input Entry,F,Array (Flexible Labels),snrestricaoarticula,snrestricaoarticula,Articular Restriction,4, Fingers,,,2,No
+599846,INDC - Input Entry,F,Array (Flexible Labels),snrestricaoarticula,snrestricaoarticula,Articular Restriction,4, Fingers,,,3,Not Rated
+599846,INDC - Input Entry,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Strength to manual muscle testing by segment.,SQ001,Shoulder Flexion,,,A1,0
+599846,INDC - Input Entry,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Strength to manual muscle testing by segment.,SQ001,Shoulder Flexion,,,A2,1
+599846,INDC - Input Entry,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Strength to manual muscle testing by segment.,SQ001,Shoulder Flexion,,,A3,2
+599846,INDC - Input Entry,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Strength to manual muscle testing by segment.,SQ001,Shoulder Flexion,,,A4,3
+599846,INDC - Input Entry,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Strength to manual muscle testing by segment.,SQ001,Shoulder Flexion,,,A5,4
+599846,INDC - Input Entry,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Strength to manual muscle testing by segment.,SQ001,Shoulder Flexion,,,A6,5
+599846,INDC - Input Entry,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Strength to manual muscle testing by segment.,SQ001,Shoulder Flexion,,,A7,Not Rated
+599846,INDC - Input Entry,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Strength to manual muscle testing by segment.,SQ002,Shoulder Abduction,,,A1,0
+599846,INDC - Input Entry,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Strength to manual muscle testing by segment.,SQ002,Shoulder Abduction,,,A2,1
+599846,INDC - Input Entry,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Strength to manual muscle testing by segment.,SQ002,Shoulder Abduction,,,A3,2
+599846,INDC - Input Entry,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Strength to manual muscle testing by segment.,SQ002,Shoulder Abduction,,,A4,3
+599846,INDC - Input Entry,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Strength to manual muscle testing by segment.,SQ002,Shoulder Abduction,,,A5,4
+599846,INDC - Input Entry,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Strength to manual muscle testing by segment.,SQ002,Shoulder Abduction,,,A6,5
+599846,INDC - Input Entry,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Strength to manual muscle testing by segment.,SQ002,Shoulder Abduction,,,A7,Not Rated
+599846,INDC - Input Entry,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Strength to manual muscle testing by segment.,SQ003,External Shoulder Rotation,,,A1,0
+599846,INDC - Input Entry,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Strength to manual muscle testing by segment.,SQ003,External Shoulder Rotation,,,A2,1
+599846,INDC - Input Entry,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Strength to manual muscle testing by segment.,SQ003,External Shoulder Rotation,,,A3,2
+599846,INDC - Input Entry,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Strength to manual muscle testing by segment.,SQ003,External Shoulder Rotation,,,A4,3
+599846,INDC - Input Entry,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Strength to manual muscle testing by segment.,SQ003,External Shoulder Rotation,,,A5,4
+599846,INDC - Input Entry,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Strength to manual muscle testing by segment.,SQ003,External Shoulder Rotation,,,A6,5
+599846,INDC - Input Entry,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Strength to manual muscle testing by segment.,SQ003,External Shoulder Rotation,,,A7,Not Rated
+599846,INDC - Input Entry,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Strength to manual muscle testing by segment.,SQ004,Internal Shoulder Rotation,,,A1,0
+599846,INDC - Input Entry,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Strength to manual muscle testing by segment.,SQ004,Internal Shoulder Rotation,,,A2,1
+599846,INDC - Input Entry,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Strength to manual muscle testing by segment.,SQ004,Internal Shoulder Rotation,,,A3,2
+599846,INDC - Input Entry,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Strength to manual muscle testing by segment.,SQ004,Internal Shoulder Rotation,,,A4,3
+599846,INDC - Input Entry,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Strength to manual muscle testing by segment.,SQ004,Internal Shoulder Rotation,,,A5,4
+599846,INDC - Input Entry,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Strength to manual muscle testing by segment.,SQ004,Internal Shoulder Rotation,,,A6,5
+599846,INDC - Input Entry,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Strength to manual muscle testing by segment.,SQ004,Internal Shoulder Rotation,,,A7,Not Rated
+599846,INDC - Input Entry,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Strength to manual muscle testing by segment.,SQ005,Elevation of the Scapula,,,A1,0
+599846,INDC - Input Entry,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Strength to manual muscle testing by segment.,SQ005,Elevation of the Scapula,,,A2,1
+599846,INDC - Input Entry,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Strength to manual muscle testing by segment.,SQ005,Elevation of the Scapula,,,A3,2
+599846,INDC - Input Entry,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Strength to manual muscle testing by segment.,SQ005,Elevation of the Scapula,,,A4,3
+599846,INDC - Input Entry,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Strength to manual muscle testing by segment.,SQ005,Elevation of the Scapula,,,A5,4
+599846,INDC - Input Entry,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Strength to manual muscle testing by segment.,SQ005,Elevation of the Scapula,,,A6,5
+599846,INDC - Input Entry,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Strength to manual muscle testing by segment.,SQ005,Elevation of the Scapula,,,A7,Not Rated
+599846,INDC - Input Entry,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Strength to manual muscle testing by segment.,SQ006,Abduction and Upper Rotation of the Scapula,,,A1,0
+599846,INDC - Input Entry,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Strength to manual muscle testing by segment.,SQ006,Abduction and Upper Rotation of the Scapula,,,A2,1
+599846,INDC - Input Entry,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Strength to manual muscle testing by segment.,SQ006,Abduction and Upper Rotation of the Scapula,,,A3,2
+599846,INDC - Input Entry,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Strength to manual muscle testing by segment.,SQ006,Abduction and Upper Rotation of the Scapula,,,A4,3
+599846,INDC - Input Entry,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Strength to manual muscle testing by segment.,SQ006,Abduction and Upper Rotation of the Scapula,,,A5,4
+599846,INDC - Input Entry,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Strength to manual muscle testing by segment.,SQ006,Abduction and Upper Rotation of the Scapula,,,A6,5
+599846,INDC - Input Entry,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Strength to manual muscle testing by segment.,SQ006,Abduction and Upper Rotation of the Scapula,,,A7,Not Rated
+599846,INDC - Input Entry,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Strength to manual muscle testing by segment.,SQ007,Elbow Flexion,,,A1,0
+599846,INDC - Input Entry,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Strength to manual muscle testing by segment.,SQ007,Elbow Flexion,,,A2,1
+599846,INDC - Input Entry,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Strength to manual muscle testing by segment.,SQ007,Elbow Flexion,,,A3,2
+599846,INDC - Input Entry,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Strength to manual muscle testing by segment.,SQ007,Elbow Flexion,,,A4,3
+599846,INDC - Input Entry,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Strength to manual muscle testing by segment.,SQ007,Elbow Flexion,,,A5,4
+599846,INDC - Input Entry,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Strength to manual muscle testing by segment.,SQ007,Elbow Flexion,,,A6,5
+599846,INDC - Input Entry,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Strength to manual muscle testing by segment.,SQ007,Elbow Flexion,,,A7,Not Rated
+599846,INDC - Input Entry,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Strength to manual muscle testing by segment.,SQ008,Elbow Extension,,,A1,0
+599846,INDC - Input Entry,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Strength to manual muscle testing by segment.,SQ008,Elbow Extension,,,A2,1
+599846,INDC - Input Entry,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Strength to manual muscle testing by segment.,SQ008,Elbow Extension,,,A3,2
+599846,INDC - Input Entry,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Strength to manual muscle testing by segment.,SQ008,Elbow Extension,,,A4,3
+599846,INDC - Input Entry,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Strength to manual muscle testing by segment.,SQ008,Elbow Extension,,,A5,4
+599846,INDC - Input Entry,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Strength to manual muscle testing by segment.,SQ008,Elbow Extension,,,A6,5
+599846,INDC - Input Entry,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Strength to manual muscle testing by segment.,SQ008,Elbow Extension,,,A7,Not Rated
+599846,INDC - Input Entry,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Strength to manual muscle testing by segment.,SQ009,Fist Extension,,,A1,0
+599846,INDC - Input Entry,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Strength to manual muscle testing by segment.,SQ009,Fist Extension,,,A2,1
+599846,INDC - Input Entry,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Strength to manual muscle testing by segment.,SQ009,Fist Extension,,,A3,2
+599846,INDC - Input Entry,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Strength to manual muscle testing by segment.,SQ009,Fist Extension,,,A4,3
+599846,INDC - Input Entry,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Strength to manual muscle testing by segment.,SQ009,Fist Extension,,,A5,4
+599846,INDC - Input Entry,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Strength to manual muscle testing by segment.,SQ009,Fist Extension,,,A6,5
+599846,INDC - Input Entry,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Strength to manual muscle testing by segment.,SQ009,Fist Extension,,,A7,Not Rated
+599846,INDC - Input Entry,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Strength to manual muscle testing by segment.,SQ010,Fist Bending,,,A1,0
+599846,INDC - Input Entry,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Strength to manual muscle testing by segment.,SQ010,Fist Bending,,,A2,1
+599846,INDC - Input Entry,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Strength to manual muscle testing by segment.,SQ010,Fist Bending,,,A3,2
+599846,INDC - Input Entry,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Strength to manual muscle testing by segment.,SQ010,Fist Bending,,,A4,3
+599846,INDC - Input Entry,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Strength to manual muscle testing by segment.,SQ010,Fist Bending,,,A5,4
+599846,INDC - Input Entry,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Strength to manual muscle testing by segment.,SQ010,Fist Bending,,,A6,5
+599846,INDC - Input Entry,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Strength to manual muscle testing by segment.,SQ010,Fist Bending,,,A7,Not Rated
+599846,INDC - Input Entry,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Strength to manual muscle testing by segment.,SQ011,Finger Bending,,,A1,0
+599846,INDC - Input Entry,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Strength to manual muscle testing by segment.,SQ011,Finger Bending,,,A2,1
+599846,INDC - Input Entry,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Strength to manual muscle testing by segment.,SQ011,Finger Bending,,,A3,2
+599846,INDC - Input Entry,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Strength to manual muscle testing by segment.,SQ011,Finger Bending,,,A4,3
+599846,INDC - Input Entry,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Strength to manual muscle testing by segment.,SQ011,Finger Bending,,,A5,4
+599846,INDC - Input Entry,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Strength to manual muscle testing by segment.,SQ011,Finger Bending,,,A6,5
+599846,INDC - Input Entry,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Strength to manual muscle testing by segment.,SQ011,Finger Bending,,,A7,Not Rated
+599846,INDC - Input Entry,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Strength to manual muscle testing by segment.,SQ012,Finger Extension,,,A1,0
+599846,INDC - Input Entry,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Strength to manual muscle testing by segment.,SQ012,Finger Extension,,,A2,1
+599846,INDC - Input Entry,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Strength to manual muscle testing by segment.,SQ012,Finger Extension,,,A3,2
+599846,INDC - Input Entry,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Strength to manual muscle testing by segment.,SQ012,Finger Extension,,,A4,3
+599846,INDC - Input Entry,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Strength to manual muscle testing by segment.,SQ012,Finger Extension,,,A5,4
+599846,INDC - Input Entry,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Strength to manual muscle testing by segment.,SQ012,Finger Extension,,,A6,5
+599846,INDC - Input Entry,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Strength to manual muscle testing by segment.,SQ012,Finger Extension,,,A7,Not Rated
+599846,INDC - Input Entry,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Strength to manual muscle testing by segment.,SQ013,Fingers Abduction,,,A1,0
+599846,INDC - Input Entry,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Strength to manual muscle testing by segment.,SQ013,Fingers Abduction,,,A2,1
+599846,INDC - Input Entry,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Strength to manual muscle testing by segment.,SQ013,Fingers Abduction,,,A3,2
+599846,INDC - Input Entry,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Strength to manual muscle testing by segment.,SQ013,Fingers Abduction,,,A4,3
+599846,INDC - Input Entry,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Strength to manual muscle testing by segment.,SQ013,Fingers Abduction,,,A5,4
+599846,INDC - Input Entry,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Strength to manual muscle testing by segment.,SQ013,Fingers Abduction,,,A6,5
+599846,INDC - Input Entry,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Strength to manual muscle testing by segment.,SQ013,Fingers Abduction,,,A7,Not Rated
+599846,INDC - Input Entry,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Strength to manual muscle testing by segment.,SQ014,Adduction of Fingers,,,A1,0
+599846,INDC - Input Entry,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Strength to manual muscle testing by segment.,SQ014,Adduction of Fingers,,,A2,1
+599846,INDC - Input Entry,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Strength to manual muscle testing by segment.,SQ014,Adduction of Fingers,,,A3,2
+599846,INDC - Input Entry,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Strength to manual muscle testing by segment.,SQ014,Adduction of Fingers,,,A4,3
+599846,INDC - Input Entry,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Strength to manual muscle testing by segment.,SQ014,Adduction of Fingers,,,A5,4
+599846,INDC - Input Entry,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Strength to manual muscle testing by segment.,SQ014,Adduction of Fingers,,,A6,5
+599846,INDC - Input Entry,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Strength to manual muscle testing by segment.,SQ014,Adduction of Fingers,,,A7,Not Rated
+599846,INDC - Input Entry,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Strength to manual muscle testing by segment.,SQ015,Opponence of Thumb,,,A1,0
+599846,INDC - Input Entry,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Strength to manual muscle testing by segment.,SQ015,Opponence of Thumb,,,A2,1
+599846,INDC - Input Entry,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Strength to manual muscle testing by segment.,SQ015,Opponence of Thumb,,,A3,2
+599846,INDC - Input Entry,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Strength to manual muscle testing by segment.,SQ015,Opponence of Thumb,,,A4,3
+599846,INDC - Input Entry,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Strength to manual muscle testing by segment.,SQ015,Opponence of Thumb,,,A5,4
+599846,INDC - Input Entry,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Strength to manual muscle testing by segment.,SQ015,Opponence of Thumb,,,A6,5
+599846,INDC - Input Entry,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Strength to manual muscle testing by segment.,SQ015,Opponence of Thumb,,,A7,Not Rated
