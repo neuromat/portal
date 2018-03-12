@@ -43,25 +43,27 @@ def _isvalid(source_path):
     with open(source_path, 'r') as source:
         reader = csv.reader(source, skipinitialspace=True)
         for row in reader:
-            # the number of columns in csv file must be 11
-            if len(row) != 11:
+            # the number of columns in csv file must be 13
+            if len(row) != 13:
                 return False
 
     # tests for column titles
     with open(source_path, 'r') as source:
         reader = csv.reader(source, skipinitialspace=True)
         for row in reader:
-            if row[0] != 'questionnaire_id' or \
+            if row[0] != 'questionnaire_code' or \
                     row[1] != 'questionnaire_title' or \
-                    row[2] != 'question_code' or \
-                    row[3] != 'question_limesurvey_type' or \
-                    row[4] != 'question_description' or \
-                    row[5] != 'subquestion_code' or \
-                    row[6] != 'subquestion_description' or \
-                    row[7] != 'option_code' or \
-                    row[8] != 'option_description' or \
-                    row[9] != 'option_value' or \
-                    row[10] != 'column_title':
+                    row[2] != 'question_type' or \
+                    row[3] != 'question_type_description' or \
+                    row[4] != 'question_index' or \
+                    row[5] != 'question_code' or \
+                    row[6] != 'question_description' or \
+                    row[7] != 'subquestion_code' or \
+                    row[8] != 'subquestion_description' or \
+                    row[9] != 'question_scale' or \
+                    row[10] != 'question_scale_label' or \
+                    row[11] != 'option_code' or \
+                    row[12] != 'option_description':
                 return False
             break
 
@@ -84,14 +86,14 @@ def _get_questionnaire_metadata(metadata):
         with open(temp_dir + '/questionnaire_cleaned.csv', 'w') as result:
             writer = csv.writer(result)
             for r in reader:
-                writer.writerow((r[2], r[3], r[4], r[6], r[8]))
+                writer.writerow((r[2], r[5], r[6], r[8], r[12]))
 
     q_cleaned = pandas.read_csv(temp_dir + '/questionnaire_cleaned.csv')
 
     records = []
 
     for key, grp in q_cleaned.groupby(['question_code',
-                                       'question_limesurvey_type',
+                                       'question_type',
                                        'question_description']):
         rec = _get_nested_rec(key, grp)
         records.append(rec)

@@ -1,195 +1,195 @@
-questionnaire_id,questionnaire_title,question_code,question_limesurvey_type,question_description,subquestion_code,subquestion_description,option_code,option_description,option_value,column_title
-599846,INDC - Avaliação de Entrada,datlesao,D,Data da lesão:, , , , , , 
-599846,INDC - Avaliação de Entrada,opcladolesao,L,Qual o lado da lesão?, , ,1,Direito,0,
-599846,INDC - Avaliação de Entrada,opcladolesao,L,Qual o lado da lesão?, , ,2,Esquerdo,1,
-599846,INDC - Avaliação de Entrada,opcladolesao,L,Qual o lado da lesão?, , ,3,Ambos,1,
-599846,INDC - Avaliação de Entrada,lislocalfisio,M,Local:,INDC,Instituição do Estudo, , , , 
-599846,INDC - Avaliação de Entrada,opcfreqfisio,L,Frequência semanal:, , ,1,1 vez,0,
-599846,INDC - Avaliação de Entrada,opcfreqfisio,L,Frequência semanal:, , ,2,2 vezes,1,
-599846,INDC - Avaliação de Entrada,opcfreqfisio,L,Frequência semanal:, , ,3,3 vezes,1,
-599846,INDC - Avaliação de Entrada,opcfreqfisio,L,Frequência semanal:, , ,4,4 vezes,1,
-599846,INDC - Avaliação de Entrada,opcfreqfisio,L,Frequência semanal:, , ,5,5 vezes,1,
-599846,INDC - Avaliação de Entrada,opcfreqfisio,L,Frequência semanal:, , ,6,6 vezes,1,
-599846,INDC - Avaliação de Entrada,opcfreqfisio,L,Frequência semanal:, , ,7,7 vezes ou mais,1,
-599846,INDC - Avaliação de Entrada,texhistoriadoenca,T,História da doença atual:, , , , , , 
-599846,INDC - Avaliação de Entrada,snTCE,L,Teve TCE associado à lesão?, , ,A1,Sim,0,
-599846,INDC - Avaliação de Entrada,snTCE,L,Teve TCE associado à lesão?, , ,A2,Não,1,
-599846,INDC - Avaliação de Entrada,snTCE,L,Teve TCE associado à lesão?, , ,A3,Não informado,1,
-599846,INDC - Avaliação de Entrada,sndreno,L,Fez utilização de dreno de tórax?, , ,1,Sim,1,
-599846,INDC - Avaliação de Entrada,sndreno,L,Fez utilização de dreno de tórax?, , ,2,Não,1,
-599846,INDC - Avaliação de Entrada,sndreno,L,Fez utilização de dreno de tórax?, , ,3,Não Informado,1,
-599846,INDC - Avaliação de Entrada,snlesovascular,L,Tiveram lesões vasculares associadas à lesão do plexo braquial?, , ,1,Sim,0,
-599846,INDC - Avaliação de Entrada,snlesovascular,L,Tiveram lesões vasculares associadas à lesão do plexo braquial?, , ,2,Não,1,
-599846,INDC - Avaliação de Entrada,snlesovascular,L,Tiveram lesões vasculares associadas à lesão do plexo braquial?, , ,3,Não Informado,1,
-599846,INDC - Avaliação de Entrada,lislesovascular3,M,Tipo(s) de lesão(ões):,SQ001,Ruptura, , , , 
-599846,INDC - Avaliação de Entrada,lislesovascular3,M,Tipo(s) de lesão(ões):,SQ002,Fistula, , , , 
-599846,INDC - Avaliação de Entrada,lislesovascular3,M,Tipo(s) de lesão(ões):,SQ003,Trombose, , , , 
-599846,INDC - Avaliação de Entrada,lislesovascular3,M,Tipo(s) de lesão(ões):,SQ004,Não especificado, , , , 
-599846,INDC - Avaliação de Entrada,texlesovascular4,T,Tipo(s) de reconstrução(ões):, , , , , , 
-599846,INDC - Avaliação de Entrada,docexameTCE,|,Anexar exames., , , , , , 
-599846,INDC - Avaliação de Entrada,opsTO,L,Realiza Terapia Ocupacional regularmente?, , ,A1,Sim,0,
-599846,INDC - Avaliação de Entrada,opsTO,L,Realiza Terapia Ocupacional regularmente?, , ,A2,Não,1,
-599846,INDC - Avaliação de Entrada,opsTO,L,Realiza Terapia Ocupacional regularmente?, , ,A3,Não Informado,1,
-599846,INDC - Avaliação de Entrada,lislocalTO,M,Local:,SQ001,Instituição do Estudo, , , , 
-599846,INDC - Avaliação de Entrada,opcfreqTO,L,Frequência semanal:, , ,1,1 vez,1,
-599846,INDC - Avaliação de Entrada,opcfreqTO,L,Frequência semanal:, , ,2,2 vezes,1,
-599846,INDC - Avaliação de Entrada,opcfreqTO,L,Frequência semanal:, , ,3,3 vezes,1,
-599846,INDC - Avaliação de Entrada,opcfreqTO,L,Frequência semanal:, , ,4,4 vezes,1,
-599846,INDC - Avaliação de Entrada,opcfreqTO,L,Frequência semanal:, , ,5,5 vezes,1,
-599846,INDC - Avaliação de Entrada,opcfreqTO,L,Frequência semanal:, , ,6,6 vezes,1,
-599846,INDC - Avaliação de Entrada,opcfreqTO,L,Frequência semanal:, , ,7,7 vezes ou mais,1,
-599846,INDC - Avaliação de Entrada,sndesacordado,L,Ficou desacordado?, , ,1,Sim,1,
-599846,INDC - Avaliação de Entrada,sndesacordado,L,Ficou desacordado?, , ,2,Não,1,
-599846,INDC - Avaliação de Entrada,sndesacordado,L,Ficou desacordado?, , ,3,Não Informado,1,
-599846,INDC - Avaliação de Entrada,textempodesacordado,S,Quanto tempo?, , , , , , 
-599846,INDC - Avaliação de Entrada,opsmedicamentos,L,Faz uso de medicamento(s)?, , ,A1,Sim,0,
-599846,INDC - Avaliação de Entrada,opsmedicamentos,L,Faz uso de medicamento(s)?, , ,A2,Não,1,
-599846,INDC - Avaliação de Entrada,opsmedicamentos,L,Faz uso de medicamento(s)?, , ,A3,Não Informado,1,
-599846,INDC - Avaliação de Entrada,lismedicamentos,P,Qual(is) medicamento(s)?,1,Opióides, , , , 
-599846,INDC - Avaliação de Entrada,lismedicamentos,P,Qual(is) medicamento(s)?,2,Antidepressivos, , , , 
-599846,INDC - Avaliação de Entrada,lismedicamentos,P,Qual(is) medicamento(s)?,3,Anticonvulsivantes, , , , 
-599846,INDC - Avaliação de Entrada,lismedicamentos,P,Qual(is) medicamento(s)?,4,Neurolépticos, , , , 
-599846,INDC - Avaliação de Entrada,lismedicamentos,P,Qual(is) medicamento(s)?,5,Complementos/Vitaminas, , , , 
-599846,INDC - Avaliação de Entrada,lismedicamentos,P,Qual(is) medicamento(s)?,6,Substâncias naturais/Chás, , , , 
-599846,INDC - Avaliação de Entrada,lismedicamentos,P,Qual(is) medicamento(s)?,7,Não sei, , , , 
-599846,INDC - Avaliação de Entrada,sncirurgiasanterio,Y,Já fez alguma cirurgia de plexo braquial?, , , , , , 
-599846,INDC - Avaliação de Entrada,texprocedimeanterior,T,Qual(is) procedimento(s) foi(ram) realizado(s)?, , , , , , 
-599846,INDC - Avaliação de Entrada,sninspecao,F,Inspeção,a, Subluxação Glenoumeral,n,Não,1,
-599846,INDC - Avaliação de Entrada,sninspecao,F,Inspeção,a, Subluxação Glenoumeral,n1,Não Avaliado,1,
-599846,INDC - Avaliação de Entrada,sninspecao,F,Inspeção,a, Subluxação Glenoumeral,s,Sim,1,
-599846,INDC - Avaliação de Entrada,sninspecao,F,Inspeção,b, Postura escoliótica,n,Não,1,
-599846,INDC - Avaliação de Entrada,sninspecao,F,Inspeção,b, Postura escoliótica,n1,Não Avaliado,1,
-599846,INDC - Avaliação de Entrada,sninspecao,F,Inspeção,b, Postura escoliótica,s,Sim,1,
-599846,INDC - Avaliação de Entrada,sninspecao,F,Inspeção,c, Sinal de Horner,n,Não,1,
-599846,INDC - Avaliação de Entrada,sninspecao,F,Inspeção,c, Sinal de Horner,n1,Não Avaliado,1,
-599846,INDC - Avaliação de Entrada,sninspecao,F,Inspeção,c, Sinal de Horner,s,Sim,1,
-599846,INDC - Avaliação de Entrada,sninspecao,F,Inspeção,d, Edema,n,Não,1,
-599846,INDC - Avaliação de Entrada,sninspecao,F,Inspeção,d, Edema,n1,Não Avaliado,1,
-599846,INDC - Avaliação de Entrada,sninspecao,F,Inspeção,d, Edema,s,Sim,1,
-599846,INDC - Avaliação de Entrada,sninspecao,F,Inspeção,f,Cicatriz,n,Não,1,
-599846,INDC - Avaliação de Entrada,sninspecao,F,Inspeção,f,Cicatriz,n1,Não Avaliado,1,
-599846,INDC - Avaliação de Entrada,sninspecao,F,Inspeção,f,Cicatriz,s,Sim,1,
-599846,INDC - Avaliação de Entrada,sninspecao,F,Inspeção,g,Alteração Trófica,n,Não,1,
-599846,INDC - Avaliação de Entrada,sninspecao,F,Inspeção,g,Alteração Trófica,n1,Não Avaliado,1,
-599846,INDC - Avaliação de Entrada,sninspecao,F,Inspeção,g,Alteração Trófica,s,Sim,1,
-599846,INDC - Avaliação de Entrada,texlocalcicatriz,T,Descrição e localização da(s) cicatriz(es):, , , , , , 
-599846,INDC - Avaliação de Entrada,snsinaltinel,L,Apresenta sinal de tinel?, , ,A1,Sim,0,
-599846,INDC - Avaliação de Entrada,snsinaltinel,L,Apresenta sinal de tinel?, , ,A2,Não,1,
-599846,INDC - Avaliação de Entrada,snsinaltinel,L,Apresenta sinal de tinel?, , ,A3,Não Avaliado,1,
-599846,INDC - Avaliação de Entrada,snrestricaoarticula,F,Restrição Articular,1, Ombro,1,Sim,1,
-599846,INDC - Avaliação de Entrada,snrestricaoarticula,F,Restrição Articular,1, Ombro,2,Não,1,
-599846,INDC - Avaliação de Entrada,snrestricaoarticula,F,Restrição Articular,1, Ombro,3,Não Avaliado,1,
-599846,INDC - Avaliação de Entrada,snrestricaoarticula,F,Restrição Articular,2, Cotovelo,1,Sim,1,
-599846,INDC - Avaliação de Entrada,snrestricaoarticula,F,Restrição Articular,2, Cotovelo,2,Não,1,
-599846,INDC - Avaliação de Entrada,snrestricaoarticula,F,Restrição Articular,2, Cotovelo,3,Não Avaliado,1,
-599846,INDC - Avaliação de Entrada,snrestricaoarticula,F,Restrição Articular,3, Punho,1,Sim,1,
-599846,INDC - Avaliação de Entrada,snrestricaoarticula,F,Restrição Articular,3, Punho,2,Não,1,
-599846,INDC - Avaliação de Entrada,snrestricaoarticula,F,Restrição Articular,3, Punho,3,Não Avaliado,1,
-599846,INDC - Avaliação de Entrada,snrestricaoarticula,F,Restrição Articular,4, Dedos,1,Sim,1,
-599846,INDC - Avaliação de Entrada,snrestricaoarticula,F,Restrição Articular,4, Dedos,2,Não,1,
-599846,INDC - Avaliação de Entrada,snrestricaoarticula,F,Restrição Articular,4, Dedos,3,Não Avaliado,1,
-599846,INDC - Avaliação de Entrada,opcforcamuscular,F,Força ao teste muscular manual por segmento.,SQ001,Flexão do Ombro,A1,0,0,
-599846,INDC - Avaliação de Entrada,opcforcamuscular,F,Força ao teste muscular manual por segmento.,SQ001,Flexão do Ombro,A2,1,1,
-599846,INDC - Avaliação de Entrada,opcforcamuscular,F,Força ao teste muscular manual por segmento.,SQ001,Flexão do Ombro,A3,2,1,
-599846,INDC - Avaliação de Entrada,opcforcamuscular,F,Força ao teste muscular manual por segmento.,SQ001,Flexão do Ombro,A4,3,1,
-599846,INDC - Avaliação de Entrada,opcforcamuscular,F,Força ao teste muscular manual por segmento.,SQ001,Flexão do Ombro,A5,4,1,
-599846,INDC - Avaliação de Entrada,opcforcamuscular,F,Força ao teste muscular manual por segmento.,SQ001,Flexão do Ombro,A6,5,1,
-599846,INDC - Avaliação de Entrada,opcforcamuscular,F,Força ao teste muscular manual por segmento.,SQ001,Flexão do Ombro,A7,Não Avaliado,1,
-599846,INDC - Avaliação de Entrada,opcforcamuscular,F,Força ao teste muscular manual por segmento.,SQ002,Abdução do Ombro,A1,0,0,
-599846,INDC - Avaliação de Entrada,opcforcamuscular,F,Força ao teste muscular manual por segmento.,SQ002,Abdução do Ombro,A2,1,1,
-599846,INDC - Avaliação de Entrada,opcforcamuscular,F,Força ao teste muscular manual por segmento.,SQ002,Abdução do Ombro,A3,2,1,
-599846,INDC - Avaliação de Entrada,opcforcamuscular,F,Força ao teste muscular manual por segmento.,SQ002,Abdução do Ombro,A4,3,1,
-599846,INDC - Avaliação de Entrada,opcforcamuscular,F,Força ao teste muscular manual por segmento.,SQ002,Abdução do Ombro,A5,4,1,
-599846,INDC - Avaliação de Entrada,opcforcamuscular,F,Força ao teste muscular manual por segmento.,SQ002,Abdução do Ombro,A6,5,1,
-599846,INDC - Avaliação de Entrada,opcforcamuscular,F,Força ao teste muscular manual por segmento.,SQ002,Abdução do Ombro,A7,Não Avaliado,1,
-599846,INDC - Avaliação de Entrada,opcforcamuscular,F,Força ao teste muscular manual por segmento.,SQ003,Rotação Externa do Ombro,A1,0,0,
-599846,INDC - Avaliação de Entrada,opcforcamuscular,F,Força ao teste muscular manual por segmento.,SQ003,Rotação Externa do Ombro,A2,1,1,
-599846,INDC - Avaliação de Entrada,opcforcamuscular,F,Força ao teste muscular manual por segmento.,SQ003,Rotação Externa do Ombro,A3,2,1,
-599846,INDC - Avaliação de Entrada,opcforcamuscular,F,Força ao teste muscular manual por segmento.,SQ003,Rotação Externa do Ombro,A4,3,1,
-599846,INDC - Avaliação de Entrada,opcforcamuscular,F,Força ao teste muscular manual por segmento.,SQ003,Rotação Externa do Ombro,A5,4,1,
-599846,INDC - Avaliação de Entrada,opcforcamuscular,F,Força ao teste muscular manual por segmento.,SQ003,Rotação Externa do Ombro,A6,5,1,
-599846,INDC - Avaliação de Entrada,opcforcamuscular,F,Força ao teste muscular manual por segmento.,SQ003,Rotação Externa do Ombro,A7,Não Avaliado,1,
-599846,INDC - Avaliação de Entrada,opcforcamuscular,F,Força ao teste muscular manual por segmento.,SQ004,Rotação Interna do Ombro,A1,0,0,
-599846,INDC - Avaliação de Entrada,opcforcamuscular,F,Força ao teste muscular manual por segmento.,SQ004,Rotação Interna do Ombro,A2,1,1,
-599846,INDC - Avaliação de Entrada,opcforcamuscular,F,Força ao teste muscular manual por segmento.,SQ004,Rotação Interna do Ombro,A3,2,1,
-599846,INDC - Avaliação de Entrada,opcforcamuscular,F,Força ao teste muscular manual por segmento.,SQ004,Rotação Interna do Ombro,A4,3,1,
-599846,INDC - Avaliação de Entrada,opcforcamuscular,F,Força ao teste muscular manual por segmento.,SQ004,Rotação Interna do Ombro,A5,4,1,
-599846,INDC - Avaliação de Entrada,opcforcamuscular,F,Força ao teste muscular manual por segmento.,SQ004,Rotação Interna do Ombro,A6,5,1,
-599846,INDC - Avaliação de Entrada,opcforcamuscular,F,Força ao teste muscular manual por segmento.,SQ004,Rotação Interna do Ombro,A7,Não Avaliado,1,
-599846,INDC - Avaliação de Entrada,opcforcamuscular,F,Força ao teste muscular manual por segmento.,SQ005,Elevação da Escápula,A1,0,0,
-599846,INDC - Avaliação de Entrada,opcforcamuscular,F,Força ao teste muscular manual por segmento.,SQ005,Elevação da Escápula,A2,1,1,
-599846,INDC - Avaliação de Entrada,opcforcamuscular,F,Força ao teste muscular manual por segmento.,SQ005,Elevação da Escápula,A3,2,1,
-599846,INDC - Avaliação de Entrada,opcforcamuscular,F,Força ao teste muscular manual por segmento.,SQ005,Elevação da Escápula,A4,3,1,
-599846,INDC - Avaliação de Entrada,opcforcamuscular,F,Força ao teste muscular manual por segmento.,SQ005,Elevação da Escápula,A5,4,1,
-599846,INDC - Avaliação de Entrada,opcforcamuscular,F,Força ao teste muscular manual por segmento.,SQ005,Elevação da Escápula,A6,5,1,
-599846,INDC - Avaliação de Entrada,opcforcamuscular,F,Força ao teste muscular manual por segmento.,SQ005,Elevação da Escápula,A7,Não Avaliado,1,
-599846,INDC - Avaliação de Entrada,opcforcamuscular,F,Força ao teste muscular manual por segmento.,SQ006,Abdução e Rotação Superior da Escápula,A1,0,0,
-599846,INDC - Avaliação de Entrada,opcforcamuscular,F,Força ao teste muscular manual por segmento.,SQ006,Abdução e Rotação Superior da Escápula,A2,1,1,
-599846,INDC - Avaliação de Entrada,opcforcamuscular,F,Força ao teste muscular manual por segmento.,SQ006,Abdução e Rotação Superior da Escápula,A3,2,1,
-599846,INDC - Avaliação de Entrada,opcforcamuscular,F,Força ao teste muscular manual por segmento.,SQ006,Abdução e Rotação Superior da Escápula,A4,3,1,
-599846,INDC - Avaliação de Entrada,opcforcamuscular,F,Força ao teste muscular manual por segmento.,SQ006,Abdução e Rotação Superior da Escápula,A5,4,1,
-599846,INDC - Avaliação de Entrada,opcforcamuscular,F,Força ao teste muscular manual por segmento.,SQ006,Abdução e Rotação Superior da Escápula,A6,5,1,
-599846,INDC - Avaliação de Entrada,opcforcamuscular,F,Força ao teste muscular manual por segmento.,SQ006,Abdução e Rotação Superior da Escápula,A7,Não Avaliado,1,
-599846,INDC - Avaliação de Entrada,opcforcamuscular,F,Força ao teste muscular manual por segmento.,SQ007,Flexão do Cotovelo,A1,0,0,
-599846,INDC - Avaliação de Entrada,opcforcamuscular,F,Força ao teste muscular manual por segmento.,SQ007,Flexão do Cotovelo,A2,1,1,
-599846,INDC - Avaliação de Entrada,opcforcamuscular,F,Força ao teste muscular manual por segmento.,SQ007,Flexão do Cotovelo,A3,2,1,
-599846,INDC - Avaliação de Entrada,opcforcamuscular,F,Força ao teste muscular manual por segmento.,SQ007,Flexão do Cotovelo,A4,3,1,
-599846,INDC - Avaliação de Entrada,opcforcamuscular,F,Força ao teste muscular manual por segmento.,SQ007,Flexão do Cotovelo,A5,4,1,
-599846,INDC - Avaliação de Entrada,opcforcamuscular,F,Força ao teste muscular manual por segmento.,SQ007,Flexão do Cotovelo,A6,5,1,
-599846,INDC - Avaliação de Entrada,opcforcamuscular,F,Força ao teste muscular manual por segmento.,SQ007,Flexão do Cotovelo,A7,Não Avaliado,1,
-599846,INDC - Avaliação de Entrada,opcforcamuscular,F,Força ao teste muscular manual por segmento.,SQ008,Extensão do Cotovelo,A1,0,0,
-599846,INDC - Avaliação de Entrada,opcforcamuscular,F,Força ao teste muscular manual por segmento.,SQ008,Extensão do Cotovelo,A2,1,1,
-599846,INDC - Avaliação de Entrada,opcforcamuscular,F,Força ao teste muscular manual por segmento.,SQ008,Extensão do Cotovelo,A3,2,1,
-599846,INDC - Avaliação de Entrada,opcforcamuscular,F,Força ao teste muscular manual por segmento.,SQ008,Extensão do Cotovelo,A4,3,1,
-599846,INDC - Avaliação de Entrada,opcforcamuscular,F,Força ao teste muscular manual por segmento.,SQ008,Extensão do Cotovelo,A5,4,1,
-599846,INDC - Avaliação de Entrada,opcforcamuscular,F,Força ao teste muscular manual por segmento.,SQ008,Extensão do Cotovelo,A6,5,1,
-599846,INDC - Avaliação de Entrada,opcforcamuscular,F,Força ao teste muscular manual por segmento.,SQ008,Extensão do Cotovelo,A7,Não Avaliado,1,
-599846,INDC - Avaliação de Entrada,opcforcamuscular,F,Força ao teste muscular manual por segmento.,SQ009,Extensão de Punho,A1,0,0,
-599846,INDC - Avaliação de Entrada,opcforcamuscular,F,Força ao teste muscular manual por segmento.,SQ009,Extensão de Punho,A2,1,1,
-599846,INDC - Avaliação de Entrada,opcforcamuscular,F,Força ao teste muscular manual por segmento.,SQ009,Extensão de Punho,A3,2,1,
-599846,INDC - Avaliação de Entrada,opcforcamuscular,F,Força ao teste muscular manual por segmento.,SQ009,Extensão de Punho,A4,3,1,
-599846,INDC - Avaliação de Entrada,opcforcamuscular,F,Força ao teste muscular manual por segmento.,SQ009,Extensão de Punho,A5,4,1,
-599846,INDC - Avaliação de Entrada,opcforcamuscular,F,Força ao teste muscular manual por segmento.,SQ009,Extensão de Punho,A6,5,1,
-599846,INDC - Avaliação de Entrada,opcforcamuscular,F,Força ao teste muscular manual por segmento.,SQ009,Extensão de Punho,A7,Não Avaliado,1,
-599846,INDC - Avaliação de Entrada,opcforcamuscular,F,Força ao teste muscular manual por segmento.,SQ010,Flexão de Punho,A1,0,0,
-599846,INDC - Avaliação de Entrada,opcforcamuscular,F,Força ao teste muscular manual por segmento.,SQ010,Flexão de Punho,A2,1,1,
-599846,INDC - Avaliação de Entrada,opcforcamuscular,F,Força ao teste muscular manual por segmento.,SQ010,Flexão de Punho,A3,2,1,
-599846,INDC - Avaliação de Entrada,opcforcamuscular,F,Força ao teste muscular manual por segmento.,SQ010,Flexão de Punho,A4,3,1,
-599846,INDC - Avaliação de Entrada,opcforcamuscular,F,Força ao teste muscular manual por segmento.,SQ010,Flexão de Punho,A5,4,1,
-599846,INDC - Avaliação de Entrada,opcforcamuscular,F,Força ao teste muscular manual por segmento.,SQ010,Flexão de Punho,A6,5,1,
-599846,INDC - Avaliação de Entrada,opcforcamuscular,F,Força ao teste muscular manual por segmento.,SQ010,Flexão de Punho,A7,Não Avaliado,1,
-599846,INDC - Avaliação de Entrada,opcforcamuscular,F,Força ao teste muscular manual por segmento.,SQ011,Flexão dos Dedos,A1,0,0,
-599846,INDC - Avaliação de Entrada,opcforcamuscular,F,Força ao teste muscular manual por segmento.,SQ011,Flexão dos Dedos,A2,1,1,
-599846,INDC - Avaliação de Entrada,opcforcamuscular,F,Força ao teste muscular manual por segmento.,SQ011,Flexão dos Dedos,A3,2,1,
-599846,INDC - Avaliação de Entrada,opcforcamuscular,F,Força ao teste muscular manual por segmento.,SQ011,Flexão dos Dedos,A4,3,1,
-599846,INDC - Avaliação de Entrada,opcforcamuscular,F,Força ao teste muscular manual por segmento.,SQ011,Flexão dos Dedos,A5,4,1,
-599846,INDC - Avaliação de Entrada,opcforcamuscular,F,Força ao teste muscular manual por segmento.,SQ011,Flexão dos Dedos,A6,5,1,
-599846,INDC - Avaliação de Entrada,opcforcamuscular,F,Força ao teste muscular manual por segmento.,SQ011,Flexão dos Dedos,A7,Não Avaliado,1,
-599846,INDC - Avaliação de Entrada,opcforcamuscular,F,Força ao teste muscular manual por segmento.,SQ012,Extensão dos Dedos,A1,0,0,
-599846,INDC - Avaliação de Entrada,opcforcamuscular,F,Força ao teste muscular manual por segmento.,SQ012,Extensão dos Dedos,A2,1,1,
-599846,INDC - Avaliação de Entrada,opcforcamuscular,F,Força ao teste muscular manual por segmento.,SQ012,Extensão dos Dedos,A3,2,1,
-599846,INDC - Avaliação de Entrada,opcforcamuscular,F,Força ao teste muscular manual por segmento.,SQ012,Extensão dos Dedos,A4,3,1,
-599846,INDC - Avaliação de Entrada,opcforcamuscular,F,Força ao teste muscular manual por segmento.,SQ012,Extensão dos Dedos,A5,4,1,
-599846,INDC - Avaliação de Entrada,opcforcamuscular,F,Força ao teste muscular manual por segmento.,SQ012,Extensão dos Dedos,A6,5,1,
-599846,INDC - Avaliação de Entrada,opcforcamuscular,F,Força ao teste muscular manual por segmento.,SQ012,Extensão dos Dedos,A7,Não Avaliado,1,
-599846,INDC - Avaliação de Entrada,opcforcamuscular,F,Força ao teste muscular manual por segmento.,SQ013,Abdução dos Dedos,A1,0,0,
-599846,INDC - Avaliação de Entrada,opcforcamuscular,F,Força ao teste muscular manual por segmento.,SQ013,Abdução dos Dedos,A2,1,1,
-599846,INDC - Avaliação de Entrada,opcforcamuscular,F,Força ao teste muscular manual por segmento.,SQ013,Abdução dos Dedos,A3,2,1,
-599846,INDC - Avaliação de Entrada,opcforcamuscular,F,Força ao teste muscular manual por segmento.,SQ013,Abdução dos Dedos,A4,3,1,
-599846,INDC - Avaliação de Entrada,opcforcamuscular,F,Força ao teste muscular manual por segmento.,SQ013,Abdução dos Dedos,A5,4,1,
-599846,INDC - Avaliação de Entrada,opcforcamuscular,F,Força ao teste muscular manual por segmento.,SQ013,Abdução dos Dedos,A6,5,1,
-599846,INDC - Avaliação de Entrada,opcforcamuscular,F,Força ao teste muscular manual por segmento.,SQ013,Abdução dos Dedos,A7,Não Avaliado,1,
-599846,INDC - Avaliação de Entrada,opcforcamuscular,F,Força ao teste muscular manual por segmento.,SQ014,Adução dos Dedos,A1,0,0,
-599846,INDC - Avaliação de Entrada,opcforcamuscular,F,Força ao teste muscular manual por segmento.,SQ014,Adução dos Dedos,A2,1,1,
-599846,INDC - Avaliação de Entrada,opcforcamuscular,F,Força ao teste muscular manual por segmento.,SQ014,Adução dos Dedos,A3,2,1,
-599846,INDC - Avaliação de Entrada,opcforcamuscular,F,Força ao teste muscular manual por segmento.,SQ014,Adução dos Dedos,A4,3,1,
-599846,INDC - Avaliação de Entrada,opcforcamuscular,F,Força ao teste muscular manual por segmento.,SQ014,Adução dos Dedos,A5,4,1,
-599846,INDC - Avaliação de Entrada,opcforcamuscular,F,Força ao teste muscular manual por segmento.,SQ014,Adução dos Dedos,A6,5,1,
-599846,INDC - Avaliação de Entrada,opcforcamuscular,F,Força ao teste muscular manual por segmento.,SQ014,Adução dos Dedos,A7,Não Avaliado,1,
-599846,INDC - Avaliação de Entrada,opcforcamuscular,F,Força ao teste muscular manual por segmento.,SQ015,Oponência do Polegar,A1,0,0,
-599846,INDC - Avaliação de Entrada,opcforcamuscular,F,Força ao teste muscular manual por segmento.,SQ015,Oponência do Polegar,A2,1,1,
-599846,INDC - Avaliação de Entrada,opcforcamuscular,F,Força ao teste muscular manual por segmento.,SQ015,Oponência do Polegar,A3,2,1,
-599846,INDC - Avaliação de Entrada,opcforcamuscular,F,Força ao teste muscular manual por segmento.,SQ015,Oponência do Polegar,A4,3,1,
-599846,INDC - Avaliação de Entrada,opcforcamuscular,F,Força ao teste muscular manual por segmento.,SQ015,Oponência do Polegar,A5,4,1,
-599846,INDC - Avaliação de Entrada,opcforcamuscular,F,Força ao teste muscular manual por segmento.,SQ015,Oponência do Polegar,A6,5,1,
-599846,INDC - Avaliação de Entrada,opcforcamuscular,F,Força ao teste muscular manual por segmento.,SQ015,Oponência do Polegar,A7,Não Avaliado,1,
+questionnaire_code,questionnaire_title,question_type,question_type_description,question_index,question_code,question_description,subquestion_code,subquestion_description,question_scale,question_scale_label,option_code,option_description
+599846,INDC - Avaliação de Entrada,D,Date,datlesao,datlesao,Data da lesão:, , ,,, , 
+599846,INDC - Avaliação de Entrada,L,List (Radio),opcladolesao,opcladolesao,Qual o lado da lesão?, , ,,,1,Direito
+599846,INDC - Avaliação de Entrada,L,List (Radio),opcladolesao,opcladolesao,Qual o lado da lesão?, , ,,,2,Esquerdo
+599846,INDC - Avaliação de Entrada,L,List (Radio),opcladolesao,opcladolesao,Qual o lado da lesão?, , ,,,3,Ambos
+599846,INDC - Avaliação de Entrada,M,Multiple choice,lislocalfisio,lislocalfisio,Local:,INDC,Instituição do Estudo,,, , 
+599846,INDC - Avaliação de Entrada,L,List (Radio),opcfreqfisio,opcfreqfisio,Frequência semanal:, , ,,,1,1 vez
+599846,INDC - Avaliação de Entrada,L,List (Radio),opcfreqfisio,opcfreqfisio,Frequência semanal:, , ,,,2,2 vezes
+599846,INDC - Avaliação de Entrada,L,List (Radio),opcfreqfisio,opcfreqfisio,Frequência semanal:, , ,,,3,3 vezes
+599846,INDC - Avaliação de Entrada,L,List (Radio),opcfreqfisio,opcfreqfisio,Frequência semanal:, , ,,,4,4 vezes
+599846,INDC - Avaliação de Entrada,L,List (Radio),opcfreqfisio,opcfreqfisio,Frequência semanal:, , ,,,5,5 vezes
+599846,INDC - Avaliação de Entrada,L,List (Radio),opcfreqfisio,opcfreqfisio,Frequência semanal:, , ,,,6,6 vezes
+599846,INDC - Avaliação de Entrada,L,List (Radio),opcfreqfisio,opcfreqfisio,Frequência semanal:, , ,,,7,7 vezes ou mais
+599846,INDC - Avaliação de Entrada,T,Long Free Text,texhistoriadoenca,texhistoriadoenca,História da doença atual:, , ,,, , 
+599846,INDC - Avaliação de Entrada,L,List (Radio),snTCE,snTCE,Teve TCE associado à lesão?, , ,,,A1,Sim
+599846,INDC - Avaliação de Entrada,L,List (Radio),snTCE,snTCE,Teve TCE associado à lesão?, , ,,,A2,Não
+599846,INDC - Avaliação de Entrada,L,List (Radio),snTCE,snTCE,Teve TCE associado à lesão?, , ,,,A3,Não informado
+599846,INDC - Avaliação de Entrada,L,List (Radio),sndreno,sndreno,Fez utilização de dreno de tórax?, , ,,,1,Sim
+599846,INDC - Avaliação de Entrada,L,List (Radio),sndreno,sndreno,Fez utilização de dreno de tórax?, , ,,,2,Não
+599846,INDC - Avaliação de Entrada,L,List (Radio),sndreno,sndreno,Fez utilização de dreno de tórax?, , ,,,3,Não Informado
+599846,INDC - Avaliação de Entrada,L,List (Radio),snlesovascular,snlesovascular,Tiveram lesões vasculares associadas à lesão do plexo braquial?, , ,,,1,Sim
+599846,INDC - Avaliação de Entrada,L,List (Radio),snlesovascular,snlesovascular,Tiveram lesões vasculares associadas à lesão do plexo braquial?, , ,,,2,Não
+599846,INDC - Avaliação de Entrada,L,List (Radio),snlesovascular,snlesovascular,Tiveram lesões vasculares associadas à lesão do plexo braquial?, , ,,,3,Não Informado
+599846,INDC - Avaliação de Entrada,M,Multiple choice,lislesovascular3,lislesovascular3,Tipo(s) de lesão(ões):,SQ001,Ruptura,,, , 
+599846,INDC - Avaliação de Entrada,M,Multiple choice,lislesovascular3,lislesovascular3,Tipo(s) de lesão(ões):,SQ002,Fistula,,, , 
+599846,INDC - Avaliação de Entrada,M,Multiple choice,lislesovascular3,lislesovascular3,Tipo(s) de lesão(ões):,SQ003,Trombose,,, , 
+599846,INDC - Avaliação de Entrada,M,Multiple choice,lislesovascular3,lislesovascular3,Tipo(s) de lesão(ões):,SQ004,Não especificado,,, , 
+599846,INDC - Avaliação de Entrada,T,Long Free Text,texlesovascular4,texlesovascular4,Tipo(s) de reconstrução(ões):, , ,,, , 
+599846,INDC - Avaliação de Entrada,|,File Upload,docexameTCE,docexameTCE,Anexar exames., , ,,, , 
+599846,INDC - Avaliação de Entrada,L,List (Radio),opsTO,opsTO,Realiza Terapia Ocupacional regularmente?, , ,,,A1,Sim
+599846,INDC - Avaliação de Entrada,L,List (Radio),opsTO,opsTO,Realiza Terapia Ocupacional regularmente?, , ,,,A2,Não
+599846,INDC - Avaliação de Entrada,L,List (Radio),opsTO,opsTO,Realiza Terapia Ocupacional regularmente?, , ,,,A3,Não Informado
+599846,INDC - Avaliação de Entrada,M,Multiple choice,lislocalTO,lislocalTO,Local:,SQ001,Instituição do Estudo,,, , 
+599846,INDC - Avaliação de Entrada,L,List (Radio),opcfreqTO,opcfreqTO,Frequência semanal:, , ,,,1,1 vez
+599846,INDC - Avaliação de Entrada,L,List (Radio),opcfreqTO,opcfreqTO,Frequência semanal:, , ,,,2,2 vezes
+599846,INDC - Avaliação de Entrada,L,List (Radio),opcfreqTO,opcfreqTO,Frequência semanal:, , ,,,3,3 vezes
+599846,INDC - Avaliação de Entrada,L,List (Radio),opcfreqTO,opcfreqTO,Frequência semanal:, , ,,,4,4 vezes
+599846,INDC - Avaliação de Entrada,L,List (Radio),opcfreqTO,opcfreqTO,Frequência semanal:, , ,,,5,5 vezes
+599846,INDC - Avaliação de Entrada,L,List (Radio),opcfreqTO,opcfreqTO,Frequência semanal:, , ,,,6,6 vezes
+599846,INDC - Avaliação de Entrada,L,List (Radio),opcfreqTO,opcfreqTO,Frequência semanal:, , ,,,7,7 vezes ou mais
+599846,INDC - Avaliação de Entrada,L,List (Radio),sndesacordado,sndesacordado,Ficou desacordado?, , ,,,1,Sim
+599846,INDC - Avaliação de Entrada,L,List (Radio),sndesacordado,sndesacordado,Ficou desacordado?, , ,,,2,Não
+599846,INDC - Avaliação de Entrada,L,List (Radio),sndesacordado,sndesacordado,Ficou desacordado?, , ,,,3,Não Informado
+599846,INDC - Avaliação de Entrada,S,Short Free Text,textempodesacordado,textempodesacordado,Quanto tempo?, , ,,, , 
+599846,INDC - Avaliação de Entrada,L,List (Radio),opsmedicamentos,opsmedicamentos,Faz uso de medicamento(s)?, , ,,,A1,Sim
+599846,INDC - Avaliação de Entrada,L,List (Radio),opsmedicamentos,opsmedicamentos,Faz uso de medicamento(s)?, , ,,,A2,Não
+599846,INDC - Avaliação de Entrada,L,List (Radio),opsmedicamentos,opsmedicamentos,Faz uso de medicamento(s)?, , ,,,A3,Não Informado
+599846,INDC - Avaliação de Entrada,P,Multiple choice with comments,lismedicamentos,lismedicamentos,Qual(is) medicamento(s)?,1,Opióides,,, , 
+599846,INDC - Avaliação de Entrada,P,Multiple choice with comments,lismedicamentos,lismedicamentos,Qual(is) medicamento(s)?,2,Antidepressivos,,, , 
+599846,INDC - Avaliação de Entrada,P,Multiple choice with comments,lismedicamentos,lismedicamentos,Qual(is) medicamento(s)?,3,Anticonvulsivantes,,, , 
+599846,INDC - Avaliação de Entrada,P,Multiple choice with comments,lismedicamentos,lismedicamentos,Qual(is) medicamento(s)?,4,Neurolépticos,,, , 
+599846,INDC - Avaliação de Entrada,P,Multiple choice with comments,lismedicamentos,lismedicamentos,Qual(is) medicamento(s)?,5,Complementos/Vitaminas,,, , 
+599846,INDC - Avaliação de Entrada,P,Multiple choice with comments,lismedicamentos,lismedicamentos,Qual(is) medicamento(s)?,6,Substâncias naturais/Chás,,, , 
+599846,INDC - Avaliação de Entrada,P,Multiple choice with comments,lismedicamentos,lismedicamentos,Qual(is) medicamento(s)?,7,Não sei,,, , 
+599846,INDC - Avaliação de Entrada,Y,Yes/No,sncirurgiasanterio,sncirurgiasanterio,Já fez alguma cirurgia de plexo braquial?, , ,,, , 
+599846,INDC - Avaliação de Entrada,T,Long Free Text,texprocedimeanterior,texprocedimeanterior,Qual(is) procedimento(s) foi(ram) realizado(s)?, , ,,, , 
+599846,INDC - Avaliação de Entrada,F,Array (Flexible Labels),sninspecao,sninspecao,Inspeção,a, Subluxação Glenoumeral,,,n,Não
+599846,INDC - Avaliação de Entrada,F,Array (Flexible Labels),sninspecao,sninspecao,Inspeção,a, Subluxação Glenoumeral,,,n1,Não Avaliado
+599846,INDC - Avaliação de Entrada,F,Array (Flexible Labels),sninspecao,sninspecao,Inspeção,a, Subluxação Glenoumeral,,,s,Sim
+599846,INDC - Avaliação de Entrada,F,Array (Flexible Labels),sninspecao,sninspecao,Inspeção,b, Postura escoliótica,,,n,Não
+599846,INDC - Avaliação de Entrada,F,Array (Flexible Labels),sninspecao,sninspecao,Inspeção,b, Postura escoliótica,,,n1,Não Avaliado
+599846,INDC - Avaliação de Entrada,F,Array (Flexible Labels),sninspecao,sninspecao,Inspeção,b, Postura escoliótica,,,s,Sim
+599846,INDC - Avaliação de Entrada,F,Array (Flexible Labels),sninspecao,sninspecao,Inspeção,c, Sinal de Horner,,,n,Não
+599846,INDC - Avaliação de Entrada,F,Array (Flexible Labels),sninspecao,sninspecao,Inspeção,c, Sinal de Horner,,,n1,Não Avaliado
+599846,INDC - Avaliação de Entrada,F,Array (Flexible Labels),sninspecao,sninspecao,Inspeção,c, Sinal de Horner,,,s,Sim
+599846,INDC - Avaliação de Entrada,F,Array (Flexible Labels),sninspecao,sninspecao,Inspeção,d, Edema,,,n,Não
+599846,INDC - Avaliação de Entrada,F,Array (Flexible Labels),sninspecao,sninspecao,Inspeção,d, Edema,,,n1,Não Avaliado
+599846,INDC - Avaliação de Entrada,F,Array (Flexible Labels),sninspecao,sninspecao,Inspeção,d, Edema,,,s,Sim
+599846,INDC - Avaliação de Entrada,F,Array (Flexible Labels),sninspecao,sninspecao,Inspeção,f,Cicatriz,,,n,Não
+599846,INDC - Avaliação de Entrada,F,Array (Flexible Labels),sninspecao,sninspecao,Inspeção,f,Cicatriz,,,n1,Não Avaliado
+599846,INDC - Avaliação de Entrada,F,Array (Flexible Labels),sninspecao,sninspecao,Inspeção,f,Cicatriz,,,s,Sim
+599846,INDC - Avaliação de Entrada,F,Array (Flexible Labels),sninspecao,sninspecao,Inspeção,g,Alteração Trófica,,,n,Não
+599846,INDC - Avaliação de Entrada,F,Array (Flexible Labels),sninspecao,sninspecao,Inspeção,g,Alteração Trófica,,,n1,Não Avaliado
+599846,INDC - Avaliação de Entrada,F,Array (Flexible Labels),sninspecao,sninspecao,Inspeção,g,Alteração Trófica,,,s,Sim
+599846,INDC - Avaliação de Entrada,T,Long Free Text,texlocalcicatriz,texlocalcicatriz,Descrição e localização da(s) cicatriz(es):, , ,,, , 
+599846,INDC - Avaliação de Entrada,L,List (Radio),snsinaltinel,snsinaltinel,Apresenta sinal de tinel?, , ,,,A1,Sim
+599846,INDC - Avaliação de Entrada,L,List (Radio),snsinaltinel,snsinaltinel,Apresenta sinal de tinel?, , ,,,A2,Não
+599846,INDC - Avaliação de Entrada,L,List (Radio),snsinaltinel,snsinaltinel,Apresenta sinal de tinel?, , ,,,A3,Não Avaliado
+599846,INDC - Avaliação de Entrada,F,Array (Flexible Labels),snrestricaoarticula,snrestricaoarticula,Restrição Articular,1, Ombro,,,1,Sim
+599846,INDC - Avaliação de Entrada,F,Array (Flexible Labels),snrestricaoarticula,snrestricaoarticula,Restrição Articular,1, Ombro,,,2,Não
+599846,INDC - Avaliação de Entrada,F,Array (Flexible Labels),snrestricaoarticula,snrestricaoarticula,Restrição Articular,1, Ombro,,,3,Não Avaliado
+599846,INDC - Avaliação de Entrada,F,Array (Flexible Labels),snrestricaoarticula,snrestricaoarticula,Restrição Articular,2, Cotovelo,,,1,Sim
+599846,INDC - Avaliação de Entrada,F,Array (Flexible Labels),snrestricaoarticula,snrestricaoarticula,Restrição Articular,2, Cotovelo,,,2,Não
+599846,INDC - Avaliação de Entrada,F,Array (Flexible Labels),snrestricaoarticula,snrestricaoarticula,Restrição Articular,2, Cotovelo,,,3,Não Avaliado
+599846,INDC - Avaliação de Entrada,F,Array (Flexible Labels),snrestricaoarticula,snrestricaoarticula,Restrição Articular,3, Punho,,,1,Sim
+599846,INDC - Avaliação de Entrada,F,Array (Flexible Labels),snrestricaoarticula,snrestricaoarticula,Restrição Articular,3, Punho,,,2,Não
+599846,INDC - Avaliação de Entrada,F,Array (Flexible Labels),snrestricaoarticula,snrestricaoarticula,Restrição Articular,3, Punho,,,3,Não Avaliado
+599846,INDC - Avaliação de Entrada,F,Array (Flexible Labels),snrestricaoarticula,snrestricaoarticula,Restrição Articular,4, Dedos,,,1,Sim
+599846,INDC - Avaliação de Entrada,F,Array (Flexible Labels),snrestricaoarticula,snrestricaoarticula,Restrição Articular,4, Dedos,,,2,Não
+599846,INDC - Avaliação de Entrada,F,Array (Flexible Labels),snrestricaoarticula,snrestricaoarticula,Restrição Articular,4, Dedos,,,3,Não Avaliado
+599846,INDC - Avaliação de Entrada,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Força ao teste muscular manual por segmento.,SQ001,Flexão do Ombro,,,A1,0
+599846,INDC - Avaliação de Entrada,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Força ao teste muscular manual por segmento.,SQ001,Flexão do Ombro,,,A2,1
+599846,INDC - Avaliação de Entrada,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Força ao teste muscular manual por segmento.,SQ001,Flexão do Ombro,,,A3,2
+599846,INDC - Avaliação de Entrada,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Força ao teste muscular manual por segmento.,SQ001,Flexão do Ombro,,,A4,3
+599846,INDC - Avaliação de Entrada,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Força ao teste muscular manual por segmento.,SQ001,Flexão do Ombro,,,A5,4
+599846,INDC - Avaliação de Entrada,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Força ao teste muscular manual por segmento.,SQ001,Flexão do Ombro,,,A6,5
+599846,INDC - Avaliação de Entrada,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Força ao teste muscular manual por segmento.,SQ001,Flexão do Ombro,,,A7,Não Avaliado
+599846,INDC - Avaliação de Entrada,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Força ao teste muscular manual por segmento.,SQ002,Abdução do Ombro,,,A1,0
+599846,INDC - Avaliação de Entrada,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Força ao teste muscular manual por segmento.,SQ002,Abdução do Ombro,,,A2,1
+599846,INDC - Avaliação de Entrada,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Força ao teste muscular manual por segmento.,SQ002,Abdução do Ombro,,,A3,2
+599846,INDC - Avaliação de Entrada,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Força ao teste muscular manual por segmento.,SQ002,Abdução do Ombro,,,A4,3
+599846,INDC - Avaliação de Entrada,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Força ao teste muscular manual por segmento.,SQ002,Abdução do Ombro,,,A5,4
+599846,INDC - Avaliação de Entrada,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Força ao teste muscular manual por segmento.,SQ002,Abdução do Ombro,,,A6,5
+599846,INDC - Avaliação de Entrada,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Força ao teste muscular manual por segmento.,SQ002,Abdução do Ombro,,,A7,Não Avaliado
+599846,INDC - Avaliação de Entrada,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Força ao teste muscular manual por segmento.,SQ003,Rotação Externa do Ombro,,,A1,0
+599846,INDC - Avaliação de Entrada,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Força ao teste muscular manual por segmento.,SQ003,Rotação Externa do Ombro,,,A2,1
+599846,INDC - Avaliação de Entrada,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Força ao teste muscular manual por segmento.,SQ003,Rotação Externa do Ombro,,,A3,2
+599846,INDC - Avaliação de Entrada,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Força ao teste muscular manual por segmento.,SQ003,Rotação Externa do Ombro,,,A4,3
+599846,INDC - Avaliação de Entrada,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Força ao teste muscular manual por segmento.,SQ003,Rotação Externa do Ombro,,,A5,4
+599846,INDC - Avaliação de Entrada,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Força ao teste muscular manual por segmento.,SQ003,Rotação Externa do Ombro,,,A6,5
+599846,INDC - Avaliação de Entrada,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Força ao teste muscular manual por segmento.,SQ003,Rotação Externa do Ombro,,,A7,Não Avaliado
+599846,INDC - Avaliação de Entrada,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Força ao teste muscular manual por segmento.,SQ004,Rotação Interna do Ombro,,,A1,0
+599846,INDC - Avaliação de Entrada,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Força ao teste muscular manual por segmento.,SQ004,Rotação Interna do Ombro,,,A2,1
+599846,INDC - Avaliação de Entrada,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Força ao teste muscular manual por segmento.,SQ004,Rotação Interna do Ombro,,,A3,2
+599846,INDC - Avaliação de Entrada,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Força ao teste muscular manual por segmento.,SQ004,Rotação Interna do Ombro,,,A4,3
+599846,INDC - Avaliação de Entrada,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Força ao teste muscular manual por segmento.,SQ004,Rotação Interna do Ombro,,,A5,4
+599846,INDC - Avaliação de Entrada,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Força ao teste muscular manual por segmento.,SQ004,Rotação Interna do Ombro,,,A6,5
+599846,INDC - Avaliação de Entrada,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Força ao teste muscular manual por segmento.,SQ004,Rotação Interna do Ombro,,,A7,Não Avaliado
+599846,INDC - Avaliação de Entrada,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Força ao teste muscular manual por segmento.,SQ005,Elevação da Escápula,,,A1,0
+599846,INDC - Avaliação de Entrada,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Força ao teste muscular manual por segmento.,SQ005,Elevação da Escápula,,,A2,1
+599846,INDC - Avaliação de Entrada,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Força ao teste muscular manual por segmento.,SQ005,Elevação da Escápula,,,A3,2
+599846,INDC - Avaliação de Entrada,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Força ao teste muscular manual por segmento.,SQ005,Elevação da Escápula,,,A4,3
+599846,INDC - Avaliação de Entrada,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Força ao teste muscular manual por segmento.,SQ005,Elevação da Escápula,,,A5,4
+599846,INDC - Avaliação de Entrada,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Força ao teste muscular manual por segmento.,SQ005,Elevação da Escápula,,,A6,5
+599846,INDC - Avaliação de Entrada,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Força ao teste muscular manual por segmento.,SQ005,Elevação da Escápula,,,A7,Não Avaliado
+599846,INDC - Avaliação de Entrada,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Força ao teste muscular manual por segmento.,SQ006,Abdução e Rotação Superior da Escápula,,,A1,0
+599846,INDC - Avaliação de Entrada,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Força ao teste muscular manual por segmento.,SQ006,Abdução e Rotação Superior da Escápula,,,A2,1
+599846,INDC - Avaliação de Entrada,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Força ao teste muscular manual por segmento.,SQ006,Abdução e Rotação Superior da Escápula,,,A3,2
+599846,INDC - Avaliação de Entrada,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Força ao teste muscular manual por segmento.,SQ006,Abdução e Rotação Superior da Escápula,,,A4,3
+599846,INDC - Avaliação de Entrada,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Força ao teste muscular manual por segmento.,SQ006,Abdução e Rotação Superior da Escápula,,,A5,4
+599846,INDC - Avaliação de Entrada,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Força ao teste muscular manual por segmento.,SQ006,Abdução e Rotação Superior da Escápula,,,A6,5
+599846,INDC - Avaliação de Entrada,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Força ao teste muscular manual por segmento.,SQ006,Abdução e Rotação Superior da Escápula,,,A7,Não Avaliado
+599846,INDC - Avaliação de Entrada,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Força ao teste muscular manual por segmento.,SQ007,Flexão do Cotovelo,,,A1,0
+599846,INDC - Avaliação de Entrada,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Força ao teste muscular manual por segmento.,SQ007,Flexão do Cotovelo,,,A2,1
+599846,INDC - Avaliação de Entrada,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Força ao teste muscular manual por segmento.,SQ007,Flexão do Cotovelo,,,A3,2
+599846,INDC - Avaliação de Entrada,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Força ao teste muscular manual por segmento.,SQ007,Flexão do Cotovelo,,,A4,3
+599846,INDC - Avaliação de Entrada,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Força ao teste muscular manual por segmento.,SQ007,Flexão do Cotovelo,,,A5,4
+599846,INDC - Avaliação de Entrada,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Força ao teste muscular manual por segmento.,SQ007,Flexão do Cotovelo,,,A6,5
+599846,INDC - Avaliação de Entrada,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Força ao teste muscular manual por segmento.,SQ007,Flexão do Cotovelo,,,A7,Não Avaliado
+599846,INDC - Avaliação de Entrada,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Força ao teste muscular manual por segmento.,SQ008,Extensão do Cotovelo,,,A1,0
+599846,INDC - Avaliação de Entrada,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Força ao teste muscular manual por segmento.,SQ008,Extensão do Cotovelo,,,A2,1
+599846,INDC - Avaliação de Entrada,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Força ao teste muscular manual por segmento.,SQ008,Extensão do Cotovelo,,,A3,2
+599846,INDC - Avaliação de Entrada,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Força ao teste muscular manual por segmento.,SQ008,Extensão do Cotovelo,,,A4,3
+599846,INDC - Avaliação de Entrada,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Força ao teste muscular manual por segmento.,SQ008,Extensão do Cotovelo,,,A5,4
+599846,INDC - Avaliação de Entrada,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Força ao teste muscular manual por segmento.,SQ008,Extensão do Cotovelo,,,A6,5
+599846,INDC - Avaliação de Entrada,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Força ao teste muscular manual por segmento.,SQ008,Extensão do Cotovelo,,,A7,Não Avaliado
+599846,INDC - Avaliação de Entrada,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Força ao teste muscular manual por segmento.,SQ009,Extensão de Punho,,,A1,0
+599846,INDC - Avaliação de Entrada,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Força ao teste muscular manual por segmento.,SQ009,Extensão de Punho,,,A2,1
+599846,INDC - Avaliação de Entrada,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Força ao teste muscular manual por segmento.,SQ009,Extensão de Punho,,,A3,2
+599846,INDC - Avaliação de Entrada,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Força ao teste muscular manual por segmento.,SQ009,Extensão de Punho,,,A4,3
+599846,INDC - Avaliação de Entrada,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Força ao teste muscular manual por segmento.,SQ009,Extensão de Punho,,,A5,4
+599846,INDC - Avaliação de Entrada,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Força ao teste muscular manual por segmento.,SQ009,Extensão de Punho,,,A6,5
+599846,INDC - Avaliação de Entrada,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Força ao teste muscular manual por segmento.,SQ009,Extensão de Punho,,,A7,Não Avaliado
+599846,INDC - Avaliação de Entrada,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Força ao teste muscular manual por segmento.,SQ010,Flexão de Punho,,,A1,0
+599846,INDC - Avaliação de Entrada,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Força ao teste muscular manual por segmento.,SQ010,Flexão de Punho,,,A2,1
+599846,INDC - Avaliação de Entrada,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Força ao teste muscular manual por segmento.,SQ010,Flexão de Punho,,,A3,2
+599846,INDC - Avaliação de Entrada,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Força ao teste muscular manual por segmento.,SQ010,Flexão de Punho,,,A4,3
+599846,INDC - Avaliação de Entrada,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Força ao teste muscular manual por segmento.,SQ010,Flexão de Punho,,,A5,4
+599846,INDC - Avaliação de Entrada,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Força ao teste muscular manual por segmento.,SQ010,Flexão de Punho,,,A6,5
+599846,INDC - Avaliação de Entrada,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Força ao teste muscular manual por segmento.,SQ010,Flexão de Punho,,,A7,Não Avaliado
+599846,INDC - Avaliação de Entrada,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Força ao teste muscular manual por segmento.,SQ011,Flexão dos Dedos,,,A1,0
+599846,INDC - Avaliação de Entrada,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Força ao teste muscular manual por segmento.,SQ011,Flexão dos Dedos,,,A2,1
+599846,INDC - Avaliação de Entrada,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Força ao teste muscular manual por segmento.,SQ011,Flexão dos Dedos,,,A3,2
+599846,INDC - Avaliação de Entrada,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Força ao teste muscular manual por segmento.,SQ011,Flexão dos Dedos,,,A4,3
+599846,INDC - Avaliação de Entrada,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Força ao teste muscular manual por segmento.,SQ011,Flexão dos Dedos,,,A5,4
+599846,INDC - Avaliação de Entrada,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Força ao teste muscular manual por segmento.,SQ011,Flexão dos Dedos,,,A6,5
+599846,INDC - Avaliação de Entrada,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Força ao teste muscular manual por segmento.,SQ011,Flexão dos Dedos,,,A7,Não Avaliado
+599846,INDC - Avaliação de Entrada,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Força ao teste muscular manual por segmento.,SQ012,Extensão dos Dedos,,,A1,0
+599846,INDC - Avaliação de Entrada,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Força ao teste muscular manual por segmento.,SQ012,Extensão dos Dedos,,,A2,1
+599846,INDC - Avaliação de Entrada,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Força ao teste muscular manual por segmento.,SQ012,Extensão dos Dedos,,,A3,2
+599846,INDC - Avaliação de Entrada,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Força ao teste muscular manual por segmento.,SQ012,Extensão dos Dedos,,,A4,3
+599846,INDC - Avaliação de Entrada,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Força ao teste muscular manual por segmento.,SQ012,Extensão dos Dedos,,,A5,4
+599846,INDC - Avaliação de Entrada,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Força ao teste muscular manual por segmento.,SQ012,Extensão dos Dedos,,,A6,5
+599846,INDC - Avaliação de Entrada,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Força ao teste muscular manual por segmento.,SQ012,Extensão dos Dedos,,,A7,Não Avaliado
+599846,INDC - Avaliação de Entrada,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Força ao teste muscular manual por segmento.,SQ013,Abdução dos Dedos,,,A1,0
+599846,INDC - Avaliação de Entrada,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Força ao teste muscular manual por segmento.,SQ013,Abdução dos Dedos,,,A2,1
+599846,INDC - Avaliação de Entrada,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Força ao teste muscular manual por segmento.,SQ013,Abdução dos Dedos,,,A3,2
+599846,INDC - Avaliação de Entrada,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Força ao teste muscular manual por segmento.,SQ013,Abdução dos Dedos,,,A4,3
+599846,INDC - Avaliação de Entrada,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Força ao teste muscular manual por segmento.,SQ013,Abdução dos Dedos,,,A5,4
+599846,INDC - Avaliação de Entrada,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Força ao teste muscular manual por segmento.,SQ013,Abdução dos Dedos,,,A6,5
+599846,INDC - Avaliação de Entrada,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Força ao teste muscular manual por segmento.,SQ013,Abdução dos Dedos,,,A7,Não Avaliado
+599846,INDC - Avaliação de Entrada,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Força ao teste muscular manual por segmento.,SQ014,Adução dos Dedos,,,A1,0
+599846,INDC - Avaliação de Entrada,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Força ao teste muscular manual por segmento.,SQ014,Adução dos Dedos,,,A2,1
+599846,INDC - Avaliação de Entrada,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Força ao teste muscular manual por segmento.,SQ014,Adução dos Dedos,,,A3,2
+599846,INDC - Avaliação de Entrada,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Força ao teste muscular manual por segmento.,SQ014,Adução dos Dedos,,,A4,3
+599846,INDC - Avaliação de Entrada,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Força ao teste muscular manual por segmento.,SQ014,Adução dos Dedos,,,A5,4
+599846,INDC - Avaliação de Entrada,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Força ao teste muscular manual por segmento.,SQ014,Adução dos Dedos,,,A6,5
+599846,INDC - Avaliação de Entrada,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Força ao teste muscular manual por segmento.,SQ014,Adução dos Dedos,,,A7,Não Avaliado
+599846,INDC - Avaliação de Entrada,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Força ao teste muscular manual por segmento.,SQ015,Oponência do Polegar,,,A1,0
+599846,INDC - Avaliação de Entrada,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Força ao teste muscular manual por segmento.,SQ015,Oponência do Polegar,,,A2,1
+599846,INDC - Avaliação de Entrada,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Força ao teste muscular manual por segmento.,SQ015,Oponência do Polegar,,,A3,2
+599846,INDC - Avaliação de Entrada,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Força ao teste muscular manual por segmento.,SQ015,Oponência do Polegar,,,A4,3
+599846,INDC - Avaliação de Entrada,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Força ao teste muscular manual por segmento.,SQ015,Oponência do Polegar,,,A5,4
+599846,INDC - Avaliação de Entrada,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Força ao teste muscular manual por segmento.,SQ015,Oponência do Polegar,,,A6,5
+599846,INDC - Avaliação de Entrada,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Força ao teste muscular manual por segmento.,SQ015,Oponência do Polegar,,,A7,Não Avaliado
