@@ -181,9 +181,10 @@ def experiment_detail(request, slug):
                 gender_grouping[participant.gender.name] = 0
             gender_grouping[participant.gender.name] += 1
             # age
-            if int(participant.age) not in age_grouping:
-                age_grouping[int(participant.age)] = 0
-            age_grouping[int(participant.age)] += 1
+            if participant.age:
+                if int(participant.age) not in age_grouping:
+                    age_grouping[int(participant.age)] = 0
+                age_grouping[int(participant.age)] += 1
 
     # get default (language) questionnaires (or first) for all groups
     questionnaires = {}
