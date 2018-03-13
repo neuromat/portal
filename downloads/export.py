@@ -9,7 +9,7 @@ from django.shortcuts import get_object_or_404
 from sys import modules
 from django.utils.encoding import smart_str
 from django.utils.translation import ugettext as _
-from django.template.defaultfilters import slugify
+from django.utils.text import slugify
 
 from experiments.models import Experiment, Group, Participant, EEGData, EMGData, EEGSetting, EMGSetting, TMSData, \
     TMSSetting, AdditionalData, ContextTree, GenericDataCollectionData, GoalkeeperGameData, Step, \
