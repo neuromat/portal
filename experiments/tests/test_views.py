@@ -1,20 +1,20 @@
+import io
+import os
 import random
 import re
+import sys
 import tempfile
 import zipfile
 from unittest import skip
 
 import haystack
-import sys
-import io
-import os
-
 from django.contrib import auth
 from django.contrib.auth.models import User, Permission
 from django.core.management import call_command
 from django.test import TestCase, override_settings
 from django.urls import reverse, resolve
 from django.utils.encoding import smart_str
+from django.utils.text import slugify
 from haystack.query import SearchQuerySet
 
 from experiments import views
@@ -888,33 +888,38 @@ class DownloadExperimentTest(TestCase):
         )
         ep_group_id = int(ep_group_str.group(1))
         if group1.id == ep_group_id:
+            group_title_slugifyed = slugify(group1.title)
             self.assertTrue(
-                any('Group_' + group1.title in element for element in
+                any('Group_' + group_title_slugifyed in element for element in
                     zipped_file.namelist())
             )
             # TODO: maybe it's necessary to construct the string representing
             # TODO: the path with file system specific separator ('/' or '\')
             self.assertTrue(
-                any('Group_' + group1.title + '/Experimental_protocol'
+                any('Group_' + group_title_slugifyed + '/Experimental_protocol'
                     in element for element in zipped_file.namelist())
             )
             if group1 != group2:
+                group_title_slugifyed = slugify(group2.title)
                 self.assertFalse(
-                    any('Group_' + group2.title + '/Experimental_protocol'
+                    any('Group_' + group_title_slugifyed +
+                        '/Experimental_protocol'
                         in element for element in zipped_file.namelist())
                 )
         else:  # group2.id == ep_group_id
+            group_title_slugifyed = slugify(group2.title)
             self.assertTrue(
-                any('Group_' + group2.title in element for element in
+                any('Group_' + group_title_slugifyed in element for element in
                     zipped_file.namelist())
             )
             self.assertTrue(
-                any('Group_' + group2.title + '/Experimental_protocol'
+                any('Group_' + group_title_slugifyed + '/Experimental_protocol'
                     in element for element in zipped_file.namelist())
             )
             if group1 != group2:
                 self.assertFalse(
-                    any('Group_' + group1.title + '/Experimental_protocol'
+                    any('Group_' + slugify(group1.title) +
+                        '/Experimental_protocol'
                         in element for element in zipped_file.namelist())
                 )
 
@@ -923,76 +928,91 @@ class DownloadExperimentTest(TestCase):
         q_group_str = re.search("questionnaires_g([0-9]+)", q_value)
         q_group_id = int(q_group_str.group(1))
         if group1.id == q_group_id:
+            group_title_slugifyed = slugify(group1.title)
             self.assertTrue(
-                any('Group_' + group1.title + '/Questionnaire_metadata'
+                any('Group_' + group_title_slugifyed +
+                    '/Questionnaire_metadata'
                     in element for element in zipped_file.namelist())
             )
             self.assertTrue(
-                any('Group_' + group1.title + '/Per_questionnaire_data'
+                any('Group_' + group_title_slugifyed +
+                    '/Per_questionnaire_data'
                     in element for element in zipped_file.namelist())
             )
             if group1 != group2:
+                group_title_slugifyed = slugify(group2.title)
                 # Questionnaire_metadata subdir exists if group2 has
                 # questionnaire(s).
                 if group2.steps.filter(type=Step.QUESTIONNAIRE).count() == 0:
                     self.assertFalse(
-                        any('Group_' + group2.title + '/Questionnaire_metadata'
+                        any('Group_' + group_title_slugifyed +
+                            '/Questionnaire_metadata'
                             in element for element in zipped_file.namelist())
                     )
                 self.assertFalse(
-                    any('Group_' + group2.title + '/Per_questionnaire_data'
+                    any('Group_' + group_title_slugifyed +
+                        '/Per_questionnaire_data'
                         in element for element in zipped_file.namelist())
                 )
         else:  # group2.id == ep_group_id
+            group_title_slugifyed = slugify(group2.title)
             self.assertTrue(
-                any('Group_' + group2.title + '/Questionnaire_metadata'
+                any('Group_' + group_title_slugifyed +
+                    '/Questionnaire_metadata'
                     in element for element in zipped_file.namelist())
             )
             self.assertTrue(
-                any('Group_' + group2.title + '/Per_questionnaire_data'
+                any('Group_' + group_title_slugifyed +
+                    '/Per_questionnaire_data'
                     in element for element in zipped_file.namelist())
             )
             if group1 != group2:
                 # Questionnaire_metadata subdir exists if group2 has
                 # questionnaire(s).
+                group_title_slugifyed = slugify(group1.title)
                 if group2.steps.filter(type=Step.QUESTIONNAIRE).count() == 0:
                     self.assertFalse(
-                        any('Group_' + group1.title + '/Questionnaire_metadata'
+                        any('Group_' + group_title_slugifyed +
+                            '/Questionnaire_metadata'
                             in element for element in zipped_file.namelist())
                     )
                 self.assertFalse(
-                    any('Group_' + group1.title + '/Per_questionnaire_data'
+                    any('Group_' + group_title_slugifyed +
+                        '/Per_questionnaire_data'
                         in element for element in zipped_file.namelist())
                 )
 
         # when user select "Per Questionnaire Data" option the file
         # Participants.csv has to be in compressed file
         questionnaire_group = Group.objects.get(pk=q_group_id)
+        group_title_slugifyed = slugify(questionnaire_group.title)
         self.assertTrue(
-            any('Group_' + questionnaire_group.title + '/Participants.csv'
+            any('Group_' + group_title_slugifyed + '/Participants.csv'
                 in element for element in zipped_file.namelist()
-                ), 'Group_' + questionnaire_group.title + '/Participants.csv '
-                                                          'not in ' +
-                   str(zipped_file.namelist())
+                ), 'Group_' + group_title_slugifyed +
+                   '/Participants.csv not in ' + str(zipped_file.namelist())
         )
 
     def assert_participants(self, group1, group2, participant1, participant2,
                             zipped_file, both):
+        group_title_slugifyed = slugify(group1.title)
         self.assertTrue(
-            any('Group_' + group1.title + '/Per_participant_data'
+            any('Group_' + group_title_slugifyed + '/Per_participant_data'
                 in element for element in zipped_file.namelist())
         )
         self.assertTrue(
-            any('Group_' + group1.title + '/Per_participant_data/Participant_' +
+            any('Group_' + group_title_slugifyed +
+                '/Per_participant_data/Participant_' +
                 participant1.code
                 in element for element in zipped_file.namelist())
         )
         if not both and (group1 != group2):
+            group_title_slugifyed = slugify(group2.title)
             self.assertFalse(
-                any('Group_' + group2.title +
+                any('Group_' + group_title_slugifyed +
                     '/Per_participant_data/Participant_' + participant2.code
                     in element for element in zipped_file.namelist()),
-                'Group_' + group2.title +
+                'Group_' + group_title_slugifyed +
                 '/Per_participant_data/Participant_' +
                 participant2.code + ' is in ' + str(zipped_file.namelist())
             )
@@ -1170,10 +1190,12 @@ class DownloadExperimentTest(TestCase):
         # subdir of the compressed file.
         for group in [g1, g2]:
             if group.steps.filter(type=Step.QUESTIONNAIRE).count() > 0:
+                group_title_slugifyed = slugify(group.title)
                 self.assertTrue(
-                    any('Group_' + group.title + '/Questionnaire_metadata'
+                    any('Group_' + group_title_slugifyed +
+                        '/Questionnaire_metadata'
                         in element for element in zipped_file.namelist()),
-                    '"Group_' + group.title +
+                    '"Group_' + group_title_slugifyed +
                     '/Questionnaire_metadata" subdir not in: ' +
                     str(zipped_file.namelist())
                 )

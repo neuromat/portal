@@ -4,7 +4,6 @@ import csv
 
 from decimal import Decimal
 from os import path, makedirs
-from csv import writer
 from django.conf import settings
 from django.shortcuts import get_object_or_404
 from sys import modules
@@ -16,7 +15,7 @@ from experiments.models import Experiment, Group, Participant, EEGData, EMGData,
     TMSSetting, AdditionalData, ContextTree, GenericDataCollectionData, GoalkeeperGameData, Step, \
     QuestionnaireResponse, Questionnaire, EEG, EMG, TMS, GoalkeeperGame, Stimulus, EMGElectrodeSetting, \
     EEGElectrodePosition, EMGSurfacePlacement, EMGIntramuscularPlacement, EMGNeedlePlacement, QuestionnaireLanguage, \
-    QuestionnaireDefaultLanguage, StepAdditionalFile
+    QuestionnaireDefaultLanguage
 
 DEFAULT_LANGUAGE = "pt-BR"
 
@@ -190,15 +189,13 @@ class ExportExecution:
         # process data for each group
         group_list = Group.objects.filter(experiment=experiment)
         for group in group_list:
-            group_resume = "Group name: " + group.title + "\n" + "Group description: " + group.description + "\n"
-            group_title = '_'.join(slugify(group.title).split('-'))
-            group_directory_name = 'Group_' + group_title
+            group_resume = "Group name: " + group.title + "\n" + \
+                           "Group description: " + group.description + "\n"
+            group_directory_name = 'Group_' + slugify(group.title)
 
-            # group_directory = Users/.../qdc/media/download/experiment_id/Group_group.title
             error_msg, group_directory = create_directory(experiment_resume_directory, group_directory_name)
             if error_msg != "":
                 return error_msg
-            # export_directory_group = EXPERIMENT_DOWNLOAD/Group_group.title
             export_directory_group = path.join(export_experiment_data, group_directory_name)
 
             if hasattr(group, 'experimental_protocol'):
@@ -589,8 +586,7 @@ class ExportExecution:
                 'tms_default_setting_id': '',
                 'context_tree_default_id': ''
             }
-            group_title = '_'.join(slugify(group.title).split('-'))
-            group_name_directory = "Group_" + group_title
+            group_name_directory = "Group_" + slugify(group.title)
             group_directory = path.join(self.get_export_directory(), group_name_directory)
             export_group_directory = path.join(self.get_input_data("base_directory"), group_name_directory)
             self.per_group_data[group_id]['group']['directory'] = group_directory

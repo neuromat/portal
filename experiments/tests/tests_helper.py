@@ -1,9 +1,10 @@
 import os
 import random
 import shutil
-import tempfile
 from datetime import datetime
 from random import randint, choice
+
+from django.utils.text import slugify
 from faker import Factory
 
 from django.contrib.auth.models import User
@@ -988,7 +989,7 @@ def create_download_dir_structure_and_files(experiment, temp_media_root):
 
     for group in experiment.groups.all():
         group_dir = os.path.join(
-            experiment_download_dir, 'Group_' + group.title
+            experiment_download_dir, 'Group_' + slugify(group.title)
         )
         # TODO: sometimes on creating this subdir, test fails claiming that
         # TODO: 'Questionnaire_metadata' already exists. It seems that
@@ -1053,19 +1054,20 @@ def remove_selected_subdir(selected, experiment, participant, group,
     experiment_download_dir = os.path.join(
         temp_media_root, 'download', str(experiment.pk)
     )
+    group_title_slugifyed = slugify(group.title)
     if 'experimental_protocol_g' in selected:
         shutil.rmtree(os.path.join(
-            experiment_download_dir, 'Group_' + group.title,
+            experiment_download_dir, 'Group_' + group_title_slugifyed,
             'Experimental_protocol'
         ))
     if 'questionnaires_g' in selected:
         shutil.rmtree(os.path.join(
-            experiment_download_dir, 'Group_' + group.title,
+            experiment_download_dir, 'Group_' + group_title_slugifyed,
             'Per_questionnaire_data'
         ))
     if 'participant_p' in selected:
         shutil.rmtree(os.path.join(
-            experiment_download_dir, 'Group_' + group.title,
+            experiment_download_dir, 'Group_' + group_title_slugifyed,
             'Per_participant_data', 'Participant_' + participant.code
         ))
     # If group has questionnaires remove 'Questionnaire_metadata' subdir
@@ -1073,7 +1075,7 @@ def remove_selected_subdir(selected, experiment, participant, group,
     if group.steps.filter(type=Step.QUESTIONNAIRE).count() > 0:
         if randint(0, 1) == 1:
             shutil.rmtree(os.path.join(
-                experiment_download_dir, 'Group_' + group.title,
+                experiment_download_dir, 'Group_' + group_title_slugifyed,
                 'Questionnaire_metadata'
             ))
 
@@ -1084,7 +1086,7 @@ def remove_selected_subdir(selected, experiment, participant, group,
         ))
     if randint(0, 1) == 1:
         os.remove(os.path.join(
-            experiment_download_dir, 'Group_' + group.title,
+            experiment_download_dir, 'Group_' + group_title_slugifyed,
             'Participants.csv'
         ))
 
