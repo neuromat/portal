@@ -66,8 +66,8 @@ $('#status_modal').on('show.bs.modal', function (event) {
     let logged_user = link.data('logged_user');
     let statuses = link.data('experiment_statuses');
     let modal = $(this);
-    modal.find('.modal-title').text('Change status for experiment ' +
-        '"' + experiment.title + '"');
+    modal.find('.modal-title').text(gettext('Change status for experiment') +
+        ' "' + experiment.title + '"');
     let modal_body = modal.find('.modal-body');
     let html = statuses_radio_options(experiment, statuses, logged_user);
     modal_body.text(gettext('Please select an option:'));
