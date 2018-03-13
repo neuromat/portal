@@ -707,7 +707,11 @@ class ExperimentDetailTest(FunctionalTest):
         self.wait_for_detail_page_load()
 
         # She clicks in Questionnaires tab
-        self.browser.find_element_by_link_text('Questionnaires').click()
+        self.wait_for(
+            lambda: self.browser.find_element_by_link_text(
+                'Questionnaires'
+            ).send_keys(Keys.ENTER)
+        )
 
         #
         # Questionnaire with code='q1' has three languages: English, French and
@@ -715,17 +719,18 @@ class ExperimentDetailTest(FunctionalTest):
         ##
         # The visitor clicks in 'fr' link and the questionnaire
         # session refreshes
-        self.browser.find_element_by_link_text('fr').click()
-        ##
-        # give time for ajax to complete request
-        ##
-        time.sleep(3)
+        self.wait_for(
+            lambda: self.browser.find_element_by_link_text('fr').click()
+        )
 
         # When she clicks in Detail button, she can see the questionnaire
         # with questions and answers in Portugues.
-        self.browser.find_element_by_xpath(
-            "//a[@href='#collapse" + str(questionnaire.id) + "']"
-        ).click()
+        self.wait_for(
+            lambda: self.browser.find_element_by_xpath(
+                "//a[@href='#collapse" + str(questionnaire.id) + "']"
+            ).click()
+        )
+
 
         questionnaires_content = self.browser.find_element_by_id(
             'questionnaires_tab').text

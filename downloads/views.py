@@ -14,6 +14,7 @@ from django.contrib import messages
 from django.shortcuts import get_object_or_404
 from django.http import HttpResponse, HttpResponseRedirect
 from django.utils.encoding import smart_str
+from django.utils.text import slugify
 from django.utils.translation import ugettext as _
 
 from .export import create_directory, ExportExecution
@@ -125,7 +126,7 @@ def download_view(request, experiment_id):
             try:
                 shutil.copytree(os.path.join(
                     settings.MEDIA_ROOT, 'download', str(experiment.id),
-                    'Group_' + group.title, 'Experimental_protocol'
+                    'Group_' + slugify(group.title), 'Experimental_protocol'
                 ), os.path.join(temp_dir, 'Group_' + group.title,
                                 'Experimental_protocol')
                 )
@@ -141,7 +142,7 @@ def download_view(request, experiment_id):
             try:
                 shutil.copytree(os.path.join(
                     settings.MEDIA_ROOT, 'download', str(experiment.id),
-                    'Group_' + group.title, 'Per_questionnaire_data'
+                    'Group_' + slugify(group.title), 'Per_questionnaire_data'
                 ), os.path.join(temp_dir, 'Group_' + group.title,
                                 'Per_questionnaire_data')
                 )
@@ -155,7 +156,7 @@ def download_view(request, experiment_id):
             try:
                 shutil.copyfile(os.path.join(
                     settings.MEDIA_ROOT, 'download', str(experiment.id),
-                    'Group_' + group.title, 'Participants.csv'
+                    'Group_' + slugify(group.title), 'Participants.csv'
                 ), os.path.join(temp_dir, 'Group_' + group.title,
                                 'Participants.csv')
                 )
@@ -179,7 +180,7 @@ def download_view(request, experiment_id):
             try:
                 shutil.copytree(os.path.join(
                     settings.MEDIA_ROOT, 'download', str(experiment.id),
-                    'Group_' + group.title, 'Per_participant_data', 
+                    'Group_' + slugify(group.title), 'Per_participant_data',
                     'Participant_' + participant.code
                 ), os.path.join(temp_dir, 'Group_' + group.title,
                                 'Per_participant_data', 'Participant_' +
@@ -199,7 +200,7 @@ def download_view(request, experiment_id):
             try:
                 shutil.copytree(os.path.join(
                     settings.MEDIA_ROOT, 'download', str(experiment.id),
-                    'Group_' + group.title, 'Questionnaire_metadata'
+                    'Group_' + slugify(group.title), 'Questionnaire_metadata'
                 ), os.path.join(temp_dir, 'Group_' + group.title,
                                 'Questionnaire_metadata')
                 )
