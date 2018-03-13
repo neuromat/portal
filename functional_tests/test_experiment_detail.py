@@ -731,7 +731,6 @@ class ExperimentDetailTest(FunctionalTest):
             ).click()
         )
 
-
         questionnaires_content = self.browser.find_element_by_id(
             'questionnaires_tab').text
 
