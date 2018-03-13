@@ -108,13 +108,14 @@ def download_view(request, experiment_id):
             reverse('experiment-detail', kwargs={'slug': experiment.slug})
         )
 
-    # Copy experiment data from settings.MEDIA_ROOT/download/<experiment.id>
+    # Copy experiment data from settings.MEDIA_ROOT/download/<experiment.id>,
     # based on user selection, to temp dir.
     for item in request.POST.getlist('download_selected'):
         # take the group title to copy subdirs/files to temp location
         group_str = re.search("g[0-9]+", item)
         group_id = int(group_str.group(0)[1:])
         group = Group.objects.get(pk=group_id)
+        group_title_slugifyed = slugify(group.title)
         # Options values in templates has group and/or participants id's as
         # substrings, so use regex to determine if they were selected.
         pattern_exp_protocol = re.compile("experimental_protocol_g[0-9]+$")
@@ -126,8 +127,8 @@ def download_view(request, experiment_id):
             try:
                 shutil.copytree(os.path.join(
                     settings.MEDIA_ROOT, 'download', str(experiment.id),
-                    'Group_' + slugify(group.title), 'Experimental_protocol'
-                ), os.path.join(temp_dir, 'Group_' + group.title,
+                    'Group_' + group_title_slugifyed, 'Experimental_protocol'
+                ), os.path.join(temp_dir, 'Group_' + group_title_slugifyed,
                                 'Experimental_protocol')
                 )
             except FileNotFoundError:
@@ -142,8 +143,8 @@ def download_view(request, experiment_id):
             try:
                 shutil.copytree(os.path.join(
                     settings.MEDIA_ROOT, 'download', str(experiment.id),
-                    'Group_' + slugify(group.title), 'Per_questionnaire_data'
-                ), os.path.join(temp_dir, 'Group_' + group.title,
+                    'Group_' + group_title_slugifyed, 'Per_questionnaire_data'
+                ), os.path.join(temp_dir, 'Group_' + group_title_slugifyed,
                                 'Per_questionnaire_data')
                 )
             except FileNotFoundError:
@@ -156,8 +157,8 @@ def download_view(request, experiment_id):
             try:
                 shutil.copyfile(os.path.join(
                     settings.MEDIA_ROOT, 'download', str(experiment.id),
-                    'Group_' + slugify(group.title), 'Participants.csv'
-                ), os.path.join(temp_dir, 'Group_' + group.title,
+                    'Group_' + group_title_slugifyed, 'Participants.csv'
+                ), os.path.join(temp_dir, 'Group_' + group_title_slugifyed,
                                 'Participants.csv')
                 )
             except FileNotFoundError:
@@ -180,9 +181,9 @@ def download_view(request, experiment_id):
             try:
                 shutil.copytree(os.path.join(
                     settings.MEDIA_ROOT, 'download', str(experiment.id),
-                    'Group_' + slugify(group.title), 'Per_participant_data',
+                    'Group_' + group_title_slugifyed, 'Per_participant_data',
                     'Participant_' + participant.code
-                ), os.path.join(temp_dir, 'Group_' + group.title,
+                ), os.path.join(temp_dir, 'Group_' + group_title_slugifyed,
                                 'Per_participant_data', 'Participant_' +
                                 participant.code)
                 )
@@ -197,11 +198,12 @@ def download_view(request, experiment_id):
     # questionnaires.
     for group in experiment.groups.all():
         if group.steps.filter(type=Step.QUESTIONNAIRE).count() > 0:
+            group_title_slugifyed = slugify(group.title)
             try:
                 shutil.copytree(os.path.join(
                     settings.MEDIA_ROOT, 'download', str(experiment.id),
-                    'Group_' + slugify(group.title), 'Questionnaire_metadata'
-                ), os.path.join(temp_dir, 'Group_' + group.title,
+                    'Group_' + group_title_slugifyed, 'Questionnaire_metadata'
+                ), os.path.join(temp_dir, 'Group_' + group_title_slugifyed,
                                 'Questionnaire_metadata')
                 )
             except FileNotFoundError:

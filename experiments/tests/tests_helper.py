@@ -1054,18 +1054,20 @@ def remove_selected_subdir(selected, experiment, participant, group,
     experiment_download_dir = os.path.join(
         temp_media_root, 'download', str(experiment.pk)
     )
-    group_dir = 'Group_' + slugify(group.title)
+    group_title_slugifyed = slugify(group.title)
     if 'experimental_protocol_g' in selected:
         shutil.rmtree(os.path.join(
-            experiment_download_dir, group_dir, 'Experimental_protocol'
+            experiment_download_dir, 'Group_' + group_title_slugifyed,
+            'Experimental_protocol'
         ))
     if 'questionnaires_g' in selected:
         shutil.rmtree(os.path.join(
-            experiment_download_dir, group_dir, 'Per_questionnaire_data'
+            experiment_download_dir, 'Group_' + group_title_slugifyed,
+            'Per_questionnaire_data'
         ))
     if 'participant_p' in selected:
         shutil.rmtree(os.path.join(
-            experiment_download_dir, group_dir,
+            experiment_download_dir, 'Group_' + group_title_slugifyed,
             'Per_participant_data', 'Participant_' + participant.code
         ))
     # If group has questionnaires remove 'Questionnaire_metadata' subdir
@@ -1073,15 +1075,19 @@ def remove_selected_subdir(selected, experiment, participant, group,
     if group.steps.filter(type=Step.QUESTIONNAIRE).count() > 0:
         if randint(0, 1) == 1:
             shutil.rmtree(os.path.join(
-                experiment_download_dir, group_dir, 'Questionnaire_metadata'
+                experiment_download_dir, 'Group_' + group_title_slugifyed,
+                'Questionnaire_metadata'
             ))
 
     # Remove Experiments.csv and Participants.csv randomly
     if randint(0, 1) == 1:
-        os.remove(os.path.join(experiment_download_dir, 'Experiment.csv'))
+        os.remove(os.path.join(
+            experiment_download_dir, 'Experiment.csv'
+        ))
     if randint(0, 1) == 1:
         os.remove(os.path.join(
-            experiment_download_dir, group_dir, 'Participants.csv'
+            experiment_download_dir, 'Group_' + group_title_slugifyed,
+            'Participants.csv'
         ))
 
 
