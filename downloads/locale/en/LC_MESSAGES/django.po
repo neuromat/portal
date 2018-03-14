@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-02-08 15:33-0200\n"
+"POT-Creation-Date: 2018-03-14 15:49-0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,42 +17,42 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: downloads/export.py:31
-msgid "Gender"
-msgstr ""
-
-#: downloads/export.py:32
-msgid "Age"
-msgstr ""
-
 #: downloads/export.py:33
 msgid "Participant code"
 msgstr ""
 
-#: downloads/export.py:37
+#: downloads/export.py:34
+msgid "Age"
+msgstr ""
+
+#: downloads/export.py:35
+msgid "Gender"
+msgstr ""
+
+#: downloads/export.py:39
 msgid "Code"
 msgstr ""
 
-#: downloads/export.py:38
+#: downloads/export.py:40
 msgid "Description"
 msgstr ""
 
-#: downloads/export.py:40
+#: downloads/export.py:42
 msgid "Abbreviated description"
 msgstr ""
 
-#: downloads/export.py:515 downloads/export.py:1597
+#: downloads/export.py:579 downloads/export.py:1722
 msgid "Yes"
 msgstr ""
 
-#: downloads/export.py:515 downloads/export.py:1597
+#: downloads/export.py:579 downloads/export.py:1722
 msgid "No"
 msgstr ""
 
-#: downloads/views.py:30
+#: downloads/views.py:31
 msgid "There was a problem downloading your experiment data"
 msgstr ""
 
-#: downloads/views.py:84
+#: downloads/views.py:85
 msgid "Please select item(s) to download"
 msgstr ""

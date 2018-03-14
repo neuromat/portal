@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-03-13 13:35-0300\n"
+"POT-Creation-Date: 2018-03-14 15:53-0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -32,11 +32,11 @@ msgid ""
 "to experiment researcher)"
 msgstr ""
 "Uma justificativa é necessária para rejeitar um experimento (esta mensagem "
-"será enviada para o pesquisador"
+"será enviada para o pesquisador)"
 
 #: static/js/change_status.js:84
 msgid "Please write a justification for rejecting this experiment"
-msgstr "Por favor escreva uma justificativa para jeitar este experimento"
+msgstr "Por favor escreva uma justificativa para rejeitar este experimento"
 
 #: static/tree-multiselect.js/jquery.tree-multiselect.js:117
 #: static/tree-multiselect.js/jquery.tree-multiselect.min.js:2
