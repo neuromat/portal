@@ -957,9 +957,7 @@ def create_q_language_metadata_dir_and_files(
 
 
 def create_group_subdir(group_dir, name):
-    subdir = os.path.join(
-        group_dir, name
-    )
+    subdir = os.path.join(group_dir, name)
     os.makedirs(subdir)
     return subdir
 
@@ -1073,7 +1071,7 @@ def remove_selected_subdir(selected, experiment, participant, group,
     # If group has questionnaires remove 'Questionnaire_metadata' subdir
     # randomly.
     if group.steps.filter(type=Step.QUESTIONNAIRE).count() > 0:
-        if randint(0, 1) == 1:
+        if randint(0, 1):
             shutil.rmtree(os.path.join(
                 experiment_download_dir, 'Group_' + group_title_slugifyed,
                 'Questionnaire_metadata'
