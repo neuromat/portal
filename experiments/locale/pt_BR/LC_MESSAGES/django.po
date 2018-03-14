@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-03-14 12:33-0300\n"
+"POT-Creation-Date: 2018-03-14 15:53-0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -542,7 +542,7 @@ msgstr "Data de fim"
 
 #: experiments/templates/experiments/header_detail.html:116
 msgid "No end date"
-msgstr "data de fim"
+msgstr "não definida"
 
 #: experiments/templates/experiments/header_detail.html:123
 msgid "Contributors"
