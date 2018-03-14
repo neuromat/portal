@@ -109,7 +109,7 @@ def download_view(request, experiment_id):
         )
 
     # Copy experiment data from settings.MEDIA_ROOT/download/<experiment.id>,
-    # based on user selection, to temp dir.
+    # based on user selection, to a temp dir.
     for item in request.POST.getlist('download_selected'):
         # take the group title to copy subdirs/files to temp location
         group_str = re.search("g[0-9]+", item)
