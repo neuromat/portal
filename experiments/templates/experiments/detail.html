@@ -25,6 +25,7 @@
 
         <!-- Tab panes -->
         <div class="tab-content portal-tab-content">
+            <!-- Groups tab -->
             <div role="tabpanel" class="tab-pane groups-tab active" id="groups_tab">
                 <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
                     {% for group in experiment.groups.all %}
@@ -343,7 +344,7 @@
                                         {% for participant in group.participants.all %}
                                             {% if participant.has_data_collection %}
                                                 <option
-                                                        value="participant_p{{ participant.id }}_g{{ group.id }}" data-section="{% trans 'Group' %} {{ group.title }}/{% trans 'Per Participant Data' %}">{% trans 'Participant ' %}{{ participant.code }}</option>
+                                                        value="participant_p{{ participant.id }}_g{{ group.id }}" data-section="{% trans 'Group' %} {{ group.title }}/{% trans 'Per Participant Data' %}">{% trans 'Participant' %} {{ participant.code }}</option>
                                             {% endif %}
                                         {% endfor %}
                                     {% endfor %}
