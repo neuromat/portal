@@ -303,8 +303,7 @@
                             <nav class="language">
                                 <ul id="id_q{{ questionnaire_id }}_language">
                                     {% for lang_code in q_language.language_codes %}
-                                        <li><a id="id_{{ questionnaire_id }}_{{ lang_code }}" class="nep-btn {% if q_language.language_code == lang_code %}active-language{% endif %}"
-                                               href="#" onclick="ajax_questionnaire_language(event, {{ questionnaire_id }}, '{{ lang_code }}')">{{ lang_code }}</a></li>
+                                        <li><a id="id_{{ questionnaire_id }}_{{ lang_code }}" class="nep-btn {% if q_language.language_code != lang_code %}not-selected-language{% endif %}" href="#" onclick="ajax_questionnaire_language(event, {{ questionnaire_id }}, '{{ lang_code }}')">{{ lang_code }}</a></li>
                                     {% endfor %}
                                 </ul>
                             </nav>
@@ -447,7 +446,7 @@
         function ajax_questionnaire_language(e, questionnaire_id, lang_code) {
             e.preventDefault();  // to not request href attribute value
             // if language button clicked is the same do nothing
-            if ($("#id_" + questionnaire_id + "_" + lang_code).hasClass("active-language")) {
+            if ( !($("#id_" + questionnaire_id + "_" + lang_code).hasClass("not-selected-language")) ) {
                 return 0;
             }
             // save panel collapse/expanded state before refresh panel area
@@ -465,10 +464,10 @@
                     $("div#" + questionnaire_id).html(data);
                     // mark language as selected
                     $("#id_q" + questionnaire_id + "_language li a").each(function () {
-                        if ($(this).html() === lang_code) {
-                            $(this).addClass("active-language");
+                        if ($(this).html() !== lang_code) {
+                            $(this).addClass("not-selected-language");
                         } else {
-                            $(this).removeClass("active-language");
+                            $(this).removeClass("not-selected-language");
                         }
                     });
                     // if panel was expanded display it expanded
