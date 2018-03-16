@@ -216,7 +216,8 @@ def experiment_detail(request, slug):
             'age_grouping': age_grouping,
             'to_be_analysed_count': to_be_analysed_count,
             'questionnaires': questionnaires,
-            'form': ChangeSlugForm()
+            'form': ChangeSlugForm(),
+            'has_setting': experiment.has_setting()
         }
     )
 

@@ -134,6 +134,10 @@ class Experiment(models.Model):  # indexed for search
 
         super(Experiment, self).save()
 
+    def has_setting(self):
+        return self.eegsetting_set.all() or self.emgsetting_set.all() or \
+                self.tmssetting_set.all() or self.contexttree_set.all()
+
 
 # TODO: delete parent subdirs if they are empty after post_delete. Example:
 # TODO: uploads/2018/01/10
@@ -213,15 +217,12 @@ class Participant(models.Model):  # not indexed for search
         unique_together = ('group', 'code')
 
     def has_data_collection(self):
-        if self.eegdata_set.all() or self.emgdata_set.all() or \
+        return self.eegdata_set.all() or self.emgdata_set.all() or \
                 self.tmsdata_set.all() or \
                 self.additionaldata_set.all() or \
                 self.genericdatacollectiondata_set.all() or \
                 self.goalkeepergamedata_set.all() or \
-                self.questionnaireresponse_set.all():
-            return True
-        else:
-            return False
+                self.questionnaireresponse_set.all()
 
 
 class Publication(models.Model):  # indexed for search
