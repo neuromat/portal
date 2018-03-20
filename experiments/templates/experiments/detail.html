@@ -303,7 +303,7 @@
                             <nav class="language">
                                 <ul id="id_q{{ questionnaire_id }}_language">
                                     {% for lang_code in q_language.language_codes %}
-                                        <li><a id="id_{{ questionnaire_id }}_{{ lang_code }}" class="nep-btn {% if q_language.language_code != lang_code %}not-selected-language{% endif %}" href="#" onclick="ajax_questionnaire_language(event, {{ questionnaire_id }}, '{{ lang_code }}')">{{ lang_code }}</a></li>
+                                        <li><a id="id_{{ questionnaire_id }}_{{ lang_code }}" class="nep-btn nep-btn-selected {% if q_language.language_code != lang_code %}not-selected-language{% endif %}" href="#" onclick="ajax_questionnaire_language(event, {{ questionnaire_id }}, '{{ lang_code }}')">{{ lang_code }}</a></li>
                                     {% endfor %}
                                 </ul>
                             </nav>

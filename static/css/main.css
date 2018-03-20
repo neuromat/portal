@@ -108,6 +108,10 @@ i#new_experiments {
   vertical-align: middle;
 }
 
+.nep-btn.nep-btn-selected:focus {
+    background: #52af8e;
+}
+
 a.nep-btn {
   text-decoration: none;
 }
