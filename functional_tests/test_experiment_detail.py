@@ -1155,7 +1155,7 @@ class DownloadExperimentTest(FunctionalTest):
         # Josileine accesses Experiment Detail Downloads tab
         self.access_downloads_tab_content(experiment)
         # wait for tree-multiselect plugin to render multiselection
-        time.sleep(0.5)
+        time.sleep(0.5)  # TODO: implicit wait. Fixes this!
 
         options = [
             'experimental_protocol_g' + str(group.id),
