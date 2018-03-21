@@ -26,7 +26,9 @@ from experiments.models import Experiment, Study, Group, Researcher, \
     EMGDigitalFilterSetting, ElectrodeModel, EMGElectrodeSetting, \
     EMGElectrodePlacementSetting, EMGSurfacePlacement, \
     EMGIntramuscularPlacement, EMGNeedlePlacement, EEGElectrodePosition, \
-    SurfaceElectrode, IntramuscularElectrode, Instruction
+    SurfaceElectrode, IntramuscularElectrode, Instruction, \
+    QuestionnaireResponse
+# TODO: not protected any more. Fix this!
 from experiments.views import _get_q_default_language_or_first
 
 
@@ -777,6 +779,7 @@ def create_questionnaire_language(questionnaire, source, language):
     :param questionnaire: Questionnaire model instance
     :param source: file to read from
     :param language: language of the questionnaire
+    :return: QuestionnaireLanguage model instance
     """
     # catch file to read the data
     file = open(source, 'r')
@@ -789,7 +792,7 @@ def create_questionnaire_language(questionnaire, source, language):
     with open(source, 'r') as fp:
         metadata = fp.read()
 
-    QuestionnaireLanguage.objects.create(
+    q_language = QuestionnaireLanguage.objects.create(
         questionnaire=questionnaire,
         language_code=language,
         survey_name=questionnaire_title,
@@ -804,6 +807,8 @@ def create_questionnaire_language(questionnaire, source, language):
             questionnaire_language=QuestionnaireLanguage.objects.last()
         )
 
+    return q_language
+
 
 def create_questionnaire(qtty, code, group):
     """
@@ -815,14 +820,38 @@ def create_questionnaire(qtty, code, group):
     """
     faker = Factory.create()
 
+    q_list = []
     for i in range(qtty):
-        Questionnaire.objects.create(
+        q_list.append(Questionnaire.objects.create(
             code=code,
             group=group, order=randint(1, 10),
             identification='questionnaire',
             numeration=faker.ssn(),
             type=Step.QUESTIONNAIRE,
-        )
+        ))
+
+    if len(q_list) > 1:
+        return q_list
+    else:
+        return q_list[0]
+
+
+
+def create_questionnaire_responses(questionnaire, participant, source):
+    """
+    Create QuestionnaireResponse object for one participant for a given
+    Questionnaire object
+    :param questionnaire: Questionnaire model instance
+    :param participant: Participant model instance
+    :param source: File with json text
+    """
+    with open(source, 'r') as fp:
+        responses = fp.read()
+
+    return QuestionnaireResponse.objects.create(
+        step=questionnaire, participant=participant, date=datetime.utcnow(),
+        limesurvey_response=responses
+    )
 
 
 # Data Collection types constants

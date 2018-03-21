@@ -29,12 +29,6 @@ input_data_keys = [
     "questionnaire_list"
 ]
 
-patient_fields = [
-                  {"field": 'code', "header": 'participant code', "description": _("Participant code")},
-                  {"field": 'age', "header": 'age (years)', "description": _("Age")},
-                  {"field": 'gender_id', "header": 'gender', "description": _("Gender")},
-                  ]
-
 classification_of_disease_fields = [
     {"field": 'code', "header": 'code', "description": _("Code")},
     {"field": 'description', "header": 'description', "description": _("Description")},
@@ -539,14 +533,21 @@ class ExportExecution:
             participant_list = Participant.objects.filter(group=group)
             if participant_list:
                 # save personal data
-                participant_data_list = self.process_participant_data(participant_list)
-
+                participant_data_list = self.process_participant_data(
+                    participant_list
+                )
                 export_participant_filename = "%s.csv" % "Participants"
-                # ex. ex. Users/..../EXPERIMENT_DOWNLOAD/Group_xxx/Participants.csv
-                complete_participant_filename = path.join(group_directory, export_participant_filename)
+                # /EXPERIMENT_DOWNLOAD/Group_xxx/Participants.csv
+                complete_participant_filename = path.join(
+                    group_directory, export_participant_filename
+                )
                 # save personal_data_list to csv file
-                save_to_csv(complete_participant_filename, participant_data_list)
-                self.files_to_zip_list.append([complete_participant_filename, export_directory_group])
+                save_to_csv(
+                    complete_participant_filename, participant_data_list
+                )
+                self.files_to_zip_list.append(
+                    [complete_participant_filename, export_directory_group]
+                )
 
         return error_msg
 
@@ -601,21 +602,34 @@ class ExportExecution:
         return headers, fields
 
     def process_participant_data(self, participants_list):
-        export_rows_participants = []
+        patient_fields = [
+            {"field": 'code', "header": 'participant code',
+             "description": _("Participant code")},
+            {"field": 'age', "header": 'age (years)', "description": _("Age")},
+            {"field": 'gender_id', "header": 'gender',
+             "description": _("Gender")},
+        ]
+        headers, fields = self.get_headers_and_fields(patient_fields)
+        model_to_export = getattr(modules['experiments.models'], 'Participant')
+        db_data = model_to_export.objects.filter(
+            id__in=participants_list
+        ).values_list(*fields).extra(order_by=['id'])
+        export_rows_participants = [headers]
 
-        if participants_list:
-            headers, fields = self.get_headers_and_fields(patient_fields)
+        # transform data
+        for record in db_data:
+            export_rows_participants.append(
+                [self.handle_exported_field(field) for field in record]
+            )
 
-            model_to_export = getattr(modules['experiments.models'], 'Participant')
-
-            db_data = model_to_export.objects.filter(id__in=participants_list).values_list(*fields).extra(
-                order_by=['id'])
-
-            export_rows_participants = [headers]
-
-            # transform data
-            for record in db_data:
-                export_rows_participants.append([self.handle_exported_field(field) for field in record])
+        # remove age data if all of them is empty
+        ages_null = 0
+        for row in export_rows_participants[1:]:
+            if row[1] == '':
+                ages_null += 1
+        if ages_null == len(export_rows_participants[1:]):
+            for i in range(len(export_rows_participants)):
+                del export_rows_participants[i][1]
 
         return export_rows_participants
 
