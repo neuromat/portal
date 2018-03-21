@@ -30,6 +30,14 @@ class DownloadCreateView(TestCase):
         create_study(1, experiment)
         return experiment
 
+    def create_download_subdirs(self):
+        experiment = self.create_basic_experiment_data()
+        group = self.create_questionnaire(experiment)
+        download_create(experiment.id, '')
+
+        return experiment, group
+
+
     @staticmethod
     def create_questionnaire(experiment):
         """
@@ -66,10 +74,7 @@ class DownloadCreateView(TestCase):
         # example file:
         # /media/download/1/Group_odit/Per_participant_data/Participant_312
         # /STEP_861-20-7671_QUESTIONNAIRE/Q5489_narakas-and-waikakul.csv
-        experiment = self.create_basic_experiment_data()
-        group = self.create_questionnaire(experiment)
-
-        download_create(experiment.id, '')
+        experiment, group = self.create_download_subdirs()
 
         # check in Per_participant_data subdir
         per_participant_data_dir = os.path.join(
@@ -84,10 +89,7 @@ class DownloadCreateView(TestCase):
     def test_do_not_write_age_column_in_csv_file_if_participants_has_date_null_2(self):
         # example file:
         # /media/download/1/Group_odit/Participants.csv
-        experiment = self.create_basic_experiment_data()
-        group = self.create_questionnaire(experiment)
-
-        download_create(experiment.id, '')
+        experiment, group = self.create_download_subdirs()
 
         # check in Particpants.csv file
         participants_file = os.path.join(
@@ -96,3 +98,19 @@ class DownloadCreateView(TestCase):
         )
         f = open(participants_file, 'r')
         self.assertNotIn('age (years)', f.read())
+
+    def test_do_not_write_age_column_in_csv_file_if_participants_has_date_null_3(self):
+        # example file:
+        # /media/download/1/Group_odit/Per_questionnaire_data
+        # /Q6631_narakas_and_waikakul/Responses_Q6631.csv
+        experiment, group = self.create_download_subdirs()
+
+        # check in Per_questionnaire_data subdir
+        per_questionnaire_data_dir = os.path.join(
+            TEMP_MEDIA_ROOT, 'download', str(experiment.id),
+            'Group_' + slugify(group.title), 'Per_questionnaire_data'
+        )
+        for root, dirs, files in os.walk(per_questionnaire_data_dir):
+            if not dirs:
+                f = open(os.path.join(root, files[0]), 'r')
+                self.assertNotIn('age (years)', f.read())
