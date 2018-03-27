@@ -147,6 +147,7 @@ CELERY_RESULT_BACKEND = 'django-db'
 # Import local settings
 try:
     from .local_settings import *
-    INSTALLED_APPS += DEV_APPS
+    if 'DEV_APPS' in locals():
+        INSTALLED_APPS += DEV_APPS
 except ImportError:
     pass
