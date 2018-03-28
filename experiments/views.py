@@ -247,13 +247,18 @@ def change_status(request, experiment_id):
         experiment.save()
         # if has justification send email to researcher
         subject = _('Your experiment was rejected')
-        message = _(
-            'We regret to inform you that your experiment, ') + experiment.title + \
-                  _(
-                      ', has not been acceptted to be published in the NeuroMat Open Database. Please check the '
-                      'reasons providing by the Neuromat Open Database Evaluation Committee:') + justification + \
-                  _(
-                      '.\nWith best regards,\n The Neuromat Open Database Evaluation Committee')
+        message = \
+            _('We regret to inform you that your experiment, ') + \
+            experiment.title + \
+            _(
+                ', has not been acceptted to be published in the '
+                'NeuroMat Open Database. Please check the reasons '
+                'providing by the Neuromat Open Database Evaluation '
+                'Committee:') + justification + \
+            _(
+                '.\nWith best regards,\n The Neuromat Open Database '
+                'Evaluation Committee'
+            )
 
         send_mail(subject, message, from_email,
                   [experiment.study.researcher.email])
@@ -267,21 +272,26 @@ def change_status(request, experiment_id):
             message=justification, experiment=experiment
         )
 
-    # If status changed to UNDER_ANALYSIS or APPROVED, send email
-    # to experiment study researcher
+    # If status changed to UNDER_ANALYSIS or APPROVED, send email to
+    # experiment study researcher
     if status == Experiment.APPROVED:
         experiment.status = status
         experiment.save()
         subject = _('Your experiment was approved')
-        message = _(
-            'We are pleased to inform you that your experiment ') + experiment.title + \
-                  _(
-                      ' was approved by Neuromat Open Database Evaluation Committee. All data of the submitted experiment'
-                      ' will be available freely to the public consultation and shared under Creative Commons Share '
-                      'Alike license.\n You can access your experiment data by clicking on the link below\n') + 'http://' + \
-                  request.get_host() + \
-                  _(
-                      '\nWith best regards,\n The NeuroMat Open Database Evaluation Committee.')
+        message = \
+            _('We are pleased to inform you that your experiment ') + \
+            experiment.title + \
+            _(
+                ' was approved by Neuromat Open Database Evaluation '
+                'Committee. All data of the submitted experiment will be '
+                'available freely to the public consultation and shared '
+                'under Creative Commons Share Alike license.\n You can '
+                'access your experiment data by clicking on the link '
+                'below\n'
+            ) + 'http://' + request.get_host() + \
+            _(
+                '\nWith best regards,\n The NeuroMat Open Database '
+                'Evaluation Committee.')
 
         send_mail(subject, message, from_email,
                   [experiment.study.researcher.email])
@@ -301,12 +311,16 @@ def change_status(request, experiment_id):
         experiment.trustee = request.user
         experiment.save()
         subject = _('Your experiment is now under analysis')
-        message = _(
-            'Thank you for submitting your experiment ') + experiment.title + \
-                  _(
-                      '. The NeuroMat Open Database Evaluation Committee will be analyze your data and will try to '
-                      'respond as soon as possible.\n With best regards,\n The NeuroMat Open Database Evaluation '
-                      'Committee')
+        message = \
+            _(
+                'Thank you for submitting your experiment ') + \
+            experiment.title + \
+            _(
+                '. The NeuroMat Open Database Evaluation Committee will '
+                'be analyze your data and will try to respond as soon '
+                'as possible.\n With best regards,\n The NeuroMat Open '
+                'Database Evaluation Committee'
+            )
         send_mail(subject, message, from_email,
                   [experiment.study.researcher.email])
         messages.success(
