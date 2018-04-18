@@ -67,7 +67,12 @@ class NepSearchForm(SearchForm):
         :param query: query entered in search input box in form
         :return: SearchQuerySet object
         """
-        words = iter(shlex.split(query))
+        try:
+            # if search term contains not closed quotes gives ValueError
+            words = iter(shlex.split(query))
+        except ValueError:
+            words = iter(shlex.split(shlex.quote(query)))
+
         result = self.searchqueryset
 
         for word in words:
