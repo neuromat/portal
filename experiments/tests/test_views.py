@@ -559,6 +559,11 @@ class SearchTest(TestCase):
         self.assertEqual(response.status_code, 200)
         # TODO: is it needed to test for redirected page?
 
+    def test_search_nothing_redirects_to_homepage(self):
+        response = self.client.get('/search/', {'q': ''})
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response['location'], '/')
+
     def test_search_returns_only_approved_experiments(self):
         # response without filter
         response = self.client.get('/search/', {'q': 'Braquial+Plexus'})
