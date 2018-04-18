@@ -32,5 +32,12 @@ class NepHighlighter(Highlighter):
         :param kwargs: from Highligther
         """
         super(NepHighlighter, self).__init__(query, **kwargs)
-        self.query_words = set([word.lower() for word in shlex.split(query)
+        # Workaround for catching ValueError exception when there are
+        # multiple quotes without closing quotes in search terms
+        # See: NepSearchForm._parse_query method.
+        try:
+            shlex_quoted = shlex.split(query)
+        except ValueError:
+            shlex_quoted = shlex.split(shlex.quote(query))
+        self.query_words = set([word.lower() for word in shlex_quoted
                                 if not word.startswith('-')])
