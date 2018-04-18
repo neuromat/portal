@@ -53,10 +53,6 @@ class NepSearchForm(SearchForm):
         if not self.is_valid():
             return self.no_query_found()
 
-        if not self.cleaned_data.get('q') and \
-                not self.cleaned_data.get('filter'):
-            return self.no_query_found()
-
         sqs = self._parse_query(self.cleaned_data['q'])
 
         if self.load_all:
