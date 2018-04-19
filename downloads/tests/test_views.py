@@ -37,7 +37,6 @@ class DownloadCreateView(TestCase):
 
         return experiment, group
 
-
     @staticmethod
     def create_questionnaire(experiment):
         """

@@ -43,7 +43,7 @@ def create_export_instance():
 def download_view(request, experiment_id):
     experiment = get_object_or_404(Experiment, pk=experiment_id)
 
-    # If it's a get request, serve file with all experiment data immediatally
+    # If it's a get request, serve file with all experiment data imediatelly
     # for download.
     if request.method == 'GET':
         compressed_file = os.path.join(
@@ -92,8 +92,8 @@ def download_view(request, experiment_id):
     # ---------------------------------------------------
     # TODO: if experiment has no groups return response with only
     # TODO: Experiments.csv
-    # create temporary dir to aggregate subdirs/files for further
-    # incorporate in compacted file
+    # Create temporary dir to aggregate subdirs/files for further
+    # incorporate in compacted file.
     temp_dir = tempfile.mkdtemp()
     # Experiment.csv always will be in compressed file
     try:
@@ -267,13 +267,11 @@ def download_create(experiment_id, template_name):
 
         # set path of the directory base: ex. /Users/.../portal/media/temp/
         base_directory, path_to_create = path.split(export.get_directory_base())
-        # ex. /Users/.../portal/media/download/experiment_id
-        error_msg, base_directory_name = create_directory(base_directory, path_to_create)
+        error_msg, base_directory_name = create_directory(
+            base_directory, path_to_create
+        )
         if error_msg != "":
             return error_msg
-
-        # # ex. /Users/.../portal/media/temp/export_instance.id/json_export.json
-        # input_export_file = path.join("export", path.join(path.join(str(export_instance.id), str(input_filename))))
 
         # prepare data to be processed
         input_data = export.read_configuration_data(input_filename)
@@ -283,13 +281,15 @@ def download_create(experiment_id, template_name):
         if error_msg != "":
             return error_msg
 
-        # load information of the data collection per participant in a dictionnary
+        # Load information of the data collection per participant in a
+        # dictionnary.
         error_msg = export.include_data_from_group(experiment_id)
         if error_msg != "":
             return error_msg
 
-        # Create arquivos para exportação
-        # create files of experimental protocol and diagnosis/participant csv file for each group
+        # Create export files
+        # Create files of experimental protocol and diagnosis/participant
+        # csv file for each group.
         error_msg = export.process_experiment_data(experiment_id)
         if error_msg != "":
             return error_msg
