@@ -53,10 +53,6 @@ class NepSearchForm(SearchForm):
         if not self.is_valid():
             return self.no_query_found()
 
-        if not self.cleaned_data.get('q') and \
-                not self.cleaned_data.get('filter'):
-            return self.no_query_found()
-
         sqs = self._parse_query(self.cleaned_data['q'])
 
         if self.load_all:
@@ -71,7 +67,14 @@ class NepSearchForm(SearchForm):
         :param query: query entered in search input box in form
         :return: SearchQuerySet object
         """
-        words = iter(shlex.split(query))
+        try:
+            # Workaround for catching ValueError exception when there are
+            # not closed quotes in search terms. Complement to this is in
+            # NepHighlighter.__init__ method.
+            words = iter(shlex.split(query))
+        except ValueError:
+            words = iter(shlex.split(shlex.quote(query)))
+
         result = self.searchqueryset
 
         for word in words:

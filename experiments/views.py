@@ -439,6 +439,12 @@ class NepSearchView(SearchView):
     form_class = NepSearchForm
     form_name = 'search_form'
 
+    def get(self, request, *args, **kwargs):
+        if not self.request.GET.get('q') and \
+                not self.request.GET.get('filter'):
+            return HttpResponseRedirect('/')
+        return super(NepSearchView, self).get(self, request)
+
     # TODO: see if it's necessary
     def get_queryset(self):
         queryset = super(NepSearchView, self).get_queryset()

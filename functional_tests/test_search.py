@@ -669,9 +669,23 @@ class SearchTest(FunctionalTest):
         self.wait_for(lambda: self.assertEqual(
             'Back Home', self.browser.find_element_by_id('link_home').text
         ))
+        # She clicks in back home page button
         self.browser.find_element_by_id('link_home').click()
 
-        # Joselina is back homepage
+        # She's back homepage
+        self.wait_for(
+            lambda:
+            self.assertEqual(self.browser.find_element_by_id(
+                'id_table_title'
+            ).find_element_by_tag_name('h2').text, 'List of Experiments')
+        )
+
+    def test_search_nothing_redirects_to_homepage(self):
+        # Joselina is at Portal homepage and accidentally clicks on search
+        # button without specify search terms or a filter.
+        self.search_for('')
+
+        # She's back homepage
         self.wait_for(
             lambda:
             self.assertEqual(self.browser.find_element_by_id(
