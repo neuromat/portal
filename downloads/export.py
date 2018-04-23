@@ -163,8 +163,8 @@ class ExportExecution:
 
         study = experiment.study
         experiment_resume_header = [
-            'Study', 'Study description', 'Start date', 'End date',
-            'Experiment Title', 'Experiment description'
+            'study', 'study_description', 'start_date', 'end_date',
+            'experiment_title', 'experiment_description'
         ]
 
         experiment_resume = [
@@ -603,9 +603,9 @@ class ExportExecution:
 
     def process_participant_data(self, participants_list):
         patient_fields = [
-            {"field": 'code', "header": 'participant code',
+            {"field": 'code', "header": 'participant_code',
              "description": _("Participant code")},
-            {"field": 'age', "header": 'age (years)', "description": _("Age")},
+            {"field": 'age', "header": 'age_(years)', "description": _("Age")},
             {"field": 'gender_id', "header": 'gender',
              "description": _("Gender")},
         ]
