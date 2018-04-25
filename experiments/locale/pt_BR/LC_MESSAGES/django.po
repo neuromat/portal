@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-03-14 15:53-0300\n"
+"POT-Creation-Date: 2018-04-25 08:34-0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -126,223 +126,223 @@ msgstr "Banco de dados de Experimentos em Neurociência"
 msgid "Groups"
 msgstr "Grupos"
 
-#: experiments/templates/experiments/detail.html:19
+#: experiments/templates/experiments/detail.html:20
 msgid "Settings"
 msgstr "Configurações"
 
-#: experiments/templates/experiments/detail.html:21
+#: experiments/templates/experiments/detail.html:23
 msgid "Questionnaires"
 msgstr "Questionários"
 
-#: experiments/templates/experiments/detail.html:23
+#: experiments/templates/experiments/detail.html:25
 #: experiments/templates/experiments/list_trustee.html:9
 msgid "Downloads"
 msgstr ""
 
-#: experiments/templates/experiments/detail.html:47
+#: experiments/templates/experiments/detail.html:49
 msgid "participants"
 msgstr "participantes"
 
-#: experiments/templates/experiments/detail.html:51
+#: experiments/templates/experiments/detail.html:53
 msgid "Inclusion criterias"
 msgstr "Critérios de inclusão"
 
-#: experiments/templates/experiments/detail.html:68
-#: experiments/templates/experiments/detail.html:92
-#: experiments/templates/experiments/detail.html:149
-#: experiments/templates/experiments/detail.html:223
-#: experiments/templates/experiments/detail.html:282
+#: experiments/templates/experiments/detail.html:70
+#: experiments/templates/experiments/detail.html:94
+#: experiments/templates/experiments/detail.html:151
+#: experiments/templates/experiments/detail.html:225
+#: experiments/templates/experiments/detail.html:284
 #: experiments/templates/experiments/questionnaires/questionnaire_language.html:12
 msgid "Details"
 msgstr "Detalhes"
 
-#: experiments/templates/experiments/detail.html:73
+#: experiments/templates/experiments/detail.html:75
 msgid "Textual description"
 msgstr "Descrição textual"
 
-#: experiments/templates/experiments/detail.html:84
+#: experiments/templates/experiments/detail.html:86
 msgid "EEG Settings"
 msgstr "Configurações de EEG"
 
-#: experiments/templates/experiments/detail.html:99
+#: experiments/templates/experiments/detail.html:101
 msgid "Amplifier: "
 msgstr "Amplificador: "
 
-#: experiments/templates/experiments/detail.html:102
-#: experiments/templates/experiments/detail.html:192
-#: experiments/templates/experiments/detail.html:239
+#: experiments/templates/experiments/detail.html:104
+#: experiments/templates/experiments/detail.html:194
+#: experiments/templates/experiments/detail.html:241
 msgid "serial number: "
 msgstr "número serial"
 
-#: experiments/templates/experiments/detail.html:105
+#: experiments/templates/experiments/detail.html:107
 msgid "gain: "
 msgstr "ganho: "
 
-#: experiments/templates/experiments/detail.html:108
+#: experiments/templates/experiments/detail.html:110
 msgid "number of channels: "
 msgstr "número de canais: "
 
-#: experiments/templates/experiments/detail.html:111
+#: experiments/templates/experiments/detail.html:113
 msgid "common mode rejection ratio: "
 msgstr "taxa de rejeição no modo comum: "
 
-#: experiments/templates/experiments/detail.html:114
+#: experiments/templates/experiments/detail.html:116
 msgid "input impedance: "
 msgstr "impedância de entrada: "
 
-#: experiments/templates/experiments/detail.html:117
+#: experiments/templates/experiments/detail.html:119
 msgid "amplifier detection type: "
 msgstr "tipo de detecção do amplificador: "
 
-#: experiments/templates/experiments/detail.html:120
+#: experiments/templates/experiments/detail.html:122
 msgid "tethering system: "
 msgstr "sistema de ligação: "
 
-#: experiments/templates/experiments/detail.html:123
+#: experiments/templates/experiments/detail.html:125
 msgid "gain setting: "
 msgstr "configuração de ganho: "
 
-#: experiments/templates/experiments/detail.html:126
-#: experiments/templates/experiments/detail.html:201
+#: experiments/templates/experiments/detail.html:128
+#: experiments/templates/experiments/detail.html:203
 msgid "sampling rate: "
 msgstr "taxa amostragem: "
 
-#: experiments/templates/experiments/detail.html:129
+#: experiments/templates/experiments/detail.html:131
 msgid "number of used channels: "
 msgstr "número de canais usados: "
 
-#: experiments/templates/experiments/detail.html:140
+#: experiments/templates/experiments/detail.html:142
 msgid "EMG Settings"
 msgstr "Configurações de EMG"
 
-#: experiments/templates/experiments/detail.html:156
+#: experiments/templates/experiments/detail.html:158
 msgid "Digital filter setting: "
 msgstr "Configurações do filtro digital:"
 
-#: experiments/templates/experiments/detail.html:157
+#: experiments/templates/experiments/detail.html:159
 msgid "filter type name: "
 msgstr "nome do tipo de filtro:"
 
-#: experiments/templates/experiments/detail.html:159
+#: experiments/templates/experiments/detail.html:161
 msgid "filter type description: "
 msgstr "descrição textual: "
 
-#: experiments/templates/experiments/detail.html:162
+#: experiments/templates/experiments/detail.html:164
 msgid "low pass: "
 msgstr "passe baixo: "
 
-#: experiments/templates/experiments/detail.html:165
+#: experiments/templates/experiments/detail.html:167
 msgid "high pass: "
 msgstr "passe alto: "
 
-#: experiments/templates/experiments/detail.html:168
+#: experiments/templates/experiments/detail.html:170
 msgid "low band pass: "
 msgstr "passe de banda baixa: "
 
-#: experiments/templates/experiments/detail.html:171
+#: experiments/templates/experiments/detail.html:173
 msgid "high band pass: "
 msgstr "passe de banda alta: "
 
-#: experiments/templates/experiments/detail.html:174
+#: experiments/templates/experiments/detail.html:176
 msgid "low notch: "
 msgstr "encaixe baixo: "
 
-#: experiments/templates/experiments/detail.html:177
+#: experiments/templates/experiments/detail.html:179
 msgid "high notch: "
 msgstr "encaixe alto: "
 
-#: experiments/templates/experiments/detail.html:180
+#: experiments/templates/experiments/detail.html:182
 msgid "order: "
 msgstr "ordem: "
 
-#: experiments/templates/experiments/detail.html:189
+#: experiments/templates/experiments/detail.html:191
 msgid "A/D converter setting: "
 msgstr "Configurações do conversor A/D: "
 
-#: experiments/templates/experiments/detail.html:195
+#: experiments/templates/experiments/detail.html:197
 msgid "signal to noise rate: "
 msgstr "taxa do ruído de sinal: "
 
-#: experiments/templates/experiments/detail.html:198
+#: experiments/templates/experiments/detail.html:200
 msgid "resolution: "
 msgstr "resolução: "
 
-#: experiments/templates/experiments/detail.html:204
+#: experiments/templates/experiments/detail.html:206
 msgid "sampling rate setting: "
 msgstr "configurações da taxa de amostragem: "
 
-#: experiments/templates/experiments/detail.html:214
+#: experiments/templates/experiments/detail.html:216
 msgid "TMS Settings"
 msgstr "Configurações de TMS"
 
-#: experiments/templates/experiments/detail.html:231
+#: experiments/templates/experiments/detail.html:233
 msgid "pulse stimulus type: "
 msgstr "tipo do estímulo de pulso: "
 
-#: experiments/templates/experiments/detail.html:236
+#: experiments/templates/experiments/detail.html:238
 msgid "TMS Device: "
 msgstr "Aparelho TMS: "
 
-#: experiments/templates/experiments/detail.html:237
-#: experiments/templates/experiments/detail.html:249
+#: experiments/templates/experiments/detail.html:239
+#: experiments/templates/experiments/detail.html:251
 msgid "description: "
 msgstr "descrição: "
 
-#: experiments/templates/experiments/detail.html:242
+#: experiments/templates/experiments/detail.html:244
 msgid "pulse type: "
 msgstr "tipo de pulso: "
 
-#: experiments/templates/experiments/detail.html:247
+#: experiments/templates/experiments/detail.html:249
 msgid "Coil model: "
 msgstr "Modelo da bobina: "
 
-#: experiments/templates/experiments/detail.html:252
+#: experiments/templates/experiments/detail.html:254
 msgid "coil shape: "
 msgstr "forma da bobina: "
 
-#: experiments/templates/experiments/detail.html:255
+#: experiments/templates/experiments/detail.html:257
 msgid "material: "
 msgstr "material: "
 
-#: experiments/templates/experiments/detail.html:258
+#: experiments/templates/experiments/detail.html:260
 msgid "material description: "
 msgstr "descrição textual: "
 
-#: experiments/templates/experiments/detail.html:261
+#: experiments/templates/experiments/detail.html:263
 msgid "coil design: "
 msgstr "desenho da bobina: "
 
-#: experiments/templates/experiments/detail.html:273
+#: experiments/templates/experiments/detail.html:275
 msgid "Context trees"
 msgstr "Árvores de contexto"
 
-#: experiments/templates/experiments/detail.html:287
+#: experiments/templates/experiments/detail.html:289
 msgid "setting text: "
 msgstr "texto das configurações: "
 
-#: experiments/templates/experiments/detail.html:298
+#: experiments/templates/experiments/detail.html:300
 msgid "Questionnaires for group"
 msgstr "Questionários para o grupo"
 
-#: experiments/templates/experiments/detail.html:323
+#: experiments/templates/experiments/detail.html:324
 msgid "Download zip file with all experiment data and metadata"
 msgstr "Baixar arquivo zip com todos os dados e metadados do experimento"
 
-#: experiments/templates/experiments/detail.html:325
+#: experiments/templates/experiments/detail.html:326
 msgid "Download all experiment data"
 msgstr "Baixar tudo"
 
-#: experiments/templates/experiments/detail.html:327
+#: experiments/templates/experiments/detail.html:328
 msgid "Select experiment data itens to download"
 msgstr "Selecione itens do experimento para download"
 
-#: experiments/templates/experiments/detail.html:333
+#: experiments/templates/experiments/detail.html:334
 msgid "Select options"
 msgstr "Opções de seleção"
 
-#: experiments/templates/experiments/detail.html:338
-#: experiments/templates/experiments/detail.html:342
-#: experiments/templates/experiments/detail.html:347
+#: experiments/templates/experiments/detail.html:339
+#: experiments/templates/experiments/detail.html:343
+#: experiments/templates/experiments/detail.html:348
 #: experiments/templates/search/experimental_protocol.html:8
 #: experiments/templates/search/genericdatacollection.html:8
 #: experiments/templates/search/goalkeepergame.html:8
@@ -354,27 +354,27 @@ msgstr "Opções de seleção"
 msgid "Group"
 msgstr "Grupo"
 
-#: experiments/templates/experiments/detail.html:338
+#: experiments/templates/experiments/detail.html:339
 msgid "Experimental Protocol Data"
 msgstr "Protocolo experimental"
 
-#: experiments/templates/experiments/detail.html:342
+#: experiments/templates/experiments/detail.html:343
 msgid "Per Questionnaire Data"
 msgstr "Por dados de questionário"
 
-#: experiments/templates/experiments/detail.html:347
+#: experiments/templates/experiments/detail.html:348
 msgid "Per Participant Data"
 msgstr "Por dados de participantes"
 
-#: experiments/templates/experiments/detail.html:347
+#: experiments/templates/experiments/detail.html:348
 msgid "Participant"
 msgstr "Participante"
 
-#: experiments/templates/experiments/detail.html:355
+#: experiments/templates/experiments/detail.html:356
 msgid "There are not data for group"
 msgstr "Não há dado para o grupo"
 
-#: experiments/templates/experiments/detail.html:355
+#: experiments/templates/experiments/detail.html:356
 msgid ""
 "But there\\'s still basic Experiment data. Click in 'Download' button to "
 "download it."
@@ -382,7 +382,7 @@ msgstr ""
 "Mas ainda há dados básicos do Experimento. Clique no botão \\'Download\\' "
 "para baixar o arquivo."
 
-#: experiments/templates/experiments/detail.html:361
+#: experiments/templates/experiments/detail.html:362
 msgid ""
 "There are not experiment groups data for this experiment. Click in \"Download"
 "\" button to download basic experiment data"
@@ -390,37 +390,37 @@ msgstr ""
 "Não há dados de grupos do experimento. Clique no botão \"Download\" para "
 "baixar dados básicos do experimento"
 
-#: experiments/templates/experiments/detail.html:368
+#: experiments/templates/experiments/detail.html:369
 msgid "Download"
 msgstr ""
 
-#: experiments/templates/experiments/detail.html:382
+#: experiments/templates/experiments/detail.html:383
 msgid "Graphical representation"
 msgstr "Representação gráfica"
 
-#: experiments/templates/experiments/detail.html:388
+#: experiments/templates/experiments/detail.html:389
 #: experiments/templates/experiments/header_detail.html:155
 #: experiments/templates/experiments/header_detail.html:188
 msgid "Close"
 msgstr "Fechar"
 
-#: experiments/templates/experiments/detail.html:553
+#: experiments/templates/experiments/detail.html:554
 msgid "Gender of the participants"
 msgstr "Gênero dos participantes"
 
-#: experiments/templates/experiments/detail.html:560
+#: experiments/templates/experiments/detail.html:561
 msgid "total"
 msgstr "total"
 
-#: experiments/templates/experiments/detail.html:567
+#: experiments/templates/experiments/detail.html:568
 msgid "Age of the participants"
 msgstr "Idade dos participantes"
 
-#: experiments/templates/experiments/detail.html:570
+#: experiments/templates/experiments/detail.html:571
 msgid "Age (years)"
 msgstr "Idade (anos)"
 
-#: experiments/templates/experiments/detail.html:573
+#: experiments/templates/experiments/detail.html:574
 msgid "Total"
 msgstr "Total"
 
@@ -644,6 +644,11 @@ msgstr "Por favor selecione uma opção"
 #: experiments/templates/experiments/questionnaires/m_type.html:7
 msgid "No data found"
 msgstr "Nenhum resultado encontrado"
+
+#: experiments/templates/experiments/questionnaires/questionnaire_language.html:2
+#: experiments/templates/search/questionnaires_languages.html:11
+msgid "Questionnaire"
+msgstr "Questionário"
 
 #: experiments/templates/experiments/questionnaires/questionnaire_language.html:31
 msgid "The user enters a date in a date field"
@@ -1146,10 +1151,6 @@ msgstr "identificação"
 msgid "Step"
 msgstr "Passo"
 
-#: experiments/templates/search/questionnaires_languages.html:11
-msgid "Questionnaire"
-msgstr "Questionário"
-
 #: experiments/templates/search/questionnaires_languages.html:17
 msgid "data"
 msgstr "dados"
@@ -1266,7 +1267,7 @@ msgstr "Configurações de TMS"
 msgid "pulse stimulus type"
 msgstr "tipo do estímulo de pulso: "
 
-#: experiments/views.py:239
+#: experiments/views.py:240
 msgid ""
 "Please provide a reason justifying the change of the status of the "
 "experiment "
@@ -1274,19 +1275,19 @@ msgstr ""
 "Por favor, forneça uma razão que justifique a mudança do status do "
 "experimento "
 
-#: experiments/views.py:241
+#: experiments/views.py:242
 msgid "to \"Not approved\". "
 msgstr "para \"Não aprovado\". "
 
-#: experiments/views.py:248
+#: experiments/views.py:249
 msgid "Your experiment was rejected"
 msgstr "Seu experimento foi rejeitado"
 
-#: experiments/views.py:250
+#: experiments/views.py:251
 msgid "We regret to inform you that your experiment, "
 msgstr "Lamentamos informar-lhe que seu experimento, "
 
-#: experiments/views.py:252
+#: experiments/views.py:254
 msgid ""
 ", has not been acceptted to be published in the NeuroMat Open Database. "
 "Please check the reasons providing by the Neuromat Open Database Evaluation "
@@ -1296,7 +1297,7 @@ msgstr ""
 "Por favor, verifique as razões fornecidas pelo comité de avaliação do Banco "
 "de dados aberto de NeuroMat:"
 
-#: experiments/views.py:255
+#: experiments/views.py:259
 msgid ""
 ".\n"
 "With best regards,\n"
@@ -1306,23 +1307,23 @@ msgstr ""
 "Cordiais saudações,\n"
 " Comité de Avaliação do Banco de dados aberto de NeuroMat."
 
-#: experiments/views.py:261 experiments/views.py:289 experiments/views.py:313
+#: experiments/views.py:267 experiments/views.py:300 experiments/views.py:328
 msgid "An email was sent to "
 msgstr "Um email foi enviado para "
 
-#: experiments/views.py:262
+#: experiments/views.py:268
 msgid " warning that the experiment was rejected."
 msgstr " comunicando que o experimento foi rejeitado."
 
-#: experiments/views.py:274
+#: experiments/views.py:280
 msgid "Your experiment was approved"
 msgstr "Seu experimento foi aprovado"
 
-#: experiments/views.py:276
+#: experiments/views.py:282
 msgid "We are pleased to inform you that your experiment "
 msgstr "Temos o prazer de informá-lo que o seu experimento "
 
-#: experiments/views.py:278
+#: experiments/views.py:285
 msgid ""
 " was approved by Neuromat Open Database Evaluation Committee. All data of "
 "the submitted experiment will be available freely to the public consultation "
@@ -1335,7 +1336,7 @@ msgstr ""
 "licença de Creative Commons Share Alike.\n"
 "Você pode acessar os dados do seu experimento clicando no link abaixo \n"
 
-#: experiments/views.py:283
+#: experiments/views.py:293
 msgid ""
 "\n"
 "With best regards,\n"
@@ -1345,19 +1346,19 @@ msgstr ""
 " Cordiais saudações,\n"
 " Comité de Avaliação do Banco de dados aberto de NeuroMat."
 
-#: experiments/views.py:290
+#: experiments/views.py:301
 msgid " warning that the experiment changed status to Approved."
 msgstr " comunicando que o experimento mudou seu estado para aprovado."
 
-#: experiments/views.py:302
+#: experiments/views.py:313
 msgid "Your experiment is now under analysis"
 msgstr "Seu experimento esta agora em analise"
 
-#: experiments/views.py:304
+#: experiments/views.py:316
 msgid "Thank you for submitting your experiment "
 msgstr "Obrigado por enviar seu experimento "
 
-#: experiments/views.py:306
+#: experiments/views.py:319
 msgid ""
 ". The NeuroMat Open Database Evaluation Committee will be analyze your data "
 "and will try to respond as soon as possible.\n"
@@ -1369,24 +1370,24 @@ msgstr ""
 "Cordiais saudações,\n"
 "Comité de Avaliação do Banco de dados aberto de NeuroMat."
 
-#: experiments/views.py:314
+#: experiments/views.py:329
 msgid " warning that the experiment is under analysis."
 msgstr " comunicando que seu experimento esta sob análise"
 
-#: experiments/views.py:328
+#: experiments/views.py:343
 msgid "The experiment data "
 msgstr "Os dados do experimento "
 
-#: experiments/views.py:329
+#: experiments/views.py:344
 msgid " was made available to be analysed by other trustee."
 msgstr " foram disponibilizados para ser analizados por outros curadores."
 
-#: experiments/views.py:351
+#: experiments/views.py:366
 msgid "Empty slugs is not allowed. Please enter a valid slug"
 msgstr ""
 "\"Slugs\" vazios não são permitidos. Por favor entre com um \"slug\" válido"
 
-#: experiments/views.py:356
+#: experiments/views.py:371
 msgid ""
 "The slug entered is not allowed. Please enter a valid slug. Type only "
 "lowcase letters without accents, numbers, dash, and underscore signs"
@@ -1394,19 +1395,19 @@ msgstr ""
 "O \"slug\" entrado não é permitido. Por favor entre com um \"slug\" válido. "
 "Digite somente letras minúsculas sem acentos, números, traços, e sublinhado"
 
-#: experiments/views.py:363
+#: experiments/views.py:378
 msgid "The slug entered is two small. Please enter at least 3 characters"
 msgstr ""
 "O \"slug\" entrado é muito pequeno. Por favor entre com pelo menos 3 "
 "caracteres"
 
-#: experiments/views.py:369
+#: experiments/views.py:384
 msgid "The slug entered is equal to other experiment slug. Please try again."
 msgstr ""
 "O \"slug\" entrado é igual ao de outro experimento. Por favor tente "
 "novamente."
 
-#: experiments/views.py:383
+#: experiments/views.py:398
 msgid "The experiment's slug was modified"
 msgstr "O \"slug\" do experimento foi alterado"
 
