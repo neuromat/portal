@@ -1,5 +1,5 @@
 {% load i18n %}
-<strong>Questionnaire {{ q_language.survey_name }}</strong>
+<strong>{% trans 'Questionnaire' %} {{ q_language.survey_name }}</strong>
 {% if q_language.survey_metadata != 'invalid_questionnaire' %}
     <div class="pull-right">
         <a href="#collapse{{ questionnaire_id }}"
