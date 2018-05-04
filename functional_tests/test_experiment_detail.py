@@ -23,6 +23,13 @@ from nep import settings
 
 class ExperimentDetailTest(FunctionalTest):
 
+    def setUp(self):
+        super(ExperimentDetailTest, self).setUp()
+        owner = User.objects.create_user(
+            username='labor1', password='nep-lab1'
+        )
+        create_experiment(1, owner, Experiment.APPROVED)
+
     def _access_experiment_detail_page(self, experiment):
         # The new visitor is in home page and see the list of experiments.
         # She clicks in a "View" link and is redirected to experiment
@@ -31,6 +38,63 @@ class ExperimentDetailTest(FunctionalTest):
             "//a[@href='/experiments/" + experiment.slug + "/']"
         )
         link.click()
+
+    @staticmethod
+    def _create_valid_questionnaires(experiment):
+        # TODO: make as in test views
+        # Create Questionnaire objects
+        # (requires valid files 'questionnaire1.csv', 'questionnaire2.csv',
+        # 'questionnaire3.csv', and their language variations in
+        # 'experiments/tests' subdirectory)
+        create_group(2, experiment)
+        group_first = experiment.groups.first()
+        group_last = experiment.groups.last()
+
+        create_questionnaire(1, 'q1', group_first)
+        questionnaire1 = Questionnaire.objects.last()
+        # create questionnaire language data default for questionnaire1
+        create_questionnaire_language(
+            questionnaire1,
+            settings.BASE_DIR + '/experiments/tests/questionnaire1.csv',
+            'en'
+        )
+        # create questionnaire language data in French for questionnaire1
+        create_questionnaire_language(
+            questionnaire1,
+            settings.BASE_DIR + '/experiments/tests/questionnaire1_fr.csv',
+            'fr'
+        )
+        # create questionnaire language data in Brazilian Portuguese for
+        # questionnaire1
+        create_questionnaire_language(
+            questionnaire1,
+            settings.BASE_DIR + '/experiments/tests/questionnaire1_pt-br.csv',
+            'pt-br'
+        )
+
+        create_questionnaire(1, 'q2', group_first)
+        questionnaire2 = Questionnaire.objects.last()
+        # create questionnaire language data default for questionnaire2
+        create_questionnaire_language(
+            questionnaire2,
+            settings.BASE_DIR + '/experiments/tests/questionnaire2.csv',
+            'en'
+        )
+        # create questionnaire language data in German for questionnaire2
+        create_questionnaire_language(
+            questionnaire2,
+            settings.BASE_DIR + '/experiments/tests/questionnaire2_de.csv',
+            'de'
+        )
+
+        create_questionnaire(1, 'q3', group_last)
+        questionnaire3 = Questionnaire.objects.last()
+        # create questionnaire language data default for questionnaire3
+        create_questionnaire_language(
+            questionnaire3,
+            settings.BASE_DIR + '/experiments/tests/questionnaire3.csv',
+            'en'
+        )
 
     # TODO: break by tabs
     def test_can_view_detail_page(self):
@@ -456,6 +520,14 @@ class ExperimentDetailTest(FunctionalTest):
 
     def test_can_view_questionnaires_content(self):
         ##
+        # TODO
+        # ----
+        # We have to refresh live server again because in parent setUp we
+        # already called it without new experiment created. When refactoring
+        # tests_helper call only in the classes setUp methods.
+        self.browser.get(self.browser.current_url)
+
+        ##
         # We've created three questionnaires in an experiment, two are from one
         # group and one are from another group. We test questions and
         # answers from this three questionnaires. See tests helper.
@@ -463,10 +535,11 @@ class ExperimentDetailTest(FunctionalTest):
         experiment = Experiment.objects.filter(
             status=Experiment.APPROVED
         ).last()
+        self._create_valid_questionnaires(experiment)
 
         # The new visitor is in home page and sees the list of experiments.
-        # She clicks in second "View" link and is redirected to experiment
-        # detail page.
+        # She clicks in the "View" link corresponded to the experiment and is
+        # redirected to experiment detail page.
         self.browser.find_element_by_xpath(
             "//a[@href='/experiments/" + experiment.slug + "/']"
         ).click()
@@ -475,13 +548,15 @@ class ExperimentDetailTest(FunctionalTest):
         # When the new visitor clicks in the Questionnaires tab, then click
         # in 'Details' button of the Questionnaires sections she sees
         # the questionnaires' content as a series of questions and answers
+        # divided by groups of questions
         self.browser.find_element_by_link_text('Questionnaires').click()
-        questionnaires = self.browser.find_element_by_id(
-            'questionnaires_tab'
-        ).find_elements_by_link_text('Details')
+        questionnaires = self.wait_for(
+            lambda: self.browser.find_element_by_id(
+                'questionnaires_tab'
+            ).find_elements_by_link_text('Details')
+        )
         for q in questionnaires:
             q.click()
-        time.sleep(0.5)
 
         # TODO: click on the 'Details' buttons just for simulate user
         # TODO: interaction, as the questionnaires' content is in html page
@@ -489,8 +564,10 @@ class ExperimentDetailTest(FunctionalTest):
             'questionnaires_tab').text
 
         ##
-        # Sample asserts for first questionnaire.
+        # sample asserts for first questionnaire
         ##
+        self.assertIn('First group', questionnaires_content)
+        self.assertIn('Second group', questionnaires_content)
         self.assertIn('History of fracture?', questionnaires_content)
         self.assertIn('Have you ever had any orthopedic surgery?',
                       questionnaires_content)
@@ -505,8 +582,10 @@ class ExperimentDetailTest(FunctionalTest):
                       questionnaires_content)
 
         ##
-        #  Sample asserts for second questionnaire
+        # sample asserts for second questionnaire
         ##
+        self.assertIn('Premier groupe', questionnaires_content)
+        self.assertIn('Deuxième groupe', questionnaires_content)
         self.assertIn('What side of the injury?', questionnaires_content)
         self.assertIn('Institution of the Study', questionnaires_content)
         self.assertIn('The user enters a free text',
@@ -519,8 +598,10 @@ class ExperimentDetailTest(FunctionalTest):
         self.assertIn('The user answers yes or not', questionnaires_content)
 
         ##
-        # Sample asserts for third questionnaire
+        # sample asserts for third questionnaire
         ##
+        self.assertIn('Primeiro grupo', questionnaires_content)
+        self.assertIn('Terceiro grupo', questionnaires_content)
         self.assertIn('Refere dor após a lesão?', questionnaires_content)
         self.assertIn('EVA da dor principal:', questionnaires_content)
         self.assertIn('Qual região apresenta alteração do trofismo?',
@@ -750,8 +831,9 @@ class ExperimentDetailTest(FunctionalTest):
                       questionnaires_content)
 
     def test_does_not_display_study_elements_if_they_not_exist(self):
-        owner = User.objects.create(username='labor1', password='nep-lab1')
-        experiment = create_experiment(1, owner, Experiment.APPROVED)
+        experiment = Experiment.objects.filter(
+            status=Experiment.APPROVED
+        ).last()
         ##
         # create study without end_date and keywords. We won't create
         # contributors either
@@ -759,7 +841,8 @@ class ExperimentDetailTest(FunctionalTest):
         create_study(1, experiment)
 
         ##
-        # TODO:
+        # TODO
+        # ----
         # We have to refresh live server again because in parent setUp we
         # already called it without new experiment created. When refactoring
         # tests_helper call only in the classes setUp methods.

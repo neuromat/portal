@@ -29,7 +29,9 @@ from experiments.tests.tests_helper import apply_setup, global_setup_ut, \
     remove_selected_subdir, create_experiment, create_trustee_users, \
     create_experiment_versions, random_utf8_string, create_context_tree, \
     create_eeg_electrodenet, create_eeg_solution, create_eeg_filter_setting, \
-    create_eeg_electrode_localization_system, create_emg_digital_filter_setting
+    create_eeg_electrode_localization_system, \
+    create_emg_digital_filter_setting, create_group, create_questionnaire, \
+    create_questionnaire_language
 from experiments.views import change_slug
 from functional_tests import test_search
 from nep import settings
@@ -194,8 +196,67 @@ class ExperimentDetailTest(TestCase):
 
     def setUp(self):
         global_setup_ut()
+        owner = User.objects.create_user(
+            username='labor1', password='nep-labor1'
+        )
+        create_experiment(1, owner, Experiment.APPROVED)
 
-    def get_q_default_language_or_first(self, questionnaire):
+    @staticmethod
+    def _create_valid_questionnaires(experiment):
+        create_group(2, experiment)
+        group_first = experiment.groups.first()
+        group_last = experiment.groups.last()
+        create_questionnaire(1, 'q1', group_first)
+        questionnaire1 = Questionnaire.objects.last()
+        # create questionnaire language data pt-br for questionnaire1
+        create_questionnaire_language(
+            questionnaire1,
+            settings.BASE_DIR + '/experiments/tests/questionnaire1_pt-br.csv',
+            # our tests helper always consider 'en' as Default Language,
+            # so we create this time as 'pt-br' to test creating questionnaire
+            # default language in test_api (by the moment only test_api tests
+            # creating questionnaire default language; can expand testing
+            # questionnaire related models)
+            'pt-br'
+        )
+        # create questionnaire language data fr for questionnaire1
+        create_questionnaire_language(
+            questionnaire1,
+            settings.BASE_DIR + '/experiments/tests/questionnaire1_fr.csv',
+            # our tests helper always consider 'en' as Default Language,
+            # so we create this time as 'pt-br' to test creating questionnaire
+            # default language in test_api (by the moment only test_api tests
+            # creating questionnaire default language; can expand testing
+            # questionnaire related models)
+            'fr'
+        )
+
+        # create questionnaire language data default for questionnaire2
+        create_questionnaire(1, 'q2', group_first)
+        questionnaire2 = Questionnaire.objects.last()
+        create_questionnaire_language(
+            questionnaire2,
+            settings.BASE_DIR + '/experiments/tests/questionnaire2.csv', 'en'
+        )
+        # create questionnaire language data de for questionnaire2
+        questionnaire2 = Questionnaire.objects.last()
+        create_questionnaire_language(
+            questionnaire2,
+            settings.BASE_DIR + '/experiments/tests/questionnaire2_de.csv',
+            'de'
+        )
+
+        create_questionnaire(1, 'q3', group_last)
+        questionnaire3 = Questionnaire.objects.last()
+        # create questionnaire language data default for questionnaire3
+        create_questionnaire_language(
+            questionnaire3,
+            settings.BASE_DIR + '/experiments/tests/questionnaire3.csv',
+            'en'
+        )
+
+    @staticmethod
+    def get_q_default_language_or_first(questionnaire):
         # TODO: correct this to adapt to unique QuestionnaireDefaultLanguage
         # TODO: model with OneToOne with Questionnaire
         qdl = QuestionnaireDefaultLanguage.objects.filter(
@@ -219,29 +280,26 @@ class ExperimentDetailTest(TestCase):
         self.assertTemplateUsed(response, 'experiments/detail.html')
 
     def test_access_experiment_detail_returns_questionnaire_data_for_default_or_first_language(self):
-        # Last experiment has questionnaires. See tests helper
         experiment = Experiment.objects.last()
         # we've made last experiment contain questionnaire data in tests helper
-        q_steps = Step.objects.filter(type=Step.QUESTIONNAIRE)
-        groups_with_qs = experiment.groups.filter(steps__in=q_steps)
+        # q_steps = Step.objects.filter(type=Step.QUESTIONNAIRE)
+        # groups_with_qs = experiment.groups.filter(steps__in=q_steps)
+        self._create_valid_questionnaires(experiment)
 
         response = self.client.get('/experiments/' + experiment.slug + '/')
-        if groups_with_qs.count() == 0:
-            self.fail('There are no groups with questionnaires. Have you '
-                      'been created the questionnaires in tests helper?')
-        for group in groups_with_qs:
+
+        for group in experiment.groups.all():
             self.assertContains(
                 response,
                 'Questionnaires for group ' + group.title
             )
-            for step in group.steps.filter(type=Step.QUESTIONNAIRE):
-                questionnaire = Questionnaire.objects.get(step_ptr=step)
+            for questionnaire in group.steps.filter(type=Step.QUESTIONNAIRE):
                 # The rule is display default questionnaire language data or
                 # first questionnaire language data if not set default
                 # questionnaire language. So we mimic the function
                 # _get_q_default_language_or_first from views that do that.
                 # TODO: In tests helper we always create default
-                # TODO: questionnaire language as English. So we would to test
+                # TODO: questionnaire language as English. So we would test
                 # TODO: only if we had first language.
                 q_language = self.get_q_default_language_or_first(
                     questionnaire
@@ -253,6 +311,8 @@ class ExperimentDetailTest(TestCase):
         # Sample asserts for first questionnaire (in Portuguese, as first
         # questionnaire, first language, created in tests helper is in
         # Portuguese).
+        self.assertIn('Primeiro Grupo', response.content.decode())
+        self.assertIn('Segundo Grupo', response.content.decode())
         self.assertIn('História de fratura', response.content.decode())
         self.assertIn('Já fez alguma cirurgia ortopédica?',
                       response.content.decode())
@@ -267,6 +327,8 @@ class ExperimentDetailTest(TestCase):
                       response.content.decode())
 
         # Sample asserts for second questionnaire
+        self.assertIn('First Group', response.content.decode())
+        self.assertIn('Third Group', response.content.decode())
         self.assertIn('What side of the injury?', response.content.decode())
         self.assertIn('Institution of the Study', response.content.decode())
         self.assertIn('The user enters a free text',
@@ -280,6 +342,8 @@ class ExperimentDetailTest(TestCase):
                       response.content.decode())
 
         # Sample asserts for third questionnaire
+
+        self.assertIn('Segundo Grupo', response.content.decode())
         self.assertIn('Refere dor após a lesão?', response.content.decode())
         self.assertIn('EVA da dor principal:', response.content.decode())
         self.assertIn('Qual região apresenta alteração do trofismo?',
