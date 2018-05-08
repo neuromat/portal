@@ -87,20 +87,32 @@ def _get_questionnaire_metadata(metadata):
         with open(temp_dir + '/questionnaire_cleaned.csv', 'w') as result:
             writer = csv.writer(result)
             for r in reader:
-                writer.writerow((r[3], r[6], r[7], r[9], r[13]))
+                writer.writerow((r[2], r[3], r[6], r[7], r[9], r[13]))
 
     q_cleaned = pandas.read_csv(temp_dir + '/questionnaire_cleaned.csv')
 
     records = []
 
+    # first, group questions by question_code
     for key, grp in q_cleaned.groupby(['question_code',
                                        'question_type',
                                        'question_description']):
         rec = _get_nested_rec(key, grp)
         records.append(rec)
 
-    records = dict(data=records)
-    return records
+    # now, build one level above, the question groups level
+    q_groups = dict()
+    for key, grp in q_cleaned.groupby(['question_group']):
+        q_groups[key] = []
+        q_unique = grp['question_code'].unique()
+        for record in records:
+            if record['question_code'] in q_unique:
+                q_groups[key].append(record)
+
+    # make dictionnaire to ease diplaying in template
+    for q_group in q_groups:
+        q_groups[q_group] = dict(data=q_groups[q_group])
+    return q_groups
 
 
 def _get_q_default_language_or_first(questionnaire):

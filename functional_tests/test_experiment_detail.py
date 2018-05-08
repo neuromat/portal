@@ -558,16 +558,14 @@ class ExperimentDetailTest(FunctionalTest):
         for q in questionnaires:
             q.click()
 
-        # TODO: click on the 'Details' buttons just for simulate user
-        # TODO: interaction, as the questionnaires' content is in html page
         questionnaires_content = self.browser.find_element_by_id(
             'questionnaires_tab').text
 
         ##
         # sample asserts for first questionnaire
         ##
-        self.assertIn('First group', questionnaires_content)
-        self.assertIn('Second group', questionnaires_content)
+        self.assertIn('First Group', questionnaires_content)
+        self.assertIn('Second Group', questionnaires_content)
         self.assertIn('History of fracture?', questionnaires_content)
         self.assertIn('Have you ever had any orthopedic surgery?',
                       questionnaires_content)
@@ -584,8 +582,6 @@ class ExperimentDetailTest(FunctionalTest):
         ##
         # sample asserts for second questionnaire
         ##
-        self.assertIn('Premier groupe', questionnaires_content)
-        self.assertIn('Deuxième groupe', questionnaires_content)
         self.assertIn('What side of the injury?', questionnaires_content)
         self.assertIn('Institution of the Study', questionnaires_content)
         self.assertIn('The user enters a free text',
@@ -600,8 +596,8 @@ class ExperimentDetailTest(FunctionalTest):
         ##
         # sample asserts for third questionnaire
         ##
-        self.assertIn('Primeiro grupo', questionnaires_content)
-        self.assertIn('Terceiro grupo', questionnaires_content)
+        self.assertIn('Primeiro Grupo', questionnaires_content)
+        self.assertIn('Terceiro Grupo', questionnaires_content)
         self.assertIn('Refere dor após a lesão?', questionnaires_content)
         self.assertIn('EVA da dor principal:', questionnaires_content)
         self.assertIn('Qual região apresenta alteração do trofismo?',
