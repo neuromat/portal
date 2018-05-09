@@ -230,7 +230,7 @@ class ExperimentDetailTest(FunctionalTest):
         # She hits ESC to exit Study modal and clicks the Groups tab
         study_modal = self.browser.find_element_by_id('study_modal')
         study_modal.send_keys(Keys.ESCAPE)
-        time.sleep(1)
+        time.sleep(1)  # TODO: eliminate implicit wait
         self.browser.find_element_by_link_text('Groups').click()
         # In Groups tab she can see a list of the groups associated with
         # this experiment with: group's title, description, the protocol
