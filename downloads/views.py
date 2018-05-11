@@ -325,7 +325,5 @@ def download_create(experiment_id, template_name):
     except OSError as e:
         print(e)
         error_msg = e
-        # messages.error(request, error_msg)
-        # return render(request, template_name)
         if template_name != "":
             return error_msg
