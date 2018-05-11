@@ -33,15 +33,16 @@
                     {% for group in experiment.groups.all %}
                         <div class="panel panel-default nep-panel-group">
                             <div class="row">
-                                <div class="col-md-2 prot-exp-image">
-                                    {% if group.experimental_protocol.image %}
+                                {% if group.experimental_protocol.image %}
+                                    <div class="col-md-2 prot-exp-image">
                                         <a id="protocol_image" href="#"
                                            data-toggle="modal"
                                            data-target="#protocol_image_full"
                                            data-image_path="/media/{{ group.experimental_protocol.image }}">
-                                            <img src="/media/{{ group.experimental_protocol.image }}"/></a>
-                                    {% endif %}
-                                </div>
+                                            <img src="/media/{{ group.experimental_protocol.image }}"/>
+                                        </a>
+                                    </div>
+                                {% endif %}
                                 <div class="col-md-10">
                                     <strong>{{ group.title }}</strong>
                                     <br>
