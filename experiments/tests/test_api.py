@@ -20,7 +20,7 @@ from experiments.models import Experiment, Study, Group, Researcher, \
     QuestionnaireLanguage, QuestionnaireDefaultLanguage, Publication, \
     ExperimentalProtocol
 from experiments.tests.tests_helper import global_setup_ut, apply_setup, \
-    create_experiment, create_group
+    create_experiment, create_group, create_questionnaire
 
 
 TEMP_MEDIA_ROOT = tempfile.mkdtemp()
@@ -45,7 +45,6 @@ class ExperimentAPITest(APITestCase):
         experiment2 = Experiment.objects.get(nes_id=1, owner=owner2)
         experiment3 = Experiment.objects.get(nes_id=2, owner=owner2)
         experiment4 = Experiment.objects.get(nes_id=3, owner=owner1)
-        experiment5 = Experiment.objects.get(nes_id=4, owner=owner2)
         response = self.client.get(self.list_url)
         self.assertEqual(
             json.loads(response.content.decode('utf8')),
@@ -106,20 +105,6 @@ class ExperimentAPITest(APITestCase):
                     'sent_date': experiment4.sent_date.strftime('%Y-%m-%d'),
                     'project_url': experiment4.project_url,
                     'ethics_committee_url': experiment4.ethics_committee_url,
-                    'ethics_committee_file': None
-                },
-                {
-                    'id': experiment5.id,
-                    'title': experiment5.title,
-                    'description': experiment5.description,
-                    'data_acquisition_done':
-                        experiment5.data_acquisition_done,
-                    'nes_id': experiment5.nes_id,
-                    'owner': experiment5.owner.username,
-                    'status': experiment5.status,
-                    'sent_date': experiment5.sent_date.strftime('%Y-%m-%d'),
-                    'project_url': experiment5.project_url,
-                    'ethics_committee_url': experiment5.ethics_committee_url,
                     'ethics_committee_file': None
                 },
             ]
@@ -710,22 +695,6 @@ class GroupAPITest(APITestCase):
                     'inclusion_criteria':
                         list(groups[5].inclusion_criteria.all())
                 },
-                {
-                    'id': groups[6].id,
-                    'title': groups[6].title,
-                    'description': groups[6].description,
-                    'experiment': groups[6].experiment.title,
-                    'inclusion_criteria':
-                        list(groups[6].inclusion_criteria.all())
-                },
-                {
-                    'id': groups[7].id,
-                    'title': groups[7].title,
-                    'description': groups[7].description,
-                    'experiment': groups[7].experiment.title,
-                    'inclusion_criteria':
-                        list(groups[7].inclusion_criteria.all())
-                }
             ]
         )
 
@@ -790,22 +759,6 @@ class GroupAPITest(APITestCase):
                     'inclusion_criteria':
                         list(groups[5].inclusion_criteria.all())
                 },
-                {
-                    'id': groups[6].id,
-                    'title': groups[6].title,
-                    'description': groups[6].description,
-                    'experiment': groups[6].experiment.title,
-                    'inclusion_criteria':
-                        list(groups[6].inclusion_criteria.all())
-                },
-                {
-                    'id': groups[7].id,
-                    'title': groups[7].title,
-                    'description': groups[7].description,
-                    'experiment': groups[7].experiment.title,
-                    'inclusion_criteria':
-                        list(groups[7].inclusion_criteria.all())
-                }
             ]
         )
 
@@ -1088,6 +1041,10 @@ class QuestionnaireLanguageAPITest(APITestCase):
 
     def setUp(self):
         global_setup_ut()
+        owner = User.objects.create_user(
+            username='labor1', password='nep-labor1'
+        )
+        create_experiment(1, owner, Experiment.APPROVED)
 
     @skip
     def test_get_returns_all_questionnairelanguages_short_url(self):
@@ -1125,11 +1082,12 @@ class QuestionnaireLanguageAPITest(APITestCase):
         )
 
     def test_POSTing_a_new_questionnairelanguage_default(self):
-        owner = User.objects.get(username='lab1')
-        # we get the only questionnaire in 'pt-br' that we create in tests
-        # helper
-        questionnaire = Questionnaire.objects.first()
-        self.client.login(username=owner.username, password='nep-lab1')
+        experiment = Experiment.objects.last()
+        owner = User.objects.last()
+        group = create_group(1, experiment)
+        questionnaire = create_questionnaire(1, 'q1', group)
+
+        self.client.login(username=owner.username, password='nep-labor1')
         list_url = reverse('api_questionnaire_language-list',
                            kwargs={'pk': questionnaire.id})
         response = self.client.post(
