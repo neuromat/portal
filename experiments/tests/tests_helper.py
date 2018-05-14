@@ -772,6 +772,58 @@ def create_generic_data_collection_data(gdc_step, participant):
     )
 
 
+def create_valid_questionnaires(experiment):
+    create_group(2, experiment)
+    group_first = experiment.groups.first()
+    group_last = experiment.groups.last()
+    create_questionnaire(1, 'q1', group_first)
+    questionnaire1 = Questionnaire.objects.last()
+    # create questionnaire language data pt-br for questionnaire1
+    create_questionnaire_language(
+        questionnaire1,
+        settings.BASE_DIR + '/experiments/tests/questionnaire1_pt-br.csv',
+        # our tests helper always consider 'en' as Default Language,
+        # so we create this time as 'pt-br' to test creating questionnaire
+        # default language in test_api (by the moment only test_api tests
+        # creating questionnaire default language; can expand testing
+        # questionnaire related models)
+        'pt-br'
+    )
+    # create questionnaire language data fr for questionnaire1
+    create_questionnaire_language(
+        questionnaire1,
+        settings.BASE_DIR + '/experiments/tests/questionnaire1_fr.csv',
+        # our tests helper always consider 'en' as Default Language,
+        # so we create this time as 'pt-br' to test creating questionnaire
+        # default language in test_api (by the moment only test_api tests
+        # creating questionnaire default language; can expand testing
+        # questionnaire related models)
+        'fr'
+    )
+
+    # create questionnaire language data default for questionnaire2
+    create_questionnaire(1, 'q2', group_first)
+    questionnaire2 = Questionnaire.objects.last()
+    create_questionnaire_language(
+        questionnaire2,
+        settings.BASE_DIR + '/experiments/tests/questionnaire2.csv', 'en'
+    )
+    # create questionnaire language data de for questionnaire2
+    questionnaire2 = Questionnaire.objects.last()
+    create_questionnaire_language(
+        questionnaire2,
+        settings.BASE_DIR + '/experiments/tests/questionnaire2_de.csv', 'de'
+    )
+
+    create_questionnaire(1, 'q3', group_last)
+    questionnaire3 = Questionnaire.objects.last()
+    # create questionnaire language data default for questionnaire3
+    create_questionnaire_language(
+        questionnaire3,
+        settings.BASE_DIR + '/experiments/tests/questionnaire3.csv', 'en'
+    )
+
+
 def create_questionnaire_language(questionnaire, source, language):
     """
     Get the data from source file containing questionnaire csv data,
@@ -781,7 +833,6 @@ def create_questionnaire_language(questionnaire, source, language):
     :param language: language of the questionnaire
     :return: QuestionnaireLanguage model instance
     """
-    # catch file to read the data
     file = open(source, 'r')
     # skip first line with column titles
     file.readline()
@@ -834,7 +885,6 @@ def create_questionnaire(qtty, code, group):
         return q_list
     else:
         return q_list[0]
-
 
 
 def create_questionnaire_responses(questionnaire, participant, source):
@@ -902,7 +952,7 @@ def create_context_tree(experiment):
     )
 
 
-def create_publication(qtty, experiment):
+def create_publication(experiment):
     """
     Create publications for experiment
     :param qtty: number of Publication's to be created
@@ -910,8 +960,7 @@ def create_publication(qtty, experiment):
     """
     faker = Factory.create()
 
-    for i in range(qtty):
-        Publication.objects.create(
+    return Publication.objects.create(
             title=faker.sentence(nb_words=6), citation=faker.text(),
             url=faker.uri(),
             experiment=experiment
@@ -924,8 +973,7 @@ def create_experiment_related_objects(experiment):
     pieces selected by the user.
     :param experiment: Experiment model instance
     """
-    create_study(1, experiment)
-    study = Study.objects.last()
+    study = create_study(1, experiment)
     # necessary creating researcher for study. See comment in
     # search_indexes.StudyIndex class
     Researcher.objects.create(
@@ -1216,8 +1264,6 @@ def global_setup_ft():
                              'functional recovery. The EEG text.'
     experiment9.save()
     create_step(1, experiment9.groups.first(), Step.EMG)
-    # Associate publications with experiment to test publications
-    create_publication(2, experiment9)
 
     # We change first experiment study approved to contain 'brachial' in
     # study description, so it have to be found by search test
@@ -1418,64 +1464,6 @@ def global_setup_ft():
     # Create TMSData objects to test search
     create_tmsdata_objects_to_test_search()
 
-    # Create Questionnaire objects
-    # (requires valid files 'questionnaire1.csv', 'questionnaire2.csv',
-    # 'questionnaire3.csv', and their language variations in
-    # 'experiments/tests' subdirectory)
-    experiment13 = Experiment.objects.filter(
-        status=Experiment.APPROVED
-    ).last()
-    # TODO: not necessary while creating groups
-    # TODO: inside create_experiment function. This has to be refactor.
-    create_group(2, experiment13)
-    group_first = experiment13.groups.first()
-    create_questionnaire(1, 'q1', group_first)
-    questionnaire1 = Questionnaire.objects.last()
-    # create questionnaire language data default for questionnaire1
-    create_questionnaire_language(
-        questionnaire1,
-        settings.BASE_DIR + '/experiments/tests/questionnaire1.csv',
-        'en'
-    )
-    # create questionnaire language data in French for questionnaire1
-    create_questionnaire_language(
-        questionnaire1,
-        settings.BASE_DIR + '/experiments/tests/questionnaire1_fr.csv',
-        'fr'
-    )
-    # create questionnaire language data in Brazilian Portuguese for
-    # questionnaire1
-    create_questionnaire_language(
-        questionnaire1,
-        settings.BASE_DIR + '/experiments/tests/questionnaire1_pt-br.csv',
-        'pt-br'
-    )
-
-    create_questionnaire(1, 'q2', group_first)
-    questionnaire2 = Questionnaire.objects.last()
-    # create questionnaire language data default for questionnaire2
-    create_questionnaire_language(
-        questionnaire2,
-        settings.BASE_DIR + '/experiments/tests/questionnaire2.csv',
-        'en'
-    )
-    # create questionnaire language data in German for questionnaire2
-    create_questionnaire_language(
-        questionnaire2,
-        settings.BASE_DIR + '/experiments/tests/questionnaire2_de.csv',
-        'de'
-    )
-
-    group_last = experiment13.groups.last()
-    create_questionnaire(1, 'q3', group_last)
-    questionnaire3 = Questionnaire.objects.last()
-    # create questionnaire language data default for questionnaire3
-    create_questionnaire_language(
-        questionnaire3,
-        settings.BASE_DIR + '/experiments/tests/questionnaire3.csv',
-        'en'
-    )
-
     # Create invalid Questionnaire object
     # (requires invalid files 'questionnaire4.csv' in 'experiments/tests'
     # subdirectory)
@@ -1536,11 +1524,6 @@ def global_setup_ut():
         version=1, sent_date=datetime.utcnow(),
         status=Experiment.APPROVED,
     )
-    experiment5 = Experiment.objects.create(
-        title='Experiment 5', nes_id=4, owner=owner2,
-        version=1, sent_date=datetime.utcnow(),
-        status=Experiment.APPROVED,
-    )
     create_ethics_committee_info(experiment3)
 
     create_group(2, experiment1)
@@ -1579,66 +1562,6 @@ def global_setup_ut():
         name='Colaborador 2', team='Numec', coordinator=False,
         study=study1
     )
-
-    # Create valid Questionnaire objects
-    # (requires the files 'questionnaire1.csv', 'questionnaire2.csv' and
-    # 'questionnaire3.csv' being generated in 'experiments/tests' subdirectory)
-    create_group(2, experiment5)
-    group_first = experiment5.groups.first()
-    create_questionnaire(1, 'q1', group_first)
-    questionnaire1 = Questionnaire.objects.last()
-    # create questionnaire language data pt-br for questionnaire1
-    create_questionnaire_language(
-        questionnaire1,
-        settings.BASE_DIR + '/experiments/tests/questionnaire1_pt-br.csv',
-        # our tests helper always consider 'en' as Default Language,
-        # so we create this time as 'pt-br' to test creating questionnaire
-        # default language in test_api (by the moment only test_api tests
-        # creating questionnaire default language; can expand testing
-        # questionnaire related models)
-        'pt-br'
-    )
-    # create questionnaire language data fr for questionnaire1
-    create_questionnaire_language(
-        questionnaire1,
-        settings.BASE_DIR + '/experiments/tests/questionnaire1_fr.csv',
-        # our tests helper always consider 'en' as Default Language,
-        # so we create this time as 'pt-br' to test creating questionnaire
-        # default language in test_api (by the moment only test_api tests
-        # creating questionnaire default language; can expand testing
-        # questionnaire related models)
-        'fr'
-    )
-
-    # create questionnaire language data default for questionnaire2
-    create_questionnaire(1, 'q2', group_first)
-    questionnaire2 = Questionnaire.objects.last()
-    create_questionnaire_language(
-        questionnaire2,
-        settings.BASE_DIR + '/experiments/tests/questionnaire2.csv', 'en'
-    )
-    # create questionnaire language data de for questionnaire2
-    questionnaire2 = Questionnaire.objects.last()
-    create_questionnaire_language(
-        questionnaire2,
-        settings.BASE_DIR + '/experiments/tests/questionnaire2_de.csv',
-        'de'
-    )
-
-    group_last = experiment5.groups.last()
-    create_questionnaire(1, 'q3', group_last)
-    questionnaire3 = Questionnaire.objects.last()
-    # create questionnaire language data default for questionnaire3
-    create_questionnaire_language(
-        questionnaire3,
-        settings.BASE_DIR + '/experiments/tests/questionnaire3.csv',
-        'en'
-    )
-
-    # create two publications for experiment4
-    create_publication(2, experiment4)
-    # create one publication for experiment5
-    create_publication(1, experiment5)
 
     # Create invalid Questionnaire object
     # (requires file 'questionnaire4.csv', being generated in

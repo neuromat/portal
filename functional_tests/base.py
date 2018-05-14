@@ -2,13 +2,15 @@ import time
 
 import os
 
-from django.contrib.auth.models import Group, Permission
+from django.contrib.auth.models import Group, Permission, User
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 from django.test import override_settings
 from selenium import webdriver
 from selenium.common.exceptions import WebDriverException
 
-from experiments.tests.tests_helper import global_setup_ft, apply_setup
+from experiments.models import Experiment
+from experiments.tests.tests_helper import global_setup_ft, apply_setup, \
+    create_experiment
 
 # To test haystack using a new index, instead of the settings.py index
 TEST_HAYSTACK_CONNECTIONS = {
@@ -30,6 +32,10 @@ class FunctionalTest(StaticLiveServerTestCase):
 
     def setUp(self):
         global_setup_ft()
+        owner = User.objects.create_user(
+            username='labor1', password='nep-lab1'
+        )
+        create_experiment(1, owner, Experiment.APPROVED)
 
         profile = webdriver.FirefoxProfile()
         profile.set_preference('intl.accept_languages', 'en')
@@ -47,7 +53,8 @@ class FunctionalTest(StaticLiveServerTestCase):
     def tearDown(self):
         self.browser.quit()
 
-    def wait_for(self, fn):
+    @staticmethod
+    def wait_for(fn):
         start_time = time.time()
         while True:
             try:

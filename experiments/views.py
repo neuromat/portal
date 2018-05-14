@@ -43,8 +43,8 @@ def _isvalid(source_path):
     with open(source_path, 'r') as source:
         reader = csv.reader(source, skipinitialspace=True)
         for row in reader:
-            # the number of columns in csv file must be 13
-            if len(row) != 13:
+            # the number of columns in csv file must be 14
+            if len(row) != 14:
                 return False
 
     # tests for column titles
@@ -53,17 +53,18 @@ def _isvalid(source_path):
         for row in reader:
             if row[0] != 'questionnaire_code' or \
                     row[1] != 'questionnaire_title' or \
-                    row[2] != 'question_type' or \
-                    row[3] != 'question_type_description' or \
-                    row[4] != 'question_index' or \
-                    row[5] != 'question_code' or \
-                    row[6] != 'question_description' or \
-                    row[7] != 'subquestion_code' or \
-                    row[8] != 'subquestion_description' or \
-                    row[9] != 'question_scale' or \
-                    row[10] != 'question_scale_label' or \
-                    row[11] != 'option_code' or \
-                    row[12] != 'option_description':
+                    row[2] != 'question_group' or \
+                    row[3] != 'question_type' or \
+                    row[4] != 'question_type_description' or \
+                    row[5] != 'question_index' or \
+                    row[6] != 'question_code' or \
+                    row[7] != 'question_description' or \
+                    row[8] != 'subquestion_code' or \
+                    row[9] != 'subquestion_description' or \
+                    row[10] != 'question_scale' or \
+                    row[11] != 'question_scale_label' or \
+                    row[12] != 'option_code' or \
+                    row[13] != 'option_description':
                 return False
             break
 
@@ -71,7 +72,7 @@ def _isvalid(source_path):
 
 
 def _get_questionnaire_metadata(metadata):
-    # Put the questionnaire data into a temporary csv file
+    # put the questionnaire data into a temporary csv file
     temp_dir = tempfile.mkdtemp()
     file = open(temp_dir + '/questionnaire.csv', 'w')
     file.write(metadata)
@@ -80,26 +81,38 @@ def _get_questionnaire_metadata(metadata):
     if not _isvalid(temp_dir + '/questionnaire.csv'):
         return 'invalid_questionnaire'
 
-    # Remove the columns that won't be used and save in another temporary file
+    # remove the columns that won't be used and save in another temporary file
     with open(temp_dir + '/questionnaire.csv', 'r') as source:
         reader = csv.reader(source, skipinitialspace=True)
         with open(temp_dir + '/questionnaire_cleaned.csv', 'w') as result:
             writer = csv.writer(result)
             for r in reader:
-                writer.writerow((r[2], r[5], r[6], r[8], r[12]))
+                writer.writerow((r[2], r[3], r[6], r[7], r[9], r[13]))
 
     q_cleaned = pandas.read_csv(temp_dir + '/questionnaire_cleaned.csv')
 
     records = []
 
+    # first, group questions by question_code
     for key, grp in q_cleaned.groupby(['question_code',
                                        'question_type',
                                        'question_description']):
         rec = _get_nested_rec(key, grp)
         records.append(rec)
 
-    records = dict(data=records)
-    return records
+    # now, build one level above, the question groups level
+    q_groups = dict()
+    for key, grp in q_cleaned.groupby(['question_group']):
+        q_groups[key] = []
+        q_unique = grp['question_code'].unique()
+        for record in records:
+            if record['question_code'] in q_unique:
+                q_groups[key].append(record)
+
+    # make dictionnaire to ease diplaying in template
+    for q_group in q_groups:
+        q_groups[q_group] = dict(data=q_groups[q_group])
+    return q_groups
 
 
 def _get_q_default_language_or_first(questionnaire):
@@ -498,8 +511,8 @@ class NepSearchView(SearchView):
                     count = 0
                     for search_filter in search_filters:
                         for group in groups:
-                            # print(group.steps.all())  # DEBUG. See TODO in
-                            # tests_helper
+                            # print(group.steps.all())  # DEBUG. See TODO
+                            # in tests_helper
                             if group.steps.filter(
                                     type=search_filter
                             ).count() > 0:

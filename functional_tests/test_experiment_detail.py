@@ -16,7 +16,8 @@ from experiments.tests.tests_helper import create_experiment, create_group, \
     create_participant, create_download_dir_structure_and_files, \
     remove_selected_subdir, create_experimental_protocol, \
     create_questionnaire, create_questionnaire_language, create_study, \
-    create_eeg_data, create_eeg_setting, create_eeg_step
+    create_eeg_data, create_eeg_setting, create_eeg_step, \
+    create_valid_questionnaires, create_publication
 from functional_tests.base import FunctionalTest
 from nep import settings
 
@@ -34,9 +35,10 @@ class ExperimentDetailTest(FunctionalTest):
 
     # TODO: break by tabs
     def test_can_view_detail_page(self):
-        experiment = Experiment.objects.filter(
-            status=Experiment.APPROVED
-        ).last()
+        # TODO: getting momentarily from tests_helper
+        experiment = Experiment.objects.get(
+            title='Brachial Plexus (with EMG Setting)'
+        )
 
         self._access_experiment_detail_page(experiment)
 
@@ -166,7 +168,7 @@ class ExperimentDetailTest(FunctionalTest):
         # She hits ESC to exit Study modal and clicks the Groups tab
         study_modal = self.browser.find_element_by_id('study_modal')
         study_modal.send_keys(Keys.ESCAPE)
-        time.sleep(1)
+        time.sleep(1)  # TODO: eliminate implicit wait
         self.browser.find_element_by_link_text('Groups').click()
         # In Groups tab she can see a list of the groups associated with
         # this experiment with: group's title, description, the protocol
@@ -235,9 +237,9 @@ class ExperimentDetailTest(FunctionalTest):
         )
 
     def test_can_see_publications_link(self):
-        experiment = Experiment.objects.filter(
-            status=Experiment.APPROVED
-        ).last()
+        experiment = Experiment.objects.last()
+        create_publication(experiment)
+        create_publication(experiment)
 
         # The new visitor is in home page and sees the list of experiments.
         # She clicks in the "View" link of last approved experiment and is
@@ -255,9 +257,9 @@ class ExperimentDetailTest(FunctionalTest):
         ))
 
     def test_can_see_publications_modal_with_correct_content(self):
-        experiment = Experiment.objects.filter(
-            status=Experiment.APPROVED
-        ).last()
+        experiment = Experiment.objects.last()
+        create_publication(experiment)
+        create_publication(experiment)
         publications = experiment.publications.all()
 
         # The new visitor is in home page and sees the list of experiments.
@@ -307,9 +309,8 @@ class ExperimentDetailTest(FunctionalTest):
         ))
 
     def test_publications_urls_are_links(self):
-        experiment = Experiment.objects.filter(
-            status=Experiment.APPROVED
-        ).last()
+        experiment = Experiment.objects.last()
+        create_publication(experiment)
 
         # The new visitor is in home page and sees the list of experiments.
         # She clicks in the "View" link of last approved experiment and is
@@ -335,9 +336,8 @@ class ExperimentDetailTest(FunctionalTest):
                 self.fail(publication.url + ' is not a link')
 
     def test_can_view_questionaire_tab(self):
-        experiment = Experiment.objects.filter(
-            status=Experiment.APPROVED
-        ).last()
+        experiment = Experiment.objects.last()
+        create_valid_questionnaires(experiment)
 
         # The new visitor is in home page and sees the list of experiments.
         # She clicks in a "View" link and is redirected to experiment
@@ -376,17 +376,11 @@ class ExperimentDetailTest(FunctionalTest):
             self.browser.find_element_by_link_text('Questionnaires')
 
     def test_can_view_group_questionnaires_and_questionnaires_titles(self):
+        experiment = Experiment.objects.last()
+        create_valid_questionnaires(experiment)
+
         ##
-        # We've created Questionnaire data in tests helper from a Sample
-        # of a questionnaire from NES, in csv format. The Questionnaire is
-        # associated with a group of the last experiment created in tests
-        # helper.
-        ##
-        experiment = Experiment.objects.filter(
-            status=Experiment.APPROVED
-        ).last()
-        ##
-        # We get groups objects with questionnaire steps
+        # get groups objects with questionnaire steps
         ##
         q_steps = Step.objects.filter(type=Step.QUESTIONNAIRE)
         groups_with_qs = experiment.groups.filter(steps__in=q_steps)
@@ -418,23 +412,15 @@ class ExperimentDetailTest(FunctionalTest):
             )
             for step in group.steps.filter(type=Step.QUESTIONNAIRE):
                 questionnaire = Questionnaire.objects.get(step_ptr=step)
-                questionnaire_language = \
-                    questionnaire.q_languages.get(
-                        language_code='en'
-                    )
+                questionnaire_language = questionnaire.q_languages.first()
                 self.assertIn(
                     'Questionnaire ' + questionnaire_language.survey_name,
                     questionnaires_content
                 )
 
     def test_detail_button_expands_questionnaire_to_display_questions_and_answers(self):
-        ##
-        # We've created Questionnaire data in tests helper from a Sample
-        # of a questionnaire from NES, in csv format
-        ##
-        experiment = Experiment.objects.filter(
-            status=Experiment.APPROVED
-        ).last()
+        experiment = Experiment.objects.last()
+        create_valid_questionnaires(experiment)
 
         # When the new visitor visits an experiment that has questionnaires,
         # in right side of each questionnaire title is a 'Detail'
@@ -455,18 +441,12 @@ class ExperimentDetailTest(FunctionalTest):
         self.assertEqual(button_details.text, 'Details')
 
     def test_can_view_questionnaires_content(self):
-        ##
-        # We've created three questionnaires in an experiment, two are from one
-        # group and one are from another group. We test questions and
-        # answers from this three questionnaires. See tests helper.
-        ##
-        experiment = Experiment.objects.filter(
-            status=Experiment.APPROVED
-        ).last()
+        experiment = Experiment.objects.last()
+        create_valid_questionnaires(experiment)
 
         # The new visitor is in home page and sees the list of experiments.
-        # She clicks in second "View" link and is redirected to experiment
-        # detail page.
+        # She clicks in the "View" link corresponded to the experiment and is
+        # redirected to experiment detail page.
         self.browser.find_element_by_xpath(
             "//a[@href='/experiments/" + experiment.slug + "/']"
         ).click()
@@ -475,37 +455,37 @@ class ExperimentDetailTest(FunctionalTest):
         # When the new visitor clicks in the Questionnaires tab, then click
         # in 'Details' button of the Questionnaires sections she sees
         # the questionnaires' content as a series of questions and answers
+        # divided by groups of questions
         self.browser.find_element_by_link_text('Questionnaires').click()
-        questionnaires = self.browser.find_element_by_id(
-            'questionnaires_tab'
-        ).find_elements_by_link_text('Details')
+        questionnaires = self.wait_for(
+            lambda: self.browser.find_element_by_id(
+                'questionnaires_tab'
+            ).find_elements_by_link_text('Details')
+        )
         for q in questionnaires:
             q.click()
-        time.sleep(0.5)
 
-        # TODO: click on the 'Details' buttons just for simulate user
-        # TODO: interaction, as the questionnaires' content is in html page
         questionnaires_content = self.browser.find_element_by_id(
             'questionnaires_tab').text
 
         ##
-        # Sample asserts for first questionnaire.
+        # sample asserts for first questionnaire
         ##
-        self.assertIn('History of fracture?', questionnaires_content)
-        self.assertIn('Have you ever had any orthopedic surgery?',
+        self.assertIn('Primeiro Grupo', questionnaires_content)
+        self.assertIn('Segundo Grupo', questionnaires_content)
+        self.assertIn('História de fratura?', questionnaires_content)
+        self.assertIn('Já fez alguma cirurgia ortopédica?',
                       questionnaires_content)
-        self.assertIn('Did you have any nerve surgery?',
+        self.assertIn('Fez alguma cirurgia de nervo?',
                       questionnaires_content)
-        self.assertIn('Identify the event that led to the trauma of your '
-                      'brachial plexus. You can mark more than one event.',
+        self.assertIn('Identifique o evento que levou ao trauma do seu plexo '
+                      'braquial. É possível marcar mais do que um evento.',
                       questionnaires_content)
-        self.assertIn('Did you have any fractures associated with the injury?',
-                      questionnaires_content)
-        self.assertIn('The user enters a date in a date field',
+        self.assertIn('Teve alguma fratura associada à lesão?',
                       questionnaires_content)
 
         ##
-        #  Sample asserts for second questionnaire
+        # sample asserts for second questionnaire
         ##
         self.assertIn('What side of the injury?', questionnaires_content)
         self.assertIn('Institution of the Study', questionnaires_content)
@@ -519,8 +499,10 @@ class ExperimentDetailTest(FunctionalTest):
         self.assertIn('The user answers yes or not', questionnaires_content)
 
         ##
-        # Sample asserts for third questionnaire
+        # sample asserts for third questionnaire
         ##
+        self.assertIn('Primeiro Grupo', questionnaires_content)
+        self.assertIn('Terceiro Grupo', questionnaires_content)
         self.assertIn('Refere dor após a lesão?', questionnaires_content)
         self.assertIn('EVA da dor principal:', questionnaires_content)
         self.assertIn('Qual região apresenta alteração do trofismo?',
@@ -566,18 +548,8 @@ class ExperimentDetailTest(FunctionalTest):
                       questionnaires_content)
 
     def test_can_see_all_language_links_of_questionnaires_if_available(self):
-        ##
-        # We've created two questionnaires in tests helper from a Sample
-        # of questionnaires from NES, in csv format. The questionnaires are
-        # associated with a group of the last approved experiment created in
-        # tests helper. One of the questionnaires has three languages, English,
-        # French, and Brazilian Portuguese. The other has two languages,
-        # English and German. Besides, we have a third questionnaire created
-        # in tests helper that has only the English language associated to it.
-        ##
-        experiment = Experiment.objects.filter(
-            status=Experiment.APPROVED
-        ).last()
+        experiment = Experiment.objects.last()
+        create_valid_questionnaires(experiment)
 
         # The visitor clicks in the experiment with questionnaire in home page
         self.browser.find_element_by_xpath(
@@ -606,27 +578,14 @@ class ExperimentDetailTest(FunctionalTest):
         for lang in lang_elements:
             q_lang_codes = q_lang_codes + ' ' + lang.text
 
-        self.assertEqual(q_lang_codes.count('en'), 3)
+        self.assertEqual(q_lang_codes.count('en'), 2)
         self.assertEqual(q_lang_codes.count('fr'), 1)
         self.assertEqual(q_lang_codes.count('pt-br'), 1)
         self.assertEqual(q_lang_codes.count('de'), 1)
 
     def test_clicking_in_pt_br_language_link_of_questionnaire_render_appropriate_language(self):
-        ##
-        # We've created two questionnaires in tests helper from a Sample
-        # of questionnaires from NES, in csv format. The questionnaires are
-        # associated with a group of the last approved experiment created in
-        # tests helper. One of the questionnaires has three languages, English,
-        # French, and Brazilian Portuguese. The other has two languages,
-        # English and German. Besides, we have a third questionnaire created
-        # in tests helper that has only the English language associated to it.
-        ##
-        experiment = Experiment.objects.filter(
-            status=Experiment.APPROVED
-        ).last()
-        ##
-        # questionnaire with code='q1' defined in tests helper
-        ##
+        experiment = Experiment.objects.last()
+        create_valid_questionnaires(experiment)
         questionnaire = Questionnaire.objects.get(code='q1')
 
         # The visitor clicks in the experiment with questionnaire in home page
@@ -683,21 +642,8 @@ class ExperimentDetailTest(FunctionalTest):
                       questionnaires_content)
 
     def test_clicking_in_fr_language_link_of_questionnaire_render_appropriate_language(self):
-        ##
-        # We've created two questionnaires in tests helper from a Sample
-        # of questionnaires from NES, in csv format. The questionnaires are
-        # associated with a group of the last approved experiment created in
-        # tests helper. One of the questionnaires has three languages, English,
-        # French, and Brazilian Portuguese. The other has two languages,
-        # English and German. Besides, we have a third questionnaire created
-        # in tests helper that has only the English language associated to it.
-        ##
-        experiment = Experiment.objects.filter(
-            status=Experiment.APPROVED
-        ).last()
-        ##
-        # questionnaire with code='q1' defined in tests helper
-        ##
+        experiment = Experiment.objects.last()
+        create_valid_questionnaires(experiment)
         questionnaire = Questionnaire.objects.get(code='q1')
 
         # The visitor clicks in the experiment with questionnaire in home page
@@ -750,8 +696,9 @@ class ExperimentDetailTest(FunctionalTest):
                       questionnaires_content)
 
     def test_does_not_display_study_elements_if_they_not_exist(self):
-        owner = User.objects.create(username='labor1', password='nep-lab1')
-        experiment = create_experiment(1, owner, Experiment.APPROVED)
+        experiment = Experiment.objects.filter(
+            status=Experiment.APPROVED
+        ).last()
         ##
         # create study without end_date and keywords. We won't create
         # contributors either
@@ -759,7 +706,8 @@ class ExperimentDetailTest(FunctionalTest):
         create_study(1, experiment)
 
         ##
-        # TODO:
+        # TODO
+        # ----
         # We have to refresh live server again because in parent setUp we
         # already called it without new experiment created. When refactoring
         # tests_helper call only in the classes setUp methods.
@@ -1103,14 +1051,10 @@ class DownloadExperimentTest(FunctionalTest):
 
     @override_settings(MEDIA_ROOT=TEMP_MEDIA_ROOT)
     def test_if_there_is_not_a_subdir_in_download_dir_structure_return_message(self):
-        ##
-        # Last approved experiment created in tests helper has the objects that
-        # we need for all groups, besides questionnaires and experimental
-        # protocols for some groups.
-        ##
-        experiment = Experiment.objects.filter(
-            status=Experiment.APPROVED
-        ).last()  # experiment9 in tests helper
+        # TODO: getting momentarily from tests_helper
+        experiment = Experiment.objects.get(
+            title='Brachial Plexus (with EMG Setting)'
+        )
         for group in experiment.groups.all():
             try:
                 group.experimental_protocol

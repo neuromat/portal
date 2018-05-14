@@ -1,34 +1,34 @@
-questionnaire_code,questionnaire_title,question_type,question_type_description,question_index,question_code,question_description,subquestion_code,subquestion_description,question_scale,question_scale_label,option_code,option_description
-599846,INDC - Évaluation d'entrée,L,List (Radio),opcfratura,opcfratura,Histoire de la fracture?, , ,,,1,Oui
-599846,INDC - Évaluation d'entrée,L,List (Radio),opcfratura,opcfratura,Histoire de la fracture?, , ,,,2,Non
-599846,INDC - Évaluation d'entrée,L,List (Radio),opcfratura,opcfratura,Histoire de la fracture?, , ,,,3,Non informé
-599846,INDC - Évaluation d'entrée,L,List (Radio),opscirurgiaortopedi,opscirurgiaortopedi,Avez-vous déjà eu une chirurgie orthopédique?, , ,,,A1,Oui
-599846,INDC - Évaluation d'entrée,L,List (Radio),opscirurgiaortopedi,opscirurgiaortopedi,Avez-vous déjà eu une chirurgie orthopédique?, , ,,,A2,Non
-599846,INDC - Évaluation d'entrée,L,List (Radio),opscirurgiaortopedi,opscirurgiaortopedi,Avez-vous déjà eu une chirurgie orthopédique?, , ,,,A3,Non informé
-599846,INDC - Évaluation d'entrée,L,List (Radio),opscirurgianervo,opscirurgianervo,Avez-vous subi une chirurgie nerveuse?, , ,,,A1,Oui
-599846,INDC - Évaluation d'entrée,L,List (Radio),opscirurgianervo,opscirurgianervo,Avez-vous subi une chirurgie nerveuse?, , ,,,A2,Non
-599846,INDC - Évaluation d'entrée,L,List (Radio),opscirurgianervo,opscirurgianervo,Avez-vous subi une chirurgie nerveuse?, , ,,,A3,Non informé
-599846,INDC - Évaluation d'entrée,Y,Yes/No,sndor,sndor,Antécédents de douleur?, , ,,, , 
-599846,INDC - Évaluation d'entrée,M,Multiple choice,listipotrauma,listipotrauma,Identifiez l'événement qui a conduit au traumatisme de votre plexus brachial. Vous pouvez marquer plus d'un événement.,1,Accidents automobiles,,, , 
-599846,INDC - Évaluation d'entrée,M,Multiple choice,listipotrauma,listipotrauma,Identifiez l'événement qui a conduit au traumatisme de votre plexus brachial. Vous pouvez marquer plus d'un événement.,10,Lésion tumorale,,, , 
-599846,INDC - Évaluation d'entrée,M,Multiple choice,listipotrauma,listipotrauma,Identifiez l'événement qui a conduit au traumatisme de votre plexus brachial. Vous pouvez marquer plus d'un événement.,2,Accidents de moto,,, , 
-599846,INDC - Évaluation d'entrée,M,Multiple choice,listipotrauma,listipotrauma,Identifiez l'événement qui a conduit au traumatisme de votre plexus brachial. Vous pouvez marquer plus d'un événement.,3,Accidents du travail,,, , 
-599846,INDC - Évaluation d'entrée,M,Multiple choice,listipotrauma,listipotrauma,Identifiez l'événement qui a conduit au traumatisme de votre plexus brachial. Vous pouvez marquer plus d'un événement.,4,Blessure par arme à feu,,, , 
-599846,INDC - Évaluation d'entrée,M,Multiple choice,listipotrauma,listipotrauma,Identifiez l'événement qui a conduit au traumatisme de votre plexus brachial. Vous pouvez marquer plus d'un événement.,5,Blessure par un objet perçant-coupant,,, , 
-599846,INDC - Évaluation d'entrée,M,Multiple choice,listipotrauma,listipotrauma,Identifiez l'événement qui a conduit au traumatisme de votre plexus brachial. Vous pouvez marquer plus d'un événement.,6,Blessure chirurgicale,,, , 
-599846,INDC - Évaluation d'entrée,M,Multiple choice,listipotrauma,listipotrauma,Identifiez l'événement qui a conduit au traumatisme de votre plexus brachial. Vous pouvez marquer plus d'un événement.,7,Blessure par rayonnement,,, , 
-599846,INDC - Évaluation d'entrée,M,Multiple choice,listipotrauma,listipotrauma,Identifiez l'événement qui a conduit au traumatisme de votre plexus brachial. Vous pouvez marquer plus d'un événement.,8,Accident en courant,,, , 
-599846,INDC - Évaluation d'entrée,M,Multiple choice,listipotrauma,listipotrauma,Identifiez l'événement qui a conduit au traumatisme de votre plexus brachial. Vous pouvez marquer plus d'un événement.,9,"Brûler, blessure",,, , 
-599846,INDC - Évaluation d'entrée,L,List (Radio),opsfratura,opsfratura,Avez-vous eu des fractures associées à la blessure?, , ,,,A1,Oui
-599846,INDC - Évaluation d'entrée,L,List (Radio),opsfratura,opsfratura,Avez-vous eu des fractures associées à la blessure?, , ,,,A2,Non
-599846,INDC - Évaluation d'entrée,L,List (Radio),opsfratura,opsfratura,Avez-vous eu des fractures associées à la blessure?, , ,,,A3,Non informé
-599846,INDC - Évaluation d'entrée,L,List (Radio),opsfisio,opsfisio,Pratiquez-vous régulièrement la physiothérapie?, , ,,,A1,Oui
-599846,INDC - Évaluation d'entrée,L,List (Radio),opsfisio,opsfisio,Pratiquez-vous régulièrement la physiothérapie?, , ,,,A2,Non
-599846,INDC - Évaluation d'entrée,L,List (Radio),opsfisio,opsfisio,Pratiquez-vous régulièrement la physiothérapie?, , ,,,A3,Non informé
-599846,INDC - Évaluation d'entrée,L,List (Radio),opsdispositivoauxili,opsdispositivoauxili,Utilisez-vous un appareil auxiliaire?, , ,,,A1,Oui
-599846,INDC - Évaluation d'entrée,L,List (Radio),opsdispositivoauxili,opsdispositivoauxili,Utilisez-vous un appareil auxiliaire?, , ,,,A2,Non
-599846,INDC - Évaluation d'entrée,L,List (Radio),opsdispositivoauxili,opsdispositivoauxili,Utilisez-vous un appareil auxiliaire?, , ,,,A3,Non informé
-599846,INDC - Évaluation d'entrée,M,Multiple choice,lisdispositivo2,lisdispositivo2,Laquelle?,1,Fronde,,, , 
-599846,INDC - Évaluation d'entrée,M,Multiple choice,lisdispositivo2,lisdispositivo2,Laquelle?,2,Épaule soutien,,, , 
-599846,INDC - Évaluation d'entrée,M,Multiple choice,lisdispositivo2,lisdispositivo2,Laquelle?,3,Orthèse de position de doigt et de doigt,,, , 
-599846,INDC - Évaluation d'entrée,M,Multiple choice,lisdispositivo2,lisdispositivo2,Laquelle?,4,Orthèse de position de doigt,,, , 
+questionnaire_code,questionnaire_title,question_group,question_type,question_type_description,question_index,question_code,question_description,subquestion_code,subquestion_description,question_scale,question_scale_label,option_code,option_description
+599846,INDC - Évaluation d'entrée,Premier groupe,L,List (Radio),opcfratura,opcfratura,Histoire de la fracture?, , ,,,1,Oui
+599846,INDC - Évaluation d'entrée,Premier groupe,L,List (Radio),opcfratura,opcfratura,Histoire de la fracture?, , ,,,2,Non
+599846,INDC - Évaluation d'entrée,Premier groupe,L,List (Radio),opcfratura,opcfratura,Histoire de la fracture?, , ,,,3,Non informé
+599846,INDC - Évaluation d'entrée,Premier groupe,L,List (Radio),opscirurgiaortopedi,opscirurgiaortopedi,Avez-vous déjà eu une chirurgie orthopédique?, , ,,,A1,Oui
+599846,INDC - Évaluation d'entrée,Premier groupe,L,List (Radio),opscirurgiaortopedi,opscirurgiaortopedi,Avez-vous déjà eu une chirurgie orthopédique?, , ,,,A2,Non
+599846,INDC - Évaluation d'entrée,Premier groupe,L,List (Radio),opscirurgiaortopedi,opscirurgiaortopedi,Avez-vous déjà eu une chirurgie orthopédique?, , ,,,A3,Non informé
+599846,INDC - Évaluation d'entrée,Premier groupe,L,List (Radio),opscirurgianervo,opscirurgianervo,Avez-vous subi une chirurgie nerveuse?, , ,,,A1,Oui
+599846,INDC - Évaluation d'entrée,Premier groupe,L,List (Radio),opscirurgianervo,opscirurgianervo,Avez-vous subi une chirurgie nerveuse?, , ,,,A2,Non
+599846,INDC - Évaluation d'entrée,Premier groupe,L,List (Radio),opscirurgianervo,opscirurgianervo,Avez-vous subi une chirurgie nerveuse?, , ,,,A3,Non informé
+599846,INDC - Évaluation d'entrée,Premier groupe,Y,Yes/No,sndor,sndor,Antécédents de douleur?, , ,,, , 
+599846,INDC - Évaluation d'entrée,Deuxième groupe,M,Multiple choice,listipotrauma,listipotrauma,Identifiez l'événement qui a conduit au traumatisme de votre plexus brachial. Vous pouvez marquer plus d'un événement.,1,Accidents automobiles,,, , 
+599846,INDC - Évaluation d'entrée,Deuxième groupe,M,Multiple choice,listipotrauma,listipotrauma,Identifiez l'événement qui a conduit au traumatisme de votre plexus brachial. Vous pouvez marquer plus d'un événement.,10,Lésion tumorale,,, , 
+599846,INDC - Évaluation d'entrée,Deuxième groupe,M,Multiple choice,listipotrauma,listipotrauma,Identifiez l'événement qui a conduit au traumatisme de votre plexus brachial. Vous pouvez marquer plus d'un événement.,2,Accidents de moto,,, , 
+599846,INDC - Évaluation d'entrée,Deuxième groupe,M,Multiple choice,listipotrauma,listipotrauma,Identifiez l'événement qui a conduit au traumatisme de votre plexus brachial. Vous pouvez marquer plus d'un événement.,3,Accidents du travail,,, , 
+599846,INDC - Évaluation d'entrée,Deuxième groupe,M,Multiple choice,listipotrauma,listipotrauma,Identifiez l'événement qui a conduit au traumatisme de votre plexus brachial. Vous pouvez marquer plus d'un événement.,4,Blessure par arme à feu,,, , 
+599846,INDC - Évaluation d'entrée,Deuxième groupe,M,Multiple choice,listipotrauma,listipotrauma,Identifiez l'événement qui a conduit au traumatisme de votre plexus brachial. Vous pouvez marquer plus d'un événement.,5,Blessure par un objet perçant-coupant,,, , 
+599846,INDC - Évaluation d'entrée,Deuxième groupe,M,Multiple choice,listipotrauma,listipotrauma,Identifiez l'événement qui a conduit au traumatisme de votre plexus brachial. Vous pouvez marquer plus d'un événement.,6,Blessure chirurgicale,,, , 
+599846,INDC - Évaluation d'entrée,Deuxième groupe,M,Multiple choice,listipotrauma,listipotrauma,Identifiez l'événement qui a conduit au traumatisme de votre plexus brachial. Vous pouvez marquer plus d'un événement.,7,Blessure par rayonnement,,, , 
+599846,INDC - Évaluation d'entrée,Deuxième groupe,M,Multiple choice,listipotrauma,listipotrauma,Identifiez l'événement qui a conduit au traumatisme de votre plexus brachial. Vous pouvez marquer plus d'un événement.,8,Accident en courant,,, , 
+599846,INDC - Évaluation d'entrée,Deuxième groupe,M,Multiple choice,listipotrauma,listipotrauma,Identifiez l'événement qui a conduit au traumatisme de votre plexus brachial. Vous pouvez marquer plus d'un événement.,9,"Brûler, blessure",,, , 
+599846,INDC - Évaluation d'entrée,Deuxième groupe,L,List (Radio),opsfratura,opsfratura,Avez-vous eu des fractures associées à la blessure?, , ,,,A1,Oui
+599846,INDC - Évaluation d'entrée,Deuxième groupe,L,List (Radio),opsfratura,opsfratura,Avez-vous eu des fractures associées à la blessure?, , ,,,A2,Non
+599846,INDC - Évaluation d'entrée,Deuxième groupe,L,List (Radio),opsfratura,opsfratura,Avez-vous eu des fractures associées à la blessure?, , ,,,A3,Non informé
+599846,INDC - Évaluation d'entrée,Deuxième groupe,L,List (Radio),opsfisio,opsfisio,Pratiquez-vous régulièrement la physiothérapie?, , ,,,A1,Oui
+599846,INDC - Évaluation d'entrée,Deuxième groupe,L,List (Radio),opsfisio,opsfisio,Pratiquez-vous régulièrement la physiothérapie?, , ,,,A2,Non
+599846,INDC - Évaluation d'entrée,Deuxième groupe,L,List (Radio),opsfisio,opsfisio,Pratiquez-vous régulièrement la physiothérapie?, , ,,,A3,Non informé
+599846,INDC - Évaluation d'entrée,Deuxième groupe,L,List (Radio),opsdispositivoauxili,opsdispositivoauxili,Utilisez-vous un appareil auxiliaire?, , ,,,A1,Oui
+599846,INDC - Évaluation d'entrée,Deuxième groupe,L,List (Radio),opsdispositivoauxili,opsdispositivoauxili,Utilisez-vous un appareil auxiliaire?, , ,,,A2,Non
+599846,INDC - Évaluation d'entrée,Deuxième groupe,L,List (Radio),opsdispositivoauxili,opsdispositivoauxili,Utilisez-vous un appareil auxiliaire?, , ,,,A3,Non informé
+599846,INDC - Évaluation d'entrée,Deuxième groupe,M,Multiple choice,lisdispositivo2,lisdispositivo2,Laquelle?,1,Fronde,,, , 
+599846,INDC - Évaluation d'entrée,Deuxième groupe,M,Multiple choice,lisdispositivo2,lisdispositivo2,Laquelle?,2,Épaule soutien,,, , 
+599846,INDC - Évaluation d'entrée,Deuxième groupe,M,Multiple choice,lisdispositivo2,lisdispositivo2,Laquelle?,3,Orthèse de position de doigt et de doigt,,, , 
+599846,INDC - Évaluation d'entrée,Deuxième groupe,M,Multiple choice,lisdispositivo2,lisdispositivo2,Laquelle?,4,Orthèse de position de doigt,,, , 

@@ -29,7 +29,10 @@ from experiments.tests.tests_helper import apply_setup, global_setup_ut, \
     remove_selected_subdir, create_experiment, create_trustee_users, \
     create_experiment_versions, random_utf8_string, create_context_tree, \
     create_eeg_electrodenet, create_eeg_solution, create_eeg_filter_setting, \
-    create_eeg_electrode_localization_system, create_emg_digital_filter_setting
+    create_eeg_electrode_localization_system, \
+    create_emg_digital_filter_setting, create_group, create_questionnaire, \
+    create_questionnaire_language, create_valid_questionnaires, \
+    create_publication
 from experiments.views import change_slug
 from functional_tests import test_search
 from nep import settings
@@ -194,8 +197,13 @@ class ExperimentDetailTest(TestCase):
 
     def setUp(self):
         global_setup_ut()
+        owner = User.objects.create_user(
+            username='labor1', password='nep-labor1'
+        )
+        create_experiment(1, owner, Experiment.APPROVED)
 
-    def get_q_default_language_or_first(self, questionnaire):
+    @staticmethod
+    def get_q_default_language_or_first(questionnaire):
         # TODO: correct this to adapt to unique QuestionnaireDefaultLanguage
         # TODO: model with OneToOne with Questionnaire
         qdl = QuestionnaireDefaultLanguage.objects.filter(
@@ -219,29 +227,23 @@ class ExperimentDetailTest(TestCase):
         self.assertTemplateUsed(response, 'experiments/detail.html')
 
     def test_access_experiment_detail_returns_questionnaire_data_for_default_or_first_language(self):
-        # Last experiment has questionnaires. See tests helper
         experiment = Experiment.objects.last()
-        # we've made last experiment contain questionnaire data in tests helper
-        q_steps = Step.objects.filter(type=Step.QUESTIONNAIRE)
-        groups_with_qs = experiment.groups.filter(steps__in=q_steps)
+        create_valid_questionnaires(experiment)
 
         response = self.client.get('/experiments/' + experiment.slug + '/')
-        if groups_with_qs.count() == 0:
-            self.fail('There are no groups with questionnaires. Have you '
-                      'been created the questionnaires in tests helper?')
-        for group in groups_with_qs:
+
+        for group in experiment.groups.all():
             self.assertContains(
                 response,
                 'Questionnaires for group ' + group.title
             )
-            for step in group.steps.filter(type=Step.QUESTIONNAIRE):
-                questionnaire = Questionnaire.objects.get(step_ptr=step)
+            for questionnaire in group.steps.filter(type=Step.QUESTIONNAIRE):
                 # The rule is display default questionnaire language data or
                 # first questionnaire language data if not set default
                 # questionnaire language. So we mimic the function
                 # _get_q_default_language_or_first from views that do that.
                 # TODO: In tests helper we always create default
-                # TODO: questionnaire language as English. So we would to test
+                # TODO: questionnaire language as English. So we would test
                 # TODO: only if we had first language.
                 q_language = self.get_q_default_language_or_first(
                     questionnaire
@@ -253,6 +255,8 @@ class ExperimentDetailTest(TestCase):
         # Sample asserts for first questionnaire (in Portuguese, as first
         # questionnaire, first language, created in tests helper is in
         # Portuguese).
+        self.assertIn('Primeiro Grupo', response.content.decode())
+        self.assertIn('Segundo Grupo', response.content.decode())
         self.assertIn('História de fratura', response.content.decode())
         self.assertIn('Já fez alguma cirurgia ortopédica?',
                       response.content.decode())
@@ -267,6 +271,8 @@ class ExperimentDetailTest(TestCase):
                       response.content.decode())
 
         # Sample asserts for second questionnaire
+        self.assertIn('First Group', response.content.decode())
+        self.assertIn('Third Group', response.content.decode())
         self.assertIn('What side of the injury?', response.content.decode())
         self.assertIn('Institution of the Study', response.content.decode())
         self.assertIn('The user enters a free text',
@@ -280,6 +286,8 @@ class ExperimentDetailTest(TestCase):
                       response.content.decode())
 
         # Sample asserts for third questionnaire
+
+        self.assertIn('Segundo Grupo', response.content.decode())
         self.assertIn('Refere dor após a lesão?', response.content.decode())
         self.assertIn('EVA da dor principal:', response.content.decode())
         self.assertIn('Qual região apresenta alteração do trofismo?',
@@ -320,26 +328,30 @@ class ExperimentDetailTest(TestCase):
         )
 
     def test_access_experiment_with_one_valid_questionnaire_and_other_invalid(self):
-        # Last 'to be analysed' experiment has an invalid questionnaire in
-        # first group and a valid questionnaire in last group. See tests
-        # helper.
-        experiment = Experiment.objects.filter(
-            status=Experiment.TO_BE_ANALYSED).last()
-        group1 = experiment.groups.first()
-        group2 = experiment.groups.last()
-        step1 = group1.steps.get(type=Step.QUESTIONNAIRE)
-        step2 = group2.steps.get(type=Step.QUESTIONNAIRE)
-        q1 = Questionnaire.objects.get(step_ptr=step1)
-        q2 = Questionnaire.objects.get(step_ptr=step2)
+        experiment = Experiment.objects.last()
+        g1 = create_group(1, experiment)
+        g2 = create_group(1, experiment)
+        q1 = create_questionnaire(1, 'q1', g1)
+        create_questionnaire_language(
+            q1,
+            settings.BASE_DIR + '/experiments/tests/questionnaire4.csv',
+            'pt-BR'
+        )
+        q2 = create_questionnaire(1, 'q2', g2)
+        create_questionnaire_language(
+            q2,
+            settings.BASE_DIR + '/experiments/tests/questionnaire1_pt-br.csv',
+            'en'
+        )
 
         response = self.client.get('/experiments/' + experiment.slug + '/')
 
         self.assertEqual(
-            response.context['questionnaires'][group1.title][q1.id][
+            response.context['questionnaires'][g1.title][q1.id][
                 'survey_metadata'], 'invalid_questionnaire'
         )
         self.assertNotEqual(
-            response.context['questionnaires'][group2.title][q2.id][
+            response.context['questionnaires'][g2.title][q2.id][
                 'survey_metadata'], 'invalid_questionnaire'
         )
 
@@ -529,6 +541,10 @@ class SearchTest(TestCase):
 
     def setUp(self):
         global_setup_ut()
+        owner = User.objects.create_user(
+            username='labor1', password='nep-labor1'
+        )
+        create_experiment(1, owner, Experiment.APPROVED)
         haystack.connections.reload('default')
         self.haystack_index('rebuild_index')
 
@@ -624,10 +640,10 @@ class SearchTest(TestCase):
             step.identification = search_text
             step.save()
         self.haystack_index('rebuild_index')
-        # TODO: it was craeted a total of 4 steps in global_setup_ut(). So,
-        # TODO: we add those to our checking. Eliminate global_setup_ut() and
+        # TODO: Objects created in global_setup_ut().
+        # TODO: Remove global_setup_ut() and
         # TODO: make model instances created by demand in each test.
-        self.check_matches_on_response(7, search_text)
+        self.check_matches_on_response(4, search_text)
 
     def test_search_stimulus_step_returns_correct_objects(self):
         test_search.SearchTest().create_objects_to_test_search_stimulus_step()
@@ -825,6 +841,17 @@ class SearchTest(TestCase):
         self.check_matches_on_response(3, 'Elektrodenlokalisierung')
 
     def test_search_questionnaire_returns_correct_number_of_objects(self):
+        experiment = Experiment.objects.last()
+        group = create_group(1, experiment)
+        q = create_questionnaire(1, 'q', group)
+        create_questionnaire_language(
+            q,
+            settings.BASE_DIR + '/experiments/tests/questionnaire1.csv',
+            'en'
+        )
+        haystack.connections.reload('default')
+        self.haystack_index('rebuild_index')
+
         response = self.client.get('/search/', {
             'q': '\"History of fracture\" \"trauma of your '
                  'brachial plexus\" \"Injury by firearm\" \"What side of the '
@@ -849,25 +876,13 @@ class SearchTest(TestCase):
         self.assertContains(response, 'What side of the injury')
         self.assertContains(response, 'Elbow Extension')
 
-    def test_search_publications_resturns_correct_number_of_objects(self):
-        ##
-        # It was created two publications for last experiment created in
-        # tests helper
-        ##
-        experiment = Experiment.objects.filter(
-            status=Experiment.APPROVED
-        ).last()
-        ##
-        # As publications created have fields filled with lorem ipsum stuff,
-        # we change some of that fields to further search form them
-        ##
-        publication = experiment.publications.first()
+    def test_search_publications_returns_correct_number_of_objects(self):
+        experiment = Experiment.objects.last()
+        publication = create_publication(experiment)
         publication.title = 'Vargas, Claudia Verletzung des Plexus Brachialis'
         publication.save()
 
-        ##
-        # Rebuid index to incorporate experiment publication change
-        ##
+        # rebuid index to incorporate experiment publication change
         self.haystack_index('rebuild_index')
 
         response = self.client.get('/search/', {
@@ -885,6 +900,10 @@ class DownloadExperimentTest(TestCase):
 
     def setUp(self):
         global_setup_ut()
+        owner = User.objects.create_user(
+            username='labor1', password='nep-labor1'
+        )
+        create_experiment(1, owner, Experiment.APPROVED)
 
     def asserts_experimental_protocol(self, ep_value, group1, group2,
                                       zipped_file):
@@ -1120,11 +1139,8 @@ class DownloadExperimentTest(TestCase):
 
     @override_settings(MEDIA_ROOT=TEMP_MEDIA_ROOT)
     def test_POSTing_download_experiment_data_returns_correct_content(self):
-        # Last approved experiment has 2 groups and questionnaire steps (with
-        # questionnaires data) created in tests helper
-        experiment = Experiment.objects.filter(
-            status=Experiment.APPROVED
-        ).last()
+        experiment = Experiment.objects.last()
+        create_valid_questionnaires(experiment)
         # Create study and participants and experimental protocol for
         # this experiment. That's what it's missing.
         create_experiment_related_objects(experiment)
@@ -1227,10 +1243,8 @@ class DownloadExperimentTest(TestCase):
 
     @override_settings(MEDIA_ROOT=TEMP_MEDIA_ROOT)
     def test_POSTing_option_data_has_not_correspondent_subdir_redirects_to_experiment_detail_view(self):
-        experiment = Experiment.objects.filter(
-            status=Experiment.APPROVED
-        ).last()
-
+        experiment = Experiment.objects.last()
+        create_valid_questionnaires(experiment)
         # Create other objects required for this experiment to test POSTing
         # data and download dir structure
         create_experiment_related_objects(experiment)
