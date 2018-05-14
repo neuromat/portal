@@ -812,8 +812,7 @@ def create_valid_questionnaires(experiment):
     questionnaire2 = Questionnaire.objects.last()
     create_questionnaire_language(
         questionnaire2,
-        settings.BASE_DIR + '/experiments/tests/questionnaire2_de.csv',
-        'de'
+        settings.BASE_DIR + '/experiments/tests/questionnaire2_de.csv', 'de'
     )
 
     create_questionnaire(1, 'q3', group_last)
@@ -821,8 +820,7 @@ def create_valid_questionnaires(experiment):
     # create questionnaire language data default for questionnaire3
     create_questionnaire_language(
         questionnaire3,
-        settings.BASE_DIR + '/experiments/tests/questionnaire3.csv',
-        'en'
+        settings.BASE_DIR + '/experiments/tests/questionnaire3.csv', 'en'
     )
 
 
@@ -1266,9 +1264,6 @@ def global_setup_ft():
                              'functional recovery. The EEG text.'
     experiment9.save()
     create_step(1, experiment9.groups.first(), Step.EMG)
-    # Associate publications with experiment to test publications
-    create_publication(experiment9)
-    create_publication(experiment9)
 
     # We change first experiment study approved to contain 'brachial' in
     # study description, so it have to be found by search test
