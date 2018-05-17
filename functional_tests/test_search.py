@@ -20,7 +20,8 @@ from experiments.tests.tests_helper import create_experiment, \
     create_emg_electrode_placement_setting, create_emg_surface_placement, \
     create_emg_intramuscular_placement, create_emg_needle_placement, \
     create_eeg_electrode_position, create_surface_electrode, \
-    create_intramuscular_electrode, create_instruction_step, create_step
+    create_intramuscular_electrode, create_instruction_step, create_step, \
+    create_publication, create_valid_questionnaires
 from functional_tests.base import FunctionalTest
 
 import time
@@ -922,9 +923,13 @@ class SearchTest(FunctionalTest):
         )
 
     def test_search_questionnaire_data_returns_correct_objects_1(self):
+        experiment = Experiment.objects.last()
+        create_valid_questionnaires(experiment)
+        self.haystack_index('rebuild_index')
+
         # Joselina wants to search for experiments that contains some
         # questionnaire data
-        self.search_for('\"History of fracture?\"')
+        self.search_for('\"Histoire de la fracture?\"')
 
         # As there are two questionnaires with terms searched by Joselina,
         # they are displayed in search results
@@ -947,15 +952,19 @@ class SearchTest(FunctionalTest):
         questionnaire_text = self.browser.find_element_by_class_name(
             'questionnaire-matches'
         ).text
-        self.assertIn('History of fracture', questionnaire_text)
+        self.assertIn('Histoire de la fracture', questionnaire_text)
 
     def test_search_questionnaire_data_returns_correct_objects_2(self):
+        experiment = Experiment.objects.last()
+        create_valid_questionnaires(experiment)
+        self.haystack_index('rebuild_index')
+
         # Joselina wants to search for experiments that contains some
-        # questionnaire data
-        self.search_for('\"trauma of your brachial plexus\"')
+        # questionnaire data.
+        self.search_for('\"História de fratura?\"')
 
         # As there are two questionnaires with terms searched by Joselina,
-        # they are displayed in search results
+        # they are displayed in search results.
         # TODO: we verify for 3 objects because test is catching invalid
         # TODO: questionnaires. See note 'Backlog' in notebook, 09/28/2017
         self.wait_for(lambda: self.verify_n_objects_in_table_rows(
@@ -975,11 +984,15 @@ class SearchTest(FunctionalTest):
         questionnaire_text = self.browser.find_element_by_class_name(
             'questionnaire-matches'
         ).text
-        self.assertIn('trauma of your brachial plexus', questionnaire_text)
+        self.assertIn('História de fratura', questionnaire_text)
 
     def test_search_questionnaire_data_returns_correct_objects_3(self):
+        experiment = Experiment.objects.last()
+        create_valid_questionnaires(experiment)
+        self.haystack_index('rebuild_index')
+
         # Joselina wants to search for experiments that contains a phrase
-        self.search_for('\"Injury by firearm\"')
+        self.search_for('\"Welche Seite der Verletzung?\"')
 
         # As there are one questionnaire with terms searched by Joselina,
         # it is displayed in search results
@@ -1003,13 +1016,19 @@ class SearchTest(FunctionalTest):
         questionnaire_text = self.browser.find_element_by_class_name(
             'questionnaire-matches'
         ).text
-        self.assertIn('Injury by firearm', questionnaire_text)
+        self.assertIn('Welche Seite der Verletzung', questionnaire_text)
 
     def test_search_questionnaire_data_returns_correct_objects_4(self):
+        experiment = Experiment.objects.last()
+        create_valid_questionnaires(experiment)
+        self.haystack_index('rebuild_index')
 
         # Joselina wants to search for experiments that contains some
         # questionnaire data
-        self.search_for('\"History of fracture\" \"What side of the injury\"')
+        self.search_for(
+            '\"Qual região apresenta alteração do trofismo\" '
+            '\"History of the current disease\"'
+        )
 
         # As there are two questionnaires with terms searched by Joselina,
         # they are displayed in search results
@@ -1032,20 +1051,17 @@ class SearchTest(FunctionalTest):
         questionnaire_rows = self.browser.find_element_by_id(
             'search_table'
         ).text
-        self.assertIn('History of fracture', questionnaire_rows)
-        self.assertIn('What side of the injury', questionnaire_rows)
+        self.assertIn(
+            'Qual região apresenta alteração do trofismo', questionnaire_rows
+        )
+        self.assertIn('History of the current disease', questionnaire_rows)
 
     def test_search_publications_returns_correct_objects(self):
-        ##
-        # It was created two publications for last experiment created in
-        # tests helper
-        ##
-        experiment = Experiment.objects.filter(
-            status=Experiment.APPROVED
-        ).last()
+        experiment = Experiment.objects.last()
+        create_publication(experiment)
         ##
         # As publications created have fields filled with lorem ipsum stuff,
-        # we change some of that fields to further search form them
+        # we change some of that fields to further search form them.
         ##
         publication = experiment.publications.first()
         publication.title = 'Vargas, Claudia Verletzung des Plexus Brachialis'
@@ -1096,13 +1112,10 @@ class SearchTest(FunctionalTest):
         # Joselina wants to search for a given stimulus step
         self.search_for(search_text)
 
-        # As there are three steps with that string, two from
-        # groups of one experiment, and one from other group of another
-        # experiment, she sees three results
         # TODO: it was craeted a total of 8 steps in global_setup_ft(). So,
         # TODO: we add those to our checking. Eliminate global_setup_ft() and
         # TODO: make model instances created by demand in each test.
-        self.check_matches(11, 'step-matches', search_text)
+        self.check_matches(8, 'step-matches', search_text)
 
     def test_search_stimulus_step_returns_correct_objects(self):
         self.create_objects_to_test_search_stimulus_step()

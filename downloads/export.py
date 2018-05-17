@@ -1470,11 +1470,9 @@ class ExportExecution:
             if 'questionnaire_data' in self.per_group_data[group_id]:
                 questionnaire_list = self.per_group_data[group_id]['questionnaire_data']
                 # create 'Per_questionnaire' directory
-                # ex. Users/.../EXPERIMENT_DOWNLOAD/Group_group.title/Per_questionnaire_data
                 error_msg, group_questionnaire_directory = create_directory(group_directory, per_questionnaire_data)
                 if error_msg != "":
                     return error_msg
-                # ex. EXPERIMENT_DOWNLOAD/Group_group.title/Per_questionnaire_data
                 export_group_questionnaire_directory = path.join(export_directory_group, per_questionnaire_data)
 
                 # create 'questionnaire_metadata' directory
@@ -1493,12 +1491,10 @@ class ExportExecution:
                     questionnaire_description_fields.insert(0, questionnaire_list[questionnaire_code]['header'])
                     questionnaire_title = questionnaire_list[questionnaire_code]['questionnaire_title']
                     # create questionnaire_title directory
-                    # ex. Users/.../EXPERIMENT_DOWNLOAD/Group_group.title/Per_questionnaire_data/Questionnaire_title
                     error_msg, questionnaire_directory = create_directory(group_questionnaire_directory,
                                                                           questionnaire_title)
                     if error_msg != "":
                         return error_msg
-                    # ex. EXPERIMENT_DOWNLOAD/Group_group.title/Per_questionnaire_data/Questionnaire_title
                     export_questionnaire_directory = path.join(export_group_questionnaire_directory,
                                                                questionnaire_title)
 
