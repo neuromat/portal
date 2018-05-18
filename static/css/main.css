@@ -486,6 +486,10 @@ h5.match {
   background-color: #e9e7e5;
 }
 
+.nep-panel-question-group {
+    background-color: #f6f4f2;
+}
+
 .prot-exp-image>a>img {
   width: 100%;
   height: 150px;
@@ -517,6 +521,10 @@ h5.match {
 .ajax-loader-gif {
     display: block;
     margin: auto;
+}
+
+.question-group {
+    margin-right: 40px;
 }
 
 /*
