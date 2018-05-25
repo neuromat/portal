@@ -1,18 +1,12 @@
-import time
-
 from django.contrib.auth.models import User
 from django.urls import reverse
 from selenium.webdriver.common.keys import Keys
 from functional_tests.base import FunctionalTest
 
 
-class LoginPageTest(FunctionalTest):
+class LoginTest(FunctionalTest):
 
     def test_can_view_login_page_and_login_in_the_system(self):
-
-        ##
-        # Getting an user instance to use bellow
-        ##
         user = User.objects.get(username='claudia')
 
         # The visitor is in home page and see that is a "Log In" link in up
@@ -56,3 +50,53 @@ class LoginPageTest(FunctionalTest):
         # correctly redirected to home page
         response = self.client.get(logout_url)
         self.assertRedirects(response, reverse('home'))
+
+
+class ResetPasswordTest(FunctionalTest):
+
+    def test_can_see_forget_password_template(self):
+        # The visitor is in home page and see that is a "Log In" link in up
+        # right corner of the page. She clicks in that link.
+        self.browser.find_element_by_link_text('Log In').click()
+
+        # Suddenly she sees that she has forgotten her password. There's a
+        # link to forgotten password cases. She clicks in it.
+        self.wait_for(
+            lambda:
+            self.browser.find_element_by_link_text('Forgot password?').click()
+        )
+
+        # A new page loads telling her to fill in her email for the system
+        # to send a recovery password for her.
+        self.wait_for(
+            lambda: self.assertIn(
+                'Password reset',
+                self.browser.find_element_by_id('content').text
+            )
+        )
+        self.assertEqual(
+            self.browser.find_element_by_tag_name('p').text,
+            'Forgotten your password? Enter your email address below, '
+            'and we\'ll email instructions for setting a new one.'
+        )
+        self.assertEqual(
+            self.browser.find_element_by_xpath(
+                "//label[@for='id_email']"
+            ).text, "Email address:"
+        )
+
+        # She fills in the input box with her email and clicks on "Reset my
+        # password button". The page refreshes telling her that an email was
+        # sent to her with instructions for setting her password.
+        box = self.browser.find_element_by_id('id_email')
+        box.send_keys('matilda@fsf.org')
+        self.browser.find_element_by_xpath(
+            "//input[@value='Reset my password']"
+        ).click()
+        self.wait_for(
+            lambda:
+            self.assertIn(
+                'Password reset sent',
+                self.browser.find_element_by_id('content').text
+            )
+        )
