@@ -1300,3 +1300,17 @@ class DownloadExperimentTest(TestCase):
             response,
             reverse('experiment-detail', kwargs={'slug': experiment.slug})
         )
+
+
+class AuthenticationSystemTest(TestCase):
+
+    def test_forget_password_uses_correct_template(self):
+        response = self.client.get('/password_reset/')
+        # TODO:
+        # This assert is ok even if the template used is the original one in
+        # django/contrib/admin/templates/registration/password_reset_form.html
+        # The true tests are below where we tests strings in the page.
+        # Because we're remodeling the page.
+        self.assertTemplateUsed(
+            response, 'registration/password_reset_form.html'
+        )

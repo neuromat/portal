@@ -21,9 +21,14 @@ urlpatterns = [
     url(r'^api-auth/', include('rest_framework.urls')),
     url(r'^api/', include(api_urls)),
     url(r'^api/docs/', include_docs_urls(title='NEP API')),
-    # Override login method from django.contrib.auth.urls.LoginView to include
-    # extra context.
+    # override login method from django.contrib.auth.urls.LoginView to include
+    # extra context
     url(r'^login/$', views.NepLoginView.as_view(), name='login'),
+    url(r'^password_reset/$', views.NepPasswordResetView.as_view(),
+        name='password_reset'
+        ),
+    url(r'^password_reset/done/$', views.NepPasswordResetDoneView.as_view(),
+        name='password_reset_done'),
     url(r'^', include('django.contrib.auth.urls')),
     url(r'^downloads/', include(urls)),
     url(r'^i18n/', include('django.conf.urls.i18n')),

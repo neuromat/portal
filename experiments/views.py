@@ -4,7 +4,8 @@ import pandas
 import tempfile
 
 from django.contrib import messages
-from django.contrib.auth.views import LoginView
+from django.contrib.auth.views import LoginView, PasswordResetView, \
+    PasswordResetDoneView
 from django.core.exceptions import PermissionDenied
 from django.core.mail import send_mail
 from django.http import HttpResponseRedirect, HttpResponse
@@ -550,5 +551,19 @@ class NepSearchView(SearchView):
 
 # inherit from LoginView to include search form besides login form
 class NepLoginView(LoginView):
+    search_form = NepSearchForm()
+    extra_context = {'search_form': search_form}
+
+
+# inherit from PasswordResetView to include search form besides password reset
+# form
+class NepPasswordResetView(PasswordResetView):
+    search_form = NepSearchForm()
+    extra_context = {'search_form': search_form}
+
+
+# inherit from PasswordResetDoneView to include search form besides password
+# reset done page
+class NepPasswordResetDoneView(PasswordResetDoneView):
     search_form = NepSearchForm()
     extra_context = {'search_form': search_form}

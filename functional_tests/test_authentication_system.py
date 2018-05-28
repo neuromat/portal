@@ -54,7 +54,7 @@ class LoginTest(FunctionalTest):
 
 class ResetPasswordTest(FunctionalTest):
 
-    def test_can_see_forget_password_template(self):
+    def test_forget_password_recovery(self):
         # The visitor is in home page and see that is a "Log In" link in up
         # right corner of the page. She clicks in that link.
         self.browser.find_element_by_link_text('Log In').click()
@@ -69,20 +69,42 @@ class ResetPasswordTest(FunctionalTest):
         # A new page loads telling her to fill in her email for the system
         # to send a recovery password for her.
         self.wait_for(
-            lambda: self.assertIn(
-                'Password reset',
-                self.browser.find_element_by_id('content').text
+            lambda: self.assertEqual(
+                self.browser.find_element_by_tag_name('h3').text,
+                'Password reset'
             )
         )
         self.assertEqual(
-            self.browser.find_element_by_tag_name('p').text,
+            self.browser.find_element_by_class_name('top-small').text,
+            'Research, Innovation and Dissemination Center for '
+            'Neuromathematics'
+        )
+        self.assertIn(
             'Forgotten your password? Enter your email address below, '
-            'and we\'ll email instructions for setting a new one.'
+            'and we\'ll email instructions for setting a new one.',
+            self.browser.find_element_by_id('forgotten_password').text
         )
         self.assertEqual(
             self.browser.find_element_by_xpath(
                 "//label[@for='id_email']"
             ).text, "Email address:"
+        )
+        ##
+        # Search form is supposed to be there too
+        ##
+        self.assertEqual(
+            self.browser.find_element_by_id('id_q').get_attribute('placeholder'),
+            'Type key terms/words to be searched'
+        )
+
+        ##
+        # As we are reusing the Django authentication system (with same
+        # templates names) we test for an element that is in original
+        # template but not in ours.
+        ##
+        self.assertNotEqual(
+            self.browser.find_element_by_tag_name('h1').text,
+            'Django administration'
         )
 
         # She fills in the input box with her email and clicks on "Reset my
@@ -96,7 +118,18 @@ class ResetPasswordTest(FunctionalTest):
         self.wait_for(
             lambda:
             self.assertIn(
-                'Password reset sent',
-                self.browser.find_element_by_id('content').text
+                'We\'ve emailed you instructions for setting your password, '
+                'if an account exists with the email you entered. You should '
+                'receive them shortly.',
+                self.browser.find_element_by_class_name('nep-content').text
             )
+        )
+        ##
+        # As we are reusing the Django authentication system (with same
+        # templates names) we test for an element that is in original
+        # template but not in ours.
+        ##
+        self.assertNotEqual(
+            self.browser.find_element_by_tag_name('h1').text,
+            'Django administration'
         )
