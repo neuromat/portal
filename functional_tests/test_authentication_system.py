@@ -1,4 +1,7 @@
+import re
+import time
 from django.contrib.auth.models import User
+from django.core import mail
 from django.urls import reverse
 from selenium.webdriver.common.keys import Keys
 from functional_tests.base import FunctionalTest
@@ -53,6 +56,14 @@ class LoginTest(FunctionalTest):
 
 
 class ResetPasswordTest(FunctionalTest):
+
+    user = None
+
+    def setUp(self):
+        self.user = User.objects.create_user(
+            username='elaine', email='elaine@example.com', password='elaine'
+        )
+        super(ResetPasswordTest, self).setUp()
 
     def test_forget_password_recovery(self):
         # The visitor is in home page and see that is a "Log In" link in up
@@ -109,9 +120,9 @@ class ResetPasswordTest(FunctionalTest):
 
         # She fills in the input box with her email and clicks on "Reset my
         # password button". The page refreshes telling her that an email was
-        # sent to her with instructions for setting her password.
+        # sent to her, with instructions for setting her password.
         box = self.browser.find_element_by_id('id_email')
-        box.send_keys('matilda@fsf.org')
+        box.send_keys(self.user.email)
         self.browser.find_element_by_xpath(
             "//input[@value='Reset my password']"
         ).click()
@@ -124,6 +135,70 @@ class ResetPasswordTest(FunctionalTest):
                 self.browser.find_element_by_class_name('nep-content').text
             )
         )
+        ##
+        # As we are reusing the Django authentication system (with same
+        # templates names) we test for an element that is in original
+        # template but not in ours.
+        ##
+        self.assertNotEqual(
+            self.browser.find_element_by_tag_name('h1').text,
+            'Django administration'
+        )
+
+        ##
+        # take some sleep to guarantie mail.outbox[0]
+        ##
+        time.sleep(0.5)
+
+        # She goes to her email client and see that a message is inbox
+        email = mail.outbox[0]
+        self.assertIn(self.user.email, email.to)
+        self.assertEqual(
+            email.subject,
+            'Password reset on ' + self.live_server_url.split('http://')[1]
+        )
+        self.assertIn(
+            'Please go to the following page and choose a new password:',
+            email.body
+        )
+
+        # In email body there's a link to reset password
+        url_search = re.search(r'http://localhost:.+', email.body)
+        if not url_search:
+            self.fail('Could not find url in email body:\n' + email.body)
+        url = url_search.group(0)
+        # She clicks on link and a new tab (or window) is opened in portal
+        self.browser.get(url)
+
+        # The page has a message and a form to change the user password
+        block_content = self.wait_for(
+            lambda:
+            self.browser.find_element_by_class_name('nep-content').text
+        )
+        self.wait_for(
+            lambda:
+            self.assertIn(
+                'Please enter your new password twice so we can verify you '
+                'typed it in correctly.',
+                block_content
+            )
+        )
+        self.assertIn('New password', block_content)
+
+        # The page has the elements for the nep header too.
+        self.assertEqual(
+            self.browser.find_element_by_tag_name('h1').text,
+            'Neuroscience Experiments Database'
+        )
+        self.assertEqual(
+            self.browser.find_element_by_id('id_q').get_attribute('placeholder'),
+            'Type key terms/words to be searched'
+        )
+        self.assertEqual(
+            self.browser.find_element_by_id('filter_box').get_attribute('title'),
+            'Select one or more data collection types'
+        )
+
         ##
         # As we are reusing the Django authentication system (with same
         # templates names) we test for an element that is in original

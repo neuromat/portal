@@ -5,7 +5,7 @@ import tempfile
 
 from django.contrib import messages
 from django.contrib.auth.views import LoginView, PasswordResetView, \
-    PasswordResetDoneView
+    PasswordResetDoneView, PasswordResetConfirmView
 from django.core.exceptions import PermissionDenied
 from django.core.mail import send_mail
 from django.http import HttpResponseRedirect, HttpResponse
@@ -565,5 +565,12 @@ class NepPasswordResetView(PasswordResetView):
 # inherit from PasswordResetDoneView to include search form besides password
 # reset done page
 class NepPasswordResetDoneView(PasswordResetDoneView):
+    search_form = NepSearchForm()
+    extra_context = {'search_form': search_form}
+
+
+# inherit from PasswordResetConfirmView to include search form besides password
+# reset confirm page
+class NepPasswordResetConfirmView(PasswordResetConfirmView):
     search_form = NepSearchForm()
     extra_context = {'search_form': search_form}

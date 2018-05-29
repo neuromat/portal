@@ -29,6 +29,11 @@ urlpatterns = [
         ),
     url(r'^password_reset/done/$', views.NepPasswordResetDoneView.as_view(),
         name='password_reset_done'),
+    url(
+        r'^reset/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})/$',
+        views.NepPasswordResetConfirmView.as_view(),
+        name='password_reset_confirm'
+    ),
     url(r'^', include('django.contrib.auth.urls')),
     url(r'^downloads/', include(urls)),
     url(r'^i18n/', include('django.conf.urls.i18n')),
