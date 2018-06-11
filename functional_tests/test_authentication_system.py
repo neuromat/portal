@@ -66,7 +66,7 @@ class ResetPasswordTest(FunctionalTest):
         super(ResetPasswordTest, self).setUp()
 
     def test_forget_password_recovery(self):
-        # The visitor is in home page and see that is a "Log In" link in up
+        # Adriana is in home page and see that is a "Log In" link in up
         # right corner of the page. She clicks in that link.
         self.browser.find_element_by_link_text('Log In').click()
 
@@ -172,18 +172,14 @@ class ResetPasswordTest(FunctionalTest):
 
         # The page has a message and a form to change the user password
         block_content = self.wait_for(
-            lambda:
-            self.browser.find_element_by_class_name('nep-content').text
+            lambda: self.browser.find_element_by_class_name('nep-content')
         )
-        self.wait_for(
-            lambda:
-            self.assertIn(
-                'Please enter your new password twice so we can verify you '
-                'typed it in correctly.',
-                block_content
-            )
+        self.assertIn(
+            'Please enter your new password twice so we can verify you '
+            'typed it in correctly.',
+            block_content.text
         )
-        self.assertIn('New password', block_content)
+        self.assertIn('New password', block_content.text)
 
         # The page has the elements for the nep header too.
         self.assertEqual(
@@ -207,4 +203,47 @@ class ResetPasswordTest(FunctionalTest):
         self.assertNotEqual(
             self.browser.find_element_by_tag_name('h1').text,
             'Django administration'
+        )
+
+        # Now Adriana can type in her new password and confirm it.
+        self.browser.find_element_by_id('id_new_password1').send_keys(
+            'new_password'
+        )
+        self.browser.find_element_by_id('id_new_password2').send_keys(
+            'new_password'
+        )
+        self.browser.find_element_by_xpath("//input[@type='submit']").click()
+
+        # The page is redirected to a page that tell her that her password
+        # was changed successfully
+        block_content = self.wait_for(
+            lambda: self.browser.find_element_by_class_name('nep-content')
+        )
+        self.assertIn('Password reset complete', block_content.text)
+        self.assertIn(
+            'Your password has been set. You may go ahead and log in now.',
+            block_content.text
+        )
+        ##
+        # As we are reusing the Django authentication system (with same
+        # templates names) we test for an element that is in original
+        # template but not in ours.
+        ##
+        self.assertNotEqual(
+            self.browser.find_element_by_tag_name('h1').text,
+            'Django administration'
+        )
+
+    # The page has the elements for the nep header too.
+        self.assertEqual(
+            self.browser.find_element_by_tag_name('h1').text,
+            'Neuroscience Experiments Database'
+        )
+        self.assertEqual(
+            self.browser.find_element_by_id('id_q').get_attribute('placeholder'),
+            'Type key terms/words to be searched'
+        )
+        self.assertEqual(
+            self.browser.find_element_by_id('filter_box').get_attribute('title'),
+            'Select one or more data collection types'
         )
