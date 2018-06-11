@@ -305,7 +305,7 @@ class TrusteeTest(FunctionalTestTrustee):
             self.fail('Could not find url in email body:\n' + email.body)
         url = url_search.group(0)
         self.assertEqual(self.live_server_url, url)
-        # She clicks on link and a new tab (or window) is open in portal
+        # She clicks on link and a new tab (or window) is opened in portal
         # home page
         self.browser.get(url)
         self.assertEqual(self.live_server_url, url)
