@@ -188,6 +188,7 @@ def experiment_detail(request, slug):
 
     gender_grouping = {}
     age_grouping = {}
+    total_participants = 0
     for group in experiment.groups.all():
         for participant in group.participants.all():
             # gender
@@ -199,6 +200,8 @@ def experiment_detail(request, slug):
                 if int(participant.age) not in age_grouping:
                     age_grouping[int(participant.age)] = 0
                 age_grouping[int(participant.age)] += 1
+        # total participants
+        total_participants += group.participants.count()
 
     # get default (language) questionnaires (or first) for all groups
     questionnaires = {}
@@ -228,6 +231,7 @@ def experiment_detail(request, slug):
             'experiment': experiment,
             'gender_grouping': gender_grouping,
             'age_grouping': age_grouping,
+            'total_participants': total_participants,
             'to_be_analysed_count': to_be_analysed_count,
             'questionnaires': questionnaires,
             'form': ChangeSlugForm(),
