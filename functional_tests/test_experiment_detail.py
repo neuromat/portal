@@ -71,14 +71,20 @@ class ExperimentDetailTest(FunctionalTest):
         )
 
         # At the right side there is a warning telling that the data
-        # acquisition was finished or not
+        # acquisition was finished. if it was not finished, display number
+        # of participants until now.
         data_acquisition_text = self.browser.find_element_by_id(
             'id_detail_acquisition').text
         if experiment.data_acquisition_done:
-            self.assertIn('Data acquisition was completed',
-                          data_acquisition_text)
+            self.assertIn(
+                'Data acquisition was completed', data_acquisition_text
+            )
         else:
-            self.assertIn('Data acquisition was not completed',
+            total_participants = 0
+            for group in experiment.groups.all():
+                total_participants += group.participants.count()
+            self.assertIn('Current number of participants: '
+                          + str(total_participants) + ' (and counting)',
                           data_acquisition_text)
 
         # Right bellow she sees the study that the experiment belongs to
