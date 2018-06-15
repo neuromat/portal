@@ -33,16 +33,15 @@
                     {% for group in experiment.groups.all %}
                         <div class="panel panel-default nep-panel-group">
                             <div class="row">
-                                {% if group.experimental_protocol.image %}
-                                    <div class="col-md-2 prot-exp-image">
+                                <div class="col-md-2 prot-exp-image">
+                                    {% if group.experimental_protocol.image %}
                                         <a id="protocol_image" href="#"
                                            data-toggle="modal"
                                            data-target="#protocol_image_full"
                                            data-image_path="/media/{{ group.experimental_protocol.image }}">
-                                            <img src="/media/{{ group.experimental_protocol.image }}"/>
-                                        </a>
-                                    </div>
-                                {% endif %}
+                                            <img src="/media/{{ group.experimental_protocol.image }}"/></a>
+                                    {% endif %}
+                                </div>
                                 <div class="col-md-10">
                                     <strong>{{ group.title }}</strong>
                                     <br>
@@ -318,13 +317,29 @@
             <!-- Downloads tab -->
             <div id="downloads_tab" class="tab-pane" role="tabpanel">
                 <div class="pull-right">
-                    <a id="button_download"
-                       href="{% url 'download-view' experiment_id=experiment.id %}"
-                       class="nep-btn-secondary"
-                       data-toggle="tooltip" data-placement="top"
-                       title="{% trans "Download zip file with all experiment data and metadata" %}"> <span
-                            class="glyphicon glyphicon-download-alt"> </span>
-                        {% trans "Download all experiment data" %}</a>
+                    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#downloadModal" title= "{% trans "Download zip file with all experiment data and metadata" %}">
+                        {% trans "Download all experiment data" %}
+                    </button>
+
+                    <div class="modal fade" id="downloadModal" tabindex="-1" role="dialog" aria-labelledby="downloadModalLabel" aria-hidden="true">
+                        <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="downloadModalLabel">{% trans 'Before downloading' %} {{ experiment.title }} ...</h5>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <div class="modal-body">
+                                    {% include 'experiments/downloadinfo.html' %}
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">{% trans 'Cancel' %}</button>
+                                    <a class="btn btn-primary" title= "{% trans "Download zip file with all experiment data and metadata" %}" href="{% url 'download-view' experiment_id=experiment.id %}">{% trans 'Agree & Download' %}</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 <h4>{% trans 'Select experiment data itens to download' %}</h4>
                 <div class="panel panel-default nep-panel-group">
@@ -364,10 +379,29 @@
                                 </em></p>
                             {% endif %}
                         </div>
-                        <div class="form-group text-right">
-                            <input type="submit" id="download_button"
-                                   class="btn btn-disabled"
-                                   value="{% trans 'Download' %}">
+                        <div class="form-group pull-right">
+                            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#downloadModal2">
+                                {% trans "Download" %}
+                            </button>
+                            <div class="modal fade" id="downloadModal2" tabindex="-1" role="dialog" aria-labelledby="downloadModalLabel2" aria-hidden="true">
+                                <div class="modal-dialog" role="document">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="downloadModalLabel2">{% trans 'Before downloading' %} {{ experiment.title }} ... </h5>
+                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                <span aria-hidden="true">&times;</span>
+                                            </button>
+                                        </div>
+                                        <div class="modal-body">
+                                            {% include 'experiments/downloadinfo.html' %}
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-dismiss="modal">{% trans 'Cancel' %}</button>
+                                            <input type="submit" id="download_button2" class="btn btn-primary" value="{% trans 'Agree & Download' %}">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </form>
                 </div>

@@ -1,0 +1,13 @@
+Before you download, this experiment is licensed under the Creative Commons Attribution 4.0 International license and requires that you comply with the following:<br>
+
+<hr/>
+
+<center><span id="cc-logo" class="icon"><img alt="cc logo" src="../../../static/by.png" align="center"></span></center><br>
+<b>You must give appropriate credit, provide a <a href="https://creativecommons.org/licenses/by/4.0/legalcode">link to the license</a>,
+    and indicate if changes were made. You may do so in any reasonable manner, but not in any way that suggests the licensor endorses you or your use.</b><br>
+<hr/>
+
+<!--# TODO: Change that to get the name of the researchers involved in the experiment, not the citation-->
+{% for publication in experiment.publications.all %}
+    {{ publication.citation }} availabe at <a href="{{ publication.url }}" target="_blank">{{ publication.url }}</a> under <a href="https://creativecommons.org/licenses/by/4.0/legalcode">CC-BY 4.0 license</a>.
+{%  endfor %}
