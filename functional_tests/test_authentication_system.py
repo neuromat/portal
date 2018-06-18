@@ -61,7 +61,8 @@ class ResetPasswordTest(FunctionalTest):
 
     def setUp(self):
         self.user = User.objects.create_user(
-            username='elaine', email='elaine@example.com', password='elaine'
+            username='elaine', email='elaine@example.com',
+            password='elaine@example'
         )
         super(ResetPasswordTest, self).setUp()
 
@@ -212,14 +213,17 @@ class ResetPasswordTest(FunctionalTest):
         self.browser.find_element_by_id('id_new_password2').send_keys(
             'new_password'
         )
-        self.browser.find_element_by_xpath("//input[@type='submit']").click()
+        self.browser.find_element_by_xpath(
+            "//input[@value='Change my password']"
+        ).click()
+        # necessary to wait for Django password reset complete redirections
+        time.sleep(1)
 
         # The page is redirected to a page that tell her that her password
         # was changed successfully
         block_content = self.wait_for(
             lambda: self.browser.find_element_by_class_name('nep-content')
         )
-        self.assertIn('Password reset complete', block_content.text)
         self.assertIn(
             'Your password has been set. You may go ahead and log in now.',
             block_content.text
@@ -234,7 +238,7 @@ class ResetPasswordTest(FunctionalTest):
             'Django administration'
         )
 
-    # The page has the elements for the nep header too.
+        # The page has the elements for the nep header too.
         self.assertEqual(
             self.browser.find_element_by_tag_name('h1').text,
             'Neuroscience Experiments Database'
@@ -247,3 +251,10 @@ class ResetPasswordTest(FunctionalTest):
             self.browser.find_element_by_id('filter_box').get_attribute('title'),
             'Select one or more data collection types'
         )
+
+        # Finally, she clicks in Log in link to be redirected to Log in page
+        self.browser.find_element_by_link_text('Log in').click()
+        self.wait_for(lambda: self.assertIn(
+            'Log In',
+            self.browser.find_element_by_tag_name('h3').text
+        ))

@@ -34,6 +34,10 @@ urlpatterns = [
         views.NepPasswordResetConfirmView.as_view(),
         name='password_reset_confirm'
     ),
+    url(
+        r'^reset/done/$', views.NepPasswordResetCompleteView.as_view(),
+        name='password_reset_complete'
+    ),
     url(r'^', include('django.contrib.auth.urls')),
     url(r'^downloads/', include(urls)),
     url(r'^i18n/', include('django.conf.urls.i18n')),
