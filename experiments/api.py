@@ -962,9 +962,10 @@ class ExperimentViewSet(viewsets.ModelViewSet):
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
 
     def get_queryset(self):
-        # TODO: don't filter by owner if not logged (gets TypeError
+        # TODO:
+        # don't filter by owner if not logged (gets TypeError
         # exception when trying to get an individual experiment)
-        if 'experiment_nes_id' in self.kwargs:
+        if 'experiment_nes_id' in self.kwargs:  # detail or change experiment
             owner = self.request.user
             nes_id = self.kwargs['experiment_nes_id']
             exp_version = appclasses.ExperimentVersion(nes_id, owner)
@@ -974,13 +975,13 @@ class ExperimentViewSet(viewsets.ModelViewSet):
                 version=exp_version.get_last_version()
             )
         else:
-            return Experiment.objects.all()
+            return Experiment.objects.all()  # list
 
     def perform_create(self, serializer):
         nes_id = self.request.data['nes_id']
         owner = self.request.user
         exp_version = appclasses.ExperimentVersion(nes_id, owner)
-        serializer.save(
+        serializer.save(  # serializer already has other fields defined
             owner=owner, version=exp_version.get_last_version() + 1
         )
 
@@ -997,31 +998,32 @@ class ExperimentViewSet(viewsets.ModelViewSet):
                   '" has arrived in NEDP portal.'
         message = 'New experiment arrived in NEDP portal:\n' + \
                   'Title:\n' + self.request.data['title'] + '\n' + \
-                  'Description:\n' + self.request.data['description'] + '\n' + \
-                  'Owner: ' + str(self.request.user) + '\n'
+                  'Description:\n' + self.request.data['description'] + '\n'\
+                  + 'Owner: ' + str(self.request.user) + '\n'
 
         send_mail(subject, message, from_email, emails)
 
     def perform_update(self, serializer):
         nes_id = self.kwargs['experiment_nes_id']
         owner = self.request.user
-        exp_version = appclasses.ExperimentVersion(nes_id, owner)
-        version = exp_version.get_last_version()
+        exp_version = \
+            appclasses.ExperimentVersion(nes_id, owner).get_last_version()
         serializer.save(
-            owner=owner, version=exp_version.get_last_version(), nes_id=nes_id
+            owner=owner, version=exp_version, nes_id=nes_id
         )
         experiment = Experiment.objects.filter(
-            nes_id=nes_id, version=version
+            nes_id=nes_id, version=exp_version
         ).values('id')[0]
-        # TODO: the download file building is been made whenever an
-        # TODO: experiment is updated. We want to build it only when the
-        # TODO: experiment status change from "Receiving" to "To be
-        # TODO: analysed", other attributes remaining the same.
-        # TODO: Ok by now, as the only situation where the experiment is
-        # TODO: updated by NES API client is precisily when the NES change
-        # TODO: status from "Receiving" to "To be analysed"
-        # TODO: see wy celery delay is not working. Commented by now.
-        # build_download_file.delay(int(experiment['id']), template_name="")
+        # TODO:
+        # the download file building is been made whenever an
+        # experiment is updated. We want to build it only when the
+        # experiment status change from "Receiving" to "To be
+        # analysed", other attributes remaining the same.
+        # Ok by now, as the only situation where the experiment is
+        # updated by NES API client is precisely when the NES change
+        # status from "Receiving" to "To be analysed"
+        # see wy celery delay is not working. Commented by now.
+        #build_download_file.delay(int(experiment['id']), template_name="")
         build_download_file(int(experiment['id']), template_name="")
 
 

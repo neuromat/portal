@@ -1346,7 +1346,7 @@ class AuthenticationSystemTest(TestCase):
 
     @skip
     def test_POST_forget_password_send_email_to_request_user(self):
-        # do not test: it's Django feature
+        # Do not test: it's Django feature; instead
         # testing mail.outbox in functional tests
         pass
 
