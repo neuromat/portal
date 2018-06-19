@@ -33,15 +33,16 @@
                     {% for group in experiment.groups.all %}
                         <div class="panel panel-default nep-panel-group">
                             <div class="row">
-                                <div class="col-md-2 prot-exp-image">
-                                    {% if group.experimental_protocol.image %}
+                                {% if group.experimental_protocol.image %}
+                                    <div class="col-md-2 prot-exp-image">
                                         <a id="protocol_image" href="#"
                                            data-toggle="modal"
                                            data-target="#protocol_image_full"
                                            data-image_path="/media/{{ group.experimental_protocol.image }}">
-                                            <img src="/media/{{ group.experimental_protocol.image }}"/></a>
-                                    {% endif %}
-                                </div>
+                                            <img src="/media/{{ group.experimental_protocol.image }}"/>
+                                        </a>
+                                    </div>
+                                {% endif %}
                                 <div class="col-md-10">
                                     <strong>{{ group.title }}</strong>
                                     <br>
@@ -317,33 +318,20 @@
             <!-- Downloads tab -->
             <div id="downloads_tab" class="tab-pane" role="tabpanel">
                 <div class="pull-right">
-                    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#downloadModal" title= "{% trans "Download zip file with all experiment data and metadata" %}">
-                        {% trans "Download all experiment data" %}
-                    </button>
-
-                    <div class="modal fade" id="downloadModal" tabindex="-1" role="dialog" aria-labelledby="downloadModalLabel" aria-hidden="true">
-                        <div class="modal-dialog" role="document">
-                            <div class="modal-content">
-                                <div class="modal-header">
-                                    <h5 class="modal-title" id="downloadModalLabel">{% trans 'Before downloading' %} {{ experiment.title }} ...</h5>
-                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                        <span aria-hidden="true">&times;</span>
-                                    </button>
-                                </div>
-                                <div class="modal-body">
-                                    {% include 'experiments/downloadinfo.html' %}
-                                </div>
-                                <div class="modal-footer">
-                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">{% trans 'Cancel' %}</button>
-                                    <a class="btn btn-primary" title= "{% trans "Download zip file with all experiment data and metadata" %}" href="{% url 'download-view' experiment_id=experiment.id %}">{% trans 'Agree & Download' %}</a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                    <a id="button_download"
+                       href="#"
+                       class="nep-btn-secondary"
+                       data-target="#license_modal"
+                       data-toggle="modal" data-placement="top"
+                       title="{% trans "Download zip file with all experiment data and metadata" %}"> <span
+                            class="glyphicon glyphicon-download-alt"> </span>
+                        {% trans "Download all experiment data" %}</a>
                 </div>
                 <h4>{% trans 'Select experiment data itens to download' %}</h4>
                 <div class="panel panel-default nep-panel-group">
-                    <form action="{% url 'download-view' experiment.id %}" method="post">
+                    <form id="download_form" action=
+                            "{% url 'download-view' experiment.id %}"
+                           method="post">
                         {% csrf_token %}
                         <div class="form-group">
                             {% if experiment.groups.all %}
@@ -379,29 +367,13 @@
                                 </em></p>
                             {% endif %}
                         </div>
-                        <div class="form-group pull-right">
-                            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#downloadModal2">
-                                {% trans "Download" %}
-                            </button>
-                            <div class="modal fade" id="downloadModal2" tabindex="-1" role="dialog" aria-labelledby="downloadModalLabel2" aria-hidden="true">
-                                <div class="modal-dialog" role="document">
-                                    <div class="modal-content">
-                                        <div class="modal-header">
-                                            <h5 class="modal-title" id="downloadModalLabel2">{% trans 'Before downloading' %} {{ experiment.title }} ... </h5>
-                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                                <span aria-hidden="true">&times;</span>
-                                            </button>
-                                        </div>
-                                        <div class="modal-body">
-                                            {% include 'experiments/downloadinfo.html' %}
-                                        </div>
-                                        <div class="modal-footer">
-                                            <button type="button" class="btn btn-secondary" data-dismiss="modal">{% trans 'Cancel' %}</button>
-                                            <input type="submit" id="download_button2" class="btn btn-primary" value="{% trans 'Agree & Download' %}">
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+                        <div class="form-group text-right">
+                            <input type="button" id="download_button"
+                                   data-toggle="modal"
+                                   data-target="#license_modal"
+                                   value="{% trans 'Download' %}"
+                                   class="btn btn-primary"
+                            disabled>
                         </div>
                     </form>
                 </div>
@@ -409,8 +381,7 @@
         </div>
 
         {# Full protocol experiment image modal #}
-        <div id="protocol_image_full" class="modal fade" tabindex="-1"
-             role="dialog">
+        <div id="protocol_image_full" class="modal fade" tabindex="-1" role="dialog">
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
@@ -426,6 +397,32 @@
                 </div><!-- /.modal-content -->
             </div><!-- /.modal-dialog -->
         </div><!-- /.modal -->
+
+        {# License agreement modal #}
+        <div class="modal fade" id="license_modal" tabindex="-1"
+             role="dialog" aria-labelledby="license_modal_label"
+             aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="license_modal_label">{% trans 'Before downloading' %} {{ experiment.title }} ...</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        {% include 'experiments/downloadinfo.html' %}
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">{% trans 'Cancel' %}</button>
+{#                        <a class="btn btn-primary" title= "{% trans "Download zip file with all experiment data and metadata" %}" href="{% url 'download-view' experiment_id=experiment.id %}">{% trans 'Agree & Download' %}</a>#}
+                        <a href="#" id="submit_download" class="btn
+                        btn-primary">{% trans 'Agree & Download' %}</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
     </section>
 {% endblock %}
 
@@ -443,13 +440,13 @@
         $("#id_slug").keyup(function () {
             // slug has to be at least 3 characters length
             $("#submit").prop("disabled", $(this).val().length < 3);
-            }).keypress(function (event) {
-                // slug has to be only letters without accents, numbers, dashes and
-                // underscores
-                const regex = new RegExp("^[a-zA-Z0-9_-]+$");
-                const is_invisible = (event.which === 0 || event.which === 8 || event.which === 13);
-                let key = String.fromCharCode(event.which);
-                return (regex.test(key) || is_invisible);
+        }).keypress(function (event) {
+            // slug has to be only letters without accents, numbers, dashes and
+            // underscores
+            const regex = new RegExp("^[a-zA-Z0-9_-]+$");
+            const is_invisible = (event.which === 0 || event.which === 8 || event.which === 13);
+            let key = String.fromCharCode(event.which);
+            return (regex.test(key) || is_invisible);
         });
     </script>
 
@@ -531,31 +528,24 @@
         $("select").treeMultiselect({
             enableSelectAll: true,
         });
-        // Prevent default on submit options download button if not/all was
-        // selected. If all was selected redirect to GET to 'download_view'
-        $("#download_button").click(function(e) {
-            const options = $("select#download_options option").length;
-            const selected = $("select#download_options :selected").length;
-            if (!selected) {
-                e.preventDefault();
-            }
-            if (selected == options) {  // PyCharm highlight not necessary
-                e.preventDefault();
-                const url = "{% url 'download-view' experiment.id %}";
-                $(location).attr('href', url)
-            }
-        });
         // Change Download submit button class while user doesn't select at least one option
         $("select#download_options").change(function () {
             const selected = $("select#download_options :selected").length;
             if (selected) {
-                $("#download_button")
-                .removeClass("btn-disabled")
-                .addClass("btn-primary");
+                $("#download_button").prop('disabled', false);
             } else {
-                $("#download_button")
-                .removeClass("btn-primary")
-                .addClass("btn-disabled");
+                $("#download_button").prop('disabled', true);
+            }
+        });
+        $('#submit_download').click(function() {
+            $('#license_modal').modal('hide');
+            const options = $("select#download_options option").length;
+            const selected = $("select#download_options :selected").length;
+            if (selected == options || selected == 0) {
+                const url = "{% url 'download-view' experiment.id %}";
+                $(location).attr('href', url)
+            } else {
+                $('#download_form').submit();
             }
         });
     </script>
