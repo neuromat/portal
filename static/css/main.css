@@ -282,9 +282,7 @@ a:hover.nep-return {
     border-radius: 100%;
 }
 .header-home {
-    background-color: #A4A6A7;
-    background-image:url("../../media/site/Background.png");
-    background-repeat: no-repeat;
+    background: #A4A6A7 url("../../media/site/Background.png") no-repeat;
     background-size: 1171px;
     text-align: center;
     border-top-left-radius: 7px;
@@ -558,6 +556,11 @@ h5.match {
     border-color: #4a9c7f;
 }
 
+.btn-primary:disabled:hover {
+    background-color: #60c8a3;
+    border-color: #60c8a3;
+}
+
 .btn-disabled, .btn-disabled:hover, .btn-disabled:focus {
     color: #fff;
     background-color: #598f88;
@@ -624,9 +627,20 @@ h5.match {
 
 /*
   ========================================
+  Modals
+  ========================================
+ */
+
+.cc-logo {
+    text-align: center;
+}
+
+/*
+  ========================================
   Haystack
   ========================================
  */
+
 /* used when highlight haystack tag is used in template */
 .highlighted {
   background: yellow;

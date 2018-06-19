@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-04-25 08:34-0300\n"
+"POT-Creation-Date: 2018-06-18 10:17-0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -29,11 +29,11 @@ msgstr ""
 msgid "Abbreviated description"
 msgstr ""
 
-#: downloads/export.py:580 downloads/export.py:1736
+#: downloads/export.py:580 downloads/export.py:1732
 msgid "Yes"
 msgstr ""
 
-#: downloads/export.py:580 downloads/export.py:1736
+#: downloads/export.py:580 downloads/export.py:1732
 msgid "No"
 msgstr ""
 

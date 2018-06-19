@@ -10,6 +10,7 @@ from unittest import skip
 import haystack
 from django.contrib import auth
 from django.contrib.auth.models import User, Permission
+from django.core import mail
 from django.core.management import call_command
 from django.test import TestCase, override_settings
 from django.urls import reverse, resolve
@@ -1300,3 +1301,81 @@ class DownloadExperimentTest(TestCase):
             response,
             reverse('experiment-detail', kwargs={'slug': experiment.slug})
         )
+
+
+class AuthenticationSystemTest(TestCase):
+
+    def test_forget_password_uses_correct_template(self):
+        response = self.client.get('/password_reset/')
+        # TODO:
+        # This assert is ok even if the template used is the original one in
+        # django/contrib/admin/templates/registration/password_reset_form.html
+        # The true test is below, where we test strings in the page.
+        # Because we're remodeling the page.
+        self.assertTemplateUsed(
+            response, 'registration/password_reset_form.html'
+        )
+
+    # As we are reusing the Django authentication system (with same
+    # templates names) we test for an element that is in original
+    # template but not in ours.
+    def test_forget_password_returns_correct_content(self):
+        response = self.client.get('/password_reset/')
+        self.assertNotContains(
+            response,
+            'Django administration'
+        )
+
+    def test_forget_password_sent_email_done_uses_correct_template(self):
+        response = self.client.get('/password_reset/done/')
+        # TODO:
+        # This assert is ok even if the template used is the original one in
+        # django/contrib/admin/templates/registration/password_reset_done.html
+        # The true test is below, where we test strings in the page.
+        # Because we're remodeling the page.
+        self.assertTemplateUsed(
+            response, 'registration/password_reset_done.html'
+        )
+
+    # As we are reusing the Django authentication system (with same
+    # templates names) we test for an element that is in original
+    # template but not in ours.
+    def test_forget_password_sent_email_done_returns_correct_content(self):
+        response = self.client.get('/password_reset/done/')
+        self.assertNotContains(response, 'Django administration')
+
+    @skip
+    def test_POST_forget_password_send_email_to_request_user(self):
+        # Do not test: it's Django feature; instead
+        # testing mail.outbox in functional tests
+        pass
+
+    def test_reset_password_from_reset_password_email_sent_uses_correct_template(self):
+        user = User.objects.create_user(
+            username='elaine', email='elaine@example.com', password='elaine'
+        )
+        self.client.post('/password_reset/', data={'email': user.email})
+
+        # get the email sent in post above
+        email = mail.outbox[0]
+        url_search = re.search(r'http://testserver/.+', email.body)
+        if not url_search:
+            self.fail('Could not find url in email body:\n' + email.body)
+        url = url_search.group(0)
+
+        response = self.client.get(url, follow=True)
+        self.assertEqual(response.status_code, 200)
+        # TODO:
+        # This assert is ok even if the template used is the original one in
+        # django/contrib/admin/templates/registration/password_reset_confirm
+        # .html
+        # The true test is below, where we test strings in the page.
+        # Because we're remodeling the page.
+        self.assertTemplateUsed(
+            response, 'registration/password_reset_confirm.html'
+        )
+        self.assertContains(response, 'Type key terms/words to be searched')
+        # As we are reusing the Django authentication system (with same
+        # templates names) we test for an element that is in original
+        # template but not in ours.
+        self.assertNotContains(response, 'Django administration')

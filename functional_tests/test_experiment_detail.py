@@ -71,14 +71,20 @@ class ExperimentDetailTest(FunctionalTest):
         )
 
         # At the right side there is a warning telling that the data
-        # acquisition was finished or not
+        # acquisition was finished. if it was not finished, display number
+        # of participants until now.
         data_acquisition_text = self.browser.find_element_by_id(
             'id_detail_acquisition').text
         if experiment.data_acquisition_done:
-            self.assertIn('Data acquisition was completed',
-                          data_acquisition_text)
+            self.assertIn(
+                'Data acquisition was completed', data_acquisition_text
+            )
         else:
-            self.assertIn('Data acquisition was not completed',
+            total_participants = 0
+            for group in experiment.groups.all():
+                total_participants += group.participants.count()
+            self.assertIn('Current number of participants: '
+                          + str(total_participants) + ' (and counting)',
                           data_acquisition_text)
 
         # Right bellow she sees the study that the experiment belongs to
@@ -788,6 +794,7 @@ class DownloadExperimentTest(FunctionalTest):
             "//a[@href='/experiments/" + experiment.slug + "/']"
         ).click()
         self.wait_for_detail_page_load()
+
         # She sees that there is a "Downloads" written tab. She
         # clicks in it, and sees a section bellow the tabs with a title
         # "Select experiment data pieces to download"
@@ -1013,6 +1020,14 @@ class DownloadExperimentTest(FunctionalTest):
             'Download all experiment data'
         ).click()
 
+        # The modal with license warning appears and she clicks in agreement
+        # button
+        self.wait_for(
+            lambda: self.browser.find_element_by_link_text(
+                'Agree & Download'
+            ).click()
+        )
+
         # She's redirected to experiment detail page with a message alerting
         # her that there was a problem with download (the download.zip file
         # is not in the file system)
@@ -1099,7 +1114,7 @@ class DownloadExperimentTest(FunctionalTest):
         # Josileine accesses Experiment Detail Downloads tab
         self.access_downloads_tab_content(experiment)
         # wait for tree-multiselect plugin to render multiselection
-        time.sleep(0.5)  # TODO: implicit wait. Fixes this!
+        time.sleep(0.5)  # TODO: implicit wait. Fix this!
 
         options = [
             'experimental_protocol_g' + str(group.id),
@@ -1126,8 +1141,98 @@ class DownloadExperimentTest(FunctionalTest):
 
         self.browser.find_element_by_id('download_button').click()
 
+        # The modal with license warning appears and she clicks in agreement
+        # button
+        self.wait_for(
+            lambda: self.browser.find_element_by_link_text(
+                'Agree & Download'
+            ).click()
+        )
+
         # She sees an error message telling her that some problem ocurred
         self.wait_for(lambda: self.assertIn(
             DOWNLOAD_ERROR_MESSAGE,
             self.browser.find_element_by_class_name('alert-danger').text
         ))
+
+    def test_clicking_in_download_all_experiment_data_link_pops_up_a_modal_with_license_warning(self):
+        experiment = Experiment.objects.last()
+        self.access_downloads_tab_content(experiment)
+
+        # After access Download tab in Experiment detail page, she clicks in
+        # Download all experiment data link
+        self.browser.find_element_by_id('button_download').click()
+        time.sleep(0.5)  # necessary to wait for modal content to load
+
+        # She sees a modal warning her from License of the data that will
+        # be downloaded
+        license_modal = \
+            self.wait_for(
+                lambda:
+                self.browser.find_element_by_id('license_modal')
+            )
+        self.assertIn(
+            'Before you download, this experiment is licensed '
+            'under the Creative Commons Attribution 4.0 '
+            'International license and requires that you '
+            'comply with the following',
+            license_modal.text
+        )
+        self.assertIn(
+            'You must give appropriate credit, provide a',
+            license_modal.text
+        )
+        self.assertIn(
+            'You must give appropriate credit, provide a',
+            license_modal.text
+        )
+        self.assertIn(
+            'and indicate if changes were made. You may do so in any '
+            'reasonable manner, but not in any way that suggests the '
+            'licensor endorses you or your use.',
+            license_modal.text
+        )
+
+    def test_clicking_in_download_button_pops_up_a_modal_with_license_warning(self):
+        experiment = Experiment.objects.last()
+        group = create_group(1, experiment)
+        create_experimental_protocol(group)
+        self.access_downloads_tab_content(experiment)
+
+        # Josileine selects an item to download and clicks in download button
+        self.wait_for(
+            lambda: self.browser.find_element_by_xpath(
+                "//input[@type='checkbox']"
+            ).click()
+        )
+        self.browser.find_element_by_id('download_button').click()
+        time.sleep(0.5)  # necessary to wait for modal content to load
+
+        # She sees a modal warning her from License of the data that will
+        # be downloaded
+        license_modal = \
+            self.wait_for(
+                lambda:
+                self.browser.find_element_by_id('license_modal')
+            )
+        self.assertIn(
+            'Before you download, this experiment is licensed '
+            'under the Creative Commons Attribution 4.0 '
+            'International license and requires that you '
+            'comply with the following',
+            license_modal.text
+        )
+        self.assertIn(
+            'You must give appropriate credit, provide a',
+            license_modal.text
+        )
+        self.assertIn(
+            'You must give appropriate credit, provide a',
+            license_modal.text
+        )
+        self.assertIn(
+            'and indicate if changes were made. You may do so in any '
+            'reasonable manner, but not in any way that suggests the '
+            'licensor endorses you or your use.',
+            license_modal.text
+        )

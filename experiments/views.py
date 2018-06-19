@@ -4,7 +4,8 @@ import pandas
 import tempfile
 
 from django.contrib import messages
-from django.contrib.auth.views import LoginView
+from django.contrib.auth.views import LoginView, PasswordResetView, \
+    PasswordResetDoneView, PasswordResetConfirmView, PasswordResetCompleteView
 from django.core.exceptions import PermissionDenied
 from django.core.mail import send_mail
 from django.http import HttpResponseRedirect, HttpResponse
@@ -187,6 +188,7 @@ def experiment_detail(request, slug):
 
     gender_grouping = {}
     age_grouping = {}
+    total_participants = 0
     for group in experiment.groups.all():
         for participant in group.participants.all():
             # gender
@@ -198,6 +200,8 @@ def experiment_detail(request, slug):
                 if int(participant.age) not in age_grouping:
                     age_grouping[int(participant.age)] = 0
                 age_grouping[int(participant.age)] += 1
+        # total participants
+        total_participants += group.participants.count()
 
     # get default (language) questionnaires (or first) for all groups
     questionnaires = {}
@@ -227,6 +231,7 @@ def experiment_detail(request, slug):
             'experiment': experiment,
             'gender_grouping': gender_grouping,
             'age_grouping': age_grouping,
+            'total_participants': total_participants,
             'to_be_analysed_count': to_be_analysed_count,
             'questionnaires': questionnaires,
             'form': ChangeSlugForm(),
@@ -550,5 +555,33 @@ class NepSearchView(SearchView):
 
 # inherit from LoginView to include search form besides login form
 class NepLoginView(LoginView):
+    search_form = NepSearchForm()
+    extra_context = {'search_form': search_form}
+
+
+# inherit from PasswordResetView to include search form besides password reset
+# form
+class NepPasswordResetView(PasswordResetView):
+    search_form = NepSearchForm()
+    extra_context = {'search_form': search_form}
+
+
+# inherit from PasswordResetDoneView to include search form besides password
+# reset done page
+class NepPasswordResetDoneView(PasswordResetDoneView):
+    search_form = NepSearchForm()
+    extra_context = {'search_form': search_form}
+
+
+# inherit from PasswordResetConfirmView to include search form besides password
+# reset confirm page
+class NepPasswordResetConfirmView(PasswordResetConfirmView):
+    search_form = NepSearchForm()
+    extra_context = {'search_form': search_form}
+
+
+# inherit from PasswordResetCompleteView to include search form besides
+# password reset complete page
+class NepPasswordResetCompleteView(PasswordResetCompleteView):
     search_form = NepSearchForm()
     extra_context = {'search_form': search_form}

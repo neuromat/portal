@@ -22,6 +22,11 @@ TIME_ZONE = 'America/Sao_Paulo'
 # Application definition
 
 INSTALLED_APPS = [
+    # Experiments app need to be before django.contrib.admin because this
+    # way the templates that have the same name as from admin templates are
+    # read first. We do this way because the authentication system is reused
+    # from Django.
+    'experiments.apps.ExperimentsConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -30,7 +35,6 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'haystack',
-    'experiments.apps.ExperimentsConfig',
     'downloads',
     'bootstrapform',
     'django_celery_results',
@@ -50,6 +54,7 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'nep.urls'
 
+LOGIN_URL = 'login'
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/'
 

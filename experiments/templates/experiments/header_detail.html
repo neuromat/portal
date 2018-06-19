@@ -21,7 +21,8 @@
     {% else %}
         <div id="id_detail_acquisition" class="pull-right">
             <span class="label label-warning">
-                {% trans "Data acquisition was not completed" %}
+                {% trans "Current number of participants: " %}
+                {{ total_participants }}&nbsp;{% trans "(and counting)" %}
             </span>
         </div>
     {% endif %}
