@@ -192,6 +192,14 @@ class Collaborator(models.Model):  # indirectly indexed for search
         return self.name
 
 
+class ExperimentResearcher(models.Model):
+    first_name = models.CharField(max_length=100)
+    last_name = models.CharField(max_length=150)
+    email = models.EmailField(blank=True)
+    institution = models.CharField(max_length=200, blank=True)
+    experiment = models.ForeignKey(Experiment, related_name='researchers')
+
+
 class Group(models.Model):  # indexed for search
     experiment = models.ForeignKey(Experiment, related_name='groups')
     title = models.CharField(max_length=50)

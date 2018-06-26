@@ -18,7 +18,7 @@ from experiments.helpers import generate_image_file
 from experiments.models import Experiment, Study, Group, Researcher, \
     Collaborator, ClassificationOfDiseases, Questionnaire, Step, \
     QuestionnaireLanguage, QuestionnaireDefaultLanguage, Publication, \
-    ExperimentalProtocol
+    ExperimentalProtocol, ExperimentResearcher
 from experiments.tests.tests_helper import global_setup_ut, apply_setup, \
     create_experiment, create_group, create_questionnaire
 
@@ -630,6 +630,33 @@ class CollaboratorAPITest(APITestCase):
         new_collaborator = Collaborator.objects.last()
         self.assertEqual(new_collaborator.name, 'Rolando Lero')
 
+
+class ExperimentResearcherAPITest(APITestCase):
+
+    def test_get_returns_all_experiment_researchers_short_url(self):
+        experiment_researcher1 = ExperimentResearcher.objects.first()
+        experiment_researcher2 = ExperimentResearcher.objects.last()
+        list_url = reverse('api_experiment_researchers-list')
+        response = self.client.get(list_url)
+        self.assertEqual(
+            json.loads(response.content.decode('utf8')),
+            [
+                {
+                    'id': experiment_researcher1.id,
+                    'first_name': experiment_researcher1.first_name,
+                    'last_name': experiment_researcher1.last_name,
+                    'email': experiment_researcher1.email,
+                    'institution': experiment_researcher1.institution
+                },
+                {
+                    'id': experiment_researcher2.id,
+                    'first_name': experiment_researcher2.first_name,
+                    'last_name': experiment_researcher2.last_name,
+                    'email': experiment_researcher2.email,
+                    'institution': experiment_researcher2.institution
+                }
+            ]
+        )
 
 @apply_setup(global_setup_ut)
 class GroupAPITest(APITestCase):
