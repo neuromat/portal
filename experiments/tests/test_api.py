@@ -20,8 +20,8 @@ from experiments.models import Experiment, Study, Group, Researcher, \
     QuestionnaireLanguage, QuestionnaireDefaultLanguage, Publication, \
     ExperimentalProtocol, ExperimentResearcher
 from experiments.tests.tests_helper import global_setup_ut, apply_setup, \
-    create_experiment, create_group, create_questionnaire
-
+    create_experiment, create_group, create_questionnaire, \
+    create_experiment_researcher
 
 TEMP_MEDIA_ROOT = tempfile.mkdtemp()
 
@@ -633,10 +633,16 @@ class CollaboratorAPITest(APITestCase):
 
 class ExperimentResearcherAPITest(APITestCase):
 
+    def setUp(self):
+        experiment1 = create_experiment(1)
+        experiment2 = create_experiment(1)
+        create_experiment_researcher(experiment1)
+        create_experiment_researcher(experiment2)
+
     def test_get_returns_all_experiment_researchers_short_url(self):
         experiment_researcher1 = ExperimentResearcher.objects.first()
         experiment_researcher2 = ExperimentResearcher.objects.last()
-        list_url = reverse('api_experiment_researchers-list')
+        list_url = reverse('api_researchers-list')
         response = self.client.get(list_url)
         self.assertEqual(
             json.loads(response.content.decode('utf8')),
@@ -646,17 +652,20 @@ class ExperimentResearcherAPITest(APITestCase):
                     'first_name': experiment_researcher1.first_name,
                     'last_name': experiment_researcher1.last_name,
                     'email': experiment_researcher1.email,
-                    'institution': experiment_researcher1.institution
+                    'institution': experiment_researcher1.institution,
+                    'experiment': experiment_researcher1.experiment.title
                 },
                 {
                     'id': experiment_researcher2.id,
                     'first_name': experiment_researcher2.first_name,
                     'last_name': experiment_researcher2.last_name,
                     'email': experiment_researcher2.email,
-                    'institution': experiment_researcher2.institution
+                    'institution': experiment_researcher2.institution,
+                    'experiment': experiment_researcher2.experiment.title
                 }
             ]
         )
+
 
 @apply_setup(global_setup_ut)
 class GroupAPITest(APITestCase):

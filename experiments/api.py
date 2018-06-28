@@ -23,7 +23,8 @@ from experiments.models import Experiment, Study, User, \
     EMGAnalogFilterSetting, \
     EMGElectrodePlacementSetting, \
     EMGSurfacePlacement, EMGIntramuscularPlacement, EMGNeedlePlacement, \
-    QuestionnaireLanguage, QuestionnaireDefaultLanguage, Publication, StepAdditionalFile
+    QuestionnaireLanguage, QuestionnaireDefaultLanguage, Publication, \
+    StepAdditionalFile, ExperimentResearcher
 
 
 ###################
@@ -102,6 +103,15 @@ class CollaboratorSerializer(serializers.ModelSerializer):
     class Meta:
         model = Collaborator
         fields = ('id', 'name', 'team', 'coordinator', 'study')
+
+
+class ExperimentResearcherSerializer(serializers.ModelSerializer):
+    experiment = serializers.ReadOnlyField(source='experiment.title')
+
+    class Meta:
+        model = ExperimentResearcher
+        fields = ('id', 'first_name', 'last_name', 'email', 'institution',
+                  'experiment')
 
 
 class AmplifierSerializer(serializers.ModelSerializer):
@@ -1088,6 +1098,13 @@ class CollaboratorViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         study = Study.objects.get(pk=self.kwargs['pk'])
         serializer.save(study=study)
+
+
+class ExperimentResearcherViewSet(viewsets.ModelViewSet):
+    serializer_class = ExperimentResearcherSerializer
+
+    def get_queryset(self):
+        return ExperimentResearcher.objects.all()
 
 
 class GroupViewSet(viewsets.ModelViewSet):
