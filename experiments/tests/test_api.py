@@ -614,8 +614,9 @@ class CollaboratorAPITest(APITestCase):
         study = Study.objects.last()
         owner = User.objects.get(username='lab2')
         self.client.login(username=owner.username, password='nep-lab2')
-        list_url = reverse('api_study_collaborators-list',
-                           kwargs={'pk': study.id})
+        list_url = reverse(
+            'api_study_collaborators-list', kwargs={'pk': study.id}
+        )
         response = self.client.post(
             list_url,
             {
@@ -665,6 +666,60 @@ class ExperimentResearcherAPITest(APITestCase):
                 }
             ]
         )
+
+    def test_get_returns_all_experiment_researchers_long_url(self):
+        experiment2 = Experiment.objects.last()
+        create_experiment_researcher(experiment2)
+        researcher1 = experiment2.researchers.first()
+        researcher2 = experiment2.researchers.last()
+        list_url = reverse(
+            'api_experiment_researchers-list', kwargs={'pk': experiment2.id}
+        )
+        response = self.client.get(list_url)
+        self.assertEqual(
+            json.loads(response.content.decode('utf8')),
+            [
+                {
+                    'id': researcher1.id,
+                    'first_name': researcher1.first_name,
+                    'last_name': researcher1.last_name,
+                    'email': researcher1.email,
+                    'institution': researcher1.institution,
+                    'experiment': researcher1.experiment.title,
+                },
+                {
+                    'id': researcher2.id,
+                    'first_name': researcher2.first_name,
+                    'last_name': researcher2.last_name,
+                    'email': researcher2.email,
+                    'institution': researcher2.institution,
+                    'experiment': researcher2.experiment.title
+                }
+            ]
+        )
+
+    def test_POSTing_a_new_experiment_researcher(self):
+        experiment = Experiment.objects.last()
+        self.client.login(
+            username=experiment.owner.username,
+            password=experiment.owner.password
+        )
+        list_url = reverse(
+            'api_experiment_researchers-list', kwargs={'pk': experiment.id}
+        )
+        response = self.client.post(
+            list_url,
+            {
+                'first_name': 'Astrojildo',
+                'last_name': 'Pereira',
+                'email': 'astrojildo@fsf.org',
+                'institution': 'FSF'
+            }
+        )
+        self.client.logout()
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        new_experiment_researcher = ExperimentResearcher.objects.last()
+        self.assertEqual(new_experiment_researcher.first_name, 'Astrojildo')
 
 
 @apply_setup(global_setup_ut)

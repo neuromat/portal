@@ -1104,7 +1104,16 @@ class ExperimentResearcherViewSet(viewsets.ModelViewSet):
     serializer_class = ExperimentResearcherSerializer
 
     def get_queryset(self):
-        return ExperimentResearcher.objects.all()
+        if 'pk' in self.kwargs:
+            return ExperimentResearcher.objects.filter(
+                experiment_id=self.kwargs['pk']
+            )
+        else:
+            return ExperimentResearcher.objects.all()
+
+    def perform_create(self, serializer):
+        experiment = Experiment.objects.get(pk=self.kwargs['pk'])
+        serializer.save(experiment=experiment)
 
 
 class GroupViewSet(viewsets.ModelViewSet):

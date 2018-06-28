@@ -61,7 +61,7 @@ api_studies_researcher_list = api.ResearcherViewSet.as_view({
 
 # Collaborators (of studies)
 api_collaborators_list = api.CollaboratorViewSet.as_view({
-    'get': 'list',
+    'get': 'list'
 })
 api_study_collaborators_list = api.CollaboratorViewSet.as_view({
     'get': 'list',
@@ -71,6 +71,10 @@ api_study_collaborators_list = api.CollaboratorViewSet.as_view({
 # Researchers (of experiments)
 api_researchers_list = api.ExperimentResearcherViewSet.as_view({
     'get': 'list',
+})
+api_experiment_researchers_list = api.ExperimentResearcherViewSet.as_view({
+    'get': 'list',
+    'post': 'create'
 })
 
 # EEG setting
@@ -480,6 +484,9 @@ urlpatterns = [
     # Researchers
     # url(r'^researchers/$', api_researcher_list, name='api_researchers-list'),
     url(r'^researchers/$', api_researchers_list, name='api_researchers-list'),
+    url(r'^experiments/(?P<pk>[0-9]+)/researchers/$',
+        api_experiment_researchers_list,
+        name='api_experiment_researchers-list'),
     url(r'^studies/(?P<pk>[0-9]+)/researcher/$', api_studies_researcher_list,
         name='api_study_researcher-list'),
     # Collaborators
