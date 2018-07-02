@@ -27,7 +27,7 @@ from experiments.models import Experiment, Study, Group, Researcher, \
     EMGElectrodePlacementSetting, EMGSurfacePlacement, \
     EMGIntramuscularPlacement, EMGNeedlePlacement, EEGElectrodePosition, \
     SurfaceElectrode, IntramuscularElectrode, Instruction, \
-    QuestionnaireResponse
+    QuestionnaireResponse, ExperimentResearcher
 # TODO: not protected any more. Fix this!
 from experiments.views import _get_q_default_language_or_first
 
@@ -244,6 +244,15 @@ def create_study_collaborator(qtty, study):
             coordinator=randint(0, 1),
             study=study
         )
+
+
+def create_experiment_researcher(experiment):
+    fake = Factory.create()
+
+    return ExperimentResearcher.objects.create(
+        first_name=fake.first_name(), last_name=fake.last_name(),
+        email=fake.email(), institution=fake.company(), experiment=experiment
+    )
 
 
 def create_keyword(qtty):

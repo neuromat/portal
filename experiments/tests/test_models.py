@@ -12,7 +12,7 @@ from faker import Factory
 
 from experiments.models import Experiment, Study, Group, Researcher, \
     Collaborator, RejectJustification, Publication, ExperimentalProtocol, Step, \
-    StepAdditionalFile, Gender, File, Participant
+    StepAdditionalFile, Gender, File, Participant, ExperimentResearcher
 from experiments.tests.tests_helper import global_setup_ut, apply_setup, \
     create_experiment, create_group, create_binary_file, create_eeg_setting, \
     create_eeg_electrode_localization_system, create_context_tree, create_step, \
@@ -21,7 +21,7 @@ from experiments.tests.tests_helper import global_setup_ut, apply_setup, \
     create_eeg_step, create_emg_step, create_emg_setting, create_emg_data, \
     create_goalkeepergame_step, create_goalkeeper_game_data, \
     create_generic_data_collection_step, create_generic_data_collection_data, \
-    create_additional_data, create_emg_electrode_placement
+    create_additional_data, create_emg_electrode_placement, create_owner
 
 
 def add_temporary_file_to_file_instance(file_instance):
@@ -409,6 +409,39 @@ class CollaboratorModel(TestCase):
         with self.assertRaises(ValidationError):
             collaborator.save()
             collaborator.full_clean()
+
+
+class ExperimentResearcherModel(TestCase):
+
+    def setUp(self):
+        owner = create_owner()
+        create_experiment(1, owner, Experiment.APPROVED)
+
+    def test_default_attributes(self):
+        experiment_researcher = ExperimentResearcher()
+        self.assertEqual(experiment_researcher.first_name, '')
+        self.assertEqual(experiment_researcher.last_name, '')
+        self.assertEqual(experiment_researcher.email, '')
+        self.assertEqual(experiment_researcher.institution, '')
+
+    def test_experiment_researcher_is_related_to_experiment(self):
+        experiment = Experiment.objects.last()
+        experiment_researcher = ExperimentResearcher.objects.create(
+            first_name='Vladimir', last_name='Ilyich Ulianov',
+            email='lenin@member.fsf.org', institution='PCUS',
+            experiment=experiment
+        )
+        self.assertIn(experiment_researcher, experiment.researchers.all())
+
+    def test_cannot_save_empty_attributes(self):
+        experiment = Experiment.objects.last()
+        experiment_researcher = ExperimentResearcher.objects.create(
+            first_name='', last_name='',
+            experiment=experiment
+        )
+        with self.assertRaises(ValidationError):
+            experiment_researcher.save()
+            experiment_researcher.full_clean()
 
 
 @apply_setup(global_setup_ut)
