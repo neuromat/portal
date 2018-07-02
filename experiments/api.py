@@ -1058,7 +1058,8 @@ class StudyViewSet(viewsets.ModelViewSet):
         last_version = appclasses.ExperimentVersion(
             exp_nes_id, owner
         ).get_last_version()
-        # TODO: if last_version == 0 generates exception: "no experiment was
+        # TODO:
+        # if last_version == 0 generates exception: "no experiment was
         # created yet"
         experiment = Experiment.objects.get(
             nes_id=exp_nes_id, owner=owner, version=last_version
@@ -1073,7 +1074,8 @@ class ResearcherViewSet(viewsets.ModelViewSet):
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
 
     def get_queryset(self):
-        # TODO: don't filter by owner if not logged (gets TypeError
+        # TODO:
+        # don't filter by owner if not logged (gets TypeError
         # exception when trying to get an individual researcher)
         if 'pk' in self.kwargs:
             return Researcher.objects.filter(study_id=self.kwargs['pk'])
@@ -1101,18 +1103,32 @@ class CollaboratorViewSet(viewsets.ModelViewSet):
 
 
 class ExperimentResearcherViewSet(viewsets.ModelViewSet):
+    # at least in tests this is not necessary
+    lookup_field = 'experiment_nes_id'
     serializer_class = ExperimentResearcherSerializer
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
 
     def get_queryset(self):
-        if 'pk' in self.kwargs:
-            return ExperimentResearcher.objects.filter(
-                experiment_id=self.kwargs['pk']
+        if 'experiment_nes_id' in self.kwargs \
+                and (self.request.user != AnonymousUser()):
+            experiments = Experiment.objects.filter(
+                nes_id=self.kwargs['experiment_nes_id'],
+                owner=self.request.user
             )
+            return ExperimentResearcher.objects.filter(
+                experiment__in=experiments)
         else:
             return ExperimentResearcher.objects.all()
 
     def perform_create(self, serializer):
-        experiment = Experiment.objects.get(pk=self.kwargs['pk'])
+        exp_nes_id = self.kwargs['experiment_nes_id']
+        owner = self.request.user
+        last_version = appclasses.ExperimentVersion(
+            exp_nes_id, owner
+        ).get_last_version()
+        experiment = Experiment.objects.get(
+            nes_id=exp_nes_id, owner=owner, version=last_version
+        )
         serializer.save(experiment=experiment)
 
 
