@@ -453,7 +453,8 @@ class StudyAPITest(APITestCase):
         new_study = Study.objects.get(experiment=experiment)
         self.assertEqual(new_study.title, 'New study')
 
-        # TODO: IMPORTANT! Test client can't POST (PUT etc.) to Study model
+        # TODO:
+        # IMPORTANT! Test client can't POST (PUT etc.) to Study model
         # without been its owner (indirectly by experiment's study). Ensure
         # that only same client can POST to that model.
 

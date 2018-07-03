@@ -159,13 +159,26 @@ def create_researchers():
 
     for study in Study.objects.all():
         Researcher.objects.create(
-            name=fake.name(),
-            email=fake.email(),
-            study=study
+            name=fake.name(), email=fake.email(), study=study
         )
-        Collaborator.objects.create(name=fake.text(max_nb_chars=15),
-                                    team=fake.text(max_nb_chars=15),
-                                    coordinator=False, study=study)
+        Collaborator.objects.create(
+            name=fake.text(max_nb_chars=15),
+            team=fake.text(max_nb_chars=15),
+            coordinator=False, study=study
+        )
+
+
+def create_researcher(study, name=None):
+    """
+    :param study: Study model instance
+    :param name: researcher's name
+    :return: Researcher model instance
+    """
+    fake = Factory.create()
+
+    return Researcher.objects.create(
+        name=name or fake.name(), email=fake.email(), study=study
+    )
 
 
 def create_genders():
@@ -246,11 +259,12 @@ def create_study_collaborator(qtty, study):
         )
 
 
-def create_experiment_researcher(experiment):
+def create_experiment_researcher(experiment, first_name=None, last_name=None):
     fake = Factory.create()
 
     return ExperimentResearcher.objects.create(
-        first_name=fake.first_name(), last_name=fake.last_name(),
+        first_name=first_name or fake.first_name(),
+        last_name=last_name or fake.last_name(),
         email=fake.email(), institution=fake.company(), experiment=experiment
     )
 

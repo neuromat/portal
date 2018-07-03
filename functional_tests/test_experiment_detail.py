@@ -17,7 +17,8 @@ from experiments.tests.tests_helper import create_experiment, create_group, \
     remove_selected_subdir, create_experimental_protocol, \
     create_questionnaire, create_questionnaire_language, create_study, \
     create_eeg_data, create_eeg_setting, create_eeg_step, \
-    create_valid_questionnaires, create_publication
+    create_valid_questionnaires, create_publication, \
+    create_experiment_researcher, create_researcher
 from functional_tests.base import FunctionalTest
 from nep import settings
 
@@ -806,6 +807,29 @@ class DownloadExperimentTest(FunctionalTest):
         )
         return downloads_tab_content
 
+    def license_text_asserts(self, license_modal):
+        self.assertIn(
+            'Before you download, you must know this experiment is licensed '
+            'under Creative Commons Attribution 4.0 '
+            'International License and requires that you '
+            'comply with the following:',
+            license_modal.text
+        )
+        self.assertIn(
+            'You must give appropriate credit, provide a',
+            license_modal.text
+        )
+        self.assertIn(
+            'You must give appropriate credit, provide a',
+            license_modal.text
+        )
+        self.assertIn(
+            'and indicate if changes were made. You may do so in any '
+            'reasonable manner, but not in any way that suggests the '
+            'licensor endorses you or your use.',
+            license_modal.text
+        )
+
     def test_can_see_link_to_download_all_experiment_data_at_once(self):
         experiment = Experiment.objects.filter(
             status=Experiment.APPROVED
@@ -1155,8 +1179,17 @@ class DownloadExperimentTest(FunctionalTest):
             self.browser.find_element_by_class_name('alert-danger').text
         ))
 
-    def test_clicking_in_download_all_experiment_data_link_pops_up_a_modal_with_license_warning(self):
+    def test_clicking_in_download_all_experiment_data_link_pops_up_a_modal_with_license_warning_1(self):
+        ##
+        # Test when there is the experiment researchers
+        ##
         experiment = Experiment.objects.last()
+        study = create_study(1, experiment)
+        create_researcher(study, 'Renan da Silva')
+        create_experiment_researcher(experiment, 'Anibal', 'das Dores')
+        create_experiment_researcher(experiment, 'Joseph', 'Hildegard')
+        create_experiment_researcher(experiment, 'Antônio', 'Farias')
+
         self.access_downloads_tab_content(experiment)
 
         # After access Download tab in Experiment detail page, she clicks in
@@ -1171,25 +1204,71 @@ class DownloadExperimentTest(FunctionalTest):
                 lambda:
                 self.browser.find_element_by_id('license_modal')
             )
+
+        self.license_text_asserts(license_modal)
+
+        # In the modal there is also how to cite that experiment in her own
+        # work
+        self.assertIn('How to cite this experiment:', license_modal.text)
+        ##
+        # this is to mimic how datetime is displayed in template by default
+        ##
+        sent_date = \
+            experiment.sent_date.strftime("%B %d, %Y").lstrip("0").replace(" 0", " ")
         self.assertIn(
-            'Before you download, this experiment is licensed '
-            'under the Creative Commons Attribution 4.0 '
-            'International license and requires that you '
-            'comply with the following',
+            'das Dores'.upper() + ', Anibal; ' +
+            'Hildegard'.upper() + ', Joseph; ' +
+            'Farias'.upper() + ', Antônio ' +
+            experiment.title + '. Sent date: ' + str(sent_date) + '.',
             license_modal.text
         )
-        self.assertIn(
-            'You must give appropriate credit, provide a',
-            license_modal.text
+        self.assertNotIn(
+            experiment.study.researcher.name.upper(), license_modal.text
         )
+
+    def test_clicking_in_download_all_experiment_data_link_pops_up_a_modal_with_license_warning_2(self):
+        ##
+        # Test when there is no experiment researchers, only the study
+        # researcher
+        ##
+        experiment = Experiment.objects.last()
+        study = create_study(1, experiment)
+        create_researcher(study, 'Renan da Silva')
+
+        self.access_downloads_tab_content(experiment)
+
+        # After access Download tab in Experiment detail page, she clicks in
+        # Download all experiment data link
+        self.browser.find_element_by_id('button_download').click()
+        time.sleep(0.5)  # necessary to wait for modal content to load
+
+        # She sees a modal warning her from License of the data that will
+        # be downloaded
+        license_modal = \
+            self.wait_for(
+                lambda:
+                self.browser.find_element_by_id('license_modal')
+            )
+
+        self.license_text_asserts(license_modal)
+
+        # In the modal there is also how to cite that experiment in her own
+        # work
+        self.assertIn('How to cite this experiment:', license_modal.text)
+        ##
+        # this is to mimic how datetime is displayed in template by default
+        ##
+        sent_date = \
+            experiment.sent_date.strftime("%B %d, %Y").lstrip("0").replace(
+                " 0", " ")
         self.assertIn(
-            'You must give appropriate credit, provide a',
-            license_modal.text
+            experiment.study.researcher.name.upper(), license_modal.text
         )
-        self.assertIn(
-            'and indicate if changes were made. You may do so in any '
-            'reasonable manner, but not in any way that suggests the '
-            'licensor endorses you or your use.',
+        self.assertNotIn(
+            'das Dores'.upper() + ', Anibal; ' +
+            'Hildegard'.upper() + ', Joseph; ' +
+            'Farias'.upper() + ', Antônio ' +
+            experiment.title + '. Sent date: ' + str(sent_date) + '.',
             license_modal.text
         )
 
@@ -1215,24 +1294,5 @@ class DownloadExperimentTest(FunctionalTest):
                 lambda:
                 self.browser.find_element_by_id('license_modal')
             )
-        self.assertIn(
-            'Before you download, this experiment is licensed '
-            'under the Creative Commons Attribution 4.0 '
-            'International license and requires that you '
-            'comply with the following',
-            license_modal.text
-        )
-        self.assertIn(
-            'You must give appropriate credit, provide a',
-            license_modal.text
-        )
-        self.assertIn(
-            'You must give appropriate credit, provide a',
-            license_modal.text
-        )
-        self.assertIn(
-            'and indicate if changes were made. You may do so in any '
-            'reasonable manner, but not in any way that suggests the '
-            'licensor endorses you or your use.',
-            license_modal.text
-        )
+
+        self.license_text_asserts(license_modal)
