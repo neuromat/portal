@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-06-20 10:44-0300\n"
+"POT-Creation-Date: 2018-07-03 11:14-0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -420,6 +420,41 @@ msgstr ""
 
 #: experiments/templates/experiments/detail.html:599
 msgid "Total"
+msgstr ""
+
+#: experiments/templates/experiments/downloadinfo.html:4
+msgid ""
+" Before you download, you must know this experiment is licensed under\n"
+"            Creative Commons Attribution 4.0 International License and "
+"requires\n"
+"            that you comply with the following:\n"
+"        "
+msgstr ""
+
+#: experiments/templates/experiments/downloadinfo.html:14
+msgid "You must give appropriate credit, provide a"
+msgstr ""
+
+#: experiments/templates/experiments/downloadinfo.html:17
+msgid "link to the license"
+msgstr ""
+
+#: experiments/templates/experiments/downloadinfo.html:20
+msgid ""
+"\n"
+"            and indicate if changes were made. You may do so in any\n"
+"            reasonable manner, but not in any way that suggests the "
+"licensor\n"
+"            endorses you or your use.\n"
+"        "
+msgstr ""
+
+#: experiments/templates/experiments/downloadinfo.html:30
+msgid "How to cite this experiment"
+msgstr ""
+
+#: experiments/templates/experiments/downloadinfo.html:38
+msgid "Sent date"
 msgstr ""
 
 #: experiments/templates/experiments/footer.html:5

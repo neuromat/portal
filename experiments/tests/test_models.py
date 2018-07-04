@@ -21,7 +21,8 @@ from experiments.tests.tests_helper import global_setup_ut, apply_setup, \
     create_eeg_step, create_emg_step, create_emg_setting, create_emg_data, \
     create_goalkeepergame_step, create_goalkeeper_game_data, \
     create_generic_data_collection_step, create_generic_data_collection_data, \
-    create_additional_data, create_emg_electrode_placement, create_owner
+    create_additional_data, create_emg_electrode_placement, create_owner, \
+    create_study
 
 
 def add_temporary_file_to_file_instance(file_instance):
@@ -65,15 +66,16 @@ def create_file_collected(qtty, step_type):
     return files_collected
 
 
-@apply_setup(global_setup_ut)
 class ResearcherModelTest(TestCase):
 
     def setUp(self):
-        global_setup_ut()
+        experiment = create_experiment(1)
+        create_study(1, experiment)
 
     def test_default_attributes(self):
         researcher = Researcher()
-        self.assertEqual(researcher.name, '')
+        self.assertEqual(researcher.first_name, '')
+        self.assertEqual(researcher.last_name, '')
         self.assertEqual(researcher.email, '')
 
     def test_researcher_is_related_to_one_study(self):
@@ -83,7 +85,7 @@ class ResearcherModelTest(TestCase):
         self.assertEqual(researcher, study.researcher)
 
     def test_cannot_save_empty_attributes(self):
-        researcher = Researcher(study=Study.objects.first())
+        researcher = Researcher(study=Study.objects.last())
         with self.assertRaises(ValidationError):
             researcher.full_clean()
 
