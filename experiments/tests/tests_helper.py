@@ -154,12 +154,14 @@ def create_trustee_users():
     group.user_set.add(trustee2)
 
 
-def create_researchers():
+def create_researchers():  # deprecated
     fake = Factory.create()
 
     for study in Study.objects.all():
         Researcher.objects.create(
-            name=fake.name(), email=fake.email(), study=study
+            first_name=fake.first_name(),
+            last_name=fake.last_name(),
+            email=fake.email(), study=study
         )
         Collaborator.objects.create(
             name=fake.text(max_nb_chars=15),
@@ -168,16 +170,19 @@ def create_researchers():
         )
 
 
-def create_researcher(study, name=None):
+def create_researcher(study, first_name=None, last_name=None):
     """
     :param study: Study model instance
-    :param name: researcher's name
+    :param first_name: researcher's first name
+    :param last_name: researcher's last name
     :return: Researcher model instance
     """
     fake = Factory.create()
 
     return Researcher.objects.create(
-        name=name or fake.name(), email=fake.email(), study=study
+        first_name=first_name or fake.first_name(),
+        last_name=last_name or fake.last_name(),
+        email=fake.email(), study=study
     )
 
 
@@ -1000,7 +1005,8 @@ def create_experiment_related_objects(experiment):
     # necessary creating researcher for study. See comment in
     # search_indexes.StudyIndex class
     Researcher.objects.create(
-        name='Negro Belchior', email='belchior@example.com', study=study
+        first_name='Negro', last_name='Belchior',
+        email='belchior@example.com', study=study
     )
     gender1 = Gender.objects.create(name='male')
     gender2 = Gender.objects.create(name='female')
@@ -1563,9 +1569,9 @@ def global_setup_ut():
     Study.objects.create(start_date=datetime.utcnow(),
                          experiment=experiment3)
 
-    Researcher.objects.create(name='Raimundo Nonato',
+    Researcher.objects.create(first_name='Raimundo', last_name='Nonato',
                               email='rnonato@example.com', study=study1)
-    Researcher.objects.create(name='Raimunda da Silva',
+    Researcher.objects.create(first_name='Raimunda', last_name='da Silva',
                               email='rsilva@example.com', study=study2)
 
     # Create some keywords to associate with studies

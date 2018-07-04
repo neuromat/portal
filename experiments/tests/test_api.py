@@ -509,13 +509,15 @@ class ResearcherAPITest(APITestCase):
             [
                 {
                     'id': researcher1.id,
-                    'name': researcher1.name,
+                    'first_name': researcher1.first_name,
+                    'last_name': researcher1.last_name,
                     'email': researcher1.email,
                     'study': researcher1.study.title
                 },
                 {
                     'id': researcher2.id,
-                    'name': researcher2.name,
+                    'first_name': researcher2.first_name,
+                    'last_name': researcher2.last_name,
                     'email': researcher2.email,
                     'study': researcher2.study.title
                 }
@@ -533,7 +535,8 @@ class ResearcherAPITest(APITestCase):
             [
                 {
                     'id': researcher.id,
-                    'name': researcher.name,
+                    'first_name': researcher.first_name,
+                    'last_name': researcher.last_name,
                     'email': researcher.email,
                     'study': researcher.study.title
                 }
@@ -549,14 +552,16 @@ class ResearcherAPITest(APITestCase):
         response = self.client.post(
             list_url,
             {
-                'name': 'João das Rosas',
+                'first_name': 'João',
+                'last_name': 'das Rosas',
                 'email': 'joao@rosas.com',
             }
         )
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.client.logout()
         new_researcher = Researcher.objects.last()
-        self.assertEqual(new_researcher.name, 'João das Rosas')
+        self.assertEqual(new_researcher.first_name, 'João')
+        self.assertEqual(new_researcher.last_name, 'das Rosas')
 
 
 @apply_setup(global_setup_ut)

@@ -33,7 +33,7 @@
             {% for researcher in experiment.researchers.all %}
                 {{ researcher.last_name|upper }}, {{ researcher.first_name }}{% if not forloop.last %}; {% endif %}
             {% empty %}
-                {{ experiment.study.researcher.name|upper  }}
+                {{ experiment.study.researcher.last_name|upper  }}, {{ experiment.study.researcher.first_name }}
             {% endfor %}
             <strong>{{ experiment.title }}</strong>. <em>{% trans "Sent date" %}</em>: {{ experiment.sent_date }}.
         </p>

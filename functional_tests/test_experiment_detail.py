@@ -109,7 +109,11 @@ class ExperimentDetailTest(FunctionalTest):
         study_researcher = self.browser.find_element_by_id(
             'study_researcher').text
         self.assertIn('Researcher:', study_researcher)
-        self.assertIn(experiment.study.researcher.name, study_researcher)
+        self.assertIn(
+            experiment.study.researcher.first_name + ' ' +
+            experiment.study.researcher.last_name,
+            study_researcher
+        )
         # The study has a start and end date
         study_start_date = self.browser.find_element_by_id(
             'study_startdate').text
@@ -1185,7 +1189,7 @@ class DownloadExperimentTest(FunctionalTest):
         ##
         experiment = Experiment.objects.last()
         study = create_study(1, experiment)
-        create_researcher(study, 'Renan da Silva')
+        create_researcher(study, 'Renan', 'da Silva')
         create_experiment_researcher(experiment, 'Anibal', 'das Dores')
         create_experiment_researcher(experiment, 'Joseph', 'Hildegard')
         create_experiment_researcher(experiment, 'Antônio', 'Farias')
@@ -1223,7 +1227,9 @@ class DownloadExperimentTest(FunctionalTest):
             license_modal.text
         )
         self.assertNotIn(
-            experiment.study.researcher.name.upper(), license_modal.text
+            experiment.study.researcher.last_name.upper() + ', ' +
+            experiment.study.researcher.first_name,
+            license_modal.text
         )
 
     def test_clicking_in_download_all_experiment_data_link_pops_up_a_modal_with_license_warning_2(self):
@@ -1233,7 +1239,7 @@ class DownloadExperimentTest(FunctionalTest):
         ##
         experiment = Experiment.objects.last()
         study = create_study(1, experiment)
-        create_researcher(study, 'Renan da Silva')
+        create_researcher(study, 'Renan', 'da Silva')
 
         self.access_downloads_tab_content(experiment)
 
@@ -1262,7 +1268,9 @@ class DownloadExperimentTest(FunctionalTest):
             experiment.sent_date.strftime("%B %d, %Y").lstrip("0").replace(
                 " 0", " ")
         self.assertIn(
-            experiment.study.researcher.name.upper(), license_modal.text
+            experiment.study.researcher.last_name.upper() + ', ' +
+            experiment.study.researcher.first_name,
+            license_modal.text
         )
         self.assertNotIn(
             'das Dores'.upper() + ', Anibal; ' +

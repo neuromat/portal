@@ -117,7 +117,9 @@ class HomePageTest(TestCase):
         message = list(response.context['messages'])[0]
         self.assertEqual(
             message.message,
-            'An email was sent to ' + experiment.study.researcher.name +
+            'An email was sent to ' +
+            experiment.study.researcher.first_name +
+            ' ' + experiment.study.researcher.last_name +
             ' warning that the experiment changed status to Approved.'
         )
         self.assertEqual(message.tags, "success")

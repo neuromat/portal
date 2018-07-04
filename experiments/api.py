@@ -94,7 +94,7 @@ class ResearcherSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Researcher
-        fields = ('id', 'name', 'email', 'study')
+        fields = ('id', 'first_name', 'last_name', 'email', 'study')
 
 
 class CollaboratorSerializer(serializers.ModelSerializer):
