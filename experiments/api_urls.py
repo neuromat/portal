@@ -459,8 +459,8 @@ urlpatterns = [
     url(r'^', include(router.urls)),
     # Studies
     url(r'^studies/$', api_studies_list, name='api_studies-list'),
-    # TODO: uniformizar nomenclatura (singular X plural quando camo é um
-    # para um)
+    # TODO:
+    # uniformizar nomenclatura (singular X plural quando campo é um para um)
     url(r'^experiments/(?P<experiment_nes_id>[0-9]+)/studies/$',
         api_experiment_studies_list, name='api_experiment_studies-list'),
     # Groups
