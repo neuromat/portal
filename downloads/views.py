@@ -108,6 +108,18 @@ def download_view(request, experiment_id):
             reverse('experiment-detail', kwargs={'slug': experiment.slug})
         )
 
+    # License.txt always will be in compressed file
+    try:
+        shutil.copyfile(os.path.join(
+            settings.MEDIA_ROOT, 'download', 'License.txt'
+        ), os.path.join(temp_dir, 'License.txt')
+        )
+    except FileNotFoundError:
+        messages.error(request, DOWNLOAD_ERROR_MESSAGE)
+        return HttpResponseRedirect(
+            reverse('experiment-detail', kwargs={'slug': experiment.slug})
+        )
+
     # Copy experiment data from settings.MEDIA_ROOT/download/<experiment.id>,
     # based on user selection, to a temp dir.
     for item in request.POST.getlist('download_selected'):
@@ -252,20 +264,15 @@ def update_export_instance(input_file, output_export, export_instance):
 def download_create(experiment_id, template_name):
     try:
         export_instance = create_export_instance()
-
         input_export_file = path.join(
             EXPORT_DIRECTORY, str(export_instance.id), str(JSON_FILENAME)
         )
-
         input_filename = path.join(settings.MEDIA_ROOT, input_export_file)
-
         create_directory(settings.MEDIA_ROOT, path.split(input_export_file)[0])
-
         build_complete_export_structure(experiment_id, input_filename)
-
         export = ExportExecution(experiment_id)
 
-        # set path of the directory base: ex. /Users/.../portal/media/temp/
+        # set path of the directory base: ex. /media/temp/
         base_directory, path_to_create = path.split(export.get_directory_base())
         error_msg, base_directory_name = create_directory(
             base_directory, path_to_create
@@ -310,13 +317,16 @@ def download_create(experiment_id, template_name):
             with ZipFile(export_complete_filename, 'w') as zip_file:
                 for filename, directory in export.files_to_zip_list:
                     fdir, fname = path.split(filename)
-
-                    zip_file.write(filename.encode('utf-8'), path.join(directory, fname))
-
+                    zip_file.write(
+                        filename.encode('utf-8'), path.join(directory, fname)
+                    )
             zip_file.close()
 
         export_instance_directory = settings.MEDIA_ROOT + '/'
-        temp_directory = path.join(export_instance_directory, path.join(EXPORT_DIRECTORY, str(export_instance.id)))
+        temp_directory = path.join(
+            export_instance_directory,
+            path.join(EXPORT_DIRECTORY, str(export_instance.id))
+        )
         rmtree(temp_directory, ignore_errors=True)
 
         if template_name != "":

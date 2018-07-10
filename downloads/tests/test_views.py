@@ -2,6 +2,8 @@ import os
 import tempfile
 
 import shutil
+import zipfile
+
 from django.contrib.auth.models import User
 from django.test import override_settings, TestCase
 from django.utils.text import slugify
@@ -19,8 +21,14 @@ TEMP_MEDIA_ROOT = os.path.join(tempfile.mkdtemp())
 @override_settings(MEDIA_ROOT=TEMP_MEDIA_ROOT)
 class DownloadCreateView(TestCase):
 
-    @classmethod
-    def tearDownClass(cls):
+    def setUp(self):
+        # license is in media/download/License.txt
+        os.makedirs(os.path.join(TEMP_MEDIA_ROOT, 'download'))
+        license_file = os.path.join(TEMP_MEDIA_ROOT, 'download', 'License.txt')
+        with open(license_file, 'w') as file:
+            file.write('license')
+
+    def tearDown(self):
         shutil.rmtree(TEMP_MEDIA_ROOT)
 
     @staticmethod
@@ -29,13 +37,6 @@ class DownloadCreateView(TestCase):
         experiment = create_experiment(1, owner, Experiment.TO_BE_ANALYSED)
         create_study(1, experiment)
         return experiment
-
-    def create_download_subdirs(self):
-        experiment = self.create_basic_experiment_data()
-        group = self.create_questionnaire(experiment)
-        download_create(experiment.id, '')
-
-        return experiment, group
 
     @staticmethod
     def create_questionnaire(experiment):
@@ -61,12 +62,28 @@ class DownloadCreateView(TestCase):
         )
         return group
 
-    def test_create_download_subdir_if_not_exist(self):
+    def create_download_subdirs(self):
         experiment = self.create_basic_experiment_data()
+        group = self.create_questionnaire(experiment)
         download_create(experiment.id, '')
 
+        return experiment, group
+
+    def test_download_zip_file_has_license_file(self):
+        experiment, group = self.create_download_subdirs()
+
+        # get the zipped file to test against its content
+        zip_file = os.path.join(
+                TEMP_MEDIA_ROOT, 'download', str(experiment.id), 'download.zip'
+            )
+        zipped_file = zipfile.ZipFile(zip_file, 'r')
+        self.assertIsNone(zipped_file.testzip())
+
+        # compressed file must always contain License.txt
         self.assertTrue(
-            os.path.exists(os.path.join(TEMP_MEDIA_ROOT, 'download'))
+            any('License.txt'
+                in element for element in zipped_file.namelist()),
+            'License.txt not in ' + str(zipped_file.namelist())
         )
 
     def test_do_not_write_age_column_in_csv_file_if_participants_has_date_null_1(self):

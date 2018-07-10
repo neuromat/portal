@@ -1075,15 +1075,32 @@ def create_text_file(file_path, text):
 
 
 def create_download_dir_structure_and_files(experiment, temp_media_root):
+    """
+    Create a complete directory tree with possible experiment data
+    directories/files that reproduces the directory/file structure
+    created when Portal receives the experiment data through Rest API.
+    :param experiment: Experiment model instance
+    :param temp_media_root: Temporary media root path
+    """
     # define download experiment data root
     experiment_download_dir = os.path.join(
         temp_media_root, 'download', str(experiment.pk)
     )
 
-    # remove subdir if exists before creating that
-    if os.path.exists(experiment_download_dir):
-        shutil.rmtree(experiment_download_dir)
     os.makedirs(experiment_download_dir)
+
+    # create fake download.zip file
+    with open(os.path.join(experiment_download_dir, 'download.zip'), 'wb') \
+            as file:
+        file.write(b'fake_experiment_data')
+        file.close()
+
+    # create License.txt file
+    create_text_file(
+        os.path.join(temp_media_root, 'download', 'License.txt'),
+        'The GNU General Public License is a free, copyleft license for '
+        'software and other kinds of works.'
+    )
 
     # create Experiment.csv file
     create_text_file(

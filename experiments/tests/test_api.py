@@ -195,6 +195,16 @@ class ExperimentAPITest(APITestCase):
         # TODO: get last version
         owner = User.objects.get(username='lab1')
         experiment = Experiment.objects.get(nes_id=1, owner=owner)
+
+        # Before generate download.zip file when changing experiment status
+        # from RECEIVING to TO_BE_ANALYSED, we need to create the
+        # license file in media/download/License.txt because that file needs
+        # to be available before bulding download.zip file
+        os.makedirs(os.path.join(TEMP_MEDIA_ROOT, 'download'))
+        license_file = os.path.join(TEMP_MEDIA_ROOT, 'download', 'License.txt')
+        with open(license_file, 'w') as file:
+            file.write('license')
+
         detail_url = reverse(
             'api_experiments-detail',
             kwargs={'experiment_nes_id': experiment.nes_id}
@@ -257,7 +267,7 @@ class ExperimentAPITest(APITestCase):
         self.assertEqual(1, experiment.version)
 
     def test_PATCHing_experiment_with_to_be_analysed_status_make_available_download_experiment(self):
-        # First we post a new experiment through API
+        # first we post a new experiment through API
         owner = User.objects.get(username='lab1')
         self.client.login(username=owner.username, password='nep-lab1')
         self.client.post(
@@ -285,6 +295,15 @@ class ExperimentAPITest(APITestCase):
                 'start_date': datetime.utcnow().strftime('%Y-%m-%d'),
             }
         )
+
+        # Before generate download.zip file we need to create the
+        # license file in media/download/License.txt because that file needs
+        # to be available before bulding download.zip file
+        os.makedirs(os.path.join(TEMP_MEDIA_ROOT, 'download'))
+        license_file = os.path.join(TEMP_MEDIA_ROOT, 'download', 'License.txt')
+        with open(license_file, 'w') as file:
+            file.write('license')
+
         # After sending the experiment data we send a "message" notifying
         # that the experiment can be analysed
         detail_url = reverse(
@@ -299,7 +318,7 @@ class ExperimentAPITest(APITestCase):
         )
         self.client.logout()
 
-        # Now we can test for downloading experiment
+        # now we can test for downloading experiment
         url = reverse('download-view', kwargs={'experiment_id': experiment.id})
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
