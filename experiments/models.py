@@ -175,11 +175,12 @@ class Study(models.Model):  # indexed for search
 
 class Researcher(models.Model):  # indirectly indexed for search
     study = models.OneToOneField(Study, related_name='researcher')
-    name = models.CharField(max_length=200)
+    first_name = models.CharField(max_length=100)
+    last_name = models.CharField(max_length=200)
     email = models.EmailField()
 
     def __str__(self):
-        return self.name
+        return self.last_name + ', ' + self.first_name
 
 
 class Collaborator(models.Model):  # indirectly indexed for search
@@ -190,6 +191,14 @@ class Collaborator(models.Model):  # indirectly indexed for search
 
     def __str__(self):
         return self.name
+
+
+class ExperimentResearcher(models.Model):
+    first_name = models.CharField(max_length=100)
+    last_name = models.CharField(max_length=150)
+    email = models.EmailField(blank=True)
+    institution = models.CharField(max_length=200, blank=True)
+    experiment = models.ForeignKey(Experiment, related_name='researchers')
 
 
 class Group(models.Model):  # indexed for search

@@ -271,7 +271,9 @@ class TrusteeTest(FunctionalTestTrustee):
         # sent to the experiment study researcher to warning her her
         # experiment was approved
         self.wait_for(lambda: self.assertIn(
-            'An email was sent to ' + experiment.study.researcher.name +
+            'An email was sent to ' +
+            experiment.study.researcher.first_name +
+            ' ' + experiment.study.researcher.last_name +
             ' warning that the experiment changed status to Approved.',
             self.browser.find_element_by_tag_name('body').text
         ))
@@ -355,7 +357,8 @@ class TrusteeTest(FunctionalTestTrustee):
             Experiment.STATUS_OPTIONS[2][1]
         ))
         self.wait_for(lambda: self.assertIn(
-            'An email was sent to ' + experiment.study.researcher.name +
+            'An email was sent to ' + experiment.study.researcher.first_name +
+            ' ' + experiment.study.researcher.last_name +
             ' warning that the experiment is under analysis.',
             self.browser.find_element_by_tag_name('body').text
         ))
@@ -467,7 +470,8 @@ class TrusteeTest(FunctionalTestTrustee):
         ))
         self.wait_for(lambda: self.assertIn(
             'An email was sent to ' +
-            experiment.study.researcher.name +
+            experiment.study.researcher.first_name +
+            ' ' + experiment.study.researcher.last_name +
             ' warning that the experiment was rejected.',
             self.browser.find_element_by_tag_name('body').text
         ))
@@ -512,7 +516,8 @@ class TrusteeTest(FunctionalTestTrustee):
         ))
         self.wait_for(lambda: self.assertNotIn(
             'An email was sent to ' +
-            experiment.study.researcher.name +
+            experiment.study.researcher.first_name +
+            ' ' + experiment.study.researcher.last_name +
             ' warning that the experiment is under analysis.',
             self.browser.find_element_by_tag_name('body').text
         ))

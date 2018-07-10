@@ -282,7 +282,9 @@ def change_status(request, experiment_id):
                   [experiment.study.researcher.email])
         messages.success(
             request,
-            _('An email was sent to ') + experiment.study.researcher.name +
+            _('An email was sent to ') +
+            experiment.study.researcher.first_name +
+            ' ' + experiment.study.researcher.last_name +
             _(' warning that the experiment was rejected.')
         )
         # Save the justification message
@@ -315,7 +317,9 @@ def change_status(request, experiment_id):
                   [experiment.study.researcher.email])
         messages.success(
             request,
-            _('An email was sent to ') + experiment.study.researcher.name +
+            _('An email was sent to ') +
+            experiment.study.researcher.first_name +
+            ' ' + experiment.study.researcher.last_name +
             _(' warning that the experiment changed status to Approved.')
         )
 
@@ -343,7 +347,9 @@ def change_status(request, experiment_id):
                   [experiment.study.researcher.email])
         messages.success(
             request,
-            _('An email was sent to ') + experiment.study.researcher.name +
+            _('An email was sent to ') +
+            experiment.study.researcher.first_name +
+            ' ' + experiment.study.researcher.last_name +
             _(' warning that the experiment is under analysis.')
         )
 

@@ -8,6 +8,7 @@ import zipfile
 from unittest import skip
 
 import haystack
+import shutil
 from django.contrib import auth
 from django.contrib.auth.models import User, Permission
 from django.core import mail
@@ -117,7 +118,9 @@ class HomePageTest(TestCase):
         message = list(response.context['messages'])[0]
         self.assertEqual(
             message.message,
-            'An email was sent to ' + experiment.study.researcher.name +
+            'An email was sent to ' +
+            experiment.study.researcher.first_name +
+            ' ' + experiment.study.researcher.last_name +
             ' warning that the experiment changed status to Approved.'
         )
         self.assertEqual(message.tags, "success")
@@ -199,7 +202,7 @@ class ExperimentDetailTest(TestCase):
     def setUp(self):
         global_setup_ut()
         owner = User.objects.create_user(
-            username='labor1', password='nep-labor1'
+            username='labor3', password='nep-labor3'
         )
         create_experiment(1, owner, Experiment.APPROVED)
 
@@ -543,7 +546,7 @@ class SearchTest(TestCase):
     def setUp(self):
         global_setup_ut()
         owner = User.objects.create_user(
-            username='labor1', password='nep-labor1'
+            username='labor2', password='nep-labor2'
         )
         create_experiment(1, owner, Experiment.APPROVED)
         haystack.connections.reload('default')
@@ -894,17 +897,26 @@ class SearchTest(TestCase):
         self.assertContains(response, '<tr', 1)
 
 
-@apply_setup(global_setup_ut)
 class DownloadExperimentTest(TestCase):
 
     TEMP_MEDIA_ROOT = os.path.join(tempfile.mkdtemp(), 'media')
 
-    def setUp(self):
-        global_setup_ut()
+    @classmethod
+    def setUpClass(cls):
         owner = User.objects.create_user(
             username='labor1', password='nep-labor1'
         )
-        create_experiment(1, owner, Experiment.APPROVED)
+        experiment = create_experiment(1, owner, Experiment.APPROVED)
+        create_valid_questionnaires(experiment)
+        create_experiment_related_objects(experiment)
+        create_download_dir_structure_and_files(
+            experiment, cls.TEMP_MEDIA_ROOT
+        )
+
+    @classmethod
+    def tearDownClass(cls):
+        shutil.rmtree(cls.TEMP_MEDIA_ROOT)
+        User.objects.last().delete()
 
     def asserts_experimental_protocol(self, ep_value, group1, group2,
                                       zipped_file):
@@ -1141,17 +1153,6 @@ class DownloadExperimentTest(TestCase):
     @override_settings(MEDIA_ROOT=TEMP_MEDIA_ROOT)
     def test_POSTing_download_experiment_data_returns_correct_content(self):
         experiment = Experiment.objects.last()
-        create_valid_questionnaires(experiment)
-        # Create study and participants and experimental protocol for
-        # this experiment. That's what it's missing.
-        create_experiment_related_objects(experiment)
-
-        # Create a complete directory tree with possible experiment data
-        # directories/files that reproduces the directory/file structure
-        # created when Portal receives the experiment data through Rest API.
-        create_download_dir_structure_and_files(
-            experiment, self.TEMP_MEDIA_ROOT
-        )
 
         # get groups and participants for tests below
         g1 = experiment.groups.order_by('?').first()
@@ -1195,6 +1196,13 @@ class DownloadExperimentTest(TestCase):
         zipped_file = zipfile.ZipFile(file, 'r')
         self.assertIsNone(zipped_file.testzip())
 
+        # compressed file must always contain License.txt
+        self.assertTrue(
+            any('License.txt'
+                in element for element in zipped_file.namelist()),
+            'License.txt not in ' + str(zipped_file.namelist())
+        )
+
         # compressed file must always contain Experiments.csv
         self.assertTrue(
             any('Experiment.csv'
@@ -1223,9 +1231,7 @@ class DownloadExperimentTest(TestCase):
                 )
 
     def test_POSTing_download_experiment_data_without_choices_redirects_to_experiment_detail_view(self):
-        experiment = Experiment.objects.filter(
-            status=Experiment.APPROVED
-        ).last()
+        experiment = Experiment.objects.last()
 
         url = reverse('download-view', kwargs={'experiment_id': experiment.id})
         # POST without data, as when nothing is selected, the request do not
@@ -1239,19 +1245,12 @@ class DownloadExperimentTest(TestCase):
     @skip
     def test_POSTing_all_options_redirects_to_view_with_GET_request(self):
         # we are prevent submit data in detail.html with JQuery by now
-        # TODO: possible implementation without javascript
+        # TODO: possible implementation masking javascript
         pass
 
     @override_settings(MEDIA_ROOT=TEMP_MEDIA_ROOT)
     def test_POSTing_option_data_has_not_correspondent_subdir_redirects_to_experiment_detail_view(self):
         experiment = Experiment.objects.last()
-        create_valid_questionnaires(experiment)
-        # Create other objects required for this experiment to test POSTing
-        # data and download dir structure
-        create_experiment_related_objects(experiment)
-        create_download_dir_structure_and_files(
-            experiment, self.TEMP_MEDIA_ROOT
-        )
 
         group = experiment.groups.order_by('?').first()
         participant = group.participants.order_by('?').first()
@@ -1283,20 +1282,18 @@ class DownloadExperimentTest(TestCase):
 
     @override_settings(MEDIA_ROOT=TEMP_MEDIA_ROOT)
     def test_GETing_download_experiment_view_without_compressed_file_redirects_to_experiment_detail_view(self):
-        experiment = Experiment.objects.filter(
-            status=Experiment.APPROVED
-        ).last()
+        experiment = Experiment.objects.last()
 
-        # create temp 'media/download/<experiment.id>' subdir
-        os.makedirs(
-            os.path.join(self.TEMP_MEDIA_ROOT, 'download', str(experiment.id))
-        )
+        os.remove(os.path.join(
+            self.TEMP_MEDIA_ROOT, 'download', str(experiment.id),
+            'download.zip'
+        ))
 
         url = reverse('download-view', kwargs={'experiment_id': experiment.id})
         response = self.client.get(url)
 
-        # As we have nothing in 'media/download/<experiment.id>' the system
-        # should redirects to experiment detail page
+        # As we don't have in 'media/download/<experiment.id>/download.zip'
+        # file the system should redirects to experiment detail page
         self.assertRedirects(
             response,
             reverse('experiment-detail', kwargs={'slug': experiment.slug})

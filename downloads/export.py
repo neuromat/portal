@@ -184,6 +184,12 @@ class ExportExecution:
             experiment_resume_directory, filename_experiment_resume
         )
 
+        # append License/Citation file into download zip list
+        self.files_to_zip_list.append(
+            [path.join(settings.MEDIA_ROOT, 'download', 'License.txt'),
+             export_experiment_data]
+        )
+
         experiment_description_fields = []
         experiment_description_fields.insert(0, experiment_resume_header)
         experiment_description_fields.insert(1, experiment_resume)
@@ -1055,8 +1061,6 @@ class ExportExecution:
                         'directory_step': path.join(participant_code_directory, directory_step_name),
                         'export_directory_step': path.join(export_participant_code_directory, directory_step_name),
                     })
-
-                # stimulus_data_list = Step.objects.filter(type='stimulus')
 
         return error_msg
 
