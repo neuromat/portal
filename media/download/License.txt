@@ -1,1 +1,11 @@
-license
+English
+-------
+You must know this experiment is licensed under Creative Commons Attribution 4
+.0 International License and requires that you comply with the following:
+
+You must give appropriate credit, provide a link to the license, and indicate
+if changes were made. You may do so in any reasonable manner, but not in any
+way that suggests the licensor endorses you or your use.
+
+Link to Creative Commons Attribution 4.0 International license and more
+details: https://creativecommons.org/licenses/by/4.0/legalcode
