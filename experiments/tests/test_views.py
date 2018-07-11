@@ -34,7 +34,7 @@ from experiments.tests.tests_helper import apply_setup, global_setup_ut, \
     create_eeg_electrode_localization_system, \
     create_emg_digital_filter_setting, create_group, create_questionnaire, \
     create_questionnaire_language, create_valid_questionnaires, \
-    create_publication
+    create_publication, create_experiment_researcher
 from experiments.views import change_slug
 from functional_tests import test_search
 from nep import settings
@@ -892,6 +892,18 @@ class SearchTest(TestCase):
         response = self.client.get('/search/', {
             'q': '\"Verletzung des Plexus Brachialis\"'
         })
+        self.assertEqual(response.status_code, 200)
+        # because in search results templates it's '<tr class ...>'
+        self.assertContains(response, '<tr', 1)
+
+    def test_search_experiment_research_returns_correct_number_of_objects(self):
+        experiment = Experiment.objects.last()
+        create_experiment_researcher(experiment, 'Boulos')
+
+        # rebuid index to incorporate experiment publication change
+        self.haystack_index('rebuild_index')
+
+        response = self.client.get('/search/', {'q': 'Boulos'})
         self.assertEqual(response.status_code, 200)
         # because in search results templates it's '<tr class ...>'
         self.assertContains(response, '<tr', 1)

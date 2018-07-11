@@ -103,6 +103,9 @@
                 {% if result.model_name == 'eegelectrodeposition' %}
                     {% include 'search/eegelectrodeposition.html' %}
                 {% endif %}
+                {% if result.model_name == 'experimentresearcher' %}
+                    {% include 'search/experimentresearcher.html' %}
+                {% endif %}
             {% empty %}
                 <p>{% trans "No results found" %}.</p>
             {% endfor %}

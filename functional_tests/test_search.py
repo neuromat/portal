@@ -21,7 +21,8 @@ from experiments.tests.tests_helper import create_experiment, \
     create_emg_intramuscular_placement, create_emg_needle_placement, \
     create_eeg_electrode_position, create_surface_electrode, \
     create_intramuscular_electrode, create_instruction_step, create_step, \
-    create_publication, create_valid_questionnaires
+    create_publication, create_valid_questionnaires, \
+    create_experiment_researcher
 from functional_tests.base import FunctionalTest
 
 import time
@@ -1363,6 +1364,31 @@ class SearchTest(FunctionalTest):
         # Joselina wants to search for a given intramuscular electrode
         self.search_for(search_text)
 
-        # As there are one intramuscular electrode with that string, she sees
+        # As there is one intramuscular electrode with that string, she sees
         # one result
         self.check_matches(1, 'eeg_electrode_position-matches', search_text)
+
+    def test_search_experiment_researcher(self):
+        experiment = create_experiment(1, status=Experiment.APPROVED)
+        create_experiment_researcher(
+            experiment, first_name='Guilherme', last_name='Boulos'
+        )
+
+        search_text = 'Boulos'
+        self.haystack_index('rebuild_index')
+
+        # Joselina wants to search for an experiment that has Boulos as one
+        # of the researchers last name
+        self.search_for(search_text)
+
+        # As there's one experiment with given researcher, she sees one result
+        self.check_matches(1, 'experiment_researcher-matches', search_text)
+
+        # Now she wants to search by first name, that is 'Guilherme'
+        search_text = 'Guilherme'
+        self.haystack_index('rebuild_index')
+        self.search_for(search_text)
+
+        # As there's one experiment with given researcher, she sees one result
+        self.check_matches(1, 'experiment_researcher-matches', search_text)
+

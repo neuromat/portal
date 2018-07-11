@@ -7,7 +7,7 @@ from experiments.models import Experiment, Study, Group, \
     ContextTree, EEGElectrodeNet, EEGSolution, EEGFilterSetting, \
     EEGElectrodeLocalizationSystem, EMGDigitalFilterSetting, Stimulus, \
     GenericDataCollection, EMGElectrodePlacementSetting, EMGElectrodeSetting, \
-    EEGElectrodePosition, Instruction
+    EEGElectrodePosition, Instruction, ExperimentResearcher
 
 
 class ExperimentIndex(indexes.SearchIndex, indexes.Indexable):
@@ -63,6 +63,20 @@ class PublicationIndex(indexes.SearchIndex, indexes.Indexable):
 
     def get_model(self):
         return Publication
+
+    def index_queryset(self, using=None):
+        experiments = Experiment.lastversion_objects.filter(
+            status=Experiment.APPROVED
+        )
+        return self.get_model().objects.filter(experiment__in=experiments)
+
+
+class ExperimentResearcherIndex(indexes.SearchIndex, indexes.Indexable):
+    text = indexes.CharField(document=True, use_template=True)
+    experiment = indexes.CharField(model_attr='experiment__id')
+
+    def get_model(self):
+        return ExperimentResearcher
 
     def index_queryset(self, using=None):
         experiments = Experiment.lastversion_objects.filter(
