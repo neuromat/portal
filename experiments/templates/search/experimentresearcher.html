@@ -1,0 +1,20 @@
+{% load highlight %}
+{% load i18n %}
+<tr class="experiment_researcher-matches">
+    <td>
+        <h5 class="match">
+            <a href="{% url 'experiment-detail' result.object.experiment.slug %}"><strong
+            >{% trans "Experiment" %}: </strong>{{ result.object.experiment.title }}
+                <strong>> {% trans "Researcher" %}: </strong>
+                {{ result.object.last_name }}</a><br><br>
+        </h5>
+        <strong>{% trans "first name" %}: </strong>
+        {% highlight result.object.first_name with query %}&nbsp;
+        <strong>{% trans "last name" %}: </strong>
+        {% highlight result.object.last_name with query %}&nbsp;
+        <strong>{% trans "email" %}: </strong>
+        {% highlight result.object.email with query %}&nbsp;
+        <strong>{% trans "institution" %}: </strong>
+        {% highlight result.object.institution with query %}&nbsp;
+    </td>
+</tr>
