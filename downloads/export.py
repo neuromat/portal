@@ -81,8 +81,8 @@ class ExportExecution:
         return self.user_name
 
     def set_directory_base(self, export_id):
-        if not os.path.exists(os.path.join(settings.MEDIA_ROOT + '/download')):
-            os.makedirs(os.path.join(settings.MEDIA_ROOT + '/download'))
+        if not os.path.exists(os.path.join(settings.MEDIA_ROOT, 'download')):
+            os.makedirs(os.path.join(settings.MEDIA_ROOT, 'download'))
         self.directory_base = path.join(
             self.base_directory_name, str(export_id)
         )
@@ -152,6 +152,36 @@ class ExportExecution:
         # /MEDIA_ROOT/download/experiment_id/
         return self.directory_base
 
+    @staticmethod
+    def add_researchers_to_citation(researchers):
+        researchers_part = ''
+        for researcher in researchers:
+            researchers_part += \
+                (researcher.last_name.upper()
+                 + ', ' + researcher.first_name + '; ')
+        return researchers_part[:-2] + ' '
+
+    def add_citation_to_file(self, experiment, file):
+        with open(file, 'w') as f:
+            f.write(
+                'How to cite this experiment:\n'
+                '----------------------------\n\n'
+            )
+            experiment_researchers = experiment.researchers.all()
+            if not experiment_researchers \
+                    and hasattr(experiment.study, 'researcher'):
+                researchers_part = self.add_researchers_to_citation(
+                    [experiment.study.researcher]
+                )
+            else:
+                researchers_part = self.add_researchers_to_citation(
+                    experiment.researchers.all()
+                )
+            f.write(
+                researchers_part + experiment.title + '. Sent date: '
+                + str(experiment.sent_date)
+            )
+
     def process_experiment_data(self, experiment_id):
         """
         General experiment data
@@ -189,6 +219,13 @@ class ExportExecution:
             [path.join(settings.MEDIA_ROOT, 'download', 'License.txt'),
              export_experiment_data]
         )
+
+        # create CITATION.txt file
+        citation_file = os.path.join(
+            experiment_resume_directory, 'CITATION.txt'
+        )
+        self.add_citation_to_file(experiment, citation_file)
+        self.files_to_zip_list.append([citation_file, export_experiment_data])
 
         experiment_description_fields = []
         experiment_description_fields.insert(0, experiment_resume_header)
@@ -1534,8 +1571,10 @@ class ExportExecution:
                             with open(complete_filename_questionnaire_metadata, 'w') as f:
                                 f.write(questionnaire_metadata_fields)
 
-                            self.files_to_zip_list.append([complete_filename_questionnaire_metadata,
-                                                           export_questionnaire_metadata_directory_name])
+                            self.files_to_zip_list.append(
+                                [complete_filename_questionnaire_metadata,
+                                 export_questionnaire_metadata_directory_name]
+                            )
 
         return error_msg
 
