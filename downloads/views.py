@@ -111,8 +111,20 @@ def download_view(request, experiment_id):
     # License.txt always will be in compressed file
     try:
         shutil.copyfile(os.path.join(
-            settings.MEDIA_ROOT, 'download', 'License.txt'
-        ), os.path.join(temp_dir, 'License.txt')
+            settings.MEDIA_ROOT, 'download', 'LICENSE.txt'
+        ), os.path.join(temp_dir, 'LICENSE.txt')
+        )
+    except FileNotFoundError:
+        messages.error(request, DOWNLOAD_ERROR_MESSAGE)
+        return HttpResponseRedirect(
+            reverse('experiment-detail', kwargs={'slug': experiment.slug})
+        )
+
+    # CITATION.txt always will be in compressed file
+    try:
+        shutil.copyfile(os.path.join(
+            settings.MEDIA_ROOT, 'download', str(experiment.id), 'CITATION.txt'
+        ), os.path.join(temp_dir, 'CITATION.txt')
         )
     except FileNotFoundError:
         messages.error(request, DOWNLOAD_ERROR_MESSAGE)
@@ -246,6 +258,8 @@ def download_view(request, experiment_id):
     experiment.downloads += 1
     experiment.save()
 
+    shutil.rmtree(temp_dir)
+
     return response
 
 
@@ -273,7 +287,8 @@ def download_create(experiment_id, template_name):
         export = ExportExecution(experiment_id)
 
         # set path of the directory base: ex. /media/temp/
-        base_directory, path_to_create = path.split(export.get_directory_base())
+        base_directory, path_to_create = \
+            path.split(export.get_directory_base())
         error_msg, base_directory_name = create_directory(
             base_directory, path_to_create
         )
@@ -311,8 +326,11 @@ def download_create(experiment_id, template_name):
 
         # create zip file and include files
         if export.files_to_zip_list:
-            export_filename = export.get_input_data("export_filename")  # 'download.zip'
-            export_complete_filename = path.join(base_directory_name, export_filename)
+            # 'download.zip'
+            export_filename = export.get_input_data("export_filename")
+            export_complete_filename = path.join(
+                base_directory_name, export_filename
+            )
 
             with ZipFile(export_complete_filename, 'w') as zip_file:
                 for filename, directory in export.files_to_zip_list:

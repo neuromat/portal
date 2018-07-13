@@ -1,16 +1,18 @@
 import os
 import tempfile
 import time
+import zipfile
 from random import choice
 from unittest import skip
 
+import shutil
 from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
 from django.test import override_settings
 from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.common.keys import Keys
 
-from downloads.views import DOWNLOAD_ERROR_MESSAGE
+from downloads.views import DOWNLOAD_ERROR_MESSAGE, download_create
 from experiments.models import Experiment, Questionnaire, Step, Group, Gender
 from experiments.tests.tests_helper import create_experiment, create_group, \
     create_participant, create_download_dir_structure_and_files, \
@@ -789,9 +791,23 @@ class ExperimentDetailTest(FunctionalTest):
             )
 
 
+TEMP_MEDIA_ROOT = os.path.join(tempfile.mkdtemp())
+
+
+@override_settings(MEDIA_ROOT=TEMP_MEDIA_ROOT)
 class DownloadExperimentTest(FunctionalTest):
 
-    TEMP_MEDIA_ROOT = os.path.join(tempfile.mkdtemp(), 'media')
+    def setUp(self):
+        super(DownloadExperimentTest, self).setUp()
+        # license is in media/download/LICENSE.txt
+        os.makedirs(os.path.join(TEMP_MEDIA_ROOT, 'download'))
+        license_file = os.path.join(TEMP_MEDIA_ROOT, 'download', 'LICENSE.txt')
+        with open(license_file, 'w') as file:
+            file.write('license')
+
+    def tearDown(self):
+        shutil.rmtree(TEMP_MEDIA_ROOT)
+        super(DownloadExperimentTest, self).tearDown()
 
     def access_downloads_tab_content(self, experiment):
         # Josileine wants to download the experiment data.
@@ -1026,7 +1042,6 @@ class DownloadExperimentTest(FunctionalTest):
         button = self.browser.find_element_by_id('download_button')
         self.assertEqual('Download', button.get_attribute('value'))
 
-    @override_settings(MEDIA_ROOT=TEMP_MEDIA_ROOT)
     def test_clicking_in_download_all_experiment_data_without_compressed_file_returns_error_message(self):
         experiment = Experiment.objects.filter(
             status=Experiment.APPROVED
@@ -1034,7 +1049,7 @@ class DownloadExperimentTest(FunctionalTest):
 
         # create temporary experiment download subdir
         os.makedirs(
-            os.path.join(self.TEMP_MEDIA_ROOT, 'download', str(experiment.pk))
+            os.path.join(TEMP_MEDIA_ROOT, 'download', str(experiment.pk))
         )
 
         # Josileine accesses Experiment Detail Downloads tab
@@ -1092,7 +1107,6 @@ class DownloadExperimentTest(FunctionalTest):
             self.browser.find_element_by_class_name('alert-warning').text
         ))
 
-    @override_settings(MEDIA_ROOT=TEMP_MEDIA_ROOT)
     def test_if_there_is_not_a_subdir_in_download_dir_structure_return_message(self):
         # TODO: getting momentarily from tests_helper
         experiment = Experiment.objects.get(
@@ -1122,9 +1136,7 @@ class DownloadExperimentTest(FunctionalTest):
                 eeg_step = create_eeg_step(group, eeg_setting)
                 create_eeg_data(eeg_setting, eeg_step, participant)
 
-        create_download_dir_structure_and_files(
-            experiment, self.TEMP_MEDIA_ROOT
-        )
+        create_download_dir_structure_and_files(experiment, TEMP_MEDIA_ROOT)
 
         ##
         # Get the variables that we will need below
@@ -1157,7 +1169,7 @@ class DownloadExperimentTest(FunctionalTest):
         # structure after experiment is ready to be analysed.
         ##
         remove_selected_subdir(
-            selected, experiment, participant, group, self.TEMP_MEDIA_ROOT
+            selected, experiment, participant, group, TEMP_MEDIA_ROOT
         )
 
         # She selects one option to download and click in Download button
@@ -1185,7 +1197,7 @@ class DownloadExperimentTest(FunctionalTest):
 
     def test_clicking_in_download_all_experiment_data_link_pops_up_a_modal_with_license_warning_1(self):
         ##
-        # Test when there is the experiment researchers
+        # Test when there are experiment researchers
         ##
         experiment = Experiment.objects.last()
         study = create_study(1, experiment)
@@ -1304,3 +1316,97 @@ class DownloadExperimentTest(FunctionalTest):
             )
 
         self.license_text_asserts(license_modal)
+
+    def test_how_to_cite_in_license_modal_is_equal_to_how_to_cite_in_citation_file_1(self):
+        experiment = Experiment.objects.last()
+        create_study(1, experiment)
+        create_researcher(experiment.study, 'Valdick', 'Soriano')
+        download_create(experiment.id, '')
+
+        # get the zipped file to test against its content
+        zip_file = os.path.join(
+            TEMP_MEDIA_ROOT, 'download', str(experiment.id),
+            'download.zip'
+        )
+        zipped_file = zipfile.ZipFile(zip_file, 'r')
+        file = zipped_file.open('EXPERIMENT_DOWNLOAD/CITATION.txt', 'r')
+
+        # Joseleine access the download tab of the last approved experiment
+        self.access_downloads_tab_content(experiment)
+
+        # After access Download tab in Experiment detail page, she clicks in
+        # Download all experiment data link
+        self.browser.find_element_by_id('button_download').click()
+        time.sleep(0.5)  # necessary to wait for modal content to load
+
+        # She sees a modal warning her from License of the data that will
+        # be downloaded
+        license_modal = \
+            self.wait_for(
+                lambda:
+                self.browser.find_element_by_id('license_modal')
+            )
+
+        # She has downloaded the experiment once and wants to see if the
+        # "How to cite" in license modal is equal to the "How to cite" in
+        # CITATION.txt file
+        self.assertIn(
+            'SORIANO, Valdick ' + experiment.title
+            + '. Sent date: '
+            + str(experiment.sent_date),
+            file.read().decode('utf-8')
+        )
+        self.assertIn(
+            'SORIANO, Valdick ' + experiment.title
+            + '. Sent date: '
+            + str(experiment.sent_date.strftime('%B %d, %Y')),
+            license_modal.text
+        )
+
+    def test_how_to_cite_in_license_modal_is_equal_to_how_to_cite_in_citation_file_2(self):
+        experiment = Experiment.objects.last()
+        create_study(1, experiment)
+        create_researcher(experiment.study, 'Valdick', 'Soriano')
+        create_experiment_researcher(experiment, 'Diana', 'Ross')
+        create_experiment_researcher(experiment, 'Guilherme', 'Boulos')
+        create_experiment_researcher(experiment, 'Edimilson', 'Costa')
+        download_create(experiment.id, '')
+
+        # get the zipped file to test against its content
+        zip_file = os.path.join(
+            TEMP_MEDIA_ROOT, 'download', str(experiment.id),
+            'download.zip'
+        )
+        zipped_file = zipfile.ZipFile(zip_file, 'r')
+        file = zipped_file.open('EXPERIMENT_DOWNLOAD/CITATION.txt', 'r')
+
+        # Joseleine access the download tab of the last approved experiment
+        self.access_downloads_tab_content(experiment)
+
+        # After access Download tab in Experiment detail page, she clicks in
+        # Download all experiment data link
+        self.browser.find_element_by_id('button_download').click()
+        time.sleep(0.5)  # necessary to wait for modal content to load
+
+        # She sees a modal warning her from License of the data that will
+        # be downloaded
+        license_modal = \
+            self.wait_for(
+                lambda:
+                self.browser.find_element_by_id('license_modal')
+            )
+
+        # She has downloaded the experiment once and wants to see if the
+        # "How to cite" in license modal is equal to the "How to cite" in
+        # CITATION.txt file
+        self.assertIn(
+            'ROSS, Diana; BOULOS, Guilherme; COSTA, Edimilson '
+            + experiment.title + '. Sent date: ' + str(experiment.sent_date),
+            file.read().decode('utf-8')
+        )
+        self.assertIn(
+            'ROSS, Diana; BOULOS, Guilherme; COSTA, Edimilson '
+            + experiment.title + '. Sent date: '
+            + str(experiment.sent_date.strftime('%B %d, %Y')),
+            license_modal.text
+        )

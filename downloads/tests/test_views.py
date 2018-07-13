@@ -12,7 +12,8 @@ from downloads.views import download_create
 from experiments.models import Experiment
 from experiments.tests.tests_helper import create_experiment, create_study, \
     create_participant, create_group, create_questionnaire, \
-    create_questionnaire_language, create_questionnaire_responses
+    create_questionnaire_language, create_questionnaire_responses, \
+    create_researcher, create_experiment_researcher
 from nep import settings
 
 TEMP_MEDIA_ROOT = os.path.join(tempfile.mkdtemp())
@@ -24,7 +25,7 @@ class DownloadCreateView(TestCase):
     def setUp(self):
         # license is in media/download/License.txt
         os.makedirs(os.path.join(TEMP_MEDIA_ROOT, 'download'))
-        license_file = os.path.join(TEMP_MEDIA_ROOT, 'download', 'License.txt')
+        license_file = os.path.join(TEMP_MEDIA_ROOT, 'download', 'LICENSE.txt')
         with open(license_file, 'w') as file:
             file.write('license')
 
@@ -77,13 +78,60 @@ class DownloadCreateView(TestCase):
                 TEMP_MEDIA_ROOT, 'download', str(experiment.id), 'download.zip'
             )
         zipped_file = zipfile.ZipFile(zip_file, 'r')
-        self.assertIsNone(zipped_file.testzip())
+        self.assertIsNone(zipped_file.testzip())  # TODO: test this separately
 
-        # compressed file must always contain License.txt
+        # compressed file must always contain License.txt file
         self.assertTrue(
-            any('License.txt'
+            any('LICENSE.txt'
                 in element for element in zipped_file.namelist()),
-            'License.txt not in ' + str(zipped_file.namelist())
+            'LICENSE.txt not in ' + str(zipped_file.namelist())
+        )
+
+    def test_download_dir_structure_has_citation_file(self):
+        experiment, group = self.create_download_subdirs()
+
+        self.assertIn(
+            'CITATION.txt', os.listdir(os.path.join(
+                TEMP_MEDIA_ROOT, 'download', str(experiment.id)
+            ))
+        )
+
+    def test_download_zip_file_has_how_to_cite_content_in_citation_file_1(self):
+        experiment = self.create_basic_experiment_data()
+        create_researcher(experiment.study, 'Valdick', 'Soriano')
+        download_create(experiment.id, '')
+
+        # get the zipped file to test against its content
+        zip_file = os.path.join(
+            TEMP_MEDIA_ROOT, 'download', str(experiment.id), 'download.zip'
+        )
+        zipped_file = zipfile.ZipFile(zip_file, 'r')
+        file = zipped_file.open('EXPERIMENT_DOWNLOAD/CITATION.txt', 'r')
+        self.assertIn(
+            'SORIANO, Valdick ' + experiment.title
+            + '. Sent date: ' + str(experiment.sent_date),
+            file.read().decode('utf-8')
+        )
+
+    def test_download_zip_file_has_how_to_cite_content_in_citation_file_2(self):
+        experiment = self.create_basic_experiment_data()
+        create_researcher(experiment.study, 'Valdick', 'Soriano')
+        create_experiment_researcher(experiment, 'Diana', 'Ross')
+        create_experiment_researcher(experiment, 'Guilherme', 'Boulos')
+        create_experiment_researcher(experiment, 'Edimilson', 'Costa')
+        download_create(experiment.id, '')
+
+        # get the zipped file to test against its content
+        zip_file = os.path.join(
+            TEMP_MEDIA_ROOT, 'download', str(experiment.id), 'download.zip'
+        )
+        zipped_file = zipfile.ZipFile(zip_file, 'r')
+
+        file = zipped_file.open('EXPERIMENT_DOWNLOAD/CITATION.txt', 'r')
+        self.assertIn(
+            'ROSS, Diana; BOULOS, Guilherme; COSTA, Edimilson '
+            + experiment.title + '. Sent date: ' + str(experiment.sent_date),
+            file.read().decode('utf-8')
         )
 
     def test_do_not_write_age_column_in_csv_file_if_participants_has_date_null_1(self):
