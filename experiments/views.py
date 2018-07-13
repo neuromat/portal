@@ -3,6 +3,7 @@ import math
 import pandas
 import tempfile
 
+import shutil
 from django.contrib import messages
 from django.contrib.auth.views import LoginView, PasswordResetView, \
     PasswordResetDoneView, PasswordResetConfirmView, PasswordResetCompleteView
@@ -113,6 +114,9 @@ def _get_questionnaire_metadata(metadata):
     # make dictionnaire to ease diplaying in template
     for q_group in q_groups:
         q_groups[q_group] = dict(data=q_groups[q_group])
+
+    shutil.rmtree(temp_dir)
+
     return q_groups
 
 

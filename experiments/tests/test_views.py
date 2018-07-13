@@ -1164,6 +1164,7 @@ class DownloadExperimentTest(TestCase):
 
     @override_settings(MEDIA_ROOT=TEMP_MEDIA_ROOT)
     def test_POSTing_download_experiment_data_returns_correct_content(self):
+        # TODO: too large, divide!
         experiment = Experiment.objects.last()
 
         # get groups and participants for tests below
@@ -1192,9 +1193,7 @@ class DownloadExperimentTest(TestCase):
             selected_items[random_choice] = all_items[random_choice]
             all_items.pop(random_choice, 0)
         response = self.client.post(
-            url, {
-                'download_selected': selected_items.values()
-            }
+            url, {'download_selected': selected_items.values()}
         )
 
         self.assertEqual(response.status_code, 200)
@@ -1208,11 +1207,18 @@ class DownloadExperimentTest(TestCase):
         zipped_file = zipfile.ZipFile(file, 'r')
         self.assertIsNone(zipped_file.testzip())
 
-        # compressed file must always contain License.txt
+        # compressed file must always contain License.txt file
         self.assertTrue(
-            any('License.txt'
+            any('LICENSE.txt'
                 in element for element in zipped_file.namelist()),
-            'License.txt not in ' + str(zipped_file.namelist())
+            'LICENSE.txt not in ' + str(zipped_file.namelist())
+        )
+
+        # compressed file must always contain CITATION.txt file
+        self.assertTrue(
+            any('CITATION.txt'
+                in element for element in zipped_file.namelist()),
+            'CITATION.txt not in ' + str(zipped_file.namelist())
         )
 
         # compressed file must always contain Experiments.csv

@@ -1,0 +1,26 @@
+English
+-------
+You must know this experiment is licensed under Creative Commons Attribution 4
+.0 International License and requires that you comply with the following:
+
+You must give appropriate credit, provide a link to the license, and indicate
+if changes were made. You may do so in any reasonable manner, but not in any
+way that suggests the licensor endorses you or your use.
+
+Link to Creative Commons Attribution 4.0 International license and more
+details: https://creativecommons.org/licenses/by/4.0/legalcode
+
+Portuguese
+----------
+Você deve saber que este experimento está licenciado sob a Licença
+Internacional Creative Commons Attribution 4.0 e requer que você cumpra o
+seguinte:
+
+Você deve dar crédito apropriado, fornecer um link para a licença e indicar
+se mudanças foram feitas. Você pode fazê-lo de qualquer maneira razoável,
+mas não de maneira que sugira que o licenciante endosse você ou o uso dos dados
+ do experimento.
+
+Link para a Licença Internacional Creative Commons Attribution 4.0
+International e para mais detalhes:
+https://creativecommons.org/licenses/by/4.0/legalcode
