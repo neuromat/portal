@@ -214,9 +214,9 @@ class ExportExecution:
             experiment_resume_directory, filename_experiment_resume
         )
 
-        # append License/Citation file into download zip list
+        # append License file into download zip list
         self.files_to_zip_list.append(
-            [path.join(settings.MEDIA_ROOT, 'download', 'License.txt'),
+            [path.join(settings.MEDIA_ROOT, 'download', 'LICENSE.txt'),
              export_experiment_data]
         )
 

@@ -25,7 +25,7 @@ class DownloadCreateView(TestCase):
     def setUp(self):
         # license is in media/download/License.txt
         os.makedirs(os.path.join(TEMP_MEDIA_ROOT, 'download'))
-        license_file = os.path.join(TEMP_MEDIA_ROOT, 'download', 'License.txt')
+        license_file = os.path.join(TEMP_MEDIA_ROOT, 'download', 'LICENSE.txt')
         with open(license_file, 'w') as file:
             file.write('license')
 
@@ -82,9 +82,9 @@ class DownloadCreateView(TestCase):
 
         # compressed file must always contain License.txt file
         self.assertTrue(
-            any('License.txt'
+            any('LICENSE.txt'
                 in element for element in zipped_file.namelist()),
-            'License.txt not in ' + str(zipped_file.namelist())
+            'LICENSE.txt not in ' + str(zipped_file.namelist())
         )
 
     def test_download_dir_structure_has_citation_file(self):

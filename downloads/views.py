@@ -111,8 +111,8 @@ def download_view(request, experiment_id):
     # License.txt always will be in compressed file
     try:
         shutil.copyfile(os.path.join(
-            settings.MEDIA_ROOT, 'download', 'License.txt'
-        ), os.path.join(temp_dir, 'License.txt')
+            settings.MEDIA_ROOT, 'download', 'LICENSE.txt'
+        ), os.path.join(temp_dir, 'LICENSE.txt')
         )
     except FileNotFoundError:
         messages.error(request, DOWNLOAD_ERROR_MESSAGE)

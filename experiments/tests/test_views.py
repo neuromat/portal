@@ -1209,9 +1209,9 @@ class DownloadExperimentTest(TestCase):
 
         # compressed file must always contain License.txt file
         self.assertTrue(
-            any('License.txt'
+            any('LICENSE.txt'
                 in element for element in zipped_file.namelist()),
-            'License.txt not in ' + str(zipped_file.namelist())
+            'LICENSE.txt not in ' + str(zipped_file.namelist())
         )
 
         # compressed file must always contain CITATION.txt file

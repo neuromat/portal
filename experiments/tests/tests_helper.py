@@ -1098,7 +1098,7 @@ def create_download_dir_structure_and_files(experiment, temp_media_root):
 
     # create License.txt file
     create_text_file(
-        os.path.join(temp_media_root, 'download', 'License.txt'),
+        os.path.join(temp_media_root, 'download', 'LICENSE.txt'),
         'The GNU General Public License is a free, copyleft license for '
         'software and other kinds of works.'
     )

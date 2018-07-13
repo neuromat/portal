@@ -198,10 +198,10 @@ class ExperimentAPITest(APITestCase):
 
         # Before generate download.zip file when changing experiment status
         # from RECEIVING to TO_BE_ANALYSED, we need to create the
-        # license file in media/download/License.txt because that file needs
+        # license file in media/download/LICENSE.txt because that file needs
         # to be available before bulding download.zip file
         os.makedirs(os.path.join(TEMP_MEDIA_ROOT, 'download'))
-        license_file = os.path.join(TEMP_MEDIA_ROOT, 'download', 'License.txt')
+        license_file = os.path.join(TEMP_MEDIA_ROOT, 'download', 'LICENSE.txt')
         with open(license_file, 'w') as file:
             file.write('license')
 
@@ -300,7 +300,7 @@ class ExperimentAPITest(APITestCase):
         # license file in media/download/License.txt because that file needs
         # to be available before bulding download.zip file
         os.makedirs(os.path.join(TEMP_MEDIA_ROOT, 'download'))
-        license_file = os.path.join(TEMP_MEDIA_ROOT, 'download', 'License.txt')
+        license_file = os.path.join(TEMP_MEDIA_ROOT, 'download', 'LICENSE.txt')
         with open(license_file, 'w') as file:
             file.write('license')
 
