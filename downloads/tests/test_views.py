@@ -87,20 +87,13 @@ class DownloadCreateView(TestCase):
             'License.txt not in ' + str(zipped_file.namelist())
         )
 
-    def test_download_zip_file_has_citation_file(self):
+    def test_download_dir_structure_has_citation_file(self):
         experiment, group = self.create_download_subdirs()
 
-        # get the zipped file to test against its content
-        zip_file = os.path.join(
-            TEMP_MEDIA_ROOT, 'download', str(experiment.id), 'download.zip'
-        )
-        zipped_file = zipfile.ZipFile(zip_file, 'r')
-
-        # compressed file must always contain Citation.txt file
-        self.assertTrue(
-            any('CITATION.txt'
-                in element for element in zipped_file.namelist()),
-            'CITATION.txt not in ' + str(zipped_file.namelist())
+        self.assertIn(
+            'CITATION.txt', os.listdir(os.path.join(
+                TEMP_MEDIA_ROOT, 'download', str(experiment.id)
+            ))
         )
 
     def test_download_zip_file_has_how_to_cite_content_in_citation_file_1(self):

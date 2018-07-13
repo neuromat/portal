@@ -1078,7 +1078,8 @@ def create_download_dir_structure_and_files(experiment, temp_media_root):
     """
     Create a complete directory tree with possible experiment data
     directories/files that reproduces the directory/file structure
-    created when Portal receives the experiment data through Rest API.
+    created when Portal receives the experiment data through Rest API and
+    triggers making download.zip file and directory/file structure.
     :param experiment: Experiment model instance
     :param temp_media_root: Temporary media root path
     """
@@ -1100,6 +1101,14 @@ def create_download_dir_structure_and_files(experiment, temp_media_root):
         os.path.join(temp_media_root, 'download', 'License.txt'),
         'The GNU General Public License is a free, copyleft license for '
         'software and other kinds of works.'
+    )
+
+    # create CITATION.txt file
+    create_text_file(
+        os.path.join(
+            temp_media_root, 'download', str(experiment.id), 'CITATION.txt'
+        ),
+        'How to cite'
     )
 
     # create Experiment.csv file

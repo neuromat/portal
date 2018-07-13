@@ -120,6 +120,18 @@ def download_view(request, experiment_id):
             reverse('experiment-detail', kwargs={'slug': experiment.slug})
         )
 
+    # CITATION.txt always will be in compressed file
+    try:
+        shutil.copyfile(os.path.join(
+            settings.MEDIA_ROOT, 'download', str(experiment.id), 'CITATION.txt'
+        ), os.path.join(temp_dir, 'CITATION.txt')
+        )
+    except FileNotFoundError:
+        messages.error(request, DOWNLOAD_ERROR_MESSAGE)
+        return HttpResponseRedirect(
+            reverse('experiment-detail', kwargs={'slug': experiment.slug})
+        )
+
     # Copy experiment data from settings.MEDIA_ROOT/download/<experiment.id>,
     # based on user selection, to a temp dir.
     for item in request.POST.getlist('download_selected'):
@@ -245,6 +257,8 @@ def download_view(request, experiment_id):
 
     experiment.downloads += 1
     experiment.save()
+
+    shutil.rmtree(temp_dir)
 
     return response
 
