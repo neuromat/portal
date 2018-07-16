@@ -96,7 +96,7 @@ class Experiment(models.Model):  # indexed for search
     title = models.CharField(max_length=150)
     description = models.TextField()
     data_acquisition_done = models.BooleanField(default=False)
-    sent_date = models.DateField(auto_now=True)
+    sent_date = models.DateField(auto_now_add=True)
     project_url = models.CharField(max_length=255, blank=True, null=True)
     # TODO: remove this attribute. It's not necessary anymore
     download_url = models.FileField(
