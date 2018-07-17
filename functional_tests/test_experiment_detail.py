@@ -135,39 +135,6 @@ class ExperimentDetailTest(FunctionalTest):
             self.assertIn(experiment.study.end_date.strftime("%B %d, %Y"),
                           study_end_date)
 
-        # Right below there is a relation of contributors of the study,
-        # the contributor's team and coordinator
-        study_contributors = self.browser.find_element_by_id(
-            'study_contributors').text
-        if experiment.study.collaborators:
-            self.assertIn('Contributors:', study_contributors)
-            table_contributors = self.browser.find_element_by_id(
-                'table_contributors')
-            row_headers_contrib = table_contributors.find_element_by_tag_name(
-                'thead').find_element_by_tag_name('tr')
-            col_headers_contrib = row_headers_contrib.find_elements_by_tag_name(
-                'th')
-            self.assertTrue(col_headers_contrib[0].text == 'Person')
-            self.assertTrue(col_headers_contrib[1].text == 'Team')
-            self.assertTrue(col_headers_contrib[2].text == 'Coordinator')
-
-            # She sees the content of contributors list
-            rows = table_contributors.find_element_by_tag_name(
-                'tbody').find_elements_by_tag_name('tr')
-            self.assertTrue(
-                any(row.find_elements_by_tag_name('td')[0].text ==
-                    experiment.study.collaborators.first().name for row in rows)
-            )
-            self.assertTrue(
-                any(row.find_elements_by_tag_name('td')[1].text ==
-                    experiment.study.collaborators.first().team for row in
-                    rows)
-            )
-            self.assertTrue(
-                any(row.find_elements_by_tag_name('td')[2].text ==
-                    str(experiment.study.collaborators.first().coordinator)
-                    for row in rows)
-            )
         # Finally, in the study modal, she sees a list of keywords
         # associated with the study
         keywords_text = self.browser.find_element_by_id('keywords').text
