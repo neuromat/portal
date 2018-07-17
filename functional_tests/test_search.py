@@ -361,26 +361,6 @@ class SearchTest(FunctionalTest):
             any('brachial Plexus' in row.text for row in group_rows)
         )
 
-        # The researcher now wishes to search for a study that has as
-        # collaborator a coleague of her, called Pero Vaz.
-        # She types 'Pero Vaz' in search box and hits Enter.
-        self.search_for('Pero Vaz')
-        # She sees that there is one Study whose one of the collaborators is
-        # Pero Vaz.
-        # self.wait_for(lambda: self.browser.find_elements_by_class_name(
-        #     'study-matches'
-        # ))
-        # study_rows = \
-        #     self.browser.find_elements_by_class_name('study-matches')
-        # self.assertTrue(any('Pero Vaz' in row.text for row in study_rows))
-
-        self.wait_for(
-            lambda: self.assertTrue(
-                any('Pero Vaz' in row.text for row in self.browser
-                    .find_elements_by_class_name('study-matches'))
-            )
-        )
-
     def test_search_returns_only_last_version_experiments(self):
 
         # The researcher searches for 'Brachial Plexus'

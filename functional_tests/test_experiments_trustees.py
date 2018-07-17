@@ -348,8 +348,9 @@ class TrusteeTest(FunctionalTestTrustee):
         # The trustee Claudia is redirect to home page with a warning
         # message telling her that the experiment is now under analysis.
         # In table she sees that the experiment is "Under analysis".
-        # TODO: some times Experiment.STATUS_OPTIONS[2][1] not equal what
-        # TODO: we want?
+        # TODO:
+        # some times Experiment.STATUS_OPTIONS[2][1] not equal what
+        # we want?
         self.wait_for(lambda: self.assertEqual(
             self.browser.find_element_by_xpath(
                 "//a[@data-experiment_id='" + str(experiment.id) + "']"

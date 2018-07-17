@@ -18,12 +18,6 @@
         {% highlight result.object.end_date with query %}&nbsp;
         <strong>{% trans "researcher" %}: </strong>
         {% highlight result.object.researcher with query %}&nbsp;
-        <strong>{% trans "collaborators" %}: </strong>
-        {% for collaborator in result.object.collaborators.all %}
-            {% highlight collaborator with query %}&nbsp;
-        {% empty %}
-            {% trans "No collaborators" %}
-        {% endfor %}
         <strong>{% trans "keywords" %}: </strong>
         {% for keyword in result.object.keywords.all %}
             {% highlight keyword with query %}&nbsp;

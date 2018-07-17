@@ -5,7 +5,7 @@ from rest_framework import serializers, permissions, viewsets
 from experiments import appclasses
 from experiments.tasks import build_download_file
 from experiments.models import Experiment, Study, User, \
-    Group, ExperimentalProtocol, Researcher, Participant, Collaborator, \
+    Group, ExperimentalProtocol, Researcher, Participant, \
     Keyword, ClassificationOfDiseases, \
     EEGSetting, EMGSetting, TMSSetting, ContextTree, Step, File, \
     EEGData, EMGData, TMSData, GoalkeeperGameData, QuestionnaireResponse, \
@@ -95,14 +95,6 @@ class ResearcherSerializer(serializers.ModelSerializer):
     class Meta:
         model = Researcher
         fields = ('id', 'first_name', 'last_name', 'email', 'study')
-
-
-class CollaboratorSerializer(serializers.ModelSerializer):
-    study = serializers.ReadOnlyField(source='study.title')
-
-    class Meta:
-        model = Collaborator
-        fields = ('id', 'name', 'team', 'coordinator', 'study')
 
 
 class ExperimentResearcherSerializer(serializers.ModelSerializer):
@@ -1081,21 +1073,6 @@ class ResearcherViewSet(viewsets.ModelViewSet):
             return Researcher.objects.filter(study_id=self.kwargs['pk'])
         else:
             return Researcher.objects.all()
-
-    def perform_create(self, serializer):
-        study = Study.objects.get(pk=self.kwargs['pk'])
-        serializer.save(study=study)
-
-
-class CollaboratorViewSet(viewsets.ModelViewSet):
-    serializer_class = CollaboratorSerializer
-    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
-
-    def get_queryset(self):
-        if 'pk' in self.kwargs:
-            return Collaborator.objects.filter(study_id=self.kwargs['pk'])
-        else:
-            return Collaborator.objects.all()
 
     def perform_create(self, serializer):
         study = Study.objects.get(pk=self.kwargs['pk'])

@@ -11,7 +11,7 @@ from random import randint, choice
 from faker import Factory
 
 from experiments.models import Experiment, Study, Group, Researcher, \
-    Collaborator, RejectJustification, Publication, ExperimentalProtocol, Step, \
+    RejectJustification, Publication, ExperimentalProtocol, Step, \
     StepAdditionalFile, Gender, File, Participant, ExperimentResearcher
 from experiments.tests.tests_helper import global_setup_ut, apply_setup, \
     create_experiment, create_group, create_binary_file, create_eeg_setting, \
@@ -382,35 +382,6 @@ class ParticipantModelTest(TestCase):
             group=group
         )
         self.assertEqual(p.code, 'abc')
-
-
-@apply_setup(global_setup_ut)
-class CollaboratorModel(TestCase):
-
-    def setUp(self):
-        global_setup_ut()
-
-    def test_default_attributes(self):
-        collaborator = Collaborator()
-        self.assertEqual(collaborator.name, '')
-        self.assertEqual(collaborator.team, '')
-        self.assertEqual(collaborator.coordinator, False)
-
-    def test_collaborator_is_related_to_study(self):
-        study = Study.objects.first()
-        collaborator = Collaborator.objects.create(
-            name='Joãzinho trinta', team='Viradouro', study=study
-        )
-        self.assertIn(collaborator, study.collaborators.all())
-
-    def test_cannot_save_empty_attributes(self):
-        study = Study.objects.first()
-        collaborator = Collaborator.objects.create(
-            name='', team='', study=study
-        )
-        with self.assertRaises(ValidationError):
-            collaborator.save()
-            collaborator.full_clean()
 
 
 class ExperimentResearcherModel(TestCase):
