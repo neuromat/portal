@@ -15,7 +15,7 @@ from django.contrib.auth import models
 from nep import settings
 from experiments.helpers import generate_image_file
 from experiments.models import Experiment, Study, Group, Researcher, \
-    Collaborator, Participant, Gender, ExperimentalProtocol, \
+    Participant, Gender, ExperimentalProtocol, \
     ClassificationOfDiseases, Keyword, Step, TMSSetting, TMSDevice, CoilModel, \
     TMSDeviceSetting, TMSData, EEGSetting, Questionnaire, \
     QuestionnaireLanguage, QuestionnaireDefaultLanguage, Publication, EEGData, \
@@ -154,20 +154,10 @@ def create_trustee_users():
     group.user_set.add(trustee2)
 
 
-def create_researchers():  # deprecated
-    fake = Factory.create()
-
+# deprecated: create researchers with create_researcher
+def create_researchers():
     for study in Study.objects.all():
-        Researcher.objects.create(
-            first_name=fake.first_name(),
-            last_name=fake.last_name(),
-            email=fake.email(), study=study
-        )
-        Collaborator.objects.create(
-            name=fake.text(max_nb_chars=15),
-            team=fake.text(max_nb_chars=15),
-            coordinator=False, study=study
-        )
+        create_researcher(study)
 
 
 def create_researcher(study, first_name=None, last_name=None):
@@ -246,21 +236,6 @@ def create_classification_of_deseases(qtty):
             code=randint(1, 1000), description=fake.text(),
             abbreviated_description=fake.text(max_nb_chars=100),
             parent=None
-        )
-
-
-def create_study_collaborator(qtty, study):
-    """
-    :param qtty: number of collaborators 
-    :param study: Study model instance
-    """
-    fake = Factory.create()
-
-    for i in range(qtty):
-        Collaborator.objects.create(
-            name=fake.name(), team=fake.word(),
-            coordinator=randint(0, 1),
-            study=study
         )
 
 
@@ -1390,17 +1365,6 @@ def global_setup_ft():
     experiment11.title = 'Experiment analysed by Claudia'
     experiment11.save()
 
-    # Create study collaborators (requires creating studies before)
-    for study in Study.objects.all():
-        create_study_collaborator(randint(2, 3), study)
-    # To test search
-    study = Study.objects.filter(
-        experiment__status=Experiment.APPROVED
-    ).last()
-    collaborator = Collaborator.objects.filter(study=study).first()
-    collaborator.name = 'Pero Vaz'
-    collaborator.save()
-
     # Create some keywords to associate with studies
     create_keyword(10)
     # Associate keywords with studies
@@ -1608,15 +1572,6 @@ def global_setup_ut():
         kw2 = choice(Keyword.objects.all())
         kw3 = choice(Keyword.objects.all())
         study.keywords.add(kw1, kw2, kw3)
-
-    Collaborator.objects.create(
-        name='Colaborador 1', team='Numec', coordinator=True,
-        study=study1
-    )
-    Collaborator.objects.create(
-        name='Colaborador 2', team='Numec', coordinator=False,
-        study=study1
-    )
 
     # Create invalid Questionnaire object
     # (requires file 'questionnaire4.csv', being generated in

@@ -30,7 +30,6 @@ class StudyIndex(indexes.SearchIndex, indexes.Indexable):
     # Requires exist researcher associated with the study. Otherwise
     # haystack will complain about researcher not being a model_attr of Study
     researcher = indexes.CharField(model_attr='researcher__id')
-    collaborators = indexes.CharField(model_attr='collaborators__name')
 
     def get_model(self):
         return Study
