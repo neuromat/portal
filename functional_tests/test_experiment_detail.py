@@ -123,7 +123,7 @@ class ExperimentDetailTest(FunctionalTest):
         ##
         # to conform to study_start_date format in browser
         ##
-        self.assertIn(experiment.study.start_date.strftime("%B %d, %Y")
+        self.assertIn(experiment.study.start_date.strftime("%b. %d, %Y")
                       .lstrip("0").replace(" 0", " "), study_start_date)
         # before
         # self.assertIn(experiment.study.start_date.strftime("%b. %d, %Y")
@@ -1197,7 +1197,8 @@ class DownloadExperimentTest(FunctionalTest):
         # this is to mimic how datetime is displayed in template by default
         ##
         sent_date = \
-            experiment.sent_date.strftime("%B %d, %Y").lstrip("0").replace(" 0", " ")
+            experiment.sent_date.strftime("%b. %d, %Y").lstrip("0").replace(
+                " 0", " ")
         self.assertIn(
             'das Dores'.upper() + ', Anibal; ' +
             'Hildegard'.upper() + ', Joseph; ' +
@@ -1326,7 +1327,7 @@ class DownloadExperimentTest(FunctionalTest):
         self.assertIn(
             'SORIANO, Valdick ' + experiment.title
             + '. Sent date: '
-            + str(experiment.sent_date.strftime('%B %d, %Y')),
+            + str(experiment.sent_date.strftime('%b. %d, %Y')),
             license_modal.text
         )
 
@@ -1374,6 +1375,6 @@ class DownloadExperimentTest(FunctionalTest):
         self.assertIn(
             'ROSS, Diana; BOULOS, Guilherme; COSTA, Edimilson '
             + experiment.title + '. Sent date: '
-            + str(experiment.sent_date.strftime('%B %d, %Y')),
+            + str(experiment.sent_date.strftime('%b. %d, %Y')),
             license_modal.text
         )
