@@ -1190,27 +1190,28 @@ class DownloadExperimentTest(FunctionalTest):
 
         self.license_text_asserts(license_modal)
 
-        # In the modal there is also how to cite that experiment in her own
-        # work
-        self.assertIn('How to cite this experiment:', license_modal.text)
-        ##
-        # this is to mimic how datetime is displayed in template by default
-        ##
-        sent_date = \
-            experiment.sent_date.strftime("%b. %d, %Y").lstrip("0").replace(
-                " 0", " ")
-        self.assertIn(
-            'das Dores'.upper() + ', Anibal; ' +
-            'Hildegard'.upper() + ', Joseph; ' +
-            'Farias'.upper() + ', Antônio ' +
-            experiment.title + '. Sent date: ' + str(sent_date) + '.',
-            license_modal.text
-        )
-        self.assertNotIn(
-            experiment.study.researcher.last_name.upper() + ', ' +
-            experiment.study.researcher.first_name,
-            license_modal.text
-        )
+        # TODO: uncomment from here when defined how citation will be
+        # # In the modal there is also how to cite that experiment in her own
+        # # work
+        # self.assertIn('How to cite this experiment:', license_modal.text)
+        # ##
+        # # this is to mimic how datetime is displayed in template by default
+        # ##
+        # sent_date = \
+        #     experiment.sent_date.strftime("%b. %d, %Y").lstrip("0").replace(
+        #         " 0", " ")
+        # self.assertIn(
+        #     'das Dores'.upper() + ', Anibal; ' +
+        #     'Hildegard'.upper() + ', Joseph; ' +
+        #     'Farias'.upper() + ', Antônio ' +
+        #     experiment.title + '. Sent date: ' + str(sent_date) + '.',
+        #     license_modal.text
+        # )
+        # self.assertNotIn(
+        #     experiment.study.researcher.last_name.upper() + ', ' +
+        #     experiment.study.researcher.first_name,
+        #     license_modal.text
+        # )
 
     def test_clicking_in_download_all_experiment_data_link_pops_up_a_modal_with_license_warning_2(self):
         ##
@@ -1238,27 +1239,28 @@ class DownloadExperimentTest(FunctionalTest):
 
         self.license_text_asserts(license_modal)
 
-        # In the modal there is also how to cite that experiment in her own
-        # work
-        self.assertIn('How to cite this experiment:', license_modal.text)
-        ##
-        # this is to mimic how datetime is displayed in template by default
-        ##
-        sent_date = \
-            experiment.sent_date.strftime("%B %d, %Y").lstrip("0").replace(
-                " 0", " ")
-        self.assertIn(
-            experiment.study.researcher.last_name.upper() + ', ' +
-            experiment.study.researcher.first_name,
-            license_modal.text
-        )
-        self.assertNotIn(
-            'das Dores'.upper() + ', Anibal; ' +
-            'Hildegard'.upper() + ', Joseph; ' +
-            'Farias'.upper() + ', Antônio ' +
-            experiment.title + '. Sent date: ' + str(sent_date) + '.',
-            license_modal.text
-        )
+        # TODO: uncomment from here when defined how citation will be
+        # # In the modal there is also how to cite that experiment in her own
+        # # work
+        # self.assertIn('How to cite this experiment:', license_modal.text)
+        # ##
+        # # this is to mimic how datetime is displayed in template by default
+        # ##
+        # sent_date = \
+        #     experiment.sent_date.strftime("%B %d, %Y").lstrip("0").replace(
+        #         " 0", " ")
+        # self.assertIn(
+        #     experiment.study.researcher.last_name.upper() + ', ' +
+        #     experiment.study.researcher.first_name,
+        #     license_modal.text
+        # )
+        # self.assertNotIn(
+        #     'das Dores'.upper() + ', Anibal; ' +
+        #     'Hildegard'.upper() + ', Joseph; ' +
+        #     'Farias'.upper() + ', Antônio ' +
+        #     experiment.title + '. Sent date: ' + str(sent_date) + '.',
+        #     license_modal.text
+        # )
 
     def test_clicking_in_download_button_pops_up_a_modal_with_license_warning(self):
         experiment = Experiment.objects.last()
@@ -1314,22 +1316,22 @@ class DownloadExperimentTest(FunctionalTest):
                 lambda:
                 self.browser.find_element_by_id('license_modal')
             )
-
-        # She has downloaded the experiment once and wants to see if the
-        # "How to cite" in license modal is equal to the "How to cite" in
-        # CITATION.txt file
-        self.assertIn(
-            'SORIANO, Valdick ' + experiment.title
-            + '. Sent date: '
-            + str(experiment.sent_date),
-            file.read().decode('utf-8')
-        )
-        self.assertIn(
-            'SORIANO, Valdick ' + experiment.title
-            + '. Sent date: '
-            + str(experiment.sent_date.strftime('%b. %d, %Y')),
-            license_modal.text
-        )
+        # TODO: uncomment from here when defined how citation will be
+        # # She has downloaded the experiment once and wants to see if the
+        # # "How to cite" in license modal is equal to the "How to cite" in
+        # # CITATION.txt file
+        # self.assertIn(
+        #     'SORIANO, Valdick ' + experiment.title
+        #     + '. Sent date: '
+        #     + str(experiment.sent_date),
+        #     file.read().decode('utf-8')
+        # )
+        # self.assertIn(
+        #     'SORIANO, Valdick ' + experiment.title
+        #     + '. Sent date: '
+        #     + str(experiment.sent_date.strftime('%b. %d, %Y')),
+        #     license_modal.text
+        # )
 
     def test_how_to_cite_in_license_modal_is_equal_to_how_to_cite_in_citation_file_2(self):
         experiment = Experiment.objects.last()
@@ -1364,17 +1366,18 @@ class DownloadExperimentTest(FunctionalTest):
                 self.browser.find_element_by_id('license_modal')
             )
 
-        # She has downloaded the experiment once and wants to see if the
-        # "How to cite" in license modal is equal to the "How to cite" in
-        # CITATION.txt file
-        self.assertIn(
-            'ROSS, Diana; BOULOS, Guilherme; COSTA, Edimilson '
-            + experiment.title + '. Sent date: ' + str(experiment.sent_date),
-            file.read().decode('utf-8')
-        )
-        self.assertIn(
-            'ROSS, Diana; BOULOS, Guilherme; COSTA, Edimilson '
-            + experiment.title + '. Sent date: '
-            + str(experiment.sent_date.strftime('%b. %d, %Y')),
-            license_modal.text
-        )
+        # TODO: uncomment from here when defined how citation will be
+        # # She has downloaded the experiment once and wants to see if the
+        # # "How to cite" in license modal is equal to the "How to cite" in
+        # # CITATION.txt file
+        # self.assertIn(
+        #     'ROSS, Diana; BOULOS, Guilherme; COSTA, Edimilson '
+        #     + experiment.title + '. Sent date: ' + str(experiment.sent_date),
+        #     file.read().decode('utf-8')
+        # )
+        # self.assertIn(
+        #     'ROSS, Diana; BOULOS, Guilherme; COSTA, Edimilson '
+        #     + experiment.title + '. Sent date: '
+        #     + str(experiment.sent_date.strftime('%b. %d, %Y')),
+        #     license_modal.text
+        # )
