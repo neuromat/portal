@@ -24,18 +24,21 @@
         {% endblocktrans %}
     </strong>
     <br>
-    <hr>
-    <div>
-        <p>
-            <strong>{% trans 'How to cite this experiment' %}:</strong>
-        </p>
-        <p>
-            {% for researcher in experiment.researchers.all %}
-                {{ researcher.last_name|upper }}, {{ researcher.first_name }}{% if not forloop.last %}; {% endif %}
-            {% empty %}
-                {{ experiment.study.researcher.last_name|upper  }}, {{ experiment.study.researcher.first_name }}
-            {% endfor %}
-            <strong>{{ experiment.title }}</strong>. <em>{% trans "Sent date" %}</em>: {{ experiment.sent_date }}.
-        </p>
-    </div>
+{# TODO: #}
+{#    By now commented while defining details about citation format: order #}
+{#    of researchers etc. #}
+{#    <hr>#}
+{#    <div>#}
+{#        <p>#}
+{#            <strong>{% trans 'How to cite this experiment' %}:</strong>#}
+{#        </p>#}
+{#        <p>#}
+{#            {% for researcher in experiment.researchers.all %}#}
+{#                {{ researcher.last_name|upper }}, {{ researcher.first_name }}{% if not forloop.last %}; {% endif %}#}
+{#            {% empty %}#}
+{#                {{ experiment.study.researcher.last_name|upper  }}, {{ experiment.study.researcher.first_name }}#}
+{#            {% endfor %}#}
+{#            <strong>{{ experiment.title }}</strong>. <em>{% trans "Sent date" %}</em>: {{ experiment.sent_date }}.#}
+{#        </p>#}
+{#    </div>#}
 </div>
