@@ -21,7 +21,7 @@ from experiments.models import Experiment, Study, Group, Researcher, \
     ExperimentalProtocol, ExperimentResearcher
 from experiments.tests.tests_helper import global_setup_ut, apply_setup, \
     create_experiment, create_group, create_questionnaire, \
-    create_experiment_researcher, create_experiment_versions
+    create_experiment_researcher, create_experiment_versions, PASSWORD
 
 TEMP_MEDIA_ROOT = tempfile.mkdtemp()
 
@@ -840,13 +840,15 @@ class GroupAPITest(APITestCase):
         )
 
     def test_get_returns_groups_of_an_experiment(self):
-        owner = User.objects.get(username='lab1')
-        experiment = Experiment.objects.get(nes_id=1, owner=owner)
-        group1 = Group.objects.get(id=1, experiment=experiment)
-        group2 = Group.objects.get(id=2, experiment=experiment)
+        experiment = create_experiment(1)
+        group1 = create_group(1, experiment)
+        group2 = create_group(1, experiment)
+
         list_url = reverse('api_experiment_groups-list',
                            kwargs={'experiment_nes_id': experiment.nes_id})
-        self.client.login(username=owner.username, password='nep-lab1')
+        self.client.login(
+            username=experiment.owner.username, password=PASSWORD
+        )
         response = self.client.get(list_url)
         self.assertEqual(
             json.loads(response.content.decode('utf8')),

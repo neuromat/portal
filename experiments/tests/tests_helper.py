@@ -31,6 +31,8 @@ from experiments.models import Experiment, Study, Group, Researcher, \
 # TODO: not protected any more. Fix this!
 from experiments.views import _get_q_default_language_or_first
 
+PASSWORD = 'labX'
+
 
 def create_group(qtty, experiment):
     # TODO: refactor to accept more than one experiment (insert qtty parameter)
@@ -84,7 +86,7 @@ def create_owner(username=None):
         fake = Factory.create()
         username = fake.word()
 
-    return User.objects.create_user(username=username, password='labX')
+    return User.objects.create_user(username=username, password=PASSWORD)
 
 
 def create_experiment(qtty, owner=None, status=Experiment.TO_BE_ANALYSED):
