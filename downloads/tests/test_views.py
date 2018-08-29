@@ -129,7 +129,7 @@ class DownloadCreateView(TestCase):
 
         file = zipped_file.open('EXPERIMENT_DOWNLOAD/CITATION.txt', 'r')
         self.assertIn(
-            'ROSS, Diana; BOULOS, Guilherme; COSTA, Edimilson '
+            'BOULOS, Guilherme; COSTA, Edimilson; ROSS, Diana '
             + experiment.title + '. Sent date: ' + str(experiment.sent_date),
             file.read().decode('utf-8')
         )
