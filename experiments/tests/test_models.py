@@ -688,7 +688,7 @@ class AdditionalDataModelTest(TestCase):
         model_instances_dict = create_model_instances_to_test_step_type_data()
         # we random select a step type because additional data can be any step
         some_step = create_step(
-            1, model_instances_dict['group'], choice(Step.STEP_TYPES)
+            1, model_instances_dict['group'], choice(Step.STEP_TYPES)[0]
         )
         # Additional data can have step=None, that refers to whole
         # experimental protocol.
