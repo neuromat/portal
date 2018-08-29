@@ -167,7 +167,8 @@ class ExportExecution:
                 'How to cite this experiment:\n'
                 '----------------------------\n\n'
             )
-            experiment_researchers = experiment.researchers.all()
+            experiment_researchers = \
+                experiment.researchers.all().order_by('last_name')
             if not experiment_researchers \
                     and hasattr(experiment.study, 'researcher'):
                 researchers_part = self.add_researchers_to_citation(
@@ -175,7 +176,7 @@ class ExportExecution:
                 )
             else:
                 researchers_part = self.add_researchers_to_citation(
-                    experiment.researchers.all()
+                    experiment_researchers
                 )
             f.write(
                 researchers_part + experiment.title + '. Sent date: '
