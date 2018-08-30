@@ -253,20 +253,20 @@ def create_experiment_researcher(experiment, first_name=None, last_name=None):
     )
 
 
-def create_keyword(qtty, keyword=None):
+def create_keyword(keyword=None):
     """
     :param qtty: number of keywords to be created
     :param keyword: keyword to be craeted
     """
     fake = Factory.create()
 
-    Keyword.objects.create(name=fake.word())
-    for i in range(qtty):
-        while True:
-            keyword = keyword if keyword else fake.word()
-            if not Keyword.objects.filter(name=keyword):
-                break
-        Keyword.objects.create(name=keyword)
+    if keyword:
+        return Keyword.objects.create(name=keyword)
+
+    while True:
+        keyword = fake.word()
+        if not Keyword.objects.get(name=keyword):
+            return Keyword.objects.create(name=keyword)
 
 
 def associate_experiments_to_trustees():
