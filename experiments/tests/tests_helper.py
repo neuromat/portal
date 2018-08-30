@@ -155,6 +155,8 @@ def create_trustee_users():
     group.user_set.add(trustee1)
     group.user_set.add(trustee2)
 
+    return [trustee1, trustee2]
+
 
 # deprecated: create researchers with create_researcher
 def create_researchers():
@@ -251,21 +253,20 @@ def create_experiment_researcher(experiment, first_name=None, last_name=None):
     )
 
 
-def create_keyword(qtty):
+def create_keyword(qtty, keyword=None):
     """
-    :param qtty: number of keywords to be created 
+    :param qtty: number of keywords to be created
+    :param keyword: keyword to be craeted
     """
     fake = Factory.create()
 
     Keyword.objects.create(name=fake.word())
     for i in range(qtty):
         while True:
-            keyword = fake.word()
+            keyword = keyword if keyword else fake.word()
             if not Keyword.objects.filter(name=keyword):
                 break
         Keyword.objects.create(name=keyword)
-    # To test search
-    Keyword.objects.create(name='brachial plexus')
 
 
 def associate_experiments_to_trustees():
@@ -661,7 +662,7 @@ def create_eeg_electrodenet(eeg_setting):
 
     return EEGElectrodeNet.objects.create(
         eeg_setting=eeg_setting, manufacturer_name=faker.word(),
-        equipment_type='eeg_electrode_net', identification=faker.text(),
+        equipment_type='eeg_electrode_net', identification=faker.word(),
         description=faker.text(), serial_number=faker.ssn()
     )
 
@@ -1299,6 +1300,8 @@ def global_setup_ft():
 
     # We change first experiment study approved to contain 'brachial' in
     # study description, so it have to be found by search test
+    # Create some keywords to associate with studies
+    create_keyword(1, 'brachial plexus')
     study = Study.objects.filter(
         experiment__status=Experiment.APPROVED
     ).first()
@@ -1367,8 +1370,6 @@ def global_setup_ft():
     experiment11.title = 'Experiment analysed by Claudia'
     experiment11.save()
 
-    # Create some keywords to associate with studies
-    create_keyword(10)
     # Associate keywords with studies
     for study in Study.objects.all():
         kw1 = choice(Keyword.objects.all())

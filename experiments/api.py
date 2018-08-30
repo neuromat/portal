@@ -1093,7 +1093,8 @@ class ExperimentResearcherViewSet(viewsets.ModelViewSet):
                 owner=self.request.user
             )
             return ExperimentResearcher.objects.filter(
-                experiment__in=experiments)
+                experiment__in=experiments
+            )
         else:
             return ExperimentResearcher.objects.all()
 

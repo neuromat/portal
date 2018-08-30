@@ -11,7 +11,7 @@ from experiments.models import Experiment, Study, Group, Researcher, \
 # TODO: when executing from bash command line, final line identifier breaks
 # imports. We are kepping in Collaborator in same line
 from experiments.models import Gender, ClassificationOfDiseases, Keyword, \
-    Collaborator, Step, TMSSetting, TMSDevice, CoilModel, TMSDeviceSetting
+    Step, TMSSetting, TMSDevice, CoilModel, TMSDeviceSetting
 from experiments.tests.tests_helper import create_classification_of_deseases, \
     create_questionnaire
 from experiments.tests.tests_helper import create_experimental_protocol
@@ -21,7 +21,6 @@ from experiments.tests.tests_helper import create_group, \
     create_tmsdata_objects_to_test_search, create_questionnaire_language
 from experiments.tests.tests_helper import create_keyword
 from experiments.tests.tests_helper import create_participant
-from experiments.tests.tests_helper import create_study_collaborator
 from nep import settings
 from nep.local_settings import BASE_DIR
 
