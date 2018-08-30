@@ -155,6 +155,8 @@ def create_trustee_users():
     group.user_set.add(trustee1)
     group.user_set.add(trustee2)
 
+    return [trustee1, trustee2]
+
 
 # deprecated: create researchers with create_researcher
 def create_researchers():
@@ -661,7 +663,7 @@ def create_eeg_electrodenet(eeg_setting):
 
     return EEGElectrodeNet.objects.create(
         eeg_setting=eeg_setting, manufacturer_name=faker.word(),
-        equipment_type='eeg_electrode_net', identification=faker.text(),
+        equipment_type='eeg_electrode_net', identification=faker.word(),
         description=faker.text(), serial_number=faker.ssn()
     )
 
