@@ -31,6 +31,7 @@ from experiments.models import Experiment, Study, Group, Researcher, \
 # TODO: not protected any more. Fix this!
 from experiments.views import _get_q_default_language_or_first
 
+# the password used for trustees in tests
 PASSWORD = 'labX'
 
 
@@ -140,22 +141,24 @@ def create_experiment_versions(qtty, experiment):
     return experiment_versions
 
 
-def create_trustee_users():
-    group = models.Group.objects.create(name='trustees')
+def create_trustee_user(username=None):
+    """
+    Create a trustee user. First get or create the group 'trustees
+    :return: User from group Trustee
+    """
+    group, created = models.Group.objects.get_or_create(name='trustees')
 
-    # Create 2 trustee users and add them to trustees group
-    trustee1 = models.User.objects.create_user(
-        username='claudia', first_name='Claudia', last_name='Vargas',
-        password='passwd'
-    )
-    trustee2 = models.User.objects.create_user(
-        username='roque', first_name='Antonio', last_name='Roque',
-        password='passwd'
-    )
-    group.user_set.add(trustee1)
-    group.user_set.add(trustee2)
+    faker = Factory.create()
+    username = username if username else faker.word()
 
-    return [trustee1, trustee2]
+    trustee = models.User.objects.create_user(
+        username=username, first_name=faker.first_name(),
+        last_name=faker.last_name(), email=faker.email(),
+        password=PASSWORD
+    )
+    group.user_set.add(trustee)
+
+    return trustee
 
 
 # deprecated: create researchers with create_researcher
@@ -1211,7 +1214,7 @@ def global_setup_ft():
                                              password='nep-lab2')
 
     # Create group Trustees
-    create_trustee_users()
+    create_trustee_user()
 
     # Create experiments for 2 owners, randomly
     create_experiment(1, choice([owner1, owner2]),
@@ -1301,7 +1304,7 @@ def global_setup_ft():
     # We change first experiment study approved to contain 'brachial' in
     # study description, so it have to be found by search test
     # Create some keywords to associate with studies
-    create_keyword(1, 'brachial plexus')
+    create_keyword('brachial plexus')
     study = Study.objects.filter(
         experiment__status=Experiment.APPROVED
     ).first()
@@ -1523,7 +1526,7 @@ def global_setup_ut():
                                              password='nep-lab2')
 
     # Create group Trustees
-    create_trustee_users()
+    create_trustee_user('claudia')
 
     experiment1 = Experiment.objects.create(
         title='Experiment 1', nes_id=1, owner=owner1,

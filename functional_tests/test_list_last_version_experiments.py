@@ -1,16 +1,12 @@
 from django.db.models import Count
 
-from experiments.models import Experiment
+from experiments.tests.tests_helper import create_experiment
 from functional_tests.base import FunctionalTest
 
 
 class NewVisitorTest(FunctionalTest):
 
-    def test_can_view_initial_page(self):
-        experiment = Experiment.objects.filter(
-            status=Experiment.APPROVED
-        ).first()
-
+    def test_can_view_initial_page_basic(self):
         # In top of page she sees a link to login in the system
         login_link = self.browser.find_element_by_id('login-language').text
         self.assertIn('Log In', login_link)
@@ -23,7 +19,7 @@ class NewVisitorTest(FunctionalTest):
 
         # She sees that in header bunner there is a search box inviting her
         # to type terms/words that will be searched in the portal
-        # Obs.: 'id_q' is the id name that haystack search system uses.
+        # Obs.: 'id_q' is the id name that haystack search system uses
         searchbox = self.browser.find_element_by_id('id_q')
         self.assertEqual(
             searchbox.get_attribute('placeholder'),
@@ -82,7 +78,8 @@ class NewVisitorTest(FunctionalTest):
             'id_table_title').find_element_by_tag_name('h2').text
         self.assertEqual('List of Experiments', table_title)
 
-        # She sees a list of experiments with columns: Title, Description
+        # She sees a list of experiments with columns: Title, Description,
+        # Participants, Version
         table = self.browser.find_element_by_id('id_experiments_table')
         row_headers = table.find_element_by_tag_name(
             'thead').find_element_by_tag_name('tr')
@@ -97,22 +94,22 @@ class NewVisitorTest(FunctionalTest):
             .find_elements_by_tag_name('tr')
         self.assertTrue(
             any(row.find_elements_by_tag_name('td')[0].text ==
-                experiment.title for row in rows)
+                self.experiment.title for row in rows)
         )
         self.assertTrue(
             any(row.find_elements_by_tag_name('td')[1].text ==
-                experiment.description for row in rows)
+                self.experiment.description for row in rows)
         )
         self.assertTrue(
             any(row.find_elements_by_tag_name('td')[2].text ==
-                str(experiment.groups.aggregate(Count(
+                str(self.experiment.groups.aggregate(Count(
                     'participants'))['participants__count']) +
-                ' in ' + str(experiment.groups.count()) + ' groups' for row
-                in rows)
+                ' in ' + str(self.experiment.groups.count()) +
+                ' groups' for row in rows)
         )
         self.assertTrue(
             any(row.find_elements_by_tag_name('td')[3].text ==
-                str(experiment.version) for row in rows)
+                str(self.experiment.version) for row in rows)
         )
 
         # She notices that in the footer there is information
@@ -133,3 +130,45 @@ class NewVisitorTest(FunctionalTest):
             'id_footer_license').text
         self.assertIn('This site content is licensed under a Creative Commons '
                       'Attributions 4.0', footer_license_text)
+
+    def test_can_view_initial_page_when_there_is_new_version_not_approved(self):
+
+        ##
+        # Create a new version for self.experiment
+        ##
+        exp_new_version = create_experiment(1, owner=self.experiment.owner)
+        exp_new_version.nes_id = self.experiment.nes_id
+        exp_new_version.version = self.experiment.version + 1
+        exp_new_version.save()
+
+        ##
+        # We have to refresh page to include reflects the inclusion of the
+        # new experiment version
+        ##
+        self.browser.refresh()
+
+        # Josenilda is in Portal home page and see the list of experiments
+        # approved. As there is one experiment approved and a new version of
+        # the same experiment that has to be analysed by a trustee, she sees
+        # the last approved version in the list
+        table = self.browser.find_element_by_id('id_experiments_table')
+        rows = table.find_element_by_tag_name('tbody').find_elements_by_tag_name('tr')
+        self.assertTrue(
+            any(row.find_elements_by_tag_name('td')[0].text ==
+                self.experiment.title for row in rows)
+        )
+        self.assertTrue(
+            any(row.find_elements_by_tag_name('td')[1].text ==
+                self.experiment.description for row in rows)
+        )
+        self.assertTrue(
+            any(row.find_elements_by_tag_name('td')[2].text ==
+                str(self.experiment.groups.aggregate(Count(
+                    'participants'))['participants__count']) +
+                ' in ' + str(self.experiment.groups.count()) +
+                ' groups' for row in rows)
+        )
+        self.assertTrue(
+            any(row.find_elements_by_tag_name('td')[3].text ==
+                str(self.experiment.version) for row in rows)
+        )

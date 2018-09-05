@@ -1152,7 +1152,7 @@ class PublicationViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         exp_nes_id = self.kwargs['experiment_nes_id']
         owner = self.request.user
-        experiment = Experiment.lastversion_objects.get(
+        experiment = Experiment.lastversion_objects.all().get(
             nes_id=exp_nes_id, owner=owner
         )
         serializer.save(experiment=experiment)

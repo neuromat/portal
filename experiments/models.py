@@ -9,35 +9,11 @@ from django.template.defaultfilters import slugify
 from django.utils.translation import ugettext_lazy as _
 
 
+# custom methods
 def _delete_file_instance(instance):
     for file in instance.files.all():
         file.file.delete()
         file.delete()
-
-
-# custom managers
-class CurrentExperimentManager(models.Manager):
-    def get_queryset(self):
-        experiment_max_version_set = \
-            Experiment.objects.values('owner', 'nes_id').annotate(
-                max_version=Max('version'))
-        q_statement = Q()
-        for experiment in experiment_max_version_set:
-            q_statement |= (Q(owner=experiment['owner']) &
-                            Q(nes_id=experiment['nes_id']) &
-                            Q(version=experiment['max_version']))
-
-        return super(CurrentExperimentManager, self).get_queryset()\
-            .filter(q_statement)
-
-
-# custom methods
-def get_data_file_dir(instance, filename):
-    directory = "download"
-    if isinstance(instance, Experiment):
-        directory = path.join(directory, str(instance.id))
-
-    return path.join(directory, filename)
 
 
 def _create_slug(experiment):
@@ -72,6 +48,61 @@ def _create_slug(experiment):
                               '-' + str(slugs.count() + 1)
         else:
             experiment.slug = slugify(experiment.title)
+
+
+def get_data_file_dir(instance, filename):
+    directory = "download"
+    if isinstance(instance, Experiment):
+        directory = path.join(directory, str(instance.id))
+
+    return path.join(directory, filename)
+
+
+# custom query sets
+class LastVersionExperimentQuerySet(models.QuerySet):
+
+    @staticmethod
+    def _q_statement(queryset):
+        q_statement = Q()
+        for experiment in queryset:
+            q_statement |= (Q(owner=experiment['owner']) &
+                            Q(nes_id=experiment['nes_id']) &
+                            Q(version=experiment['max_version']))
+        return q_statement
+
+    def all(self):
+        max_version_set = \
+            Experiment.objects.values('owner', 'nes_id').annotate(
+                max_version=Max('version')
+            )
+        q_statement = self._q_statement(max_version_set)
+
+        return self.filter(q_statement)
+
+    def approved(self):
+        max_version_set = \
+            Experiment.objects.filter(status=Experiment.APPROVED).values(
+                'owner', 'nes_id'
+            ).annotate(max_version=Max('version'))
+        q_statement = self._q_statement(max_version_set)
+
+        return self.filter(q_statement)
+
+    # Implement methods for other experiment statuses if necessary
+
+
+# custom managers
+class LastVersionExperimentManager(models.Manager):
+    def get_queryset(self):
+        return LastVersionExperimentQuerySet(self.model, using=self._db)
+
+    def all(self):
+        return self.get_queryset().all()
+
+    def approved(self):
+        return self.get_queryset().approved()
+
+    # Implement methods for other experiment statuses if necessary
 
 
 # models
@@ -121,7 +152,7 @@ class Experiment(models.Model):  # indexed for search
     slug = models.SlugField(max_length=100, unique=True)
 
     objects = models.Manager()
-    lastversion_objects = CurrentExperimentManager()
+    lastversion_objects = LastVersionExperimentManager()
 
     class Meta:
         unique_together = ('nes_id', 'owner', 'version')

@@ -55,7 +55,7 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         try:
             owner = User.objects.get(username=options['owner'])
-            experiment = Experiment.lastversion_objects.get(
+            experiment = Experiment.lastversion_objects.all().get(
                 nes_id=options['nes_id'], owner=owner
             )
         except User.DoesNotExist:
