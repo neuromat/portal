@@ -9,11 +9,11 @@ from django.test import override_settings, TestCase
 from django.utils.text import slugify
 
 from downloads.views import download_create
-from experiments.models import Experiment
+from experiments.models import Experiment, Gender
 from experiments.tests.tests_helper import create_experiment, create_study, \
     create_participant, create_group, create_questionnaire, \
     create_questionnaire_language, create_questionnaire_responses, \
-    create_researcher, create_experiment_researcher
+    create_researcher, create_experiment_researcher, create_genders
 from nep import settings
 
 TEMP_MEDIA_ROOT = os.path.join(tempfile.mkdtemp())
@@ -23,6 +23,10 @@ TEMP_MEDIA_ROOT = os.path.join(tempfile.mkdtemp())
 class DownloadCreateView(TestCase):
 
     def setUp(self):
+        # TODO: it's created in other tests suites, so was breaking here
+        if not Gender.objects.all():
+            create_genders()
+
         # license is in media/download/License.txt
         os.makedirs(os.path.join(TEMP_MEDIA_ROOT, 'download'))
         license_file = os.path.join(TEMP_MEDIA_ROOT, 'download', 'LICENSE.txt')
