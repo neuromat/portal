@@ -152,7 +152,7 @@ def home_page(request):
             request.user.groups.filter(name='trustees').exists():
         all_experiments = \
             Experiment.lastversion_objects.all()
-        # We put experiments in following order:
+        # Put experiments in following order:
         # TO_BE_ANALYSED, UNDER_ANALYSIS, NOT_APPROVED and APPROVED
         to_be_analysed = all_experiments.filter(
             status=Experiment.TO_BE_ANALYSED)
@@ -163,9 +163,7 @@ def home_page(request):
         experiments = to_be_analysed | under_analysis | not_approved | approved
         to_be_analysed_count = to_be_analysed.count()
     else:
-        experiments = Experiment.lastversion_objects.filter(
-            status=Experiment.APPROVED
-        )
+        experiments = Experiment.lastversion_objects.approved()
 
     for experiment in experiments:
         experiment.total_participants = \

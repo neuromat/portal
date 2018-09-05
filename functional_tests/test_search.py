@@ -3,6 +3,7 @@ import sys
 
 import haystack
 from django.core.management import call_command
+from django.test import override_settings
 
 from experiments.models import Study, Experiment, Group, Step, EMGSetting, \
     GoalkeeperGame, ContextTree, EEGSetting, Stimulus, GenericDataCollection, \
@@ -22,15 +23,33 @@ from experiments.tests.tests_helper import create_experiment, \
     create_eeg_electrode_position, create_surface_electrode, \
     create_intramuscular_electrode, create_instruction_step, create_step, \
     create_publication, create_valid_questionnaires, \
-    create_experiment_researcher
+    create_experiment_researcher, global_setup_ft, apply_setup, \
+    create_trustee_user
 from functional_tests.base import FunctionalTest
 
 import time
 
 
+# To test haystack using a new index, instead of the settings.py index
+TEST_HAYSTACK_CONNECTIONS = {
+    'default': {
+        'ENGINE':
+            'haystack.backends.elasticsearch_backend.ElasticsearchSearchEngine',
+        'URL': 'http://127.0.0.1:9200/',
+        'INDEX_NAME': 'test_haystack',
+        'TIMEOUT': 60 * 10,
+    }
+}
+
+
+@override_settings(HAYSTACK_CONNECTIONS=TEST_HAYSTACK_CONNECTIONS)
+@apply_setup(global_setup_ft)
 class SearchTest(FunctionalTest):
 
     def setUp(self):
+        create_trustee_user('claudia')
+        create_trustee_user('roque')
+        global_setup_ft()
         super(SearchTest, self).setUp()
         haystack.connections.reload('default')
         self.haystack_index('rebuild_index')
@@ -1353,12 +1372,11 @@ class SearchTest(FunctionalTest):
         create_experiment_researcher(
             experiment, first_name='Guilherme', last_name='Boulos'
         )
-
-        search_text = 'Boulos'
         self.haystack_index('rebuild_index')
 
         # Joselina wants to search for an experiment that has Boulos as one
         # of the researchers last name
+        search_text = 'Boulos'
         self.search_for(search_text)
 
         # As there's one experiment with given researcher, she sees one result
@@ -1366,9 +1384,8 @@ class SearchTest(FunctionalTest):
 
         # Now she wants to search by first name, that is 'Guilherme'
         search_text = 'Guilherme'
-        self.haystack_index('rebuild_index')
         self.search_for(search_text)
+        time.sleep(1)  # TODO: remove explicit delay
 
         # As there's one experiment with given researcher, she sees one result
         self.check_matches(1, 'experiment_researcher-matches', search_text)
-

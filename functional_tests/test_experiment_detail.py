@@ -20,11 +20,13 @@ from experiments.tests.tests_helper import create_experiment, create_group, \
     create_questionnaire, create_questionnaire_language, create_study, \
     create_eeg_data, create_eeg_setting, create_eeg_step, \
     create_valid_questionnaires, create_publication, \
-    create_experiment_researcher, create_researcher
+    create_experiment_researcher, create_researcher, global_setup_ft, \
+    apply_setup, create_trustee_user
 from functional_tests.base import FunctionalTest
 from nep import settings
 
 
+@apply_setup(global_setup_ft)
 class ExperimentDetailTest(FunctionalTest):
 
     def _access_experiment_detail_page(self, experiment):
@@ -35,6 +37,12 @@ class ExperimentDetailTest(FunctionalTest):
             "//a[@href='/experiments/" + experiment.slug + "/']"
         )
         link.click()
+
+    def setUp(self):
+        create_trustee_user('claudia')
+        create_trustee_user('roque')
+        global_setup_ft()
+        super(ExperimentDetailTest, self).setUp()
 
     # TODO: break by tabs
     def test_can_view_detail_page(self):
@@ -121,13 +129,19 @@ class ExperimentDetailTest(FunctionalTest):
             'study_startdate').text
         self.assertIn('Start date:', study_start_date)
         ##
-        # to conform to study_start_date format in browser
+        # To conform to study_start_date format in template. For month
+        # September (9) we have to do something more.
+        # TODO: search for better solution
         ##
-        self.assertIn(experiment.study.start_date.strftime("%b. %d, %Y")
-                      .lstrip("0").replace(" 0", " "), study_start_date)
-        # before
-        # self.assertIn(experiment.study.start_date.strftime("%b. %d, %Y")
-        #               .lstrip("0").replace(" 0", " "), study_start_date)
+        if experiment.study.start_date.month == 9:
+            strdate = experiment.study.start_date.strftime(
+                "%b. %d, %Y"
+            ).lstrip("0").replace(". 0", "t. ")
+        else:
+            strdate = experiment.study.start_date.strftime(
+                "%b. %d, %Y"
+            ).lstrip("0").replace(" 0", " ")
+        self.assertIn(strdate, study_start_date)
         study_end_date = self.browser.find_element_by_id(
             'study_enddate').text
         self.assertIn('End date:', study_end_date)
@@ -167,9 +181,10 @@ class ExperimentDetailTest(FunctionalTest):
                 for ic in group.inclusion_criteria.all():
                     self.assertIn(ic.code + ' - ' + ic.description,
                                   groups_tab_content)
-            code_not_recognized_instances = code_not_recognized_instances + \
+            code_not_recognized_instances = \
+                code_not_recognized_instances + \
                 group.inclusion_criteria.filter(
-                        description='Code not recognized'
+                    description='Code not recognized'
                 ).count()
         code_not_recognized_in_template = \
             len(self.browser.find_elements_by_class_name('not-recognized'))
@@ -676,14 +691,11 @@ class ExperimentDetailTest(FunctionalTest):
                       questionnaires_content)
 
     def test_does_not_display_study_elements_if_they_not_exist(self):
-        experiment = Experiment.objects.filter(
-            status=Experiment.APPROVED
-        ).last()
         ##
         # create study without end_date and keywords. We won't create
         # contributors either
         ##
-        create_study(1, experiment)
+        create_study(1, self.experiment)
 
         ##
         # TODO
@@ -697,7 +709,7 @@ class ExperimentDetailTest(FunctionalTest):
         self.wait_for(
             lambda:
             self.browser.find_element_by_xpath(
-                "//a[@href='/experiments/" + experiment.slug + "/']"
+                "//a[@href='/experiments/" + self.experiment.slug + "/']"
             ).click()
         )
 
@@ -706,12 +718,12 @@ class ExperimentDetailTest(FunctionalTest):
         self.wait_for(
             lambda:
             self.browser.find_element_by_link_text(
-                experiment.study.title).click()
+                self.experiment.study.title).click()
         )
 
         # The modal pops up and she see the fields of the study
         self.wait_for(lambda: self.assertIn(
-            experiment.study.title,
+            self.experiment.study.title,
             self.browser.find_element_by_id('modal_study_title').text
         ))
 
@@ -762,9 +774,13 @@ TEMP_MEDIA_ROOT = os.path.join(tempfile.mkdtemp())
 
 
 @override_settings(MEDIA_ROOT=TEMP_MEDIA_ROOT)
+@apply_setup(global_setup_ft)
 class DownloadExperimentTest(FunctionalTest):
 
     def setUp(self):
+        create_trustee_user('claudia')
+        create_trustee_user('roque')
+        global_setup_ft()
         super(DownloadExperimentTest, self).setUp()
         # license is in media/download/LICENSE.txt
         os.makedirs(os.path.join(TEMP_MEDIA_ROOT, 'download'))

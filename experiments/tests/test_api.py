@@ -24,7 +24,7 @@ from experiments.models import Experiment, Study, Group, Researcher, \
 from experiments.tests.tests_helper import global_setup_ut, apply_setup, \
     create_experiment, create_group, create_questionnaire, \
     create_experiment_researcher, create_experiment_versions, PASSWORD, \
-    create_owner, create_trustee_users, create_study
+    create_owner, create_trustee_user, create_study
 
 TEMP_MEDIA_ROOT = tempfile.mkdtemp()
 
@@ -76,10 +76,9 @@ class ExperimentAPITest(APITestCase):
         shutil.rmtree(TEMP_MEDIA_ROOT)
 
     def test_POSTing_new_experiment_send_email_to_trustees(self):
-        trustees = create_trustee_users()
-        emails = []
-        for trustee in trustees:
-            emails += trustee.email
+        trustee1 = create_trustee_user('claudia')
+        trustee2 = create_trustee_user('roque')
+        emails = [trustee1.email, trustee2.email]
 
         self.send_mail_called = False
 

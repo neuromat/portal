@@ -4,15 +4,17 @@ from django.contrib.auth.models import User
 from django.core import mail
 from django.urls import reverse
 from selenium.webdriver.common.keys import Keys
+
+from experiments.tests.tests_helper import PASSWORD, create_trustee_user
 from functional_tests.base import FunctionalTest
 
 
 class LoginTest(FunctionalTest):
 
     def test_can_view_login_page_and_login_in_the_system(self):
-        user = User.objects.get(username='claudia')
+        trustee = create_trustee_user('claudia')
 
-        # The visitor is in home page and see that is a "Log In" link in up
+        # The trustee is in home page and see that is a "Log In" link in up
         # right corner of the page. She clicks in that link.
         self.browser.find_element_by_link_text('Log In').click()
 
@@ -28,9 +30,9 @@ class LoginTest(FunctionalTest):
         # came from django auth system. You can see them by inspecting
         # element in browser.
         inputbox_username = self.browser.find_element_by_id('id_username')
-        inputbox_username.send_keys('claudia')
+        inputbox_username.send_keys(trustee.username)
         inputbox_password = self.browser.find_element_by_id('id_password')
-        inputbox_password.send_keys('passwd')
+        inputbox_password.send_keys(PASSWORD)
 
         # She hits enter to make login.
         login_button = self.browser.find_element_by_id('id_submit')
@@ -40,7 +42,7 @@ class LoginTest(FunctionalTest):
         # welcome message and your name (or username) in up right corner of
         # the screen.
         self.wait_for(lambda: self.assertIn(
-            'Welcome, ' + user.first_name,
+            'Welcome, ' + trustee.first_name,
             self.browser.find_element_by_id('login-language').text
         ))
 

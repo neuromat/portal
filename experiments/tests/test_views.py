@@ -28,44 +28,56 @@ from experiments.models import Experiment, Step, Questionnaire, \
 from experiments.tests.tests_helper import apply_setup, global_setup_ut, \
     create_experiment_related_objects, \
     create_download_dir_structure_and_files, \
-    remove_selected_subdir, create_experiment, create_trustee_users, \
+    remove_selected_subdir, create_experiment, create_trustee_user, \
     create_experiment_versions, random_utf8_string, create_context_tree, \
     create_eeg_electrodenet, create_eeg_solution, create_eeg_filter_setting, \
     create_eeg_electrode_localization_system, \
     create_emg_digital_filter_setting, create_group, create_questionnaire, \
     create_questionnaire_language, create_valid_questionnaires, \
-    create_publication, create_experiment_researcher
+    create_publication, create_experiment_researcher, create_study, \
+    create_researcher, PASSWORD
 from experiments.views import change_slug
 from functional_tests import test_search
 from nep import settings
 
 
-@apply_setup(global_setup_ut)
 class HomePageTest(TestCase):
 
     def setUp(self):
-        global_setup_ut()
+        self.experiment = create_experiment(1)
 
     def test_uses_home_template(self):
         response = self.client.get('/')
         self.assertTemplateUsed(response, 'experiments/home.html')
 
+    def test_when_new_version_of_experiment_was_not_approved_display_last_approved_version(self):
+        self.experiment.status = Experiment.APPROVED
+        self.experiment.save()
+
+        exp_new_version = create_experiment(1, self.experiment.owner)
+        exp_new_version.nes_id = self.experiment.nes_id
+        exp_new_version.version = self.experiment.version + 1
+        exp_new_version.save()
+
+        response = self.client.get('/')
+
+        self.assertIn(self.experiment, response.context['experiments'])
+
     def test_trustee_can_change_experiment_status_with_a_POST_request(self):
-        trustee_user = User.objects.get(username='claudia')
-        # password='passwd' from test helper
-        self.client.login(username=trustee_user.username, password='passwd')
-        experiment = Experiment.objects.filter(
-            status=Experiment.TO_BE_ANALYSED
-        ).first()
+        study = create_study(1, self.experiment)
+        create_researcher(study)
+        trustee_user = create_trustee_user()
+        self.client.login(username=trustee_user.username, password=PASSWORD)
         response = self.client.post(
-            '/experiments/' + str(experiment.id) + '/change_status/',
+            '/experiments/' + str(self.experiment.id) + '/change_status/',
             {'status': Experiment.UNDER_ANALYSIS}
         )
         # Is it redirecting?
         self.assertEqual(response.status_code, 302)
-        # TODO: is it using correct template after redirecting
-        # TODO: experiment has changed status to UNDER_ANALYSIS?
-        experiment = Experiment.objects.get(pk=experiment.id)
+        # TODO:
+        # Is it using correct template after redirecting
+        # experiment has changed status to UNDER_ANALYSIS?
+        experiment = Experiment.objects.get(pk=self.experiment.id)
         self.assertEqual(experiment.status, Experiment.UNDER_ANALYSIS)
 
     def test_send_email_to_researcher_when_trustee_changes_status(self):
@@ -74,9 +86,8 @@ class HomePageTest(TestCase):
         Other are similar.
         """
         # TODO: See if is valid to implement all of them.
-        experiment = Experiment.objects.filter(
-            status=Experiment.UNDER_ANALYSIS
-        ).first()
+        study = create_study(1, self.experiment)
+        create_researcher(study)
 
         self.send_mail_called = False
 
@@ -91,27 +102,28 @@ class HomePageTest(TestCase):
         views.send_mail = fake_send_mail
 
         self.client.post(
-            '/experiments/' + str(experiment.id) + '/change_status/',
+            '/experiments/' + str(self.experiment.id) + '/change_status/',
             {'status': Experiment.APPROVED, 'warning_email_to':
-                experiment.study.researcher.email},
+                self.experiment.study.researcher.email},
             )
 
         self.assertTrue(self.send_mail_called)
         self.assertEqual(self.subject,
                          'Your experiment was approved')
         self.assertEqual(self.from_email, 'noreplay@nep.prp.usp.br')
-        self.assertEqual(self.to, [experiment.study.researcher.email])
+        self.assertEqual(self.to, [self.experiment.study.researcher.email])
 
     def test_adds_success_message(self):
         # TODO: see if it is worth to test other messages
-        experiment = Experiment.objects.filter(
-            status=Experiment.UNDER_ANALYSIS
-        ).first()
+        self.experiment.status = Experiment.UNDER_ANALYSIS
+        self.experiment.save()
+        study = create_study(1, self.experiment)
+        create_researcher(study)
 
         response = self.client.post(
-            '/experiments/' + str(experiment.id) + '/change_status/',
+            '/experiments/' + str(self.experiment.id) + '/change_status/',
             {'status': Experiment.APPROVED, 'warning_email_to':
-                experiment.study.researcher.email},
+                self.experiment.study.researcher.email},
             follow=True
         )
 
@@ -119,22 +131,21 @@ class HomePageTest(TestCase):
         self.assertEqual(
             message.message,
             'An email was sent to ' +
-            experiment.study.researcher.first_name +
-            ' ' + experiment.study.researcher.last_name +
+            self.experiment.study.researcher.first_name +
+            ' ' + self.experiment.study.researcher.last_name +
             ' warning that the experiment changed status to Approved.'
         )
         self.assertEqual(message.tags, "success")
 
     def test_cant_change_status_to_not_approved_without_justification(self):
-        experiment = Experiment.objects.filter(
-            status=Experiment.UNDER_ANALYSIS
-        ).first()
+        self.experiment.status = Experiment.UNDER_ANALYSIS
+        self.experiment.save()
         self.client.post(
-            '/experiments/' + str(experiment.id) + '/change_status/',
+            '/experiments/' + str(self.experiment.id) + '/change_status/',
             {'status': Experiment.NOT_APPROVED},
-            )
+        )
         # experiment has mantained status UNDER_ANALYSIS?
-        experiment = Experiment.objects.get(pk=experiment.id)
+        experiment = Experiment.objects.get(pk=self.experiment.id)
         self.assertEqual(experiment.status, Experiment.UNDER_ANALYSIS)
 
     # TODO!
@@ -142,43 +153,35 @@ class HomePageTest(TestCase):
         pass
 
     def test_when_change_status_to_not_approved_save_justification_message(self):
-        experiment = Experiment.objects.filter(
-            status=Experiment.UNDER_ANALYSIS
-        ).first()
+        study = create_study(1, self.experiment)
+        create_researcher(study)
         self.client.post(
-            '/experiments/' + str(experiment.id) + '/change_status/',
+            '/experiments/' + str(self.experiment.id) + '/change_status/',
             {'status': Experiment.NOT_APPROVED,
              'justification': '404 Bad experiment!'},
             )
-        experiment = Experiment.objects.get(pk=experiment.id)
-        self.assertNotEqual('', experiment.justification)
+        self.assertNotEqual('', self.experiment.justification)
 
     def test_change_status_to_under_analysis_associate_experiment_with_trustee(self):
-        trustee_user = User.objects.get(username='claudia')
-        # password='passwd' from test helper
-        self.client.login(username=trustee_user.username, password='passwd')
-        experiment = Experiment.objects.filter(
-            status=Experiment.TO_BE_ANALYSED
-        ).first()
+        study = create_study(1, self.experiment)
+        create_researcher(study)
+        trustee_user = create_trustee_user()
+        self.client.login(username=trustee_user.username, password=PASSWORD)
         self.client.post(
-            '/experiments/' + str(experiment.id) + '/change_status/',
+            '/experiments/' + str(self.experiment.id) + '/change_status/',
             {'status': Experiment.UNDER_ANALYSIS},
-            )
-        experiment = Experiment.objects.get(pk=experiment.id)
+        )
+        experiment = Experiment.objects.get(pk=self.experiment.id)
         self.assertEqual(trustee_user, experiment.trustee)
 
     def test_change_status_from_under_analysis_to_to_be_analysed_disassociate_trustee(self):
-        trustee_user = User.objects.get(username='claudia')
-        # password='passwd' from test helper
-        self.client.login(username=trustee_user.username, password='passwd')
-        experiment = Experiment.objects.filter(
-            status=Experiment.UNDER_ANALYSIS
-        ).first()
+        trustee_user = create_trustee_user()
+        self.client.login(username=trustee_user.username, password=PASSWORD)
         self.client.post(
-            '/experiments/' + str(experiment.id) + '/change_status/',
+            '/experiments/' + str(self.experiment.id) + '/change_status/',
             {'status': Experiment.TO_BE_ANALYSED},
             )
-        experiment = Experiment.objects.get(pk=experiment.id)
+        experiment = Experiment.objects.get(pk=self.experiment.id)
         self.assertEqual(None, experiment.trustee)
 
 
@@ -369,13 +372,13 @@ class ExperimentDetailTest(TestCase):
 class ChangeExperimentSlugTest(TestCase):
 
     def setUp(self):
-        create_trustee_users()
+        trustee = create_trustee_user('claudia')
         group = auth.models.Group.objects.get(name='trustees')
         permission = Permission.objects.get(codename='change_slug')
         group.permissions.add(permission)
 
-        trustee_user = User.objects.get(username='claudia')
-        self.client.login(username=trustee_user.username, password='passwd')
+        trustee_user = User.objects.get(username=trustee.username)
+        self.client.login(username=trustee_user.username, password=PASSWORD)
 
         create_experiment(1)
 

@@ -11,11 +11,19 @@ from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.common.keys import Keys
 
 from experiments.models import Experiment
-from experiments.tests.tests_helper import random_utf8_string
+from experiments.tests.tests_helper import random_utf8_string, \
+    global_setup_ft, apply_setup, create_trustee_user
 from functional_tests.base import FunctionalTestTrustee
 
 
+@apply_setup(global_setup_ft)
 class TrusteeTest(FunctionalTestTrustee):
+
+    def setUp(self):
+        create_trustee_user('claudia')
+        create_trustee_user('roque')
+        global_setup_ft()
+        super(TrusteeTest, self).setUp()
 
     def _access_experiment_detail_page(self, experiment):
         # The new visitor is in home page and see the list of experiments.
@@ -37,7 +45,8 @@ class TrusteeTest(FunctionalTestTrustee):
         # The trustee clicks in experiment url link to change the url
         self.wait_for(
             lambda: self.browser.find_element_by_class_name(
-                'fa-pencil-square-o').click()
+                'fa-pencil-square-o'
+            ).click()
         )
         return experiment
 
@@ -836,9 +845,7 @@ class TrusteeTest(FunctionalTestTrustee):
 
         # The trustee tryes to enter a slug with less than three characters
         self.wait_for(
-            lambda: self.browser.find_element_by_id(
-                'id_slug'
-            ).send_keys('sl')
+            lambda: self.browser.find_element_by_id('id_slug').send_keys('sl')
         )
         self.browser.execute_script(
             'document.getElementById("submit").disabled = false;'
