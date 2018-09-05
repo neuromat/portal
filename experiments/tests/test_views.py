@@ -29,7 +29,7 @@ from experiments.tests.tests_helper import apply_setup, global_setup_ut, \
     create_experiment_related_objects, \
     create_download_dir_structure_and_files, \
     remove_selected_subdir, create_experiment, create_trustee_user, \
-    create_experiment_versions, random_utf8_string, create_context_tree, \
+    create_next_version_experiment, random_utf8_string, create_context_tree, \
     create_eeg_electrodenet, create_eeg_solution, create_eeg_filter_setting, \
     create_eeg_electrode_localization_system, \
     create_emg_digital_filter_setting, create_group, create_questionnaire, \
@@ -438,7 +438,7 @@ class ChangeExperimentSlugTest(TestCase):
     def test_POSTing_a_valid_n_experiment_version_changes_all_slugs_correctly(
             self):
         experiment = Experiment.objects.first()
-        experiment_versions = create_experiment_versions(3, experiment)
+        experiment_versions = create_next_version_experiment(3, experiment)
         last_version = experiment_versions[len(experiment_versions) - 1]
 
         self.client.post(

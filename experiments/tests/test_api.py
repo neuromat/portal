@@ -23,7 +23,7 @@ from experiments.models import Experiment, Study, Group, Researcher, \
     ExperimentalProtocol, ExperimentResearcher
 from experiments.tests.tests_helper import global_setup_ut, apply_setup, \
     create_experiment, create_group, create_questionnaire, \
-    create_experiment_researcher, create_experiment_versions, PASSWORD, \
+    create_experiment_researcher, create_next_version_experiment, PASSWORD, \
     create_owner, create_trustee_user, create_study
 
 TEMP_MEDIA_ROOT = tempfile.mkdtemp()
@@ -603,7 +603,7 @@ class ExperimentResearcherAPITest(APITestCase):
 
     def test_POSTing_a_new_experiment_researcher_associates_with_last_experiment_version(self):
         # create experiment version 2
-        create_experiment_versions(1, self.experiment1)
+        create_next_version_experiment(1, self.experiment1)
 
         self.client.login(
             username=self.experiment1.owner.username,

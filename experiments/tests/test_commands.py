@@ -15,7 +15,7 @@ from experiments.models import Gender, Study, Group, EEGSetting, \
 from experiments.tests.tests_helper import create_experiment, create_study, \
     create_group, create_participant, create_experimental_protocol, \
     create_eeg_setting, create_eeg_data, \
-    create_eeg_step, create_genders, create_experiment_versions, create_owner, \
+    create_eeg_step, create_genders, create_next_version_experiment, create_owner, \
     create_uploads_subdirs_and_files, \
     create_download_subdirs
 from nep import settings
@@ -93,7 +93,7 @@ class CommandsTest(TestCase):
 
         owner = create_owner('labX')
         experiment = create_experiment(1, owner=owner)
-        experiment_versions = create_experiment_versions(5, experiment)
+        experiment_versions = create_next_version_experiment(5, experiment)
         experiment_version = choice(experiment_versions)
 
         out = StringIO()
@@ -118,7 +118,7 @@ class CommandsTest(TestCase):
 
         owner = create_owner('labX')
         experiment = create_experiment(1, owner=owner)
-        experiment_versions = create_experiment_versions(11, experiment)
+        experiment_versions = create_next_version_experiment(11, experiment)
         experiment_version = choice(experiment_versions)
 
         out = StringIO()
