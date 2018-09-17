@@ -176,7 +176,8 @@ class ExperimentAPITest(APITestCase):
                 'project_url': self.experiment1.project_url,
                 'ethics_committee_url':
                     self.experiment1.ethics_committee_url,
-                'ethics_committee_file': None
+                'ethics_committee_file': None,
+                'release_notes': self.experiment1.release_notes
             }
         )
         self.client.logout()
