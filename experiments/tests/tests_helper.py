@@ -83,9 +83,13 @@ def create_owner(username=None):
     :param username: String
     :return: auth.User model instance
     """
+    fake = Factory.create()
+
     if not username:
-        fake = Factory.create()
-        username = fake.word()
+        while True:
+            username = fake.word()
+            if not User.objects.filter(username=username):
+                break
 
     return User.objects.create_user(username=username, password=PASSWORD)
 

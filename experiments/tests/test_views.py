@@ -438,11 +438,13 @@ class ChangeExperimentSlugTest(TestCase):
     def test_POSTing_a_valid_n_experiment_version_changes_all_slugs_correctly(
             self):
         experiment = Experiment.objects.first()
-        experiment_versions = create_next_version_experiment(3, experiment)
-        last_version = experiment_versions[len(experiment_versions) - 1]
+        experiment_v2 = create_next_version_experiment(experiment)
+        experiment_v3 = create_next_version_experiment(experiment_v2)
+        experiment_v4 = create_next_version_experiment(experiment_v3)
 
         self.client.post(
-            '/experiments/' + str(last_version.id) + '/change_slug/',
+            '/experiments/' + str(experiment_v4.id) +
+            '/change_slug/',
             {'slug': 'new-slug-for-version-4'}
         )
 

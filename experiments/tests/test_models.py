@@ -147,12 +147,11 @@ class ExperimentModelTest(TestCase):
         self.assertEqual(experiment.ethics_committee_file, None)
         self.assertEqual(experiment.slug, '')
         self.assertEqual(experiment.downloads, 0)
+        self.assertEqual(experiment.release_notes, '')
 
     def test_cannot_save_empty_attributes(self):
-        owner = User.objects.first()
-        # version=17: large number to avoid conflicts with global setup
         experiment = Experiment(
-            nes_id=1, title='', description='', owner=owner,
+            nes_id=1, title='', description='', owner=self.owner,
             version=17, slug='', sent_date=datetime.utcnow()
         )
         # TODO: slug='' does not raises ValidationError
@@ -172,12 +171,6 @@ class ExperimentModelTest(TestCase):
     def test_can_save_same_experiment_to_different_owners(self):
         owner2 = create_owner('lab2')
         experiment = create_experiment(1, self.owner)
-        # Experiment.objects.create(
-        #     title='A title', description='A description', nes_id=1,
-        #     owner=self.owner, version=17,
-        #     sent_date=datetime.utcnow(),
-        #     slug='slug6'  # last slug in tests_helper was 'slug'
-        # )
         experiment2 = Experiment(
             title=experiment.title, description=experiment.description,
             nes_id=experiment.nes_id, owner=owner2,

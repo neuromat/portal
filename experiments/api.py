@@ -38,7 +38,7 @@ class ExperimentSerializer(serializers.ModelSerializer):
         fields = ('id', 'title', 'description', 'data_acquisition_done',
                   'nes_id', 'owner', 'status',
                   'sent_date', 'project_url', 'ethics_committee_url',
-                  'ethics_committee_file')
+                  'ethics_committee_file', 'release_notes')
 
 
 class UserSerializer(serializers.ModelSerializer):
