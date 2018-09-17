@@ -23,7 +23,7 @@ from experiments.models import Experiment, Study, Group, Researcher, \
     ExperimentalProtocol, ExperimentResearcher
 from experiments.tests.tests_helper import global_setup_ut, apply_setup, \
     create_experiment, create_group, create_questionnaire, \
-    create_experiment_researcher, create_experiment_versions, PASSWORD, \
+    create_experiment_researcher, create_next_version_experiment, PASSWORD, \
     create_owner, create_trustee_user, create_study
 
 TEMP_MEDIA_ROOT = tempfile.mkdtemp()
@@ -113,22 +113,27 @@ class ExperimentAPITest(APITestCase):
         self.assertEqual(self.to, emails)
 
     def test_POSTing_experiment_generates_new_version(self):
-        # Post experiment already sended to portal
-        self.client.login(username=self.owner.username, password='nep-lab1')
-        self.client.post(
+        # post experiment already sended to portal
+        self.client.login(username=self.owner.username, password=PASSWORD)
+        response = self.client.post(
             self.list_url,
             {
                 'title': 'New title',
                 'description': 'New description',
                 'nes_id': self.experiment1.nes_id,
-                'sent_date': datetime.utcnow().strftime('%Y-%m-%d')
+                'sent_date': datetime.utcnow().strftime('%Y-%m-%d'),
+                'release_notes': 'This experiment has changed'
             }
         )
         self.client.logout()
 
-        # We have just posted the experiment so we can get the last one
         experiment_version_2 = Experiment.objects.last()
-        self.assertEqual(experiment_version_2.version, 1)
+        self.assertEqual(experiment_version_2.version, 2)
+        # included after including experiment release_notes field
+        self.assertEqual(
+            experiment_version_2.release_notes,
+            'This experiment has changed'
+        )
 
     @override_settings(MEDIA_ROOT=TEMP_MEDIA_ROOT)
     def test_PATCHing_an_existing_experiment(self):
@@ -178,7 +183,7 @@ class ExperimentAPITest(APITestCase):
 
         shutil.rmtree(TEMP_MEDIA_ROOT)
 
-    def test_POSTing_experiments_creates_version_one(self):
+    def test_POSTing_experiment_creates_version_one(self):
         self.client.login(username=self.owner.username, password='nep-lab1')
         self.client.post(
             self.list_url,
@@ -603,7 +608,7 @@ class ExperimentResearcherAPITest(APITestCase):
 
     def test_POSTing_a_new_experiment_researcher_associates_with_last_experiment_version(self):
         # create experiment version 2
-        create_experiment_versions(1, self.experiment1)
+        create_next_version_experiment(self.experiment1)
 
         self.client.login(
             username=self.experiment1.owner.username,

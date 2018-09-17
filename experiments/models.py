@@ -143,13 +143,15 @@ class Experiment(models.Model):  # indexed for search
     status = models.CharField(
         max_length=20, choices=STATUS_OPTIONS, default=RECEIVING
     )
-    trustee = models.ForeignKey(User, null=True,
-                                blank=True, related_name='experiments')
+    trustee = models.ForeignKey(
+        User, null=True, blank=True, related_name='experiments'
+    )
     # TODO: We want slug field do not save empty string.
     # TODO: This implies that the experiments are being
     # TODO: saved in tests, with slug='', what we don't want. The tests should
     # TODO: regret when saving experiments with slug=''.
     slug = models.SlugField(max_length=100, unique=True)
+    release_notes = models.TextField(blank=True, default='')
 
     objects = models.Manager()
     lastversion_objects = LastVersionExperimentManager()

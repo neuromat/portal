@@ -15,7 +15,7 @@ from experiments.models import Gender, Study, Group, EEGSetting, \
 from experiments.tests.tests_helper import create_experiment, create_study, \
     create_group, create_participant, create_experimental_protocol, \
     create_eeg_setting, create_eeg_data, \
-    create_eeg_step, create_genders, create_experiment_versions, create_owner, \
+    create_eeg_step, create_genders, create_next_version_experiment, create_owner, \
     create_uploads_subdirs_and_files, \
     create_download_subdirs
 from nep import settings
@@ -93,8 +93,9 @@ class CommandsTest(TestCase):
 
         owner = create_owner('labX')
         experiment = create_experiment(1, owner=owner)
-        experiment_versions = create_experiment_versions(5, experiment)
-        experiment_version = choice(experiment_versions)
+        experiment_v2 = create_next_version_experiment(experiment)
+        experiment_v3 = create_next_version_experiment(experiment_v2)
+        experiment_version = choice([experiment, experiment_v2, experiment_v3])
 
         out = StringIO()
         call_command(
@@ -103,8 +104,8 @@ class CommandsTest(TestCase):
             '--last', stdout=out
         )
 
-        self.assertEqual(5, Experiment.objects.count())
-        self.assertEqual(5, Experiment.lastversion_objects.last().version)
+        self.assertEqual(2, Experiment.objects.count())
+        self.assertEqual(2, Experiment.objects.last().version)
 
         self.assertIn(
             'Last version of experiment "%s" successfully removed'
@@ -118,8 +119,8 @@ class CommandsTest(TestCase):
 
         owner = create_owner('labX')
         experiment = create_experiment(1, owner=owner)
-        experiment_versions = create_experiment_versions(11, experiment)
-        experiment_version = choice(experiment_versions)
+        experiment_version_2 = create_next_version_experiment(experiment)
+        experiment_version = choice([experiment, experiment_version_2])
 
         out = StringIO()
         call_command(

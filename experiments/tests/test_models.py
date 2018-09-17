@@ -22,7 +22,7 @@ from experiments.tests.tests_helper import global_setup_ut, apply_setup, \
     create_goalkeepergame_step, create_goalkeeper_game_data, \
     create_generic_data_collection_step, create_generic_data_collection_data, \
     create_additional_data, create_emg_electrode_placement, create_owner, \
-    create_study
+    create_study, create_next_version_experiment
 
 
 def add_temporary_file_to_file_instance(file_instance):
@@ -121,12 +121,11 @@ class StudyModelTest(TestCase):
             study.full_clean()
 
 
-@apply_setup(global_setup_ut)
 class ExperimentModelTest(TestCase):
     TEMP_MEDIA_ROOT = tempfile.mkdtemp()
 
     def setUp(self):
-        global_setup_ut()
+        self.owner = create_owner()
 
     def tearDown(self):
         # used only when testing deleting files
@@ -148,12 +147,11 @@ class ExperimentModelTest(TestCase):
         self.assertEqual(experiment.ethics_committee_file, None)
         self.assertEqual(experiment.slug, '')
         self.assertEqual(experiment.downloads, 0)
+        self.assertEqual(experiment.release_notes, '')
 
     def test_cannot_save_empty_attributes(self):
-        owner = User.objects.first()
-        # version=17: large number to avoid conflicts with global setup
         experiment = Experiment(
-            nes_id=1, title='', description='', owner=owner,
+            nes_id=1, title='', description='', owner=self.owner,
             version=17, slug='', sent_date=datetime.utcnow()
         )
         # TODO: slug='' does not raises ValidationError
@@ -171,154 +169,67 @@ class ExperimentModelTest(TestCase):
             experiment.full_clean()
 
     def test_can_save_same_experiment_to_different_owners(self):
-        owner1 = User.objects.get(username='lab1')
-        owner2 = User.objects.get(username='lab2')
-        Experiment.objects.create(
-            title='A title', description='A description', nes_id=1,
-            owner=owner1, version=17,
+        owner2 = create_owner('lab2')
+        experiment = create_experiment(1, self.owner)
+        experiment2 = Experiment(
+            title=experiment.title, description=experiment.description,
+            nes_id=experiment.nes_id, owner=owner2,
+            version=experiment.version,
             sent_date=datetime.utcnow(),
-            slug='slug6'  # last slug in tests_helper was 'slug'
+            slug='a-slug'
         )
-        experiment2 = Experiment(title='A title', description='A description',
-                                 nes_id=1, owner=owner2,
-                                 version=17,
-                                 sent_date=datetime.utcnow(),
-                                 slug='slug7')
         experiment2.full_clean()
 
     def test_experiment_is_related_to_owner(self):
-        owner = User.objects.first()
-        experiment = Experiment(nes_id=17, owner=owner,
-                                version=1, sent_date=datetime.utcnow())
+        experiment = Experiment(
+            nes_id=17, owner=self.owner, version=1, sent_date=datetime.utcnow()
+        )
         experiment.save()
-        self.assertIn(experiment, owner.experiment_set.all())
+        self.assertIn(experiment, self.owner.experiment_set.all())
 
     def test_cannot_create_experiment_with_same_slug(self):
-        fake = Factory.create()
-
         # slugs are automatically created in Experiment model when it's the
-        # first saving; so we have to save two instances, and after modify
+        # first time saving; so we have to save two instances, and after modify
         # slug field to be the same, and only then try to save.
-        e1 = Experiment.objects.create(
-            title=fake.text(max_nb_chars=15),
-            description=fake.text(max_nb_chars=200),
-            nes_id=randint(1, 10000),
-            owner=User.objects.get(username='lab1'),
-            version=1, sent_date=datetime.utcnow(),
-            status=Experiment.TO_BE_ANALYSED,
-            data_acquisition_done=True,
-        )
-        e1.slug = 'same-slug'
-        e1.save()
-        e2 = Experiment.objects.create(
-            title=fake.text(max_nb_chars=15),
-            description=fake.text(max_nb_chars=200),
-            nes_id=randint(1, 10000),
-            owner=User.objects.get(username='lab1'),
-            version=1,
-            sent_date=datetime.utcnow(),
-            status=Experiment.TO_BE_ANALYSED,
-            data_acquisition_done=True,
-        )
-        e2.slug = 'same-slug'
+        e1 = create_experiment(1)
+        e2 = create_experiment(1)
+        e2.slug = e1.slug
 
         with self.assertRaises(ValidationError):
             e2.full_clean()
 
     def test_creating_experiment_creates_predefined_slug(self):
-        fake = Factory.create()
-
-        experiments_now = Experiment.objects.all().count()
+        owner2 = create_owner()
 
         # create experiment: nes_id 1, owner lab1, first version
-        e1 = Experiment.objects.create(
-            title='This is a slug',
-            description=fake.text(max_nb_chars=200),
-            nes_id=experiments_now + 1,
-            owner=User.objects.get(username='lab1'),
-            version=1, sent_date=datetime.utcnow(),
-            status=Experiment.TO_BE_ANALYSED,
-            data_acquisition_done=True,
-        )
+        e1 = create_experiment(1, owner=self.owner)
         self.assertEqual(slugify(e1.title), e1.slug)
 
         # create experiment: nes_id 1, owner lab1, second version,
         # title unaltered
-        e2 = Experiment.objects.create(
-            title='This is a slug',
-            description=fake.text(max_nb_chars=200),
-            nes_id=experiments_now + 1,
-            owner=User.objects.get(username='lab1'),
-            version=2, sent_date=datetime.utcnow(),
-            status=Experiment.TO_BE_ANALYSED,
-            data_acquisition_done=True,
-        )
+        e2 = create_next_version_experiment(e1)
         self.assertEqual(slugify(e1.title) + '-v2', e2.slug)
 
         # create experiment: nes_id 1, owner lab1, third version, title altered
-        e3 = Experiment.objects.create(
-            title='This is another slug',
-            description=fake.text(max_nb_chars=200),
-            nes_id=experiments_now + 1,
-            owner=User.objects.get(username='lab1'),
-            version=3, sent_date=datetime.utcnow(),
-            status=Experiment.TO_BE_ANALYSED,
-            data_acquisition_done=True,
-        )
+        e3 = create_next_version_experiment(e2)
+        e3.title = e1.title
+        e3.save()
         self.assertEqual(slugify(e1.title) + '-v3', e3.slug)
 
-        # create experiment: nes_id 2, owner lab2, first version,
+        # create experiment: owner lab2, first version,
         # existing title from other experiment
-        e4 = Experiment.objects.create(
-            title='This is a slug',
-            description=fake.text(max_nb_chars=200),
-            nes_id=experiments_now + 2,
-            owner=User.objects.get(username='lab2'),
-            version=1, sent_date=datetime.utcnow(),
-            status=Experiment.TO_BE_ANALYSED,
-            data_acquisition_done=True,
-        )
+        e4 = create_experiment(qtty=1, owner=owner2, title=e1.title)
         self.assertEqual(slugify(e4.title) + '-2', e4.slug)
 
         # create experiment: nes_id 2, owner lab2, second version,
         # title unaltered
-        e5 = Experiment.objects.create(
-            title='This is a slug',
-            description=fake.text(max_nb_chars=200),
-            nes_id=experiments_now + 2,
-            owner=User.objects.get(username='lab2'),
-            version=2, sent_date=datetime.utcnow(),
-            status=Experiment.TO_BE_ANALYSED,
-            data_acquisition_done=True,
-        )
-        self.assertEqual(slugify(e4.title) + '-2-v2', e5.slug)
-
-        # create experiment: nes_id 2, owner lab2, third version,
-        # title unaltered
-        e6 = Experiment.objects.create(
-            title='This is a slug',
-            description=fake.text(max_nb_chars=200),
-            nes_id=experiments_now + 2,
-            owner=User.objects.get(username='lab2'),
-            version=3, sent_date=datetime.utcnow(),
-            status=Experiment.TO_BE_ANALYSED,
-            data_acquisition_done=True,
-        )
+        e5 = create_next_version_experiment(e4)
+        e6 = create_next_version_experiment(e5)
         self.assertEqual(slugify(e4.title) + '-2-v3', e6.slug)
 
-        # create experiment: nes_id 3, owner lab2, first version,
-        # non-existing title from other experiment
-        e7 = Experiment.objects.create(
-            title='This is one more slug',
-            description=fake.text(max_nb_chars=200),
-            nes_id=experiments_now + 3,
-            owner=User.objects.get(username='lab2'),
-            version=1, sent_date=datetime.utcnow(),
-            status=Experiment.TO_BE_ANALYSED,
-            data_acquisition_done=True,
-        )
+        # create experiment: owner lab2, first version, non-existing title
+        e7 = create_experiment(1, owner2, title='This is one more slug')
         self.assertEqual(slugify(e7.title), e7.slug)
-
 
     def test_delete_instance_deletes_its_files(self):
         experiment = create_experiment(1)
