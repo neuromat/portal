@@ -83,14 +83,19 @@ def create_owner(username=None):
     :param username: String
     :return: auth.User model instance
     """
+    fake = Factory.create()
+
     if not username:
-        fake = Factory.create()
-        username = fake.word()
+        while True:
+            username = fake.word()
+            if not User.objects.filter(username=username):
+                break
 
     return User.objects.create_user(username=username, password=PASSWORD)
 
 
-def create_experiment(qtty, owner=None, status=Experiment.TO_BE_ANALYSED):
+def create_experiment(qtty, owner=None, status=Experiment.TO_BE_ANALYSED,
+                      title=None):
     """
     :param qtty: number of experiments to be created
     :param owner: owner of experiment - User instance model
@@ -104,7 +109,7 @@ def create_experiment(qtty, owner=None, status=Experiment.TO_BE_ANALYSED):
     experiments = []
     for i in range(qtty):
         experiment = Experiment.objects.create(
-            title=fake.text(max_nb_chars=15),
+            title=title if title else fake.text(max_nb_chars=15),
             description=fake.text(max_nb_chars=200),
             # TODO: guarantee that this won't
             # TODO: genetates constraint violaton (nes_id, owner_id)!
@@ -121,24 +126,19 @@ def create_experiment(qtty, owner=None, status=Experiment.TO_BE_ANALYSED):
     return experiments
 
 
-def create_experiment_versions(qtty, experiment):
+def create_next_version_experiment(experiment):
     """
     :param qtty: number of versions to create
     :param experiment: Experiment model instance
     :return: list of all versions including the first
     """
     current_version = experiment.version
-    for version in range(qtty):
-        experiment_version = experiment
-        experiment_version.pk = None
-        experiment_version.version = current_version + 1
-        experiment_version.save()
-        current_version += 1
+    experiment.pk = None
+    current_version += 1
+    experiment.version = current_version
+    experiment.save()
 
-    experiment_versions = []
-    for ev in Experiment.objects.all():
-        experiment_versions.append(ev)
-    return experiment_versions
+    return experiment
 
 
 def create_trustee_user(username=None):

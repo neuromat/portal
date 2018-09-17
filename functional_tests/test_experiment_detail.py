@@ -136,7 +136,7 @@ class ExperimentDetailTest(FunctionalTest):
         if experiment.study.start_date.month == 9:
             strdate = experiment.study.start_date.strftime(
                 "%b. %d, %Y"
-            ).lstrip("0").replace(". 0", "t. ")
+            ).lstrip("0").replace(". ", "t. ")
         else:
             strdate = experiment.study.start_date.strftime(
                 "%b. %d, %Y"
