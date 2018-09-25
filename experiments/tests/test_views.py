@@ -196,7 +196,6 @@ TEST_HAYSTACK_CONNECTIONS = {
     }
 }
 
-
 # TODO: we are testing only questionnaire view part. Complete with other
 # TODO: tests: groups, studies, settings etc
 @apply_setup(global_setup_ut)

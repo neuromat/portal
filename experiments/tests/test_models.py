@@ -77,6 +77,7 @@ class ResearcherModelTest(TestCase):
         self.assertEqual(researcher.first_name, '')
         self.assertEqual(researcher.last_name, '')
         self.assertEqual(researcher.email, '')
+        self.assertEqual(researcher.citation_name,'')
 
     def test_researcher_is_related_to_one_study(self):
         study = Study.objects.last()
@@ -88,6 +89,14 @@ class ResearcherModelTest(TestCase):
         researcher = Researcher(study=Study.objects.last())
         with self.assertRaises(ValidationError):
             researcher.full_clean()
+
+    def test_researcher_citation_name_overlap_first_and_last_name(self):
+        researcher = Researcher(citation_name='de TAL, Fulano')
+        self.assertEqual(researcher.__str__(), 'de TAL, Fulano')
+
+    def test_researcher_citation_without_citation_name(self):
+        researcher = Researcher(first_name='Fulano',last_name='de Tal')
+        self.assertEqual(researcher.__str__(), 'de Tal, Fulano')
 
     # TODO: test cannot save researcher without study
 
@@ -307,25 +316,35 @@ class ExperimentResearcherModel(TestCase):
         self.assertEqual(experiment_researcher.last_name, '')
         self.assertEqual(experiment_researcher.email, '')
         self.assertEqual(experiment_researcher.institution, '')
+        self.assertEqual(experiment_researcher.citation_name, '')
 
     def test_experiment_researcher_is_related_to_experiment(self):
         experiment = Experiment.objects.last()
         experiment_researcher = ExperimentResearcher.objects.create(
             first_name='Vladimir', last_name='Ilyich Ulianov',
             email='lenin@member.fsf.org', institution='PCUS',
-            experiment=experiment
+            experiment=experiment, citation_name='ULIANOV, Vladimir I.'
         )
         self.assertIn(experiment_researcher, experiment.researchers.all())
 
     def test_cannot_save_empty_attributes(self):
         experiment = Experiment.objects.last()
         experiment_researcher = ExperimentResearcher.objects.create(
-            first_name='', last_name='',
+            first_name='', last_name='', citation_name='',
             experiment=experiment
         )
         with self.assertRaises(ValidationError):
             experiment_researcher.save()
             experiment_researcher.full_clean()
+
+    def test_experiment_researcher_citation_name_overlap_first_and_last_name(self):
+        experiment_researcher = ExperimentResearcher(citation_name='ULIANOV, Vladimir I.')
+        self.assertEqual(experiment_researcher.__str__(), 'ULIANOV, Vladimir I.')
+
+    def test_experiment_researcher_citation_without_citation_name(self):
+        experiment_researcher = ExperimentResearcher(first_name='Vladimir', last_name='Ilyich Ulianov')
+        self.assertEqual(experiment_researcher.__str__(), 'Ilyich Ulianov, Vladimir')
+
 
 
 @apply_setup(global_setup_ut)

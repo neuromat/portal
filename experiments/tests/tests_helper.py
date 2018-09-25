@@ -167,19 +167,20 @@ def create_researchers():
         create_researcher(study)
 
 
-def create_researcher(study, first_name=None, last_name=None):
+def create_researcher(study, first_name=None, last_name=None, citation_name=None):
     """
     :param study: Study model instance
     :param first_name: researcher's first name
     :param last_name: researcher's last name
+    :param citation_name: researcher's citation name
     :return: Researcher model instance
     """
     fake = Factory.create()
-
     return Researcher.objects.create(
         first_name=first_name or fake.first_name(),
         last_name=last_name or fake.last_name(),
-        email=fake.email(), study=study
+        email=fake.email(), study=study,
+        citation_name=citation_name or fake.last_name()+', '+fake.first_name()
     )
 
 
@@ -246,14 +247,21 @@ def create_classification_of_deseases(qtty):
         )
 
 
-def create_experiment_researcher(experiment, first_name=None, last_name=None):
+def create_experiment_researcher(experiment, first_name=None, last_name=None, citation_name=None):
     fake = Factory.create()
 
-    return ExperimentResearcher.objects.create(
+    form = ExperimentResearcher(
         first_name=first_name or fake.first_name(),
         last_name=last_name or fake.last_name(),
-        email=fake.email(), institution=fake.company(), experiment=experiment
+        email=fake.email(), institution=fake.company(),
+        experiment=experiment
     )
+    form.citation_name = citation_name or form.last_name.upper() +\
+                         ', ' + form.first_name
+    form.save()
+
+    experiment_researcher = ExperimentResearcher.objects.last()
+    return experiment_researcher
 
 
 def create_keyword(keyword=None):
@@ -987,7 +995,8 @@ def create_experiment_related_objects(experiment):
     # search_indexes.StudyIndex class
     Researcher.objects.create(
         first_name='Negro', last_name='Belchior',
-        email='belchior@example.com', study=study
+        email='belchior@example.com', study=study,
+        citation_name='BELCHIOR, Negro'
     )
     gender1 = Gender.objects.create(name='male')
     gender2 = Gender.objects.create(name='female')
@@ -1566,9 +1575,11 @@ def global_setup_ut():
                          experiment=experiment3)
 
     Researcher.objects.create(first_name='Raimundo', last_name='Nonato',
-                              email='rnonato@example.com', study=study1)
+                              email='rnonato@example.com', study=study1,
+                              citation_name='NONATO, Raimundo')
     Researcher.objects.create(first_name='Raimunda', last_name='da Silva',
-                              email='rsilva@example.com', study=study2)
+                              email='rsilva@example.com', study=study2,
+                              citation_name='SILVA, Raimunda da')
 
     # Create some keywords to associate with studies
     create_keyword(10)

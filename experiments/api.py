@@ -94,7 +94,7 @@ class ResearcherSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Researcher
-        fields = ('id', 'first_name', 'last_name', 'email', 'study')
+        fields = ('id', 'first_name', 'last_name', 'email', 'study', 'citation_name')
 
 
 class ExperimentResearcherSerializer(serializers.ModelSerializer):
@@ -103,7 +103,7 @@ class ExperimentResearcherSerializer(serializers.ModelSerializer):
     class Meta:
         model = ExperimentResearcher
         fields = ('id', 'first_name', 'last_name', 'email', 'institution',
-                  'experiment')
+                  'experiment', 'citation_name')
 
 
 class AmplifierSerializer(serializers.ModelSerializer):

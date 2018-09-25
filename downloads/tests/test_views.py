@@ -102,7 +102,7 @@ class DownloadCreateView(TestCase):
 
     def test_download_zip_file_has_how_to_cite_content_in_citation_file_1(self):
         experiment = self.create_basic_experiment_data()
-        create_researcher(experiment.study, 'Valdick', 'Soriano')
+        create_researcher(experiment.study, 'Valdick', 'Soriano', 'SORIANO, Valdick')
         download_create(experiment.id, '')
 
         # get the zipped file to test against its content
@@ -112,7 +112,7 @@ class DownloadCreateView(TestCase):
         zipped_file = zipfile.ZipFile(zip_file, 'r')
         file = zipped_file.open('EXPERIMENT_DOWNLOAD/CITATION.txt', 'r')
         self.assertIn(
-            'SORIANO, Valdick ' + experiment.title
+            'SORIANO, Valdick. ' + experiment.title
             + '. Sent date: ' + str(experiment.sent_date),
             file.read().decode('utf-8')
         )
@@ -121,7 +121,7 @@ class DownloadCreateView(TestCase):
         experiment = self.create_basic_experiment_data()
         create_researcher(experiment.study, 'Valdick', 'Soriano')
         create_experiment_researcher(experiment, 'Diana', 'Ross')
-        create_experiment_researcher(experiment, 'Guilherme', 'Boulos')
+        create_experiment_researcher(experiment, 'Guilherme', 'Boulos', 'BOULOS, Guilherme C.')
         create_experiment_researcher(experiment, 'Edimilson', 'Costa')
         download_create(experiment.id, '')
 
@@ -132,8 +132,8 @@ class DownloadCreateView(TestCase):
         zipped_file = zipfile.ZipFile(zip_file, 'r')
 
         file = zipped_file.open('EXPERIMENT_DOWNLOAD/CITATION.txt', 'r')
-        self.assertIn(
-            'BOULOS, Guilherme; COSTA, Edimilson; ROSS, Diana '
+x        self.assertIn(
+            'BOULOS, Guilherme C.; COSTA, Edimilson; ROSS, Diana. '
             + experiment.title + '. Sent date: ' + str(experiment.sent_date),
             file.read().decode('utf-8')
         )

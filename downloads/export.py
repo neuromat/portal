@@ -156,10 +156,14 @@ class ExportExecution:
     def add_researchers_to_citation(researchers):
         researchers_part = ''
         for researcher in researchers:
-            researchers_part += \
-                (researcher.last_name.upper()
-                 + ', ' + researcher.first_name + '; ')
-        return researchers_part[:-2] + ' '
+            if not researcher.citation_name:
+                researchers_part += \
+                    (researcher.last_name.upper() + ', '
+                     + researcher.first_name + '; ')
+            else:
+                researchers_part += \
+                    (researcher.citation_name + '; ')
+        return researchers_part[:-2] + '. '
 
     def add_citation_to_file(self, experiment, file):
         with open(file, 'w') as f:
