@@ -290,7 +290,7 @@ class ParticipantModelTest(TestCase):
         experiment = create_experiment(1)
         group = create_group(1, experiment)
         create_genders()
-        create_participant(1, group)
+        create_participant(1, group, Gender.objects.get(name='female'))
 
     def test_can_save_null_age_attribute(self):
         group = Group.objects.last()

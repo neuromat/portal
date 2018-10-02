@@ -21,7 +21,7 @@ from experiments.tests.tests_helper import create_experiment, create_group, \
     create_eeg_data, create_eeg_setting, create_eeg_step, \
     create_valid_questionnaires, create_publication, \
     create_experiment_researcher, create_researcher, global_setup_ft, \
-    apply_setup, create_trustee_user
+    apply_setup, create_trustee_user, create_genders
 from functional_tests.base import FunctionalTest
 from nep import settings
 
@@ -978,6 +978,7 @@ class DownloadExperimentTest(FunctionalTest):
         # Experiment and Group data. One group created has no data besides
         # Group data, the other has 1 participant associated
         ##
+        create_genders()
         owner = User.objects.get(username='lab1')
         create_experiment(1, owner, Experiment.APPROVED)
         experiment = Experiment.objects.last()

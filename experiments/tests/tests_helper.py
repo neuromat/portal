@@ -180,7 +180,7 @@ def create_researcher(study, first_name=None, last_name=None, citation_name=None
         first_name=first_name or fake.first_name(),
         last_name=last_name or fake.last_name(),
         email=fake.email(), study=study,
-        citation_name=citation_name or fake.last_name()+', '+fake.first_name()
+        citation_name=citation_name or fake.last_name() + ', ' + fake.first_name()
     )
 
 
@@ -189,7 +189,7 @@ def create_genders():
     Gender.objects.create(name='female')
 
 
-def create_participant(qtty, group, gender=Gender.objects.get(pk='female')):
+def create_participant(qtty, group, gender):
     """
     :param qtty: number of objects to create
     :param gender: Gender model instance

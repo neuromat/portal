@@ -51,7 +51,9 @@ class DownloadCreateView(TestCase):
             - settings.BASE_DIR/experiments/tests/response_questionnaire7.json
         """
         group = create_group(1, experiment)
-        participant = create_participant(1, group)
+        participant = create_participant(
+            1, group, Gender.objects.get(name='female')
+        )
         participant.age = None
         participant.save()
         questionnaire = create_questionnaire(1, 'Q5489', group)
