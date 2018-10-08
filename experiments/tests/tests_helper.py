@@ -247,21 +247,15 @@ def create_classification_of_deseases(qtty):
         )
 
 
-def create_experiment_researcher(experiment, first_name=None, last_name=None, citation_name=None):
+def create_experiment_researcher(experiment, first_name=None, last_name=None):
     fake = Factory.create()
 
-    form = ExperimentResearcher(
+    return ExperimentResearcher.objects.create(
         first_name=first_name or fake.first_name(),
         last_name=last_name or fake.last_name(),
         email=fake.email(), institution=fake.company(),
         experiment=experiment
     )
-    form.citation_name = citation_name or form.last_name.upper() +\
-                         ', ' + form.first_name
-    form.save()
-
-    experiment_researcher = ExperimentResearcher.objects.last()
-    return experiment_researcher
 
 
 def create_keyword(keyword=None):

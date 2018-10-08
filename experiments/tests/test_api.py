@@ -548,7 +548,8 @@ class ExperimentResearcherAPITest(APITestCase):
                     'email': self.experiment_researcher1.email,
                     'institution': self.experiment_researcher1.institution,
                     'experiment': self.experiment_researcher1.experiment.title,
-                    'citation_name': self.experiment_researcher1.citation_name
+                    'citation_name': self.experiment_researcher1.citation_name,
+                    'citation_order': self.experiment_researcher1.citation_order
                 },
                 {
                     'id': self.experiment_researcher2.id,
@@ -557,7 +558,8 @@ class ExperimentResearcherAPITest(APITestCase):
                     'email': self.experiment_researcher2.email,
                     'institution': self.experiment_researcher2.institution,
                     'experiment': self.experiment_researcher2.experiment.title,
-                    'citation_name': self.experiment_researcher2.citation_name
+                    'citation_name': self.experiment_researcher2.citation_name,
+                    'citation_order': self.experiment_researcher2.citation_order
                 }
             ]
         )

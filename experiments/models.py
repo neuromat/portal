@@ -226,6 +226,7 @@ class ExperimentResearcher(models.Model):
     institution = models.CharField(max_length=200, blank=True)
     experiment = models.ForeignKey(Experiment, related_name='researchers')
     citation_name = models.CharField(max_length=252, default='', blank=True)
+    citation_order = models.PositiveIntegerField(null=True)
 
     def __str__(self):
         if not self.citation_name:

@@ -9,7 +9,7 @@ from django.test import override_settings, TestCase
 from django.utils.text import slugify
 
 from downloads.views import download_create
-from experiments.models import Experiment, Gender
+from experiments.models import Experiment, Gender, ExperimentResearcher
 from experiments.tests.tests_helper import create_experiment, create_study, \
     create_participant, create_group, create_questionnaire, \
     create_questionnaire_language, create_questionnaire_responses, \
@@ -123,7 +123,10 @@ class DownloadCreateView(TestCase):
         experiment = self.create_basic_experiment_data()
         create_researcher(experiment.study, 'Valdick', 'Soriano')
         create_experiment_researcher(experiment, 'Diana', 'Ross')
-        create_experiment_researcher(experiment, 'Guilherme', 'Boulos', 'BOULOS, Guilherme C.')
+        create_experiment_researcher(experiment, 'Guilherme', 'Boulos')
+        er = ExperimentResearcher.objects.last()
+        er.citation_name = 'BOULOS, Guilherme C.'
+        er.save()
         create_experiment_researcher(experiment, 'Edimilson', 'Costa')
         download_create(experiment.id, '')
 
