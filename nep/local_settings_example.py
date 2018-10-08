@@ -19,6 +19,11 @@ DATABASES = {
     }
 }
 
+# <host>:<port> for testing tha uses haystack/elasticsearch
+# This is used when substituting HAYSTACK_CONNECTIONS for another, separated
+# instance of the engine backend.
+HAYSTACK_TEST_URL = 'http://127.0.0.1:9200/'
+
 TIME_ZONE = 'America/Sao_Paulo'
 
 STATICFILES_DIRS = [

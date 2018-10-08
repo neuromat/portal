@@ -60,7 +60,7 @@ LOGOUT_REDIRECT_URL = '/'
 
 ##
 # Haystack
-##
+# --------
 # change 'URL' to reflect the elasticsearch server location/port
 HAYSTACK_CONNECTIONS = {
     'default': {
