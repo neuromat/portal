@@ -2,6 +2,7 @@ import random
 import sys
 
 import haystack
+from django.conf import settings
 from django.core.management import call_command
 from django.test import override_settings
 
@@ -35,7 +36,7 @@ TEST_HAYSTACK_CONNECTIONS = {
     'default': {
         'ENGINE':
             'haystack.backends.elasticsearch_backend.ElasticsearchSearchEngine',
-        'URL': 'http://127.0.0.1:9200/',
+        'URL': settings.HAYSTACK_TEST_URL,
         'INDEX_NAME': 'test_haystack',
         'TIMEOUT': 60 * 10,
     }
