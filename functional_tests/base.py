@@ -2,6 +2,7 @@ import time
 
 import os
 
+from django.conf import settings
 from django.contrib.auth.models import Group, Permission, User
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 from selenium import webdriver
@@ -15,7 +16,7 @@ TEST_HAYSTACK_CONNECTIONS = {
     'default': {
         'ENGINE':
             'haystack.backends.elasticsearch_backend.ElasticsearchSearchEngine',
-        'URL': 'http://127.0.0.1:9200/',
+        'URL': settings.HAYSTACK_TEST_URL,
         'INDEX_NAME': 'test_haystack',
         'TIMEOUT': 60 * 10,
     }
