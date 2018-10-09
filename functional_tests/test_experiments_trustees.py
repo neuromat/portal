@@ -176,9 +176,7 @@ class TrusteeTest(FunctionalTestTrustee):
         # But we need to wait for modal been visible, until we can ESCAPE it.
         ##
         time.sleep(0.5)
-        self.browser.find_element_by_id('id_status_choices').send_keys(
-            Keys.ESCAPE
-        )
+        self.browser.find_element_by_tag_name('body').send_keys(Keys.ESCAPE)
         ##
         # We have to wait again, for modal been completely escaped
         ##
@@ -215,7 +213,7 @@ class TrusteeTest(FunctionalTestTrustee):
         # that is approved. As when the experiment is already approved or
         # rejected trustee can't change its status, clicking on it has no
         # effect, the modal doesn't pop up.
-        status_choices_form.send_keys(Keys.ESCAPE)
+        self.browser.find_element_by_tag_name('body').send_keys(Keys.ESCAPE)
         self.wait_for(
             lambda: self.browser.find_element_by_link_text('Approved').click()
         )
@@ -613,9 +611,6 @@ class TrusteeTest(FunctionalTestTrustee):
                 "//a[@href='/experiments/" + experiment.slug + "/']"
             ).click()
         )
-        self.browser.find_element_by_link_text('View').find_element_by_xpath(
-            "//a[@href='/experiments/" + experiment.slug + "/']"
-        ).click()
 
         # Bellow experiment description there's a link to ethics committee
         # approval site, and a link to download the ethics committee file

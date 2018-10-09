@@ -317,6 +317,7 @@ class ExperimentResearcherModel(TestCase):
         self.assertEqual(experiment_researcher.email, '')
         self.assertEqual(experiment_researcher.institution, '')
         self.assertEqual(experiment_researcher.citation_name, '')
+        self.assertEqual(experiment_researcher.citation_order, None)
 
     def test_experiment_researcher_is_related_to_experiment(self):
         experiment = Experiment.objects.last()

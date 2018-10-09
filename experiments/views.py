@@ -9,6 +9,7 @@ from django.contrib.auth.views import LoginView, PasswordResetView, \
     PasswordResetDoneView, PasswordResetConfirmView, PasswordResetCompleteView
 from django.core.exceptions import PermissionDenied
 from django.core.mail import send_mail
+from django.db.models import Count
 from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import render
 from django.template.loader import render_to_string
@@ -18,6 +19,8 @@ from django.utils.translation import activate, LANGUAGE_SESSION_KEY, \
 from django.template.defaultfilters import slugify
 
 from haystack.generic_views import SearchView
+
+from downloads.export import ExportExecution
 from experiments.forms import NepSearchForm, ChangeSlugForm
 from experiments.models import Experiment, RejectJustification, Step, \
     Questionnaire, QuestionnaireDefaultLanguage, QuestionnaireLanguage
@@ -145,6 +148,24 @@ def _get_available_languages(questionnaire):
     return lang_code
 
 
+def _order_researchers(experiment):
+    researchers = experiment.researchers.all().annotate(
+        null_position=Count('citation_order')
+    ).order_by('-null_position', 'citation_order')
+    researchers_order = \
+        ExportExecution.add_researchers_to_citation(researchers)
+    if not researchers:
+        if hasattr(experiment, 'study') and \
+                hasattr(experiment.study, 'researcher'):
+            researchers = [experiment.study.researcher]
+            researchers_order = \
+                ExportExecution.add_researchers_to_citation(researchers)
+        else:
+            researchers_order = None
+
+    return researchers_order
+
+
 def home_page(request):
     # will be None if home contains the list of normal user
     to_be_analysed_count = None
@@ -228,6 +249,8 @@ def experiment_detail(request, slug):
                 questionnaires[group.title][q.id]['language_codes'] = \
                     _get_available_languages(q)
 
+    researchers_ordered = _order_researchers(experiment)
+
     return render(
         request, 'experiments/detail.html', {
             'experiment': experiment,
@@ -237,7 +260,8 @@ def experiment_detail(request, slug):
             'to_be_analysed_count': to_be_analysed_count,
             'questionnaires': questionnaires,
             'form': ChangeSlugForm(),
-            'has_setting': experiment.has_setting()
+            'has_setting': experiment.has_setting(),
+            'researchers_order': researchers_ordered
         }
     )
 
