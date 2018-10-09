@@ -167,12 +167,11 @@ def create_researchers():
         create_researcher(study)
 
 
-def create_researcher(study, first_name=None, last_name=None, citation_name=None):
+def create_researcher(study, first_name=None, last_name=None):
     """
     :param study: Study model instance
     :param first_name: researcher's first name
     :param last_name: researcher's last name
-    :param citation_name: researcher's citation name
     :return: Researcher model instance
     """
     fake = Factory.create()
@@ -180,7 +179,6 @@ def create_researcher(study, first_name=None, last_name=None, citation_name=None
         first_name=first_name or fake.first_name(),
         last_name=last_name or fake.last_name(),
         email=fake.email(), study=study,
-        citation_name=citation_name or fake.last_name() + ', ' + fake.first_name()
     )
 
 

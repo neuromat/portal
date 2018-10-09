@@ -5,6 +5,7 @@ import csv
 from decimal import Decimal
 from os import path, makedirs
 from django.conf import settings
+from django.db.models import Count
 from django.shortcuts import get_object_or_404
 from sys import modules
 from django.utils.encoding import smart_str
@@ -172,7 +173,9 @@ class ExportExecution:
                 '----------------------------\n\n'
             )
             experiment_researchers = \
-                experiment.researchers.all().order_by('last_name')
+                experiment.researchers.all().annotate(
+                    null_position=Count('citation_order')
+                ).order_by('-null_position', 'citation_order')
             if not experiment_researchers \
                     and hasattr(experiment.study, 'researcher'):
                 researchers_part = self.add_researchers_to_citation(

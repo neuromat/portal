@@ -970,15 +970,14 @@ class DownloadExperimentTest(FunctionalTest):
         self.assertNotIn('Per Questionnaire data', downloads_tab_content.text)
         self.assertNotIn('Participant ', downloads_tab_content.text)
 
-    def test_can_see_groups_items_in_downloads_tab_content_only_if_they_exist(
-            self):
+    def test_can_see_groups_items_in_downloads_tab_content_only_if_they_exist(self):
         ##
         # Let's create an experiment with Experiment and Groups data. With
         # it, we simulate that Portal received an experiment, only with
         # Experiment and Group data. One group created has no data besides
         # Group data, the other has 1 participant associated
         ##
-        create_genders()
+        # create_genders()  # when eliminating global_ft() return with
         owner = User.objects.get(username='lab1')
         create_experiment(1, owner, Experiment.APPROVED)
         experiment = Experiment.objects.last()
@@ -1333,30 +1332,40 @@ class DownloadExperimentTest(FunctionalTest):
                 lambda:
                 self.browser.find_element_by_id('license_modal')
             )
-        # TODO: uncomment from here when defined how citation will be
-        # # She has downloaded the experiment once and wants to see if the
-        # # "How to cite" in license modal is equal to the "How to cite" in
-        # # CITATION.txt file
-        # self.assertIn(
-        #     'SORIANO, Valdick ' + experiment.title
-        #     + '. Sent date: '
-        #     + str(experiment.sent_date),
-        #     file.read().decode('utf-8')
-        # )
-        # self.assertIn(
-        #     'SORIANO, Valdick ' + experiment.title
-        #     + '. Sent date: '
-        #     + str(experiment.sent_date.strftime('%b. %d, %Y')),
-        #     license_modal.text
-        # )
+
+        # She has downloaded the experiment once and wants to see if the
+        # "How to cite" in license modal is equal to the "How to cite" in
+        # CITATION.txt file
+        self.assertIn(
+            'SORIANO, Valdick. ' + experiment.title
+            + '. Sent date: '
+            + str(experiment.sent_date),
+            file.read().decode('utf-8')
+        )
+        print(file.read().decode('utf-8'))  # DEBUG
+        self.assertIn(
+            'SORIANO, Valdick. ' + experiment.title
+            + '. Sent date: '
+            + str(experiment.sent_date.strftime('%b. %d, %Y').lstrip('0').replace(' 0', ' ')),
+            license_modal.text
+        )
 
     def test_how_to_cite_in_license_modal_is_equal_to_how_to_cite_in_citation_file_2(self):
         experiment = Experiment.objects.last()
         create_study(1, experiment)
         create_researcher(experiment.study, 'Valdick', 'Soriano')
-        create_experiment_researcher(experiment, 'Diana', 'Ross')
-        create_experiment_researcher(experiment, 'Guilherme', 'Boulos')
-        create_experiment_researcher(experiment, 'Edimilson', 'Costa')
+        researcher1 = create_experiment_researcher(experiment, 'Diana', 'Ross')
+        researcher1.citation_order = 21
+        researcher1.citation_name = 'ROSS B., Diana'
+        researcher1.save()
+        create_experiment_researcher(
+            experiment, 'Guilherme', 'Boulos'
+        )
+        researcher3 = create_experiment_researcher(
+            experiment, 'Edimilson', 'Costa'
+        )
+        researcher3.citation_order = 3
+        researcher3.save()
         download_create(experiment.id, '')
 
         # get the zipped file to test against its content
@@ -1383,18 +1392,18 @@ class DownloadExperimentTest(FunctionalTest):
                 self.browser.find_element_by_id('license_modal')
             )
 
-        # TODO: uncomment from here when defined how citation will be
-        # # She has downloaded the experiment once and wants to see if the
-        # # "How to cite" in license modal is equal to the "How to cite" in
-        # # CITATION.txt file
-        # self.assertIn(
-        #     'ROSS, Diana; BOULOS, Guilherme; COSTA, Edimilson '
-        #     + experiment.title + '. Sent date: ' + str(experiment.sent_date),
-        #     file.read().decode('utf-8')
-        # )
-        # self.assertIn(
-        #     'ROSS, Diana; BOULOS, Guilherme; COSTA, Edimilson '
-        #     + experiment.title + '. Sent date: '
-        #     + str(experiment.sent_date.strftime('%b. %d, %Y')),
-        #     license_modal.text
-        # )
+        # She has downloaded the experiment once and wants to see if the
+        # "How to cite" in license modal is equal to the "How to cite" in
+        # CITATION.txt file
+        self.assertIn(
+            'COSTA, Edimilson; ROSS B., Diana; BOULOS, Guilherme. '
+            + experiment.title + '. Sent date: ' + str(experiment.sent_date),
+            file.read().decode('utf-8')
+        )
+        self.assertIn(
+            'COSTA, Edimilson; ROSS B., Diana; BOULOS, Guilherme. '
+            + experiment.title + '. Sent date: '
+            + str(experiment.sent_date.strftime('%b. %d, %Y').lstrip('0').replace(' 0', ' ')),
+            license_modal.text
+        )
+

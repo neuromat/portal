@@ -5,6 +5,7 @@ import haystack
 from django.conf import settings
 from django.core.management import call_command
 from django.test import override_settings
+from selenium.webdriver.common.keys import Keys
 
 from experiments.models import Study, Experiment, Group, Step, EMGSetting, \
     GoalkeeperGame, ContextTree, EEGSetting, Stimulus, GenericDataCollection, \
@@ -618,10 +619,10 @@ class SearchTest(FunctionalTest):
     def test_search_only_with_one_filter_returns_correct_results_1(self):
         # Joselina wishes to search only experiments that has EEG
         # stpes, regardless of search terms.
-        self.browser.find_element_by_id('filter_box').click()
+        self.browser.find_element_by_id('filter_box').send_keys(Keys.ENTER)
         self.browser.find_element_by_xpath(
             "//select/option[@value='" + Step.EEG + "']"
-        ).click()
+        ).send_keys(Keys.ENTER)
         self.browser.find_element_by_id('submit_terms').click()
         time.sleep(2)
 
@@ -640,15 +641,15 @@ class SearchTest(FunctionalTest):
     def test_search_only_with_one_filter_returns_correct_results_2(self):
         # Joselina wishes to search only experiments that has EMG
         # steps, regardless of search terms.
-        self.browser.find_element_by_id('filter_box').click()
+        self.browser.find_element_by_id('filter_box').send_keys(Keys.ENTER)
         self.browser.find_element_by_xpath(
             "//select/option[@value='" + Step.EMG + "']"
-        ).click()
+        ).send_keys(Keys.ENTER)
         self.browser.find_element_by_id('submit_terms').click()
         time.sleep(2)
 
         # As we have two experiments with EMG steps, Joselina
-        # gets two rows that corresponds to that the experiments
+        # gets two rows that corresponds to that experiments
         self.verify_n_objects_in_table_rows(2, 'experiment-matches')
         self.verify_n_objects_in_table_rows(0, 'study-matches')
         self.verify_n_objects_in_table_rows(0, 'group-matches')
