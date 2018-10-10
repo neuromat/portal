@@ -21,7 +21,7 @@ from experiments.tests.tests_helper import create_experiment, create_group, \
     create_eeg_data, create_eeg_setting, create_eeg_step, \
     create_valid_questionnaires, create_publication, \
     create_experiment_researcher, create_researcher, global_setup_ft, \
-    apply_setup, create_trustee_user, create_genders
+    apply_setup, create_trustee_user, create_next_version_experiment
 from functional_tests.base import FunctionalTest
 from nep import settings
 
@@ -41,7 +41,7 @@ class ExperimentDetailTest(FunctionalTest):
     def setUp(self):
         create_trustee_user('claudia')
         create_trustee_user('roque')
-        global_setup_ft()
+        # global_setup_ft()
         super(ExperimentDetailTest, self).setUp()
 
     # TODO: break by tabs
@@ -768,6 +768,98 @@ class ExperimentDetailTest(FunctionalTest):
             self.browser.find_element_by_xpath(
                 "//a[@href='#change_url_modal']"
             )
+
+    def test_can_view_versions_tab(self):
+        experiment_v2 = create_next_version_experiment(self.experiment)
+
+        ##
+        # have to refresh home page to display last version created above
+        ##
+        self.browser.refresh()
+
+        # The new visitor is in home page and sees the list of experiments.
+        # She clicks in a "View" link and is redirected to experiment
+        # detail page
+        self.browser.find_element_by_xpath(
+            "//a[@href='/experiments/" + str(experiment_v2.slug) + "/']"
+        ).click()
+
+        # There's a tab written Versions
+        self.wait_for(lambda: self.assertEqual(
+            self.browser.find_element_by_link_text('Versions').text,
+            'Versions'
+        ))
+
+    def test_does_not_display_versions_tab_if_there_are_not_versions(self):
+        # The new visitor is in home page and sees the list of experiments.
+        # She clicks in a "View" link and is redirected to experiment
+        # detail page
+        self.browser.find_element_by_xpath(
+            "//a[@href='/experiments/" + str(self.experiment.slug) + "/']"
+        ).click()
+
+        # As there's only one version she doesn't see the Versions tab
+        with self.assertRaises(NoSuchElementException):
+            self.browser.find_element_by_link_text('Versions')
+
+    def test_can_view_versions_tab_content(self):
+        experiment_v2 = create_next_version_experiment(self.experiment)
+        experiment_v3 = create_next_version_experiment(experiment_v2)
+
+        ##
+        # have to refresh home page to display last version created above
+        ##
+        self.browser.refresh()
+
+        # The new visitor is in home page and sees the list of experiments.
+        # She clicks in a "View" link and is redirected to experiment
+        # detail page
+        self.browser.find_element_by_xpath(
+            "//a[@href='/experiments/" + str(experiment_v3.slug) + "/']"
+        ).click()
+
+        # Rosa sees the Versions tab and click on it
+        self.browser.find_element_by_link_text('Versions').click()
+
+        # Versions tab displays the other versions of the experiment
+        # excluding the current one she is in
+        self.wait_for(lambda: self.assertIn(
+            'Version 1',
+            self.browser.find_element_by_id('versions_tab').text
+        ))
+        versions_tab = self.browser.find_element_by_id('versions_tab').text
+        self.assertIn('Version 2', versions_tab)
+        self.assertNotIn('Version 3', versions_tab)
+
+        # Ok, Rosa notes that the experiment has other two versions and she
+        # can view other versions of by clicking in the links.
+        # So she clicks on the first vresion
+        self.browser.find_element_by_link_text('Version 1').click()
+
+        # She sees in url address, below the experiment title, that the URL of
+        # the experiment has changed to the slug of the first version
+        self.wait_for(lambda: self.assertIn(
+            self.experiment.slug,
+            self.browser.find_element_by_id('experiment_url').text
+        ))
+        self.browser.find_element_by_link_text('Versions').click()
+
+        # She clicks again in the Versions tab and notes that now there are
+        # only the experiment versions 2 and 3 options to click
+        self.wait_for(lambda: self.assertIn(
+            'Version 2',
+            self.browser.find_element_by_id('versions_tab').text
+        ))
+        versions_tab = self.browser.find_element_by_id('versions_tab').text
+        self.assertIn('Version 3', versions_tab)
+        self.assertNotIn('Version 1', versions_tab)
+
+        # Finally Rosa clicks in version 2 link to see what that version has
+        self.browser.find_element_by_link_text('Version 2').click()
+        self.wait_for(lambda: self.assertIn(
+            experiment_v2.slug,
+            self.browser.find_element_by_id('experiment_url').text
+        ))
 
 
 TEMP_MEDIA_ROOT = os.path.join(tempfile.mkdtemp())
