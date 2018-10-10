@@ -983,7 +983,7 @@ class ExperimentViewSet(viewsets.ModelViewSet):
         nes_id = self.request.data['nes_id']
         owner = self.request.user
         exp_version = appclasses.ExperimentVersion(nes_id, owner)
-        serializer.save(  # serializer already has other fields defined
+        serializer.save(
             owner=owner, version=exp_version.get_last_version() + 1
         )
 

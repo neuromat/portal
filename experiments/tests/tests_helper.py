@@ -128,17 +128,14 @@ def create_experiment(qtty, owner=None, status=Experiment.TO_BE_ANALYSED,
 
 def create_next_version_experiment(experiment):
     """
-    :param qtty: number of versions to create
     :param experiment: Experiment model instance
-    :return: list of all versions including the first
+    :return: new experiment version
     """
-    current_version = experiment.version
-    experiment.pk = None
-    current_version += 1
-    experiment.version = current_version
-    experiment.save()
-
-    return experiment
+    return Experiment.objects.create(
+        owner=experiment.owner, nes_id=experiment.nes_id,
+        version=experiment.version + 1, title=experiment.title,
+        description=experiment.description, status=experiment.status
+    )
 
 
 def create_trustee_user(username=None):

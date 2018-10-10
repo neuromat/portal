@@ -191,11 +191,15 @@ def home_page(request):
             sum([len(group.participants.all())
                  for group in experiment.groups.all()])
 
-    return render(request, 'experiments/home.html',
-                  {'experiments': experiments,
-                   'to_be_analysed_count': to_be_analysed_count,
-                   'table_title': 'List of Experiments',
-                   'search_form': NepSearchForm()})
+    return render(
+        request, 'experiments/home.html',
+        {
+            'experiments': experiments,
+            'to_be_analysed_count': to_be_analysed_count,
+            'table_title': 'List of Experiments',
+            'search_form': NepSearchForm()
+        }
+    )
 
 
 def experiment_detail(request, slug):
@@ -251,6 +255,11 @@ def experiment_detail(request, slug):
 
     researchers_ordered = _order_researchers(experiment)
 
+    other_versions = Experiment.objects.filter(
+        nes_id=experiment.nes_id,
+        status=Experiment.APPROVED,
+    ).exclude(version=experiment.version)
+
     return render(
         request, 'experiments/detail.html', {
             'experiment': experiment,
@@ -261,7 +270,8 @@ def experiment_detail(request, slug):
             'questionnaires': questionnaires,
             'form': ChangeSlugForm(),
             'has_setting': experiment.has_setting(),
-            'researchers_order': researchers_ordered
+            'researchers_order': researchers_ordered,
+            'other_versions': other_versions
         }
     )
 
