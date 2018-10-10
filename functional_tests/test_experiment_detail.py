@@ -21,7 +21,7 @@ from experiments.tests.tests_helper import create_experiment, create_group, \
     create_eeg_data, create_eeg_setting, create_eeg_step, \
     create_valid_questionnaires, create_publication, \
     create_experiment_researcher, create_researcher, global_setup_ft, \
-    apply_setup, create_trustee_user
+    apply_setup, create_trustee_user, create_next_version_experiment
 from functional_tests.base import FunctionalTest
 from nep import settings
 
@@ -41,7 +41,7 @@ class ExperimentDetailTest(FunctionalTest):
     def setUp(self):
         create_trustee_user('claudia')
         create_trustee_user('roque')
-        global_setup_ft()
+        # global_setup_ft()
         super(ExperimentDetailTest, self).setUp()
 
     # TODO: break by tabs
@@ -769,6 +769,98 @@ class ExperimentDetailTest(FunctionalTest):
                 "//a[@href='#change_url_modal']"
             )
 
+    def test_can_view_versions_tab(self):
+        experiment_v2 = create_next_version_experiment(self.experiment)
+
+        ##
+        # have to refresh home page to display last version created above
+        ##
+        self.browser.refresh()
+
+        # The new visitor is in home page and sees the list of experiments.
+        # She clicks in a "View" link and is redirected to experiment
+        # detail page
+        self.browser.find_element_by_xpath(
+            "//a[@href='/experiments/" + str(experiment_v2.slug) + "/']"
+        ).click()
+
+        # There's a tab written Versions
+        self.wait_for(lambda: self.assertEqual(
+            self.browser.find_element_by_link_text('Versions').text,
+            'Versions'
+        ))
+
+    def test_does_not_display_versions_tab_if_there_are_not_versions(self):
+        # The new visitor is in home page and sees the list of experiments.
+        # She clicks in a "View" link and is redirected to experiment
+        # detail page
+        self.browser.find_element_by_xpath(
+            "//a[@href='/experiments/" + str(self.experiment.slug) + "/']"
+        ).click()
+
+        # As there's only one version she doesn't see the Versions tab
+        with self.assertRaises(NoSuchElementException):
+            self.browser.find_element_by_link_text('Versions')
+
+    def test_can_view_versions_tab_content(self):
+        experiment_v2 = create_next_version_experiment(self.experiment)
+        experiment_v3 = create_next_version_experiment(experiment_v2)
+
+        ##
+        # have to refresh home page to display last version created above
+        ##
+        self.browser.refresh()
+
+        # The new visitor is in home page and sees the list of experiments.
+        # She clicks in a "View" link and is redirected to experiment
+        # detail page
+        self.browser.find_element_by_xpath(
+            "//a[@href='/experiments/" + str(experiment_v3.slug) + "/']"
+        ).click()
+
+        # Rosa sees the Versions tab and click on it
+        self.browser.find_element_by_link_text('Versions').click()
+
+        # Versions tab displays the other versions of the experiment
+        # excluding the current one she is in
+        self.wait_for(lambda: self.assertIn(
+            'Version 1',
+            self.browser.find_element_by_id('versions_tab').text
+        ))
+        versions_tab = self.browser.find_element_by_id('versions_tab').text
+        self.assertIn('Version 2', versions_tab)
+        self.assertNotIn('Version 3', versions_tab)
+
+        # Ok, Rosa notes that the experiment has other two versions and she
+        # can view other versions of by clicking in the links.
+        # So she clicks on the first vresion
+        self.browser.find_element_by_link_text('Version 1').click()
+
+        # She sees in url address, below the experiment title, that the URL of
+        # the experiment has changed to the slug of the first version
+        self.wait_for(lambda: self.assertIn(
+            self.experiment.slug,
+            self.browser.find_element_by_id('experiment_url').text
+        ))
+        self.browser.find_element_by_link_text('Versions').click()
+
+        # She clicks again in the Versions tab and notes that now there are
+        # only the experiment versions 2 and 3 options to click
+        self.wait_for(lambda: self.assertIn(
+            'Version 2',
+            self.browser.find_element_by_id('versions_tab').text
+        ))
+        versions_tab = self.browser.find_element_by_id('versions_tab').text
+        self.assertIn('Version 3', versions_tab)
+        self.assertNotIn('Version 1', versions_tab)
+
+        # Finally Rosa clicks in version 2 link to see what that version has
+        self.browser.find_element_by_link_text('Version 2').click()
+        self.wait_for(lambda: self.assertIn(
+            experiment_v2.slug,
+            self.browser.find_element_by_id('experiment_url').text
+        ))
+
 
 TEMP_MEDIA_ROOT = os.path.join(tempfile.mkdtemp())
 
@@ -970,14 +1062,14 @@ class DownloadExperimentTest(FunctionalTest):
         self.assertNotIn('Per Questionnaire data', downloads_tab_content.text)
         self.assertNotIn('Participant ', downloads_tab_content.text)
 
-    def test_can_see_groups_items_in_downloads_tab_content_only_if_they_exist(
-            self):
+    def test_can_see_groups_items_in_downloads_tab_content_only_if_they_exist(self):
         ##
         # Let's create an experiment with Experiment and Groups data. With
         # it, we simulate that Portal received an experiment, only with
         # Experiment and Group data. One group created has no data besides
         # Group data, the other has 1 participant associated
         ##
+        # create_genders()  # when eliminating global_ft() return with
         owner = User.objects.get(username='lab1')
         create_experiment(1, owner, Experiment.APPROVED)
         experiment = Experiment.objects.last()
@@ -1332,30 +1424,40 @@ class DownloadExperimentTest(FunctionalTest):
                 lambda:
                 self.browser.find_element_by_id('license_modal')
             )
-        # TODO: uncomment from here when defined how citation will be
-        # # She has downloaded the experiment once and wants to see if the
-        # # "How to cite" in license modal is equal to the "How to cite" in
-        # # CITATION.txt file
-        # self.assertIn(
-        #     'SORIANO, Valdick ' + experiment.title
-        #     + '. Sent date: '
-        #     + str(experiment.sent_date),
-        #     file.read().decode('utf-8')
-        # )
-        # self.assertIn(
-        #     'SORIANO, Valdick ' + experiment.title
-        #     + '. Sent date: '
-        #     + str(experiment.sent_date.strftime('%b. %d, %Y')),
-        #     license_modal.text
-        # )
+
+        # She has downloaded the experiment once and wants to see if the
+        # "How to cite" in license modal is equal to the "How to cite" in
+        # CITATION.txt file
+        self.assertIn(
+            'SORIANO, Valdick. ' + experiment.title
+            + '. Sent date: '
+            + str(experiment.sent_date),
+            file.read().decode('utf-8')
+        )
+        print(file.read().decode('utf-8'))  # DEBUG
+        self.assertIn(
+            'SORIANO, Valdick. ' + experiment.title
+            + '. Sent date: '
+            + str(experiment.sent_date.strftime('%b. %d, %Y').lstrip('0').replace(' 0', ' ')),
+            license_modal.text
+        )
 
     def test_how_to_cite_in_license_modal_is_equal_to_how_to_cite_in_citation_file_2(self):
         experiment = Experiment.objects.last()
         create_study(1, experiment)
         create_researcher(experiment.study, 'Valdick', 'Soriano')
-        create_experiment_researcher(experiment, 'Diana', 'Ross')
-        create_experiment_researcher(experiment, 'Guilherme', 'Boulos')
-        create_experiment_researcher(experiment, 'Edimilson', 'Costa')
+        researcher1 = create_experiment_researcher(experiment, 'Diana', 'Ross')
+        researcher1.citation_order = 21
+        researcher1.citation_name = 'ROSS B., Diana'
+        researcher1.save()
+        create_experiment_researcher(
+            experiment, 'Guilherme', 'Boulos'
+        )
+        researcher3 = create_experiment_researcher(
+            experiment, 'Edimilson', 'Costa'
+        )
+        researcher3.citation_order = 3
+        researcher3.save()
         download_create(experiment.id, '')
 
         # get the zipped file to test against its content
@@ -1382,18 +1484,18 @@ class DownloadExperimentTest(FunctionalTest):
                 self.browser.find_element_by_id('license_modal')
             )
 
-        # TODO: uncomment from here when defined how citation will be
-        # # She has downloaded the experiment once and wants to see if the
-        # # "How to cite" in license modal is equal to the "How to cite" in
-        # # CITATION.txt file
-        # self.assertIn(
-        #     'ROSS, Diana; BOULOS, Guilherme; COSTA, Edimilson '
-        #     + experiment.title + '. Sent date: ' + str(experiment.sent_date),
-        #     file.read().decode('utf-8')
-        # )
-        # self.assertIn(
-        #     'ROSS, Diana; BOULOS, Guilherme; COSTA, Edimilson '
-        #     + experiment.title + '. Sent date: '
-        #     + str(experiment.sent_date.strftime('%b. %d, %Y')),
-        #     license_modal.text
-        # )
+        # She has downloaded the experiment once and wants to see if the
+        # "How to cite" in license modal is equal to the "How to cite" in
+        # CITATION.txt file
+        self.assertIn(
+            'COSTA, Edimilson; ROSS B., Diana; BOULOS, Guilherme. '
+            + experiment.title + '. Sent date: ' + str(experiment.sent_date),
+            file.read().decode('utf-8')
+        )
+        self.assertIn(
+            'COSTA, Edimilson; ROSS B., Diana; BOULOS, Guilherme. '
+            + experiment.title + '. Sent date: '
+            + str(experiment.sent_date.strftime('%b. %d, %Y').lstrip('0').replace(' 0', ' ')),
+            license_modal.text
+        )
+

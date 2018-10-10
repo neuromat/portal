@@ -23,6 +23,9 @@
                 <li role="presentation"><a href="#questionnaires_tab" role="tab" data-toggle="tab"> {% trans "Questionnaires" %}</a></li>
             {% endif %}
             <li role="presentation"><a href="#downloads_tab" role="tab" data-toggle="tab">{% trans "Downloads" %}</a></li>
+            {% if other_versions %}
+                <li role="presentation"><a href="#versions_tab" role="tab" data-toggle="tab">{% trans "Versions" %}</a></li>
+            {% endif %}
         </ul>
 
         <!-- Tab panes -->
@@ -377,6 +380,16 @@
                         </div>
                     </form>
                 </div>
+            </div>
+            <!-- Versions tab -->
+            <div id="versions_tab" class="tab-pane" role="tabpanel">
+                {% if other_versions %}
+                    <ul>
+                        {% for version in other_versions %}
+                            <li><a href="{% url 'experiment-detail' version.slug %}">Version {{ version.version }}</a></li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
             </div>
         </div>
 

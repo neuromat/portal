@@ -128,17 +128,14 @@ def create_experiment(qtty, owner=None, status=Experiment.TO_BE_ANALYSED,
 
 def create_next_version_experiment(experiment):
     """
-    :param qtty: number of versions to create
     :param experiment: Experiment model instance
-    :return: list of all versions including the first
+    :return: new experiment version
     """
-    current_version = experiment.version
-    experiment.pk = None
-    current_version += 1
-    experiment.version = current_version
-    experiment.save()
-
-    return experiment
+    return Experiment.objects.create(
+        owner=experiment.owner, nes_id=experiment.nes_id,
+        version=experiment.version + 1, title=experiment.title,
+        description=experiment.description, status=experiment.status
+    )
 
 
 def create_trustee_user(username=None):
@@ -175,11 +172,10 @@ def create_researcher(study, first_name=None, last_name=None):
     :return: Researcher model instance
     """
     fake = Factory.create()
-
     return Researcher.objects.create(
         first_name=first_name or fake.first_name(),
         last_name=last_name or fake.last_name(),
-        email=fake.email(), study=study
+        email=fake.email(), study=study,
     )
 
 
@@ -188,7 +184,7 @@ def create_genders():
     Gender.objects.create(name='female')
 
 
-def create_participant(qtty, group, gender=Gender.objects.get(pk='female')):
+def create_participant(qtty, group, gender):
     """
     :param qtty: number of objects to create
     :param gender: Gender model instance
@@ -252,7 +248,8 @@ def create_experiment_researcher(experiment, first_name=None, last_name=None):
     return ExperimentResearcher.objects.create(
         first_name=first_name or fake.first_name(),
         last_name=last_name or fake.last_name(),
-        email=fake.email(), institution=fake.company(), experiment=experiment
+        email=fake.email(), institution=fake.company(),
+        experiment=experiment
     )
 
 
@@ -987,7 +984,8 @@ def create_experiment_related_objects(experiment):
     # search_indexes.StudyIndex class
     Researcher.objects.create(
         first_name='Negro', last_name='Belchior',
-        email='belchior@example.com', study=study
+        email='belchior@example.com', study=study,
+        citation_name='BELCHIOR, Negro'
     )
     gender1 = Gender.objects.create(name='male')
     gender2 = Gender.objects.create(name='female')
@@ -1566,9 +1564,11 @@ def global_setup_ut():
                          experiment=experiment3)
 
     Researcher.objects.create(first_name='Raimundo', last_name='Nonato',
-                              email='rnonato@example.com', study=study1)
+                              email='rnonato@example.com', study=study1,
+                              citation_name='NONATO, Raimundo')
     Researcher.objects.create(first_name='Raimunda', last_name='da Silva',
-                              email='rsilva@example.com', study=study2)
+                              email='rsilva@example.com', study=study2,
+                              citation_name='SILVA, Raimunda da')
 
     # Create some keywords to associate with studies
     create_keyword(10)

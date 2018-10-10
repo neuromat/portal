@@ -211,9 +211,12 @@ class Researcher(models.Model):  # indirectly indexed for search
     first_name = models.CharField(max_length=100)
     last_name = models.CharField(max_length=200)
     email = models.EmailField()
+    citation_name = models.CharField(max_length=302, default='', blank=True)
 
     def __str__(self):
-        return self.last_name + ', ' + self.first_name
+        if not self.citation_name:
+            return self.last_name + ', ' + self.first_name
+        return self.citation_name
 
 
 class ExperimentResearcher(models.Model):
@@ -222,6 +225,13 @@ class ExperimentResearcher(models.Model):
     email = models.EmailField(blank=True)
     institution = models.CharField(max_length=200, blank=True)
     experiment = models.ForeignKey(Experiment, related_name='researchers')
+    citation_name = models.CharField(max_length=252, default='', blank=True)
+    citation_order = models.PositiveIntegerField(null=True)
+
+    def __str__(self):
+        if not self.citation_name:
+            return self.last_name + ', ' + self.first_name
+        return self.citation_name
 
 
 class Group(models.Model):  # indexed for search

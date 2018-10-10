@@ -190,7 +190,7 @@ TEST_HAYSTACK_CONNECTIONS = {
     'default': {
         'ENGINE':
             'haystack.backends.elasticsearch_backend.ElasticsearchSearchEngine',
-        'URL': 'http://127.0.0.1:9200/',
+        'URL': settings.HAYSTACK_TEST_URL,
         'INDEX_NAME': 'test_haystack',
         'TIMEOUT': 60 * 10,
     }
@@ -207,7 +207,7 @@ class ExperimentDetailTest(TestCase):
         owner = User.objects.create_user(
             username='labor3', password='nep-labor3'
         )
-        create_experiment(1, owner, Experiment.APPROVED)
+        self.experiment = create_experiment(1, owner, Experiment.APPROVED)
 
     @staticmethod
     def get_q_default_language_or_first(questionnaire):
@@ -367,6 +367,19 @@ class ExperimentDetailTest(TestCase):
 
         response = self.client.get('/experiments/' + experiment.slug + '/')
         self.assertIsInstance(response.context['form'], ChangeSlugForm)
+
+    def test_access_experiment_wo_other_experiment_versions_returns_no_other(self):
+        response = self.client.get('/experiments/' + self.experiment.slug + '/')
+
+        self.assertFalse(response.context['other_versions'])
+
+    def test_access_experiment_with_other_experiment_versions_returns_other_versions(self):
+        experiment_v2 = create_next_version_experiment(self.experiment)
+        experiment_v3 = create_next_version_experiment(experiment_v2)
+
+        response = self.client.get('/experiments/' + experiment_v3.slug + '/')
+
+        self.assertEqual(len(response.context['other_versions']), 2)
 
 
 class ChangeExperimentSlugTest(TestCase):
@@ -589,6 +602,7 @@ class SearchTest(TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response['location'], '/')
 
+    @skip
     def test_search_returns_only_approved_experiments(self):
         # response without filter
         response = self.client.get('/search/', {'q': 'Braquial+Plexus'})

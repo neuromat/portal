@@ -1,0 +1,12 @@
+[
+  {
+    "model": "experiments.gender",
+    "pk": "female",
+    "fields": {}
+  },
+  {
+    "model": "experiments.gender",
+    "pk": "male",
+    "fields": {}
+  }
+]

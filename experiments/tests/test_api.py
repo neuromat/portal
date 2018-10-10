@@ -468,14 +468,16 @@ class ResearcherAPITest(APITestCase):
                     'first_name': researcher1.first_name,
                     'last_name': researcher1.last_name,
                     'email': researcher1.email,
-                    'study': researcher1.study.title
+                    'study': researcher1.study.title,
+                    'citation_name': researcher1.citation_name
                 },
                 {
                     'id': researcher2.id,
                     'first_name': researcher2.first_name,
                     'last_name': researcher2.last_name,
                     'email': researcher2.email,
-                    'study': researcher2.study.title
+                    'study': researcher2.study.title,
+                    'citation_name': researcher2.citation_name
                 }
             ]
         )
@@ -494,7 +496,8 @@ class ResearcherAPITest(APITestCase):
                     'first_name': researcher.first_name,
                     'last_name': researcher.last_name,
                     'email': researcher.email,
-                    'study': researcher.study.title
+                    'study': researcher.study.title,
+                    'citation_name': researcher.citation_name
                 }
             ]
         )
@@ -544,7 +547,9 @@ class ExperimentResearcherAPITest(APITestCase):
                     'last_name': self.experiment_researcher1.last_name,
                     'email': self.experiment_researcher1.email,
                     'institution': self.experiment_researcher1.institution,
-                    'experiment': self.experiment_researcher1.experiment.title
+                    'experiment': self.experiment_researcher1.experiment.title,
+                    'citation_name': self.experiment_researcher1.citation_name,
+                    'citation_order': self.experiment_researcher1.citation_order
                 },
                 {
                     'id': self.experiment_researcher2.id,
@@ -552,7 +557,9 @@ class ExperimentResearcherAPITest(APITestCase):
                     'last_name': self.experiment_researcher2.last_name,
                     'email': self.experiment_researcher2.email,
                     'institution': self.experiment_researcher2.institution,
-                    'experiment': self.experiment_researcher2.experiment.title
+                    'experiment': self.experiment_researcher2.experiment.title,
+                    'citation_name': self.experiment_researcher2.citation_name,
+                    'citation_order': self.experiment_researcher2.citation_order
                 }
             ]
         )
@@ -599,7 +606,8 @@ class ExperimentResearcherAPITest(APITestCase):
                 'first_name': 'Astrojildo',
                 'last_name': 'Pereira',
                 'email': 'astrojildo@fsf.org',
-                'institution': 'FSF'
+                'institution': 'FSF',
+                'citation_name': 'PEREIRA, Astrojildo'
             }
         )
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
@@ -625,7 +633,8 @@ class ExperimentResearcherAPITest(APITestCase):
                 'first_name': 'Astrojildo',
                 'last_name': 'Pereira',
                 'email': 'astrojildo@fsf.org',
-                'institution': 'FSF'
+                'institution': 'FSF',
+                'citation_name': 'PEREIRA, Astrojildo'
             }
         )
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)

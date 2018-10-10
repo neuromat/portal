@@ -9,7 +9,7 @@ from django.test import override_settings, TestCase
 from django.utils.text import slugify
 
 from downloads.views import download_create
-from experiments.models import Experiment, Gender
+from experiments.models import Experiment, Gender, ExperimentResearcher
 from experiments.tests.tests_helper import create_experiment, create_study, \
     create_participant, create_group, create_questionnaire, \
     create_questionnaire_language, create_questionnaire_responses, \
@@ -20,7 +20,7 @@ TEMP_MEDIA_ROOT = os.path.join(tempfile.mkdtemp())
 
 
 @override_settings(MEDIA_ROOT=TEMP_MEDIA_ROOT)
-class DownloadCreateView(TestCase):
+class DownloadCreateViewTest(TestCase):
 
     def setUp(self):
         # TODO: it's created in other tests suites, so was breaking here
@@ -51,7 +51,9 @@ class DownloadCreateView(TestCase):
             - settings.BASE_DIR/experiments/tests/response_questionnaire7.json
         """
         group = create_group(1, experiment)
-        participant = create_participant(1, group)
+        participant = create_participant(
+            1, group, Gender.objects.get(name='female')
+        )
         participant.age = None
         participant.save()
         questionnaire = create_questionnaire(1, 'Q5489', group)
@@ -102,7 +104,10 @@ class DownloadCreateView(TestCase):
 
     def test_download_zip_file_has_how_to_cite_content_in_citation_file_1(self):
         experiment = self.create_basic_experiment_data()
-        create_researcher(experiment.study, 'Valdick', 'Soriano')
+        researcher = create_researcher(experiment.study, 'Valdick', 'Soriano')
+        researcher.citation_name = 'SORIANO, Valdick'
+        researcher.save()
+
         download_create(experiment.id, '')
 
         # get the zipped file to test against its content
@@ -112,7 +117,7 @@ class DownloadCreateView(TestCase):
         zipped_file = zipfile.ZipFile(zip_file, 'r')
         file = zipped_file.open('EXPERIMENT_DOWNLOAD/CITATION.txt', 'r')
         self.assertIn(
-            'SORIANO, Valdick ' + experiment.title
+            'SORIANO, Valdick. ' + experiment.title
             + '. Sent date: ' + str(experiment.sent_date),
             file.read().decode('utf-8')
         )
@@ -121,7 +126,11 @@ class DownloadCreateView(TestCase):
         experiment = self.create_basic_experiment_data()
         create_researcher(experiment.study, 'Valdick', 'Soriano')
         create_experiment_researcher(experiment, 'Diana', 'Ross')
-        create_experiment_researcher(experiment, 'Guilherme', 'Boulos')
+        researcher = create_experiment_researcher(
+            experiment, 'Guilherme', 'Boulos'
+        )
+        researcher.citation_name = 'BOULOS, Guilherme C.'
+        researcher.save()
         create_experiment_researcher(experiment, 'Edimilson', 'Costa')
         download_create(experiment.id, '')
 
@@ -133,7 +142,35 @@ class DownloadCreateView(TestCase):
 
         file = zipped_file.open('EXPERIMENT_DOWNLOAD/CITATION.txt', 'r')
         self.assertIn(
-            'BOULOS, Guilherme; COSTA, Edimilson; ROSS, Diana '
+            'ROSS, Diana; BOULOS, Guilherme C.; COSTA, Edimilson. '
+            + experiment.title + '. Sent date: ' + str(experiment.sent_date),
+            file.read().decode('utf-8')
+        )
+
+    def test_download_zip_file_has_researchers_citation_in_right_order(self):
+        experiment = self.create_basic_experiment_data()
+        researcher1 = create_experiment_researcher(experiment, 'Diana', 'Ross')
+        researcher1.citation_order = 21
+        researcher1.save()
+
+        researcher2 = create_experiment_researcher(
+            experiment, 'Guilherme', 'Boulos'
+        )
+        researcher2.citation_order = 3
+        researcher2.save()
+
+        create_experiment_researcher(experiment, 'Edimilson', 'Costa')
+        download_create(experiment.id, '')
+
+        # get the zipped file to test against its content
+        zip_file = os.path.join(
+            TEMP_MEDIA_ROOT, 'download', str(experiment.id), 'download.zip'
+        )
+        zipped_file = zipfile.ZipFile(zip_file, 'r')
+
+        file = zipped_file.open('EXPERIMENT_DOWNLOAD/CITATION.txt', 'r')
+        self.assertIn(
+            'BOULOS, Guilherme; ROSS, Diana; COSTA, Edimilson. '
             + experiment.title + '. Sent date: ' + str(experiment.sent_date),
             file.read().decode('utf-8')
         )
