@@ -384,6 +384,7 @@
             <!-- Versions tab -->
             <div id="versions_tab" class="tab-pane" role="tabpanel">
                 {% if other_versions %}
+                    <h3>Other versions of this experiment</h3>
                     <ul>
                         {% for version in other_versions %}
                             <li><a href="{% url 'experiment-detail' version.slug %}">Version {{ version.version }}</a></li>
