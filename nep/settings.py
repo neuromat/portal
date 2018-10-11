@@ -76,6 +76,13 @@ HAYSTACK_CUSTOM_HIGHLIGHTER = 'experiments.appclasses.NepHighlighter'
 # TODO: this has to be solved after first Portal release. It's just a jerry-rig
 HAYSTACK_SEARCH_RESULTS_PER_PAGE = 500
 
+# <host>:<port> for testing tha uses haystack/elasticsearch
+# This is used when substituting HAYSTACK_CONNECTIONS for another, separated
+# instance of the engine backend.
+# IMPORTANT: overwrite it in local settings not here as settings.py is
+# updated by new releases
+HAYSTACK_TEST_URL = 'http://127.0.0.1:9200/'
+
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
