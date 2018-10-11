@@ -185,7 +185,7 @@ class HomePageTest(TestCase):
         self.assertEqual(None, experiment.trustee)
 
 
-# To test haystack using a new index, instead of the settings.py index
+# test haystack using a new index, instead of the settings.py index
 TEST_HAYSTACK_CONNECTIONS = {
     'default': {
         'ENGINE':
