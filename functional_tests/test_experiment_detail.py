@@ -828,6 +828,7 @@ class ExperimentDetailTest(FunctionalTest):
             self.browser.find_element_by_id('versions_tab').text
         ))
         versions_tab = self.browser.find_element_by_id('versions_tab').text
+        self.assertIn('Other versions of this experiment', versions_tab)
         self.assertIn('Version 2', versions_tab)
         self.assertNotIn('Version 3', versions_tab)
 
