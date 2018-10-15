@@ -126,15 +126,17 @@ def create_experiment(qtty, owner=None, status=Experiment.TO_BE_ANALYSED,
     return experiments
 
 
-def create_next_version_experiment(experiment):
+def create_next_version_experiment(experiment, release_notes=None):
     """
     :param experiment: Experiment model instance
+    :param release_notes: string with version release notes
     :return: new experiment version
     """
     return Experiment.objects.create(
         owner=experiment.owner, nes_id=experiment.nes_id,
         version=experiment.version + 1, title=experiment.title,
-        description=experiment.description, status=experiment.status
+        description=experiment.description, status=experiment.status,
+        release_notes=release_notes
     )
 
 

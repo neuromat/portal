@@ -803,8 +803,12 @@ class ExperimentDetailTest(FunctionalTest):
             self.browser.find_element_by_link_text('Versions')
 
     def test_can_view_versions_tab_content(self):
-        experiment_v2 = create_next_version_experiment(self.experiment)
-        experiment_v3 = create_next_version_experiment(experiment_v2)
+        experiment_v2 = create_next_version_experiment(
+            self.experiment, 'Text explaining changes in version 2'
+        )
+        experiment_v3 = create_next_version_experiment(
+            experiment_v2, 'Text explaining changes in version 3'
+        )
 
         ##
         # have to refresh home page to display last version created above
@@ -822,7 +826,9 @@ class ExperimentDetailTest(FunctionalTest):
         self.browser.find_element_by_link_text('Versions').click()
 
         # Versions tab displays the other versions of the experiment
-        # excluding the current one she is in
+        # excluding the current one she is in. Versions tab displays a link
+        # to access specific experiment version and the text explaining what
+        # was changed (the text can be in versions other than first one)
         self.wait_for(lambda: self.assertIn(
             'Version 1',
             self.browser.find_element_by_id('versions_tab').text
@@ -830,6 +836,7 @@ class ExperimentDetailTest(FunctionalTest):
         versions_tab = self.browser.find_element_by_id('versions_tab').text
         self.assertIn('Other versions of this experiment', versions_tab)
         self.assertIn('Version 2', versions_tab)
+        self.assertIn('Text explaining changes in version 2', versions_tab)
         self.assertNotIn('Version 3', versions_tab)
 
         # Ok, Rosa notes that the experiment has other two versions and she
@@ -853,6 +860,7 @@ class ExperimentDetailTest(FunctionalTest):
         ))
         versions_tab = self.browser.find_element_by_id('versions_tab').text
         self.assertIn('Version 3', versions_tab)
+        self.assertIn('Text explaining changes in version 3', versions_tab)
         self.assertNotIn('Version 1', versions_tab)
 
         # Finally Rosa clicks in version 2 link to see what that version has
