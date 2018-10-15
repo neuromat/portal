@@ -388,7 +388,7 @@
                     {% for version in other_versions %}
                         <div class="panel panel-default nep-panel-group">
                             <h3>
-                                <a href="{% url 'experiment-detail' version.slug %}">{% trans 'Version' %}{{ version.version }}</a>
+                                <a href="{% url 'experiment-detail' version.slug %}">{% trans 'Version' %} {{ version.version }}</a>
                             </h3>
                             {{ version.release_notes }}
                         </div>
