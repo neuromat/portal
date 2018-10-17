@@ -30,7 +30,7 @@ from experiments.models import Experiment, Study, Group, Researcher, \
     QuestionnaireResponse, ExperimentResearcher
 # TODO: not protected any more. Fix this!
 from experiments.views import _get_q_default_language_or_first
-
+import time
 # the password used for trustees in tests
 PASSWORD = 'labX'
 
@@ -126,15 +126,17 @@ def create_experiment(qtty, owner=None, status=Experiment.TO_BE_ANALYSED,
     return experiments
 
 
-def create_next_version_experiment(experiment):
+def create_next_version_experiment(experiment, release_notes=''):
     """
     :param experiment: Experiment model instance
+    :param release_notes: string with version release notes
     :return: new experiment version
     """
     return Experiment.objects.create(
         owner=experiment.owner, nes_id=experiment.nes_id,
         version=experiment.version + 1, title=experiment.title,
-        description=experiment.description, status=experiment.status
+        description=experiment.description, status=experiment.status,
+        release_notes=release_notes
     )
 
 
@@ -779,14 +781,15 @@ def create_generic_data_collection_data(gdc_step, participant):
 
 
 def create_valid_questionnaires(experiment):
-    create_group(2, experiment)
-    group_first = experiment.groups.first()
-    group_last = experiment.groups.last()
-    create_questionnaire(1, 'q1', group_first)
-    questionnaire1 = Questionnaire.objects.last()
+    g1 = create_group(1, experiment)
+    q1 = create_questionnaire(1, 'q1', g1)
+    q2 = create_questionnaire(1, 'q2', g1)
+    g2 = create_group(1, experiment)
+    q3 = create_questionnaire(1, 'q3', g2)
+
     # create questionnaire language data pt-br for questionnaire1
     create_questionnaire_language(
-        questionnaire1,
+        q1,
         settings.BASE_DIR + '/experiments/tests/questionnaire1_pt-br.csv',
         # our tests helper always consider 'en' as Default Language,
         # so we create this time as 'pt-br' to test creating questionnaire
@@ -797,7 +800,7 @@ def create_valid_questionnaires(experiment):
     )
     # create questionnaire language data fr for questionnaire1
     create_questionnaire_language(
-        questionnaire1,
+        q1,
         settings.BASE_DIR + '/experiments/tests/questionnaire1_fr.csv',
         # our tests helper always consider 'en' as Default Language,
         # so we create this time as 'pt-br' to test creating questionnaire
@@ -808,24 +811,19 @@ def create_valid_questionnaires(experiment):
     )
 
     # create questionnaire language data default for questionnaire2
-    create_questionnaire(1, 'q2', group_first)
-    questionnaire2 = Questionnaire.objects.last()
     create_questionnaire_language(
-        questionnaire2,
+        q2,
         settings.BASE_DIR + '/experiments/tests/questionnaire2.csv', 'en'
     )
     # create questionnaire language data de for questionnaire2
-    questionnaire2 = Questionnaire.objects.last()
     create_questionnaire_language(
-        questionnaire2,
+        q2,
         settings.BASE_DIR + '/experiments/tests/questionnaire2_de.csv', 'de'
     )
 
-    create_questionnaire(1, 'q3', group_last)
-    questionnaire3 = Questionnaire.objects.last()
     # create questionnaire language data default for questionnaire3
     create_questionnaire_language(
-        questionnaire3,
+        q3,
         settings.BASE_DIR + '/experiments/tests/questionnaire3.csv', 'en'
     )
 
@@ -1206,10 +1204,12 @@ def global_setup_ft():
     functional tests.
     """
     # Create 2 API clients
-    owner1 = models.User.objects.create_user(username='lab1',
-                                             password='nep-lab1')
-    owner2 = models.User.objects.create_user(username='lab2',
-                                             password='nep-lab2')
+    owner1 = models.User.objects.create_user(
+        username='lab1', password='nep-lab1'
+    )
+    owner2 = models.User.objects.create_user(
+        username='lab2', password='nep-lab2'
+    )
 
     # Create group Trustees
     create_trustee_user()
