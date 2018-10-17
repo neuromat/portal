@@ -110,7 +110,7 @@ class ChangeSlugForm(forms.models.ModelForm):
         fields = ('slug',)
         widgets = {
             'slug': forms.fields.TextInput(attrs={
-                'placeholder': 'Type new slug',
+                'placeholder': _('Type new slug'),
                 'class': 'form-control input-lg',
             }),
         }

@@ -371,6 +371,7 @@ class ExperimentDetailTest(TestCase):
     def test_access_experiment_wo_other_experiment_versions_returns_no_other(self):
         response = self.client.get('/experiments/' + self.experiment.slug + '/')
 
+        # other_versions are the other experiments versions
         self.assertFalse(response.context['other_versions'])
 
     def test_access_experiment_with_other_experiment_versions_returns_other_versions(self):
@@ -379,6 +380,7 @@ class ExperimentDetailTest(TestCase):
 
         response = self.client.get('/experiments/' + experiment_v3.slug + '/')
 
+        # other_versions are the other experiments versions
         self.assertEqual(len(response.context['other_versions']), 2)
 
 
