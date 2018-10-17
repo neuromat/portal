@@ -21,9 +21,12 @@ from experiments.tests.tests_helper import create_experiment, create_group, \
     create_eeg_data, create_eeg_setting, create_eeg_step, \
     create_valid_questionnaires, create_publication, \
     create_experiment_researcher, create_researcher, global_setup_ft, \
-    apply_setup, create_trustee_user, create_next_version_experiment
+    apply_setup, create_trustee_user, create_next_version_experiment, \
+    create_ethics_committee_info
 from functional_tests.base import FunctionalTest
 from nep import settings
+
+TEMP_MEDIA_ROOT = os.path.join(tempfile.mkdtemp())
 
 
 @apply_setup(global_setup_ft)
@@ -41,17 +44,19 @@ class ExperimentDetailTest(FunctionalTest):
     def setUp(self):
         create_trustee_user('claudia')
         create_trustee_user('roque')
-        # global_setup_ft()
         super(ExperimentDetailTest, self).setUp()
 
     # TODO: break by tabs
+    @override_settings(MEDIA_ROOT=TEMP_MEDIA_ROOT)
     def test_can_view_detail_page(self):
-        # TODO: getting momentarily from tests_helper
-        experiment = Experiment.objects.get(
-            title='Brachial Plexus (with EMG Setting)'
-        )
+        study = create_study(1, self.experiment)
+        create_ethics_committee_info(self.experiment)
+        create_researcher(study)
+        g1 = create_group(1, self.experiment)
+        create_experimental_protocol(g1)
+        create_group(1, self.experiment)
 
-        self._access_experiment_detail_page(experiment)
+        self._access_experiment_detail_page(self.experiment)
 
         # She sees a new page with a header title: Open Database
         # for Experiments in Neuroscience.
@@ -65,19 +70,19 @@ class ExperimentDetailTest(FunctionalTest):
         # page.
         experiment_title = self.browser.find_element_by_id(
             'id_detail_title').text
-        self.assertEqual(experiment.title, experiment_title)
+        self.assertEqual(self.experiment.title, experiment_title)
         link_home = self.browser.find_element_by_id('id_link_home').text
         self.assertIn('Back Home', link_home)
         experiment_description = self.browser.find_element_by_id(
             'id_detail_description').text
-        self.assertEqual(experiment.description, experiment_description)
+        self.assertEqual(self.experiment.description, experiment_description)
 
         # Bellow experiment description there is a link to the project site
         # (because experiment has that data posted via api)
         ethics_commitee_project_info = \
             self.browser.find_element_by_link_text('Project Info')
         self.assertEqual(
-            experiment.project_url,
+            self.experiment.project_url,
             ethics_commitee_project_info.get_attribute('href')
         )
 
@@ -86,13 +91,13 @@ class ExperimentDetailTest(FunctionalTest):
         # of participants until now.
         data_acquisition_text = self.browser.find_element_by_id(
             'id_detail_acquisition').text
-        if experiment.data_acquisition_done:
+        if self.experiment.data_acquisition_done:
             self.assertIn(
                 'Data acquisition was completed', data_acquisition_text
             )
         else:
             total_participants = 0
-            for group in experiment.groups.all():
+            for group in self.experiment.groups.all():
                 total_participants += group.participants.count()
             self.assertIn('Current number of participants: '
                           + str(total_participants) + ' (and counting)',
@@ -101,27 +106,27 @@ class ExperimentDetailTest(FunctionalTest):
         # Right bellow she sees the study that the experiment belongs to
         # at left
         study_text = self.browser.find_element_by_id('id_detail_study').text
-        self.assertIn('From study: ' + experiment.study.title, study_text)
+        self.assertIn('From study: ' + self.experiment.study.title, study_text)
 
         # She clicks in Related study link and sees a modal with Study data
-        self.browser.find_element_by_link_text(experiment.study.title).click()
+        self.browser.find_element_by_link_text(self.experiment.study.title).click()
 
         # The modal has the study title and the study description
         self.wait_for(lambda: self.assertIn(
-            experiment.study.title,
+            self.experiment.study.title,
             self.browser.find_element_by_id('modal_study_title').text
         ))
 
         study_description = self.browser.find_element_by_id(
             'study_description').text
         # It indicates that the study was made by a researcher
-        self.assertIn(experiment.study.description, study_description)
+        self.assertIn(self.experiment.study.description, study_description)
         study_researcher = self.browser.find_element_by_id(
             'study_researcher').text
         self.assertIn('Researcher:', study_researcher)
         self.assertIn(
-            experiment.study.researcher.first_name + ' ' +
-            experiment.study.researcher.last_name,
+            self.experiment.study.researcher.first_name + ' ' +
+            self.experiment.study.researcher.last_name,
             study_researcher
         )
         # The study has a start and end date
@@ -133,26 +138,26 @@ class ExperimentDetailTest(FunctionalTest):
         # September (9) we have to do something more.
         # TODO: search for better solution
         ##
-        if experiment.study.start_date.month == 9:
-            strdate = experiment.study.start_date.strftime(
+        if self.experiment.study.start_date.month == 9:
+            strdate = self.experiment.study.start_date.strftime(
                 "%b. %d, %Y"
             ).lstrip("0").replace(". ", "t. ")
         else:
-            strdate = experiment.study.start_date.strftime(
+            strdate = self.experiment.study.start_date.strftime(
                 "%b. %d, %Y"
             ).lstrip("0").replace(" 0", " ")
         self.assertIn(strdate, study_start_date)
         study_end_date = self.browser.find_element_by_id(
             'study_enddate').text
         self.assertIn('End date:', study_end_date)
-        if experiment.study.end_date:
-            self.assertIn(experiment.study.end_date.strftime("%B %d, %Y"),
+        if self.experiment.study.end_date:
+            self.assertIn(self.experiment.study.end_date.strftime("%B %d, %Y"),
                           study_end_date)
 
         # Finally, in the study modal, she sees a list of keywords
         # associated with the study
         keywords_text = self.browser.find_element_by_id('keywords').text
-        for keyword in experiment.study.keywords.all():
+        for keyword in self.experiment.study.keywords.all():
             self.assertIn(keyword.name, keywords_text)
 
         ##
@@ -171,7 +176,7 @@ class ExperimentDetailTest(FunctionalTest):
         # used to include each group.
         groups_tab_content = self.browser.find_element_by_id('groups_tab').text
         code_not_recognized_instances = 0
-        for group in experiment.groups.all():
+        for group in self.experiment.groups.all():
             self.assertIn(group.title, groups_tab_content)
             self.assertIn(group.description, groups_tab_content)
             self.assertIn(str(group.participants.all().count()) +
@@ -196,18 +201,18 @@ class ExperimentDetailTest(FunctionalTest):
         # written 'Details'. She clicks on the first link and the panel
         # expands displaying textual representation of the experimental
         # protocol.
-        group = experiment.groups.first()
+        group = self.experiment.groups.first()
         link_details = self.browser.find_element_by_link_text('Details')
         link_details.click()
 
         self.wait_for(lambda: self.assertIn(
             'Textual description',
-            self.browser.find_element_by_id('collapse' + str(group.id)).text
+            self.browser.find_element_by_id('collapse_group' + str(group.id)).text
         ))
 
         self.assertIn(
             group.experimental_protocol.textual_description,
-            self.browser.find_element_by_id('collapse' + str(group.id)).text
+            self.browser.find_element_by_id('collapse_group' + str(group.id)).text
         )
 
         # She notices that the protocol experiment image is a link. When she
@@ -227,20 +232,21 @@ class ExperimentDetailTest(FunctionalTest):
         ).get_attribute('src')
         self.assertTrue(
             '/media/' +
-            str(experiment.groups.first().experimental_protocol.image),
+            str(self.experiment.groups.first().experimental_protocol.image),
             protocol_image_path
         )
 
+        shutil.rmtree(TEMP_MEDIA_ROOT)
+
     def test_can_see_publications_link(self):
-        experiment = Experiment.objects.last()
-        create_publication(experiment)
-        create_publication(experiment)
+        create_publication(self.experiment)
+        create_publication(self.experiment)
 
         # The new visitor is in home page and sees the list of experiments.
         # She clicks in the "View" link of last approved experiment and is
         # redirected to experimentdetail page
         self.browser.find_element_by_xpath(
-            "//a[@href='/experiments/" + str(experiment.slug) + "/']"
+            "//a[@href='/experiments/" + str(self.experiment.slug) + "/']"
         ).click()
 
         # As last approved experiment has a publication associated with it,
@@ -252,16 +258,15 @@ class ExperimentDetailTest(FunctionalTest):
         ))
 
     def test_can_see_publications_modal_with_correct_content(self):
-        experiment = Experiment.objects.last()
-        create_publication(experiment)
-        create_publication(experiment)
-        publications = experiment.publications.all()
+        create_publication(self.experiment)
+        create_publication(self.experiment)
+        publications = self.experiment.publications.all()
 
         # The new visitor is in home page and sees the list of experiments.
         # She clicks in the "View" link of last approved experiment and is
         # redirected to experimentdetail page
         self.browser.find_element_by_xpath(
-            "//a[@href='/experiments/" + str(experiment.slug) + "/']"
+            "//a[@href='/experiments/" + str(self.experiment.slug) + "/']"
         ).click()
 
         ##
@@ -304,14 +309,13 @@ class ExperimentDetailTest(FunctionalTest):
         ))
 
     def test_publications_urls_are_links(self):
-        experiment = Experiment.objects.last()
-        create_publication(experiment)
+        create_publication(self.experiment)
 
         # The new visitor is in home page and sees the list of experiments.
         # She clicks in the "View" link of last approved experiment and is
         # redirected to experimentdetail page
         self.browser.find_element_by_xpath(
-            "//a[@href='/experiments/" + str(experiment.slug) + "/']"
+            "//a[@href='/experiments/" + str(self.experiment.slug) + "/']"
         ).click()
 
         # As last approved experiment has publications associated with it,
@@ -321,7 +325,7 @@ class ExperimentDetailTest(FunctionalTest):
             'Publications'
         ).click())
 
-        for publication in experiment.publications.all():
+        for publication in self.experiment.publications.all():
             try:
                 self.wait_for(
                     lambda:
@@ -331,14 +335,13 @@ class ExperimentDetailTest(FunctionalTest):
                 self.fail(publication.url + ' is not a link')
 
     def test_can_view_questionaire_tab(self):
-        experiment = Experiment.objects.last()
-        create_valid_questionnaires(experiment)
+        create_valid_questionnaires(self.experiment)
 
         # The new visitor is in home page and sees the list of experiments.
         # She clicks in a "View" link and is redirected to experiment
         # detail page
         self.browser.find_element_by_xpath(
-            "//a[@href='/experiments/" + str(experiment.slug) + "/']"
+            "//a[@href='/experiments/" + str(self.experiment.slug) + "/']"
         ).click()
 
         # There's a tab written Questionnaires
@@ -348,20 +351,11 @@ class ExperimentDetailTest(FunctionalTest):
         ))
 
     def test_does_not_display_questionnaire_tab_if_there_are_not_questionnaires(self):
-        ##
-        # We pick an experiment without questionnaires. The second approved
-        # experiment hasn't questionnaires steps in any experiment protocol
-        # of no one group. See tests helper
-        ##
-        experiment = Experiment.objects.filter(
-            status=Experiment.APPROVED
-        ).all()[1]
-
         # The new visitor is in home page and sees the list of experiments.
         # She clicks in second "View" link and is redirected to experiment
         # detail page
         self.browser.find_element_by_xpath(
-            "//a[@href='/experiments/" + experiment.slug + "/']"
+            "//a[@href='/experiments/" + self.experiment.slug + "/']"
         ).click()
         self.wait_for_detail_page_load()
 
@@ -371,20 +365,19 @@ class ExperimentDetailTest(FunctionalTest):
             self.browser.find_element_by_link_text('Questionnaires')
 
     def test_can_view_group_questionnaires_and_questionnaires_titles(self):
-        experiment = Experiment.objects.last()
-        create_valid_questionnaires(experiment)
+        create_valid_questionnaires(self.experiment)
 
         ##
         # get groups objects with questionnaire steps
         ##
         q_steps = Step.objects.filter(type=Step.QUESTIONNAIRE)
-        groups_with_qs = experiment.groups.filter(steps__in=q_steps)
+        groups_with_qs = self.experiment.groups.filter(steps__in=q_steps)
 
         # The new visitor is in home page and sees the list of experiments.
         # She clicks in a "View" link and is redirected to experiment
         # detail page
         self.browser.find_element_by_xpath(
-            "//a[@href='/experiments/" + experiment.slug + "/']"
+            "//a[@href='/experiments/" + self.experiment.slug + "/']"
         ).click()
         self.wait_for_detail_page_load()
 
@@ -414,15 +407,14 @@ class ExperimentDetailTest(FunctionalTest):
                 )
 
     def test_detail_button_expands_questionnaire_to_display_questions_and_answers(self):
-        experiment = Experiment.objects.last()
-        create_valid_questionnaires(experiment)
+        create_valid_questionnaires(self.experiment)
 
         # When the new visitor visits an experiment that has questionnaires,
         # in right side of each questionnaire title is a 'Detail'
         # button. When she clicks on it, the questionnaire expand to display
         # the questions and answers.
         self.browser.find_element_by_xpath(
-            "//a[@href='/experiments/" + experiment.slug + "/']"
+            "//a[@href='/experiments/" + self.experiment.slug + "/']"
         ).click()
         self.wait_for_detail_page_load()
 
@@ -436,14 +428,13 @@ class ExperimentDetailTest(FunctionalTest):
         self.assertEqual(button_details.text, 'Details')
 
     def test_can_view_questionnaires_content(self):
-        experiment = Experiment.objects.last()
-        create_valid_questionnaires(experiment)
+        create_valid_questionnaires(self.experiment)
 
         # The new visitor is in home page and sees the list of experiments.
         # She clicks in the "View" link corresponded to the experiment and is
         # redirected to experiment detail page.
         self.browser.find_element_by_xpath(
-            "//a[@href='/experiments/" + experiment.slug + "/']"
+            "//a[@href='/experiments/" + self.experiment.slug + "/']"
         ).click()
         self.wait_for_detail_page_load()
 
@@ -514,15 +505,21 @@ class ExperimentDetailTest(FunctionalTest):
         # We've created invalid Questionnaire data in tests helper in first
         # experiment approved
         ##
-        experiment = Experiment.objects.filter(
-            status=Experiment.APPROVED
-        ).first()
+        group = create_group(1, self.experiment)
+        create_questionnaire(1, 'q4', group)
+        questionnaire = Questionnaire.objects.last()
+        # create invalid questionnaire language data default
+        create_questionnaire_language(
+            questionnaire,
+            settings.BASE_DIR + '/experiments/tests/questionnaire4.csv',
+            'en'
+        )
 
         # The new visitor is at home page and sees the list of experiments.
         # She clicks in a "View" link and is redirected to experiment
         # detail page
         self.browser.find_element_by_xpath(
-            "//a[@href='/experiments/" + experiment.slug + "/']"
+            "//a[@href='/experiments/" + self.experiment.slug + "/']"
         ).click()
         self.wait_for_detail_page_load()
 
@@ -543,12 +540,11 @@ class ExperimentDetailTest(FunctionalTest):
                       questionnaires_content)
 
     def test_can_see_all_language_links_of_questionnaires_if_available(self):
-        experiment = Experiment.objects.last()
-        create_valid_questionnaires(experiment)
+        create_valid_questionnaires(self.experiment)
 
         # The visitor clicks in the experiment with questionnaire in home page
         self.browser.find_element_by_xpath(
-            "//a[@href='/experiments/" + experiment.slug + "/']"
+            "//a[@href='/experiments/" + self.experiment.slug + "/']"
         ).click()
         self.wait_for_detail_page_load()
 
@@ -579,13 +575,12 @@ class ExperimentDetailTest(FunctionalTest):
         self.assertEqual(q_lang_codes.count('de'), 1)
 
     def test_clicking_in_pt_br_language_link_of_questionnaire_render_appropriate_language(self):
-        experiment = Experiment.objects.last()
-        create_valid_questionnaires(experiment)
+        create_valid_questionnaires(self.experiment)
         questionnaire = Questionnaire.objects.get(code='q1')
 
         # The visitor clicks in the experiment with questionnaire in home page
         self.browser.find_element_by_xpath(
-            "//a[@href='/experiments/" + experiment.slug + "/']"
+            "//a[@href='/experiments/" + self.experiment.slug + "/']"
         ).click()
         self.wait_for_detail_page_load()
         ##
@@ -637,13 +632,12 @@ class ExperimentDetailTest(FunctionalTest):
                       questionnaires_content)
 
     def test_clicking_in_fr_language_link_of_questionnaire_render_appropriate_language(self):
-        experiment = Experiment.objects.last()
-        create_valid_questionnaires(experiment)
+        create_valid_questionnaires(self.experiment)
         questionnaire = Questionnaire.objects.get(code='q1')
 
         # The visitor clicks in the experiment with questionnaire in home page
         self.browser.find_element_by_xpath(
-            "//a[@href='/experiments/" + experiment.slug + "/']"
+            "//a[@href='/experiments/" + self.experiment.slug + "/']"
         ).click()
         self.wait_for_detail_page_load()
 
@@ -672,10 +666,15 @@ class ExperimentDetailTest(FunctionalTest):
             ).click()
         )
 
+        ##
+        # give time for ajax to complete request
+        ##
+        time.sleep(0.2)
+
         questionnaires_content = self.browser.find_element_by_id(
             'questionnaires_tab').text
 
-        # Sample asserts for first questionnaire, Portuguese language
+        # Sample asserts for first questionnaire, French language
         self.assertIn('Histoire de la fracture?', questionnaires_content)
         self.assertIn('Avez-vous déjà eu une chirurgie orthopédique?',
                       questionnaires_content)
@@ -687,8 +686,7 @@ class ExperimentDetailTest(FunctionalTest):
                       questionnaires_content)
         self.assertIn('Avez-vous eu des fractures associées à la blessure?',
                       questionnaires_content)
-        self.assertIn('The user answers yes or not',
-                      questionnaires_content)
+        self.assertIn('The user answers yes or not', questionnaires_content)
 
     def test_does_not_display_study_elements_if_they_not_exist(self):
         ##
@@ -744,22 +742,17 @@ class ExperimentDetailTest(FunctionalTest):
 
     def test_can_see_url_text_for_experiments_approved(self):
 
-        experiment = Experiment.objects.filter(
-            status=Experiment.APPROVED
-        ).first()
-        self._access_experiment_detail_page(experiment)
+        self._access_experiment_detail_page(self.experiment)
 
         # TODO: see if we can get current url not just self.live_server_url
         self.wait_for(lambda: self.assertIn(
-            'url: ' + self.live_server_url + '/experiments/' + experiment.slug,
+            'url: ' + self.live_server_url + '/experiments/' +
+            self.experiment.slug,
             self.browser.find_element_by_class_name('detail-header').text
         ))
 
     def test_cannot_see_link_to_change_slug_if_user_not_in_staff(self):
-        experiment = Experiment.objects.filter(
-            status=Experiment.APPROVED
-        ).first()
-        self._access_experiment_detail_page(experiment)
+        self._access_experiment_detail_page(self.experiment)
         self.wait_for_detail_page_load()
 
         # The user enters in experiment detail page and can't see the link
@@ -869,9 +862,6 @@ class ExperimentDetailTest(FunctionalTest):
             experiment_v2.slug,
             self.browser.find_element_by_id('experiment_url').text
         ))
-
-
-TEMP_MEDIA_ROOT = os.path.join(tempfile.mkdtemp())
 
 
 @override_settings(MEDIA_ROOT=TEMP_MEDIA_ROOT)
