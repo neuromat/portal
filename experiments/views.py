@@ -16,7 +16,6 @@ from django.template.loader import render_to_string
 from django.utils.text import slugify
 from django.utils.translation import activate, LANGUAGE_SESSION_KEY, \
     ugettext as _
-from django.template.defaultfilters import slugify
 
 from haystack.generic_views import SearchView
 
