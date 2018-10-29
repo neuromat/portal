@@ -38,7 +38,11 @@
                                     </p>
                                 {% elif data.question_limesurvey_type == 'Y' %}
                                     <p>
-                                        <em>{% trans 'The user answers' %}</em> yes <em>or</em> not
+                                        <em>{% trans "The user answers" %}</em> yes <em>or</em> not
+                                    </p>
+                                {% elif data.question_limesurvey_type == 'X' %}
+                                    <p>
+                                        <em>{% trans "A text is displayed to the participant (user does not answer this question)" %}</em>
                                     </p>
                                 {% else %}
                                     <p>

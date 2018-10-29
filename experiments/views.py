@@ -202,7 +202,7 @@ def home_page(request):
 
 
 def experiment_detail(request, slug):
-    # will be None if home contains the list for common user
+    # will be None if home contains the list for user not logged in
     to_be_analysed_count = None
     if request.user.is_authenticated and \
             request.user.groups.filter(name='trustees').exists():

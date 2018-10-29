@@ -276,6 +276,9 @@ class ExperimentDetailTest(TestCase):
                       response.content.decode())
         self.assertIn('The user enters a date in a date field',
                       response.content.decode())
+        self.assertIn('A text is displayed to the participant (user does not '
+                      'answer this question)',
+                      response.content.decode())
 
         # Sample asserts for second questionnaire
         self.assertIn('First Group', response.content.decode())
@@ -293,7 +296,6 @@ class ExperimentDetailTest(TestCase):
                       response.content.decode())
 
         # Sample asserts for third questionnaire
-
         self.assertIn('Segundo Grupo', response.content.decode())
         self.assertIn('Refere dor após a lesão?', response.content.decode())
         self.assertIn('EVA da dor principal:', response.content.decode())

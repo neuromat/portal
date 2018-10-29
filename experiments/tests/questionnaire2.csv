@@ -193,3 +193,5 @@ questionnaire_code,questionnaire_title,question_group,question_type,question_typ
 599846,INDC - Input Entry,Third Group,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Strength to manual muscle testing by segment.,SQ015,Opponence of Thumb,,,A5,4
 599846,INDC - Input Entry,Third Group,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Strength to manual muscle testing by segment.,SQ015,Opponence of Thumb,,,A6,5
 599846,INDC - Input Entry,Third Group,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Strength to manual muscle testing by segment.,SQ015,Opponence of Thumb,,,A7,Not Rated
+599846,INDC - Input Entry,Third Group,M,Multiple choice,lisdispositivo2,lisdispositivo2,Which one?,4,Finger Position Orthosis,,, ,
+599846,INDC - Input Entry,Third Group,X,Text display,testdisplay,testdisplay,Text displayed to the participant,,,,, ,

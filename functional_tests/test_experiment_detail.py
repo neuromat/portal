@@ -483,6 +483,11 @@ class ExperimentDetailTest(FunctionalTest):
         self.assertIn('The user uploads file(s)',
                       questionnaires_content)
         self.assertIn('The user answers yes or not', questionnaires_content)
+        self.assertIn(
+            'A text is displayed to the participant (user does not answer '
+            'this question)',
+            questionnaires_content
+        )
 
         ##
         # sample asserts for third questionnaire
