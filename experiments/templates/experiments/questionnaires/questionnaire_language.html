@@ -51,6 +51,10 @@
                                     <p>
                                         <em>{% trans "The user enters a free text" %}</em>
                                     </p>
+                                {% elif data.question_limesurvey_type == 'N' %}
+                                    <p>
+                                        <em>{% trans "Participant answers with a numerical value" %}</em>
+                                    </p>
 {#                                {% else %}#}
 {#                                    <p>#}
 {#                                        <em>{% trans "The user enters a free text" %}</em>#}

@@ -298,7 +298,10 @@ class ExperimentDetailTest(TestCase):
             '5 or no level)',
             response.content.decode()
         )
-        # asserts for questions that has no metadata subquestions/answers
+
+        ##
+        # Asserts for questions that has no metadata subquestions/answers
+        #
         self.assertIn('The user uploads file(s)',
                       response.content.decode())
         self.assertIn('<em>The user answers</em> yes <em>or</em> not',
@@ -308,6 +311,12 @@ class ExperimentDetailTest(TestCase):
         self.assertIn('A text is displayed to the participant (user does not '
                       'answer this question)',
                       response.content.decode())
+        # N - Numerical Input
+        self.assertIn('Questão Numerical Input', response.content.decode())
+        self.assertIn(
+            'Participant answers with a numerical value',
+            response.content.decode()
+        )
 
         # Sample asserts for third questionnaire
         self.assertIn('Segundo Grupo', response.content.decode())

@@ -488,6 +488,7 @@ class ExperimentDetailTest(FunctionalTest):
             '5 or no level)',
             questionnaires_content
         )
+        self.assertIn('Questão Numerical Input', questionnaires_content)
 
         ##
         # asserts for questions that has no metadata subquestions/answers
@@ -498,6 +499,10 @@ class ExperimentDetailTest(FunctionalTest):
         self.assertIn(
             'A text is displayed to the participant (user does not answer '
             'this question)',
+            questionnaires_content
+        )
+        self.assertIn(
+            'Participant answers with a numerical value',
             questionnaires_content
         )
 
