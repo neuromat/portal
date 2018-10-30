@@ -210,3 +210,7 @@ questionnaire_code,questionnaire_title,question_group,question_type,question_typ
 599846,INDC - Input Entry,Third Group,H,Array (Flexible Labels) by Column,arrayByColumn[SQ001],arrayByColumn,Questão Array by column,SQ001,Subquestion 1,,,A2,Answer 2
 599846,INDC - Input Entry,Third Group,H,Array (Flexible Labels) by Column,arrayByColumn[SQ002],arrayByColumn,Questão Array by column,SQ002,Subquestion 2,,,A1,Answer 1
 599846,INDC - Input Entry,Third Group,H,Array (Flexible Labels) by Column,arrayByColumn[SQ002],arrayByColumn,Questão Array by column,SQ002,Subquestion 2,,,A2,Answer array by column 2
+599846,INDC - Input Entry,Third Group,;,Array (Flexible Labels) multiple texts,arrayTexts[SQ001],arrayTexts,Questão Array (Texts),SQ001,subquestionSQ001,,,,
+599846,INDC - Input Entry,Third Group,;,Array (Flexible Labels) multiple texts,arrayTexts[SQ001],arrayTexts,Questão Array (Texts),SQ001,subquestionSQ001,,,,
+599846,INDC - Input Entry,Third Group,;,Array (Flexible Labels) multiple texts,arrayTexts[SQ002],arrayTexts,Questão Array (Texts),SQ002,subquestionSQ002,,,,
+599846,INDC - Input Entry,Third Group,;,Array (Flexible Labels) multiple texts,arrayTexts[SQ002],arrayTexts,Questão Array (Texts),SQ002,subquestionSQ002,,,,

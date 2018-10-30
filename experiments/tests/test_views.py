@@ -317,12 +317,20 @@ class ExperimentDetailTest(TestCase):
             'Participant answers with a numerical value',
             response.content.decode()
         )
-        self.assertIn('Questão Numerical Input', response.content.decode())
+        # H - Array (Flexible Labels) by Column
         self.assertIn('Questão Array by column', response.content.decode())
         self.assertIn(
             'Subquestion array by column 1', response.content.decode()
         )
         self.assertIn('Answer array by column 2', response.content.decode())
+
+        # ; - Array (Flexible Labels) multiple texts
+        self.assertIn('Questão Array (Texts)', response.content.decode())
+        self.assertIn('subquestionSQ002', response.content.decode())
+        self.assertIn(
+            '(The question is a matrix based on the following fields)',
+            response.content.decode()
+        )
 
         # Sample asserts for third questionnaire
         self.assertIn('Segundo Grupo', response.content.decode())

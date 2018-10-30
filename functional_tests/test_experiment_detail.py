@@ -492,6 +492,12 @@ class ExperimentDetailTest(FunctionalTest):
         self.assertIn('Questão Array by column', questionnaires_content)
         self.assertIn('Subquestion array by column 1', questionnaires_content)
         self.assertIn('Answer array by column 2', questionnaires_content)
+        self.assertIn('Questão Array (Texts)', questionnaires_content)
+        self.assertIn('subquestionSQ002', questionnaires_content)
+        self.assertIn(
+            '(The question is a matrix based on the following fields)',
+            questionnaires_content
+        )
 
         ##
         # asserts for questions that has no metadata subquestions/answers
