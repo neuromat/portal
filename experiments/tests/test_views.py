@@ -317,6 +317,12 @@ class ExperimentDetailTest(TestCase):
             'Participant answers with a numerical value',
             response.content.decode()
         )
+        self.assertIn('Questão Numerical Input', response.content.decode())
+        self.assertIn('Questão Array by column', response.content.decode())
+        self.assertIn(
+            'Subquestion array by column 1', response.content.decode()
+        )
+        self.assertIn('Answer array by column 2', response.content.decode())
 
         # Sample asserts for third questionnaire
         self.assertIn('Segundo Grupo', response.content.decode())

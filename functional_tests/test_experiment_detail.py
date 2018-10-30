@@ -489,6 +489,9 @@ class ExperimentDetailTest(FunctionalTest):
             questionnaires_content
         )
         self.assertIn('Questão Numerical Input', questionnaires_content)
+        self.assertIn('Questão Array by column', questionnaires_content)
+        self.assertIn('Subquestion array by column 1', questionnaires_content)
+        self.assertIn('Answer array by column 2', questionnaires_content)
 
         ##
         # asserts for questions that has no metadata subquestions/answers

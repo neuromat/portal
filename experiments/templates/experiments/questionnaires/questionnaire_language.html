@@ -22,7 +22,7 @@
                         {% for data in question_group_values.data %}
                             <ul>
                                 <li>{{ data.question_description }}</li>
-                                {% if data.question_limesurvey_type == 'F' or data.question_limesurvey_type == '1' %}
+                                {% if data.question_limesurvey_type == 'F' or data.question_limesurvey_type == '1' or data.question_limesurvey_type == 'H' %}
                                     {% include 'experiments/questionnaires/f_type.html' %}
                                 {% elif data.question_limesurvey_type == 'L' %}
                                     {% include 'experiments/questionnaires/l_type.html' %}

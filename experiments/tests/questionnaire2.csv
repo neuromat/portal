@@ -206,3 +206,7 @@ questionnaire_code,questionnaire_title,question_group,question_type,question_typ
 599846,INDC - Input Entry,Third Group,A,Array (5 Point Choice),array5pointchoice[SQ001],array5pointchoice,Questão Array (5 point choice),SQ001,subquestionSQ001,,,,
 599846,INDC - Input Entry,Third Group,A,Array (5 Point Choice),array5pointchoice[SQ002],array5pointchoice,Questão Array (5 point choice),SQ002,subquestionSQ002,,,,
 599846,INDC - Input Entry,Third Group,N,Numerical Input,numericalInput,numericalInput,Questão Numerical Input,,,,,,
+599846,INDC - Input Entry,Third Group,H,Array (Flexible Labels) by Column,arrayByColumn[SQ001],arrayByColumn,Questão Array by column,SQ001,Subquestion array by column 1,,,A1,Answer 1
+599846,INDC - Input Entry,Third Group,H,Array (Flexible Labels) by Column,arrayByColumn[SQ001],arrayByColumn,Questão Array by column,SQ001,Subquestion 1,,,A2,Answer 2
+599846,INDC - Input Entry,Third Group,H,Array (Flexible Labels) by Column,arrayByColumn[SQ002],arrayByColumn,Questão Array by column,SQ002,Subquestion 2,,,A1,Answer 1
+599846,INDC - Input Entry,Third Group,H,Array (Flexible Labels) by Column,arrayByColumn[SQ002],arrayByColumn,Questão Array by column,SQ002,Subquestion 2,,,A2,Answer array by column 2
