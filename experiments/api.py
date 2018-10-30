@@ -11,20 +11,19 @@ from experiments.models import Experiment, Study, User, \
     EEGData, EMGData, TMSData, GoalkeeperGameData, QuestionnaireResponse, \
     AdditionalData, GenericDataCollectionData, EEG, EMG, TMS, Instruction, \
     Pause, Task, TaskForTheExperimenter, \
-    GenericDataCollection, Stimulus, GoalkeeperGame, SetOfStep, Questionnaire, \
-    EEGAmplifierSetting, Amplifier, EEGSolution, EEGFilterSetting, \
-    EEGElectrodeNet, \
-    SurfaceElectrode, NeedleElectrode, IntramuscularElectrode, \
-    EEGElectrodeLocalizationSystem, EEGElectrodePosition, \
-    TMSDeviceSetting, TMSDevice, CoilModel, \
+    GenericDataCollection, Stimulus, GoalkeeperGame, SetOfStep, \
+    Questionnaire, EEGAmplifierSetting, Amplifier, EEGSolution,  \
+    EEGFilterSetting, EEGElectrodeNet, SurfaceElectrode, NeedleElectrode, \
+    IntramuscularElectrode, EEGElectrodeLocalizationSystem, \
+    EEGElectrodePosition, TMSDeviceSetting, TMSDevice, CoilModel, \
     EMGDigitalFilterSetting, ADConverter, EMGADConverterSetting, \
     EMGElectrodeSetting, \
-    EMGPreamplifierSetting, EMGAmplifierSetting, EMGPreamplifierFilterSetting, \
-    EMGAnalogFilterSetting, \
-    EMGElectrodePlacementSetting, \
-    EMGSurfacePlacement, EMGIntramuscularPlacement, EMGNeedlePlacement, \
-    QuestionnaireLanguage, QuestionnaireDefaultLanguage, Publication, \
-    StepAdditionalFile, ExperimentResearcher
+    EMGPreamplifierSetting, EMGAmplifierSetting, \
+    EMGPreamplifierFilterSetting, EMGAnalogFilterSetting, \
+    EMGElectrodePlacementSetting, EMGSurfacePlacement, \
+    EMGIntramuscularPlacement, EMGNeedlePlacement, QuestionnaireLanguage, \
+    QuestionnaireDefaultLanguage, Publication, StepAdditionalFile, \
+    ExperimentResearcher
 
 
 ###################
@@ -70,16 +69,20 @@ class StudySerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         if 'end_date' in validated_data:
-            study = Study.objects.create(experiment=validated_data['experiment'],
-                                         title=validated_data['title'],
-                                         description=validated_data['description'],
-                                         start_date=validated_data['start_date'],
-                                         end_date=validated_data['end_date'])
+            study = Study.objects.create(
+                experiment=validated_data['experiment'],
+                title=validated_data['title'],
+                description=validated_data['description'],
+                start_date=validated_data['start_date'],
+                end_date=validated_data['end_date']
+            )
         else:
-            study = Study.objects.create(experiment=validated_data['experiment'],
-                                         title=validated_data['title'],
-                                         description=validated_data['description'],
-                                         start_date=validated_data['start_date'])
+            study = Study.objects.create(
+                experiment=validated_data['experiment'],
+                title=validated_data['title'],
+                description=validated_data['description'],
+                start_date=validated_data['start_date']
+            )
         if 'keywords' in self.initial_data:
             keywords_data = self.initial_data['keywords']
             for keyword_data in keywords_data:
@@ -94,7 +97,9 @@ class ResearcherSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Researcher
-        fields = ('id', 'first_name', 'last_name', 'email', 'study', 'citation_name')
+        fields = (
+            'id', 'first_name', 'last_name', 'email', 'study', 'citation_name'
+        )
 
 
 class ExperimentResearcherSerializer(serializers.ModelSerializer):
@@ -132,7 +137,10 @@ class EEGAmplifierSettingSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = EEGAmplifierSetting
-        fields = ('eeg_setting', 'eeg_amplifier', 'gain', 'sampling_rate', 'number_of_channels_used')
+        fields = (
+            'eeg_setting', 'eeg_amplifier', 'gain', 'sampling_rate',
+            'number_of_channels_used'
+        )
 
 
 class EEGSolutionSettingSerializer(serializers.ModelSerializer):
@@ -148,8 +156,12 @@ class EEGFilterSettingSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = EEGFilterSetting
-        fields = ('eeg_setting', 'eeg_filter_type_name', 'eeg_filter_type_description', 'high_pass', 'low_pass',
-                  'high_band_pass', 'low_band_pass', 'high_notch', 'low_notch', 'order')
+        fields = (
+            'eeg_setting', 'eeg_filter_type_name',
+            'eeg_filter_type_description', 'high_pass', 'low_pass',
+            'high_band_pass', 'low_band_pass', 'high_notch', 'low_notch',
+            'order'
+        )
 
 
 class SurfaceElectrodeSerializer(serializers.ModelSerializer):
@@ -235,7 +247,9 @@ class EEGElectrodeLocalizationSystemSerializer(serializers.ModelSerializer):
 
 
 class EEGElectrodePositionSerializer(serializers.ModelSerializer):
-    eeg_electrode_localization_system = serializers.ReadOnlyField(source='eeg_electrode_localization_system.name')
+    eeg_electrode_localization_system = serializers.ReadOnlyField(
+        source='eeg_electrode_localization_system.name'
+    )
 
     class Meta:
         model = EEGElectrodePosition
@@ -248,8 +262,10 @@ class EEGElectrodeNetSettingSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = EEGElectrodeNet
-        fields = ('eeg_setting',
-                  'manufacturer_name', 'equipment_type', 'identification', 'description', 'serial_number')
+        fields = (
+            'eeg_setting', 'manufacturer_name', 'equipment_type',
+            'identification', 'description', 'serial_number'
+        )
 
 
 class EEGSettingSerializer(serializers.ModelSerializer):
@@ -265,7 +281,10 @@ class EMGSettingSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = EMGSetting
-        fields = ('id', 'experiment', 'name', 'description', 'acquisition_software_version')
+        fields = (
+            'id', 'experiment', 'name', 'description',
+            'acquisition_software_version'
+        )
 
 
 class EMGDigitalFilterSettingSerializer(serializers.ModelSerializer):
@@ -273,8 +292,11 @@ class EMGDigitalFilterSettingSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = EMGDigitalFilterSetting
-        fields = ('emg_setting', 'filter_type_name', 'filter_type_description', 'low_pass', 'high_pass',
-                  'low_band_pass', 'high_band_pass', 'low_notch', 'high_notch', 'order')
+        fields = (
+            'emg_setting', 'filter_type_name', 'filter_type_description',
+            'low_pass', 'high_pass', 'low_band_pass', 'high_band_pass',
+            'low_notch', 'high_notch', 'order'
+        )
 
 
 class ADConverterSerializer(serializers.ModelSerializer):
@@ -310,7 +332,9 @@ class EMGElectrodeSettingSerializer(serializers.ModelSerializer):
 
 
 class EMGPreamplifierSettingSerializer(serializers.ModelSerializer):
-    emg_electrode_setting = serializers.ReadOnlyField(source='emg_electrode_setting.name')
+    emg_electrode_setting = serializers.ReadOnlyField(
+        source='emg_electrode_setting.name'
+    )
 
     class Meta:
         model = EMGPreamplifierSetting
@@ -318,7 +342,9 @@ class EMGPreamplifierSettingSerializer(serializers.ModelSerializer):
 
 
 class EMGAmplifierSettingSerializer(serializers.ModelSerializer):
-    emg_electrode_setting = serializers.ReadOnlyField(source='emg_electrode_setting.name')
+    emg_electrode_setting = serializers.ReadOnlyField(
+        source='emg_electrode_setting.name'
+    )
 
     class Meta:
         model = EMGAmplifierSetting
@@ -326,7 +352,9 @@ class EMGAmplifierSettingSerializer(serializers.ModelSerializer):
 
 
 class EMGPreamplifierFilterSettingSerializer(serializers.ModelSerializer):
-    emg_electrode_setting = serializers.ReadOnlyField(source='emg_electrode_setting.name')
+    emg_electrode_setting = serializers.ReadOnlyField(
+        source='emg_electrode_setting.name'
+    )
 
     class Meta:
         model = EMGPreamplifierFilterSetting
@@ -337,7 +365,9 @@ class EMGPreamplifierFilterSettingSerializer(serializers.ModelSerializer):
 
 
 class EMGAnalogFilterSettingSerializer(serializers.ModelSerializer):
-    emg_electrode_setting = serializers.ReadOnlyField(source='emg_electrode_setting.name')
+    emg_electrode_setting = serializers.ReadOnlyField(
+        source='emg_electrode_setting.name'
+    )
 
     class Meta:
         model = EMGAnalogFilterSetting
@@ -348,11 +378,16 @@ class EMGAnalogFilterSettingSerializer(serializers.ModelSerializer):
 
 
 class EMGElectrodePlacementSettingSerializer(serializers.ModelSerializer):
-    emg_electrode_setting = serializers.ReadOnlyField(source='emg_electrode_setting.name')
+    emg_electrode_setting = serializers.ReadOnlyField(
+        source='emg_electrode_setting.name'
+    )
 
     class Meta:
         model = EMGElectrodePlacementSetting
-        fields = ('emg_electrode_setting', 'emg_electrode_placement', 'muscle_side', 'muscle_name', 'remarks')
+        fields = (
+            'emg_electrode_setting', 'emg_electrode_placement',
+            'muscle_side', 'muscle_name', 'remarks'
+        )
 
 
 class EMGSurfacePlacementSerializer(serializers.ModelSerializer):
@@ -458,7 +493,9 @@ class TMSDeviceSettingSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = TMSDeviceSetting
-        fields = ('tms_setting', 'tms_device', 'pulse_stimulus_type', 'coil_model')
+        fields = (
+            'tms_setting', 'tms_device', 'pulse_stimulus_type', 'coil_model'
+        )
 
 
 class ContextTreeSerializer(serializers.ModelSerializer):
@@ -466,7 +503,10 @@ class ContextTreeSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ContextTree
-        fields = ('id', 'experiment', 'name', 'description', 'setting_text', 'setting_file')
+        fields = (
+            'id', 'experiment', 'name', 'description', 'setting_text',
+            'setting_file'
+        )
 
 
 class ClassificationOfDiseasesSerializer(serializers.Serializer):
@@ -479,9 +519,9 @@ class ClassificationOfDiseasesSerializer(serializers.Serializer):
 
 class GroupSerializer(serializers.ModelSerializer):
     experiment = serializers.ReadOnlyField(source='experiment.title')
-    inclusion_criteria = ClassificationOfDiseasesSerializer(many=True,
-                                                            read_only=False)
-
+    inclusion_criteria = ClassificationOfDiseasesSerializer(
+        many=True, read_only=False
+    )
     class Meta:
         model = Group
         fields = ('id', 'title', 'description', 'experiment',
@@ -703,14 +743,15 @@ class GoalkeeperGameStepSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = GoalkeeperGame
-        fields = ('id', 'group', 'identification', 'description',
-                  'duration_value', 'duration_unit', 'numeration',
-                  'type', 'parent', 'order',
-                  'number_of_repetitions',
-                  'interval_between_repetitions_value',
-                  'interval_between_repetitions_unit',
-                  'random_position',
-                  'software_name', 'software_description', 'software_version', 'context_tree')
+        fields = (
+            'id', 'group', 'identification', 'description',
+            'duration_value', 'duration_unit', 'numeration', 'type',
+            'parent', 'order','number_of_repetitions',
+            'interval_between_repetitions_value',
+            'interval_between_repetitions_unit', 'random_position',
+            'software_name', 'software_description', 'software_version',
+            'context_tree'
+        )
 
 
 class SetOfStepSerializer(serializers.ModelSerializer):
@@ -718,14 +759,14 @@ class SetOfStepSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = SetOfStep
-        fields = ('id', 'group', 'identification', 'description',
-                  'duration_value', 'duration_unit', 'numeration',
-                  'type', 'parent', 'order',
-                  'number_of_repetitions',
-                  'interval_between_repetitions_value',
-                  'interval_between_repetitions_unit',
-                  'random_position',
-                  'number_of_mandatory_steps', 'is_sequential')
+        fields = (
+            'id', 'group', 'identification', 'description',
+            'duration_value', 'duration_unit', 'numeration', 'type',
+            'parent', 'order', 'number_of_repetitions',
+            'interval_between_repetitions_value',
+            'interval_between_repetitions_unit', 'random_position',
+            'number_of_mandatory_steps', 'is_sequential'
+        )
 
 
 class QuestionnaireStepSerializer(serializers.ModelSerializer):
@@ -733,14 +774,13 @@ class QuestionnaireStepSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Questionnaire
-        fields = ('id', 'group', 'identification', 'description',
-                  'duration_value', 'duration_unit', 'numeration',
-                  'type', 'parent', 'order',
-                  'number_of_repetitions',
-                  'interval_between_repetitions_value',
-                  'interval_between_repetitions_unit',
-                  'random_position',
-                  'code')
+        fields = (
+            'id', 'group', 'identification', 'description',
+            'duration_value', 'duration_unit', 'numeration', 'type',
+            'parent', 'order', 'number_of_repetitions',
+            'interval_between_repetitions_value',
+            'interval_between_repetitions_unit', 'random_position', 'code'
+        )
 
 
 class QuestionnaireLanguageSerializer(serializers.ModelSerializer):
@@ -749,8 +789,10 @@ class QuestionnaireLanguageSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = QuestionnaireLanguage
-        fields = ('id', 'questionnaire', 'language_code', 'survey_name',
-                  'survey_metadata', 'is_default')
+        fields = (
+            'id', 'questionnaire', 'language_code', 'survey_name',
+            'survey_metadata', 'is_default'
+        )
 
     def create(self, validated_data):
         validated_data.pop('is_default')
@@ -784,10 +826,11 @@ class EEGDataSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = EEGData
-        fields = ('id',
-                  'step', 'participant', 'date', 'time',
-                  'description', 'file_format',
-                  'eeg_setting', 'eeg_cap_size', 'eeg_setting_reason_for_change', 'files')
+        fields = (
+            'id', 'step', 'participant', 'date', 'time', 'description',
+            'file_format', 'eeg_setting', 'eeg_cap_size',
+            'eeg_setting_reason_for_change', 'files'
+        )
 
     def create(self, validated_data):
         eeg_data = EEGData.objects.create(
@@ -831,7 +874,8 @@ class EMGDataSerializer(serializers.ModelSerializer):
             description=validated_data['description'],
             file_format=validated_data['file_format'],
             emg_setting=validated_data['emg_setting'],
-            emg_setting_reason_for_change=validated_data['emg_setting_reason_for_change'])
+            emg_setting_reason_for_change=
+            validated_data['emg_setting_reason_for_change'])
 
         if 'files' in self.initial_data:
             files = self.initial_data['files']
@@ -847,16 +891,20 @@ class TMSDataSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = TMSData
-        fields = ('id',
-                  'step', 'participant', 'date', 'time',
-                  'tms_setting', 'resting_motor_threshold', 'test_pulse_intensity_of_simulation',
-                  'second_test_pulse_intensity', 'interval_between_pulses', 'interval_between_pulses_unit',
-                  'time_between_mep_trials', 'time_between_mep_trials_unit', 'repetitive_pulse_frequency',
-                  'coil_orientation', 'coil_orientation_angle', 'direction_of_induced_current', 'description',
-                  'hotspot_name', 'coordinate_x', 'coordinate_y', 'hot_spot_map',
-                  'localization_system_name', 'localization_system_description', 'localization_system_image',
-                  'brain_area_name', 'brain_area_description',
-                  'brain_area_system_name', 'brain_area_system_description')
+        fields = (
+            'id', 'step', 'participant', 'date', 'time', 'tms_setting',
+            'resting_motor_threshold', 'test_pulse_intensity_of_simulation',
+            'second_test_pulse_intensity', 'interval_between_pulses',
+            'interval_between_pulses_unit', 'time_between_mep_trials',
+            'time_between_mep_trials_unit', 'repetitive_pulse_frequency',
+            'coil_orientation', 'coil_orientation_angle',
+            'direction_of_induced_current', 'description', 'hotspot_name',
+            'coordinate_x', 'coordinate_y', 'hot_spot_map',
+            'localization_system_name', 'localization_system_description',
+            'localization_system_image', 'brain_area_name',
+            'brain_area_description', 'brain_area_system_name',
+            'brain_area_system_description'
+        )
 
 
 class GoalkeeperGameDataSerializer(serializers.ModelSerializer):
@@ -941,7 +989,8 @@ class GenericDataCollectionDataSerializer(serializers.ModelSerializer):
             date=validated_data['date'],
             time=validated_data['time'],
             description=validated_data['description'],
-            file_format=validated_data['file_format'])
+            file_format=validated_data['file_format']
+        )
 
         if 'files' in self.initial_data:
             files = self.initial_data['files']
@@ -1017,14 +1066,14 @@ class ExperimentViewSet(viewsets.ModelViewSet):
             nes_id=nes_id, version=exp_version
         ).values('id')[0]
         # TODO:
-        # the download file building is been made whenever an
+        # 1) The download file building is been made whenever an
         # experiment is updated. We want to build it only when the
         # experiment status change from "Receiving" to "To be
         # analysed", other attributes remaining the same.
         # Ok by now, as the only situation where the experiment is
         # updated by NES API client is precisely when the NES change
-        # status from "Receiving" to "To be analysed"
-        # see wy celery delay is not working. Commented by now.
+        # status from "Receiving" to "To be analysed";
+        # 2) See wy celery delay is not working. Commented by now.
         #build_download_file.delay(int(experiment['id']), template_name="")
         build_download_file(int(experiment['id']), template_name="")
 
@@ -1188,7 +1237,8 @@ class EEGSettingViewSet(viewsets.ModelViewSet):
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
 
     def get_queryset(self):
-        if 'experiment_nes_id' in self.kwargs and (self.request.user != AnonymousUser()):
+        if 'experiment_nes_id' in self.kwargs and \
+                (self.request.user != AnonymousUser()):
             experiment = Experiment.objects.filter(
                 nes_id=self.kwargs['experiment_nes_id'],
                 owner=self.request.user
@@ -1225,7 +1275,9 @@ class EEGAmplifierSettingViewSet(viewsets.ModelViewSet):
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
 
     def get_queryset(self):
-        return EEGAmplifierSetting.objects.filter(eeg_setting_id=self.kwargs['pk'])
+        return EEGAmplifierSetting.objects.filter(
+            eeg_setting_id=self.kwargs['pk']
+        )
 
     def perform_create(self, serializer):
         eeg_setting = EEGSetting.objects.get(pk=self.kwargs['pk'])
@@ -1249,7 +1301,9 @@ class EEGFilterSettingViewSet(viewsets.ModelViewSet):
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
 
     def get_queryset(self):
-        return EEGFilterSetting.objects.filter(eeg_setting_id=self.kwargs['pk'])
+        return EEGFilterSetting.objects.filter(
+            eeg_setting_id=self.kwargs['pk']
+        )
 
     def perform_create(self, serializer):
         eeg_setting = EEGSetting.objects.get(pk=self.kwargs['pk'])
@@ -1295,7 +1349,9 @@ class IntramuscularElectrodeViewSet(viewsets.ModelViewSet):
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
 
     def get_queryset(self):
-        return IntramuscularElectrode.objects.filter(group_id=self.kwargs['pk'])
+        return IntramuscularElectrode.objects.filter(
+            group_id=self.kwargs['pk']
+        )
 
     def perform_create(self, serializer):
         serializer.save()
@@ -1306,7 +1362,9 @@ class EEGElectrodeLocalizationSystemViewSet(viewsets.ModelViewSet):
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
 
     def get_queryset(self):
-        return EEGElectrodeLocalizationSystem.objects.filter(eeg_setting_id=self.kwargs['pk'])
+        return EEGElectrodeLocalizationSystem.objects.filter(
+            eeg_setting_id=self.kwargs['pk']
+        )
 
     def perform_create(self, serializer):
         eeg_setting = EEGSetting.objects.get(pk=self.kwargs['pk'])
@@ -1318,11 +1376,17 @@ class EEGElectrodePositionViewSet(viewsets.ModelViewSet):
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
 
     def get_queryset(self):
-        return EEGElectrodePosition.objects.filter(eeg_electrode_localization_system_id=self.kwargs['pk'])
+        return EEGElectrodePosition.objects.filter(
+            eeg_electrode_localization_system_id=self.kwargs['pk']
+        )
 
     def perform_create(self, serializer):
-        eeg_electrode_localization_system = EEGElectrodeLocalizationSystem(pk=self.kwargs['pk'])
-        serializer.save(eeg_electrode_localization_system=eeg_electrode_localization_system)
+        eeg_electrode_localization_system = EEGElectrodeLocalizationSystem(
+            pk=self.kwargs['pk']
+        )
+        serializer.save(
+            eeg_electrode_localization_system=eeg_electrode_localization_system
+        )
 
 
 class EMGSettingViewSet(viewsets.ModelViewSet):
@@ -1331,7 +1395,8 @@ class EMGSettingViewSet(viewsets.ModelViewSet):
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
 
     def get_queryset(self):
-        if 'experiment_nes_id' in self.kwargs and (self.request.user != AnonymousUser()):
+        if 'experiment_nes_id' in self.kwargs and \
+                (self.request.user != AnonymousUser()):
             experiment = Experiment.objects.filter(
                 nes_id=self.kwargs['experiment_nes_id'],
                 owner=self.request.user
@@ -1357,7 +1422,9 @@ class EMGDigitalFilterSettingViewSet(viewsets.ModelViewSet):
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
 
     def get_queryset(self):
-        return EMGDigitalFilterSetting.objects.filter(emg_setting_id=self.kwargs['pk'])
+        return EMGDigitalFilterSetting.objects.filter(
+            emg_setting_id=self.kwargs['pk']
+        )
 
     def perform_create(self, serializer):
         emg_setting = EMGSetting.objects.get(pk=self.kwargs['pk'])
@@ -1380,7 +1447,9 @@ class EMGADConverterSettingViewSet(viewsets.ModelViewSet):
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
 
     def get_queryset(self):
-        return EMGADConverterSetting.objects.filter(emg_setting_id=self.kwargs['pk'])
+        return EMGADConverterSetting.objects.filter(
+            emg_setting_id=self.kwargs['pk']
+        )
 
     def perform_create(self, serializer):
         emg_setting = EMGSetting.objects.get(pk=self.kwargs['pk'])
@@ -1392,7 +1461,9 @@ class EMGElectrodeSettingViewSet(viewsets.ModelViewSet):
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
 
     def get_queryset(self):
-        return EMGElectrodeSetting.objects.filter(emg_setting_id=self.kwargs['pk'])
+        return EMGElectrodeSetting.objects.filter(
+            emg_setting_id=self.kwargs['pk']
+        )
 
     def perform_create(self, serializer):
         emg_setting = EMGSetting.objects.get(pk=self.kwargs['pk'])
@@ -1407,7 +1478,9 @@ class EMGPreamplifierSettingViewSet(viewsets.ModelViewSet):
         return EMGPreamplifierSetting.objects.filter(id=self.kwargs['pk'])
 
     def perform_create(self, serializer):
-        emg_electrode_setting = EMGElectrodeSetting.objects.get(pk=self.kwargs['pk'])
+        emg_electrode_setting = EMGElectrodeSetting.objects.get(
+            pk=self.kwargs['pk']
+        )
         serializer.save(emg_electrode_setting=emg_electrode_setting)
 
 
@@ -1419,7 +1492,9 @@ class EMGAmplifierSettingViewSet(viewsets.ModelViewSet):
         return EMGAmplifierSetting.objects.filter(id=self.kwargs['pk'])
 
     def perform_create(self, serializer):
-        emg_electrode_setting = EMGElectrodeSetting.objects.get(pk=self.kwargs['pk'])
+        emg_electrode_setting = EMGElectrodeSetting.objects.get(
+            pk=self.kwargs['pk']
+        )
         serializer.save(emg_electrode_setting=emg_electrode_setting)
 
 
@@ -1428,10 +1503,14 @@ class EMGPreamplifierFilterSettingViewSet(viewsets.ModelViewSet):
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
 
     def get_queryset(self):
-        return EMGPreamplifierFilterSetting.objects.filter(id=self.kwargs['pk'])
+        return EMGPreamplifierFilterSetting.objects.filter(
+            id=self.kwargs['pk']
+        )
 
     def perform_create(self, serializer):
-        emg_preamplifier_setting = EMGPreamplifierSetting.objects.get(pk=self.kwargs['pk'])
+        emg_preamplifier_setting = EMGPreamplifierSetting.objects.get(
+            pk=self.kwargs['pk']
+        )
         serializer.save(emg_preamplifier_setting=emg_preamplifier_setting)
 
 
@@ -1443,7 +1522,9 @@ class EMGAnalogFilterSettingViewSet(viewsets.ModelViewSet):
         return EMGAnalogFilterSetting.objects.filter(id=self.kwargs['pk'])
 
     def perform_create(self, serializer):
-        emg_amplifier_setting = EMGAmplifierSetting.objects.get(pk=self.kwargs['pk'])
+        emg_amplifier_setting = EMGAmplifierSetting.objects.get(
+            pk=self.kwargs['pk']
+        )
         serializer.save(emg_amplifier_setting=emg_amplifier_setting)
 
 
@@ -1452,10 +1533,14 @@ class EMGElectrodePlacementSettingViewSet(viewsets.ModelViewSet):
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
 
     def get_queryset(self):
-        return EMGElectrodePlacementSetting.objects.filter(id=self.kwargs['pk'])
+        return EMGElectrodePlacementSetting.objects.filter(
+            id=self.kwargs['pk']
+        )
 
     def perform_create(self, serializer):
-        emg_electrode_setting = EMGElectrodeSetting.objects.get(pk=self.kwargs['pk'])
+        emg_electrode_setting = EMGElectrodeSetting.objects.get(
+            pk=self.kwargs['pk']
+        )
         serializer.save(emg_electrode_setting=emg_electrode_setting)
 
 
@@ -1498,7 +1583,8 @@ class TMSSettingViewSet(viewsets.ModelViewSet):
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
 
     def get_queryset(self):
-        if 'experiment_nes_id' in self.kwargs and (self.request.user != AnonymousUser()):
+        if 'experiment_nes_id' in self.kwargs and \
+                (self.request.user != AnonymousUser()):
             experiment = Experiment.objects.filter(
                 nes_id=self.kwargs['experiment_nes_id'],
                 owner=self.request.user
@@ -1546,7 +1632,9 @@ class TMSDeviceSettingViewSet(viewsets.ModelViewSet):
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
 
     def get_queryset(self):
-        return TMSDeviceSetting.objects.filter(tms_setting_id=self.kwargs['pk'])
+        return TMSDeviceSetting.objects.filter(
+            tms_setting_id=self.kwargs['pk']
+        )
 
     def perform_create(self, serializer):
         tms_setting = TMSSetting.objects.get(pk=self.kwargs['pk'])
@@ -1559,7 +1647,8 @@ class ContextTreeViewSet(viewsets.ModelViewSet):
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
 
     def get_queryset(self):
-        if 'experiment_nes_id' in self.kwargs and (self.request.user != AnonymousUser()):
+        if 'experiment_nes_id' in self.kwargs and \
+                (self.request.user != AnonymousUser()):
             experiment = Experiment.objects.filter(
                 nes_id=self.kwargs['experiment_nes_id'],
                 owner=self.request.user
@@ -1681,7 +1770,9 @@ class TaskForExperimenterStepViewSet(viewsets.ModelViewSet):
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
 
     def get_queryset(self):
-        return TaskForTheExperimenter.objects.filter(group_id=self.kwargs['pk'])
+        return TaskForTheExperimenter.objects.filter(
+            group_id=self.kwargs['pk']
+        )
 
     def perform_create(self, serializer):
         group = Group.objects.get(pk=self.kwargs['pk'])

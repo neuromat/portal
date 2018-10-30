@@ -16,7 +16,6 @@ from django.template.loader import render_to_string
 from django.utils.text import slugify
 from django.utils.translation import activate, LANGUAGE_SESSION_KEY, \
     ugettext as _
-from django.template.defaultfilters import slugify
 
 from haystack.generic_views import SearchView
 
@@ -203,7 +202,7 @@ def home_page(request):
 
 
 def experiment_detail(request, slug):
-    # will be None if home contains the list for common user
+    # will be None if home contains the list for user not logged in
     to_be_analysed_count = None
     if request.user.is_authenticated and \
             request.user.groups.filter(name='trustees').exists():

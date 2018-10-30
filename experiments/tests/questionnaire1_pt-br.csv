@@ -31,4 +31,5 @@ questionnaire_code,questionnaire_title,question_group,question_type,question_typ
 599846,INDC - Avaliação de Entrada,Segundo Grupo,M,Multiple choice,lisdispositivo2,lisdispositivo2,Qual(is)?,1,Tipóia,,, , 
 599846,INDC - Avaliação de Entrada,Segundo Grupo,M,Multiple choice,lisdispositivo2,lisdispositivo2,Qual(is)?,2,Suporte de ombro,,, , 
 599846,INDC - Avaliação de Entrada,Segundo Grupo,M,Multiple choice,lisdispositivo2,lisdispositivo2,Qual(is)?,3,Órtese de posicionamento de punho e dedos,,, , 
-599846,INDC - Avaliação de Entrada,Segundo Grupo,M,Multiple choice,lisdispositivo2,lisdispositivo2,Qual(is)?,4,Órtese de posicionamento de dedos,,, , 
+599846,INDC - Avaliação de Entrada,Segundo Grupo,M,Multiple choice,lisdispositivo2,lisdispositivo2,Qual(is)?,4,Órtese de posicionamento de dedos,,, ,
+599846,INDC - Avaliação de Entrada,Segundo Grupo,X,Text display,testdisplay,testdisplay,Texto mostrado ao participante,,,,, ,

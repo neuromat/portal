@@ -9,11 +9,11 @@ from experiments.models import Experiment, Study, Group, Researcher, \
     Questionnaire
 # python manage.py shell < experiments/tests/faker_populator.py
 # TODO: when executing from bash command line, final line identifier breaks
-# imports. We are kepping in Collaborator in same line
+# imports. Kepping in Collaborator in same line.
 from experiments.models import Gender, ClassificationOfDiseases, Keyword, \
     Step, TMSSetting, TMSDevice, CoilModel, TMSDeviceSetting
 from experiments.tests.tests_helper import create_classification_of_deseases, \
-    create_questionnaire
+    create_questionnaire, create_researcher
 from experiments.tests.tests_helper import create_experimental_protocol
 from experiments.tests.tests_helper import create_group, \
     create_ethics_committee_info, create_step, create_tms_setting, \
@@ -154,12 +154,9 @@ researcher.save()
 
 # Create study collaborators (requires creating studies before)
 for study in Study.objects.all():
-    create_study_collaborator(randint(2, 3), study)
+    create_researcher(study, 'Pero', 'Vaz')
 # To test search (necessary to approve experiment(s) in front-end or
 # directly in database)
-collaborator = Collaborator.objects.last()
-collaborator.name = 'Pero Vaz'
-collaborator.save()
 
 # Create some keywords to associate with studies
 create_keyword(10)

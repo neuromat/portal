@@ -7,19 +7,18 @@ from django.test import TestCase, override_settings
 from django.core.exceptions import ValidationError
 from django.contrib.auth.models import User
 from datetime import datetime
-from random import randint, choice
-from faker import Factory
+from random import choice
 
 from experiments.models import Experiment, Study, Group, Researcher, \
     RejectJustification, Publication, ExperimentalProtocol, Step, \
     StepAdditionalFile, Gender, File, Participant, ExperimentResearcher
 from experiments.tests.tests_helper import global_setup_ut, apply_setup, \
     create_experiment, create_group, create_binary_file, create_eeg_setting, \
-    create_eeg_electrode_localization_system, create_context_tree, create_step, \
-    create_stimulus_step, create_experimental_protocol, create_tms_setting, \
-    create_tms_data, create_participant, create_genders, create_eeg_data, \
-    create_eeg_step, create_emg_step, create_emg_setting, create_emg_data, \
-    create_goalkeepergame_step, create_goalkeeper_game_data, \
+    create_eeg_electrode_localization_system, create_context_tree, \
+    create_step, create_stimulus_step, create_experimental_protocol, \
+    create_tms_setting, create_tms_data, create_participant, create_genders,\
+    create_eeg_data, create_eeg_step, create_emg_step, create_emg_setting,\
+    create_emg_data, create_goalkeepergame_step, create_goalkeeper_game_data, \
     create_generic_data_collection_step, create_generic_data_collection_data, \
     create_additional_data, create_emg_electrode_placement, create_owner, \
     create_study, create_next_version_experiment
@@ -77,7 +76,7 @@ class ResearcherModelTest(TestCase):
         self.assertEqual(researcher.first_name, '')
         self.assertEqual(researcher.last_name, '')
         self.assertEqual(researcher.email, '')
-        self.assertEqual(researcher.citation_name,'')
+        self.assertEqual(researcher.citation_name, '')
 
     def test_researcher_is_related_to_one_study(self):
         study = Study.objects.last()
@@ -95,7 +94,7 @@ class ResearcherModelTest(TestCase):
         self.assertEqual(researcher.__str__(), 'de TAL, Fulano')
 
     def test_researcher_citation_without_citation_name(self):
-        researcher = Researcher(first_name='Fulano',last_name='de Tal')
+        researcher = Researcher(first_name='Fulano', last_name='de Tal')
         self.assertEqual(researcher.__str__(), 'de Tal, Fulano')
 
     # TODO: test cannot save researcher without study
@@ -339,13 +338,22 @@ class ExperimentResearcherModel(TestCase):
             experiment_researcher.full_clean()
 
     def test_experiment_researcher_citation_name_overlap_first_and_last_name(self):
-        experiment_researcher = ExperimentResearcher(citation_name='ULIANOV, Vladimir I.')
-        self.assertEqual(experiment_researcher.__str__(), 'ULIANOV, Vladimir I.')
+        experiment_researcher = ExperimentResearcher(
+            citation_name='ULIANOV, Vladimir I.'
+        )
+        # TODO: not necessary __str__
+        self.assertEqual(
+            experiment_researcher.__str__(), 'ULIANOV, Vladimir I.'
+        )
 
     def test_experiment_researcher_citation_without_citation_name(self):
-        experiment_researcher = ExperimentResearcher(first_name='Vladimir', last_name='Ilyich Ulianov')
-        self.assertEqual(experiment_researcher.__str__(), 'Ilyich Ulianov, Vladimir')
-
+        experiment_researcher = ExperimentResearcher(
+            first_name='Vladimir', last_name='Ilyich Ulianov'
+        )
+        # TODO: not necessary __str__
+        self.assertEqual(
+            experiment_researcher.__str__(), 'Ilyich Ulianov, Vladimir'
+        )
 
 
 @apply_setup(global_setup_ut)
@@ -596,7 +604,9 @@ class GenericDataCollectionDataModel(TestCase):
             generic_data_collection_step, model_instances_dict['participant']
         )
 
-        files_collected = create_file_collected(2, generic_data_collection_data)
+        files_collected = create_file_collected(
+            2, generic_data_collection_data
+        )
 
         generic_data_collection_data.delete()
         self.assertFalse(File.objects.exists())

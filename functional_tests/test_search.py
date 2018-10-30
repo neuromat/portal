@@ -447,13 +447,13 @@ class SearchTest(FunctionalTest):
         # EEG and EMG
         search_box = self.browser.find_element_by_id('id_q')
         search_box.send_keys('Brachial Plexus')
-        self.browser.find_element_by_id('filter_box').click()
+        self.browser.find_element_by_id('filter_box').send_keys(Keys.ENTER)
         self.browser.find_element_by_xpath(
             "//select/option[@value='" + Step.EEG + "']"
-        ).click()
+        ).send_keys(Keys.ENTER)
         self.browser.find_element_by_xpath(
             "//select/option[@value='" + Step.EMG + "']"
-        ).click()
+        ).send_keys(Keys.ENTER)
         self.browser.find_element_by_id('submit_terms').click()
         time.sleep(2)
 

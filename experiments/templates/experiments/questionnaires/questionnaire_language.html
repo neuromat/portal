@@ -22,11 +22,17 @@
                         {% for data in question_group_values.data %}
                             <ul>
                                 <li>{{ data.question_description }}</li>
-                                {% if data.question_limesurvey_type == 'F' %}
+                                {% if data.question_limesurvey_type == 'F' or data.question_limesurvey_type == '1' or data.question_limesurvey_type == 'H' %}
                                     {% include 'experiments/questionnaires/f_type.html' %}
                                 {% elif data.question_limesurvey_type == 'L' %}
                                     {% include 'experiments/questionnaires/l_type.html' %}
-                                {% elif data.question_limesurvey_type == 'M' or data.question_limesurvey_type == 'B' or data.question_limesurvey_type == 'P' %}
+                                {% elif data.question_limesurvey_type == 'M' or data.question_limesurvey_type == 'B' or data.question_limesurvey_type == 'P' or data.question_limesurvey_type == 'A' or data.question_limesurvey_type == ';' %}
+                                    {% if data.question_limesurvey_type == 'A' %}
+                                        <em>{% trans "(For each subquestion the participant chooses a level from 1 to 5 or no level)" %}</em><br>
+                                    {% endif %}
+                                    {% if data.question_limesurvey_type == ';' %}
+                                        <em>{% trans "(The question is a matrix based on the following fields)" %}</em><br>
+                                    {% endif %}
                                     {% include 'experiments/questionnaires/m_type.html' %}
                                 {% elif data.question_limesurvey_type == 'D' %}
                                     <p>
@@ -38,12 +44,24 @@
                                     </p>
                                 {% elif data.question_limesurvey_type == 'Y' %}
                                     <p>
-                                        <em>{% trans 'The user answers' %}</em> yes <em>or</em> not
+                                        <em>{% trans "The user answers" %}</em> yes <em>or</em> not
                                     </p>
-                                {% else %}
+                                {% elif data.question_limesurvey_type == 'X' %}
+                                    <p>
+                                        <em>{% trans "A text is displayed to the participant (user does not answer this question)" %}</em>
+                                    </p>
+                                {% elif data.question_limesurvey_type == 'T' %}
                                     <p>
                                         <em>{% trans "The user enters a free text" %}</em>
                                     </p>
+                                {% elif data.question_limesurvey_type == 'N' %}
+                                    <p>
+                                        <em>{% trans "Participant answers with a numerical value" %}</em>
+                                    </p>
+{#                                {% else %}#}
+{#                                    <p>#}
+{#                                        <em>{% trans "The user enters a free text" %}</em>#}
+{#                                    </p>#}
                                 {% endif %}
                             </ul>
                         {% endfor %}

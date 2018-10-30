@@ -163,7 +163,7 @@ def download_view(request, experiment_id):
                 )
         if pattern_questionnaires.match(item):
             # Add Per_questionnaire_data subdir for the specific group in temp
-            # dir.
+            # dir
             try:
                 shutil.copytree(os.path.join(
                     settings.MEDIA_ROOT, 'download', str(experiment.id),
@@ -177,7 +177,7 @@ def download_view(request, experiment_id):
                     reverse('experiment-detail',
                             kwargs={'slug': experiment.slug})
                 )
-            # add Participants.csv file for the specific group in temp dir.
+            # add Participants.csv file for the specific group in temp dir
             try:
                 shutil.copyfile(os.path.join(
                     settings.MEDIA_ROOT, 'download', str(experiment.id),
@@ -241,8 +241,8 @@ def download_view(request, experiment_id):
     compressed_file = shutil.make_archive(os.path.join(
         tempfile.mkdtemp(), 'download'), 'zip', temp_dir
     )
-    # workaround to unit test serving compressed file
-    if 'test' in sys.argv or 'runserver' in sys.argv:
+    # workaround to unit test serving compressed file, besides jenkins
+    if 'test' in sys.argv or 'runserver' or 'jenkins' in sys.argv:
         file = open(os.path.join(temp_dir, compressed_file), 'rb')
         response = HttpResponse(file, content_type='application/zip')
         response['Content-Length'] = path.getsize(compressed_file)
