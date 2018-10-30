@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-10-29 12:28-0300\n"
+"POT-Creation-Date: 2018-10-30 17:15-0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -734,29 +734,57 @@ msgstr "Nenhum resultado encontrado"
 msgid "Questionnaire"
 msgstr "Questionário"
 
-#: experiments/templates/experiments/questionnaires/questionnaire_language.html:33
-msgid "The user enters a date in a date field"
-msgstr "O usuário entra com uma data em um campo de data"
+#: experiments/templates/experiments/questionnaires/questionnaire_language.html:31
+msgid ""
+"(For each subquestion the participant chooses a level from 1 to 5 or no "
+"level)"
+msgstr ""
+"(Para cada subquestão, o participante escolhe um nível de 1 a 5 ou nenhum "
+"nível"
 
-#: experiments/templates/experiments/questionnaires/questionnaire_language.html:37
-msgid "The user uploads file(s)"
-msgstr "O usuário carrega um(ns) arquivo(s)"
+#: experiments/templates/experiments/questionnaires/questionnaire_language.html:34
+msgid "(This question is a matrix based on the following fields)"
+msgstr "(Esta questão é uma matriz baseada nas seguintes opções)"
 
-#: experiments/templates/experiments/questionnaires/questionnaire_language.html:41
-msgid "The user answers"
-msgstr "O usuário responde"
+#: experiments/templates/experiments/questionnaires/questionnaire_language.html:39
+msgid "Participant enters a date in a date field"
+msgstr "O participante entra com uma data em um campo de data"
 
-#: experiments/templates/experiments/questionnaires/questionnaire_language.html:45
+#: experiments/templates/experiments/questionnaires/questionnaire_language.html:43
+msgid "Participant uploads file(s)"
+msgstr "O participante carrega um(ns) arquivo(s)"
+
+#: experiments/templates/experiments/questionnaires/questionnaire_language.html:47
+msgid "Participant answers"
+msgstr "O participante responde"
+
+#: experiments/templates/experiments/questionnaires/questionnaire_language.html:47
+msgid "yes"
+msgstr "sim"
+
+#: experiments/templates/experiments/questionnaires/questionnaire_language.html:47
+msgid "or"
+msgstr "ou"
+
+#: experiments/templates/experiments/questionnaires/questionnaire_language.html:47
+msgid "not"
+msgstr "não"
+
+#: experiments/templates/experiments/questionnaires/questionnaire_language.html:51
 msgid ""
 "A text is displayed to the participant (user does not answer this question)"
 msgstr ""
 "Um texto é mostrado ao participante (o usuário não responde esta questão)"
 
-#: experiments/templates/experiments/questionnaires/questionnaire_language.html:49
-msgid "The user enters a free text"
-msgstr "O usuário entra com um texto livre"
+#: experiments/templates/experiments/questionnaires/questionnaire_language.html:55
+msgid "Participant enters a free text"
+msgstr "O participante entra com um texto livre"
 
-#: experiments/templates/experiments/questionnaires/questionnaire_language.html:61
+#: experiments/templates/experiments/questionnaires/questionnaire_language.html:59
+msgid "Participant answers with a numerical value"
+msgstr "O participante responde com um valor numérico"
+
+#: experiments/templates/experiments/questionnaires/questionnaire_language.html:75
 msgid ""
 "The questionnaire in this language is in invalid format, and can't be "
 "displayed"
@@ -811,7 +839,7 @@ msgstr "Esqueçeu sua senha?"
 
 #: experiments/templates/registration/password_reset_complete.html:16
 msgid "Your password has been set.  You may go ahead and log in now."
-msgstr ""
+msgstr "Sua senha está definida. Você pode entrar no sistema agora."
 
 #: experiments/templates/registration/password_reset_complete.html:17
 #, fuzzy
@@ -824,18 +852,20 @@ msgid ""
 "Please enter your new password twice so we can verify you typed it in "
 "correctly."
 msgstr ""
+"Por favor entre com sua nova senha duas vezes para que possamos "
+"verificaração."
 
 #: experiments/templates/registration/password_reset_confirm.html:22
 #, fuzzy
 #| msgid "Forgot password?"
 msgid "New password:"
-msgstr "Esqueçeu sua senha?"
+msgstr "Nova senha:"
 
 #: experiments/templates/registration/password_reset_confirm.html:28
 #, fuzzy
 #| msgid "Forgot password?"
 msgid "Confirm password:"
-msgstr "Esqueçeu sua senha?"
+msgstr "Confirme a senha:"
 
 #: experiments/templates/registration/password_reset_confirm.html:33
 #, fuzzy
@@ -1589,6 +1619,9 @@ msgstr ""
 #: experiments/views.py:457
 msgid "The experiment's slug was modified"
 msgstr "O \"slug\" do experimento foi alterado"
+
+#~ msgid "The user answers"
+#~ msgstr "O usuário responde"
 
 #~ msgid "collaborators"
 #~ msgstr "colaboradores"
