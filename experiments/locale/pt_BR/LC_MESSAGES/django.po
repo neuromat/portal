@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-10-30 17:15-0300\n"
+"POT-Creation-Date: 2018-10-30 18:40-0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -784,7 +784,12 @@ msgstr "O participante entra com um texto livre"
 msgid "Participant answers with a numerical value"
 msgstr "O participante responde com um valor numérico"
 
-#: experiments/templates/experiments/questionnaires/questionnaire_language.html:75
+#: experiments/templates/experiments/questionnaires/questionnaire_language.html:63
+msgid "Participant chooses a level from 1 to 5 or no level"
+msgstr ""
+"O participante escolhe um nível de 1 a 5 ou nenhum nível"
+
+#: experiments/templates/experiments/questionnaires/questionnaire_language.html:79
 msgid ""
 "The questionnaire in this language is in invalid format, and can't be "
 "displayed"

@@ -498,6 +498,7 @@ class ExperimentDetailTest(FunctionalTest):
             '(This question is a matrix based on the following fields)',
             questionnaires_content
         )
+        self.assertIn('Five Point Choice', questionnaires_content)
 
         ##
         # asserts for questions that has no metadata subquestions/answers
@@ -512,6 +513,10 @@ class ExperimentDetailTest(FunctionalTest):
         )
         self.assertIn(
             'Participant answers with a numerical value',
+            questionnaires_content
+        )
+        self.assertIn(
+            'Participant chooses a level from 1 to 5 or no level',
             questionnaires_content
         )
 

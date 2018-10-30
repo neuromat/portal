@@ -286,7 +286,7 @@ class ExperimentDetailTest(TestCase):
         self.assertIn('Questão Array dual scale', response.content.decode())
         self.assertIn('Subquestion 2', response.content.decode())
         self.assertIn('Answer 1', response.content.decode())
-        # asserts for array (5 point choice)
+        # asserts for array (5 point choice) question type
         self.assertIn(
             'Questão Array (5 point choice)', response.content.decode()
         )
@@ -330,6 +330,12 @@ class ExperimentDetailTest(TestCase):
         self.assertIn('subquestionSQ002', response.content.decode())
         self.assertIn(
             '(This question is a matrix based on the following fields)',
+            response.content.decode()
+        )
+        # 5 - 5 point choice
+        self.assertIn('Five Point Choice', response.content.decode())
+        self.assertIn(
+            'Participant chooses a level from 1 to 5 or no level',
             response.content.decode()
         )
 
