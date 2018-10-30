@@ -31,20 +31,20 @@
                                         <em>{% trans "(For each subquestion the participant chooses a level from 1 to 5 or no level)" %}</em><br>
                                     {% endif %}
                                     {% if data.question_limesurvey_type == ';' %}
-                                        <em>{% trans "(The question is a matrix based on the following fields)" %}</em><br>
+                                        <em>{% trans "(This question is a matrix based on the following fields)" %}</em><br>
                                     {% endif %}
                                     {% include 'experiments/questionnaires/m_type.html' %}
                                 {% elif data.question_limesurvey_type == 'D' %}
                                     <p>
-                                        <em>{% trans "The user enters a date in a date field" %}.</em>
+                                        <em>{% trans "Participant enters a date in a date field" %}.</em>
                                     </p>
                                 {% elif data.question_limesurvey_type == '|' %}
                                     <p>
-                                        <em>{% trans "The user uploads file(s)" %}.</em>
+                                        <em>{% trans "Participant uploads file(s)" %}.</em>
                                     </p>
                                 {% elif data.question_limesurvey_type == 'Y' %}
                                     <p>
-                                        <em>{% trans "The user answers" %}</em> yes <em>or</em> not
+                                        <em>{% trans "Participant answers" %}</em> {% trans 'yes' %} <em>{% trans 'or' %}</em> {% trans 'not' %}
                                     </p>
                                 {% elif data.question_limesurvey_type == 'X' %}
                                     <p>
@@ -52,7 +52,7 @@
                                     </p>
                                 {% elif data.question_limesurvey_type == 'T' %}
                                     <p>
-                                        <em>{% trans "The user enters a free text" %}</em>
+                                        <em>{% trans "Participant enters a free text" %}</em>
                                     </p>
                                 {% elif data.question_limesurvey_type == 'N' %}
                                     <p>

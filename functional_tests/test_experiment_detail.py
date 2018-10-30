@@ -495,16 +495,16 @@ class ExperimentDetailTest(FunctionalTest):
         self.assertIn('Questão Array (Texts)', questionnaires_content)
         self.assertIn('subquestionSQ002', questionnaires_content)
         self.assertIn(
-            '(The question is a matrix based on the following fields)',
+            '(This question is a matrix based on the following fields)',
             questionnaires_content
         )
 
         ##
         # asserts for questions that has no metadata subquestions/answers
         ##
-        self.assertIn('The user enters a free text', questionnaires_content)
-        self.assertIn('The user uploads file(s)', questionnaires_content)
-        self.assertIn('The user answers yes or not', questionnaires_content)
+        self.assertIn('Participant enters a free text', questionnaires_content)
+        self.assertIn('Participant uploads file(s)', questionnaires_content)
+        self.assertIn('Participant answers yes or not', questionnaires_content)
         self.assertIn(
             'A text is displayed to the participant (user does not answer '
             'this question)',
