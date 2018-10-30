@@ -280,8 +280,6 @@ class ExperimentDetailTest(TestCase):
         self.assertIn('Third Group', response.content.decode())
         self.assertIn('What side of the injury?', response.content.decode())
         self.assertIn('Institution of the Study', response.content.decode())
-        self.assertIn('The user enters a free text',
-                      response.content.decode())
         self.assertIn('Injury type (s):', response.content.decode())
         self.assertIn('Thrombosis', response.content.decode())
         self.assertIn('Attach exams.', response.content.decode())
@@ -302,11 +300,14 @@ class ExperimentDetailTest(TestCase):
         ##
         # Asserts for questions that has no metadata subquestions/answers
         #
-        self.assertIn('The user uploads file(s)',
+        self.assertIn(
+            'Participant enters a free text', response.content.decode()
+        )
+        self.assertIn('Participant uploads file(s)',
                       response.content.decode())
-        self.assertIn('<em>The user answers</em> yes <em>or</em> not',
+        self.assertIn('<em>Participant answers</em> yes <em>or</em> not',
                       response.content.decode())
-        self.assertIn('The user enters a date in a date field',
+        self.assertIn('Participant enters a date in a date field',
                       response.content.decode())
         self.assertIn('A text is displayed to the participant (user does not '
                       'answer this question)',
@@ -328,7 +329,7 @@ class ExperimentDetailTest(TestCase):
         self.assertIn('Questão Array (Texts)', response.content.decode())
         self.assertIn('subquestionSQ002', response.content.decode())
         self.assertIn(
-            '(The question is a matrix based on the following fields)',
+            '(This question is a matrix based on the following fields)',
             response.content.decode()
         )
 
