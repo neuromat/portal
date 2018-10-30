@@ -274,10 +274,8 @@ class ExperimentDetailTest(TestCase):
                       response.content.decode())
         self.assertIn('Teve alguma fratura associada à lesão?',
                       response.content.decode())
-        self.assertIn('The user enters a date in a date field',
-                      response.content.decode())
 
-        # Sample asserts for second questionnaire
+        # sample asserts for second questionnaire
         self.assertIn('First Group', response.content.decode())
         self.assertIn('Third Group', response.content.decode())
         self.assertIn('What side of the injury?', response.content.decode())
@@ -287,13 +285,54 @@ class ExperimentDetailTest(TestCase):
         self.assertIn('Injury type (s):', response.content.decode())
         self.assertIn('Thrombosis', response.content.decode())
         self.assertIn('Attach exams.', response.content.decode())
+        self.assertIn('Questão Array dual scale', response.content.decode())
+        self.assertIn('Subquestion 2', response.content.decode())
+        self.assertIn('Answer 1', response.content.decode())
+        # asserts for array (5 point choice)
+        self.assertIn(
+            'Questão Array (5 point choice)', response.content.decode()
+        )
+        self.assertIn('subquestionSQ001', response.content.decode())
+        self.assertIn(
+            '(For each subquestion the participant chooses a level from 1 to '
+            '5 or no level)',
+            response.content.decode()
+        )
+
+        ##
+        # Asserts for questions that has no metadata subquestions/answers
+        #
         self.assertIn('The user uploads file(s)',
                       response.content.decode())
         self.assertIn('<em>The user answers</em> yes <em>or</em> not',
                       response.content.decode())
+        self.assertIn('The user enters a date in a date field',
+                      response.content.decode())
+        self.assertIn('A text is displayed to the participant (user does not '
+                      'answer this question)',
+                      response.content.decode())
+        # N - Numerical Input
+        self.assertIn('Questão Numerical Input', response.content.decode())
+        self.assertIn(
+            'Participant answers with a numerical value',
+            response.content.decode()
+        )
+        # H - Array (Flexible Labels) by Column
+        self.assertIn('Questão Array by column', response.content.decode())
+        self.assertIn(
+            'Subquestion array by column 1', response.content.decode()
+        )
+        self.assertIn('Answer array by column 2', response.content.decode())
+
+        # ; - Array (Flexible Labels) multiple texts
+        self.assertIn('Questão Array (Texts)', response.content.decode())
+        self.assertIn('subquestionSQ002', response.content.decode())
+        self.assertIn(
+            '(The question is a matrix based on the following fields)',
+            response.content.decode()
+        )
 
         # Sample asserts for third questionnaire
-
         self.assertIn('Segundo Grupo', response.content.decode())
         self.assertIn('Refere dor após a lesão?', response.content.decode())
         self.assertIn('EVA da dor principal:', response.content.decode())

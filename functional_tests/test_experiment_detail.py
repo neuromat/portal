@@ -475,14 +475,45 @@ class ExperimentDetailTest(FunctionalTest):
         ##
         self.assertIn('What side of the injury?', questionnaires_content)
         self.assertIn('Institution of the Study', questionnaires_content)
-        self.assertIn('The user enters a free text',
-                      questionnaires_content)
         self.assertIn('Injury type (s):', questionnaires_content)
         self.assertIn('Thrombosis', questionnaires_content)
         self.assertIn('Attach exams.', questionnaires_content)
-        self.assertIn('The user uploads file(s)',
-                      questionnaires_content)
+        self.assertIn('Questão Array dual scale', questionnaires_content)
+        self.assertIn('Subquestion 2', questionnaires_content)
+        self.assertIn('Answer 1', questionnaires_content)
+        self.assertIn('Questão Array (5 point choice)', questionnaires_content)
+        self.assertIn('subquestionSQ001', questionnaires_content)
+        self.assertIn(
+            '(For each subquestion the participant chooses a level from 1 to '
+            '5 or no level)',
+            questionnaires_content
+        )
+        self.assertIn('Questão Numerical Input', questionnaires_content)
+        self.assertIn('Questão Array by column', questionnaires_content)
+        self.assertIn('Subquestion array by column 1', questionnaires_content)
+        self.assertIn('Answer array by column 2', questionnaires_content)
+        self.assertIn('Questão Array (Texts)', questionnaires_content)
+        self.assertIn('subquestionSQ002', questionnaires_content)
+        self.assertIn(
+            '(The question is a matrix based on the following fields)',
+            questionnaires_content
+        )
+
+        ##
+        # asserts for questions that has no metadata subquestions/answers
+        ##
+        self.assertIn('The user enters a free text', questionnaires_content)
+        self.assertIn('The user uploads file(s)', questionnaires_content)
         self.assertIn('The user answers yes or not', questionnaires_content)
+        self.assertIn(
+            'A text is displayed to the participant (user does not answer '
+            'this question)',
+            questionnaires_content
+        )
+        self.assertIn(
+            'Participant answers with a numerical value',
+            questionnaires_content
+        )
 
         ##
         # sample asserts for third questionnaire
