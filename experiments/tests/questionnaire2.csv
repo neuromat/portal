@@ -195,3 +195,13 @@ questionnaire_code,questionnaire_title,question_group,question_type,question_typ
 599846,INDC - Input Entry,Third Group,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Strength to manual muscle testing by segment.,SQ015,Opponence of Thumb,,,A7,Not Rated
 599846,INDC - Input Entry,Third Group,M,Multiple choice,lisdispositivo2,lisdispositivo2,Which one?,4,Finger Position Orthosis,,, ,
 599846,INDC - Input Entry,Third Group,X,Text display,testdisplay,testdisplay,Text displayed to the participant,,,,, ,
+599846,INDC - Input Entry,Third Group,1,Array Dual Scale,arrayDualScale[SQ001],arrayDualScale,Questão Array dual scale,SQ001,Subquestion 1,,,A1,Answer 1
+599846,INDC - Input Entry,Third Group,1,Array Dual Scale,arrayDualScale[SQ001],arrayDualScale,Questão Array dual scale,SQ001,Subquestion 1,,,A2,Answer 2
+599846,INDC - Input Entry,Third Group,1,Array Dual Scale,arrayDualScale[SQ002],arrayDualScale,Questão Array dual scale,SQ002,Subquestion 2,,,A1,Answer 1
+599846,INDC - Input Entry,Third Group,1,Array Dual Scale,arrayDualScale[SQ002],arrayDualScale,Questão Array dual scale,SQ002,Subquestion 2,,,A2,Answer 2
+599846,INDC - Input Entry,Third Group,1,Array Dual Scale,arrayDualScale[SQ001],arrayDualScale,Questão Array dual scale,SQ001,Subquestion 1,,,A1,Answer 1
+599846,INDC - Input Entry,Third Group,1,Array Dual Scale,arrayDualScale[SQ001],arrayDualScale,Questão Array dual scale,SQ001,Subquestion 1,,,A2,Answer 2
+599846,INDC - Input Entry,Third Group,1,Array Dual Scale,arrayDualScale[SQ002],arrayDualScale,Questão Array dual scale,SQ002,Subquestion 2,,,A1,Answer 1
+599846,INDC - Input Entry,Third Group,1,Array Dual Scale,arrayDualScale[SQ002],arrayDualScale,Questão Array dual scale,SQ002,Subquestion 2,,,A2,Answer 2
+599846,INDC - Input Entry,Third Group,A,Array (5 Point Choice),array5pointchoice[SQ001],array5pointchoice,Questão Array (5 point choice),SQ001,subquestionSQ001,,,,
+599846,INDC - Input Entry,Third Group,A,Array (5 Point Choice),array5pointchoice[SQ002],array5pointchoice,Questão Array (5 point choice),SQ002,subquestionSQ002,,,,

@@ -274,13 +274,8 @@ class ExperimentDetailTest(TestCase):
                       response.content.decode())
         self.assertIn('Teve alguma fratura associada à lesão?',
                       response.content.decode())
-        self.assertIn('The user enters a date in a date field',
-                      response.content.decode())
-        self.assertIn('A text is displayed to the participant (user does not '
-                      'answer this question)',
-                      response.content.decode())
 
-        # Sample asserts for second questionnaire
+        # sample asserts for second questionnaire
         self.assertIn('First Group', response.content.decode())
         self.assertIn('Third Group', response.content.decode())
         self.assertIn('What side of the injury?', response.content.decode())
@@ -290,9 +285,28 @@ class ExperimentDetailTest(TestCase):
         self.assertIn('Injury type (s):', response.content.decode())
         self.assertIn('Thrombosis', response.content.decode())
         self.assertIn('Attach exams.', response.content.decode())
+        self.assertIn('Questão Array dual scale', response.content.decode())
+        self.assertIn('Subquestion 2', response.content.decode())
+        self.assertIn('Answer 1', response.content.decode())
+        # asserts for array (5 point choice)
+        self.assertIn(
+            'Questão Array (5 point choice)', response.content.decode()
+        )
+        self.assertIn('subquestionSQ001', response.content.decode())
+        self.assertIn(
+            '(For each subquestion the participant chooses a level from 1 to '
+            '5 or no level)',
+            response.content.decode()
+        )
+        # asserts for questions that has no metadata subquestions/answers
         self.assertIn('The user uploads file(s)',
                       response.content.decode())
         self.assertIn('<em>The user answers</em> yes <em>or</em> not',
+                      response.content.decode())
+        self.assertIn('The user enters a date in a date field',
+                      response.content.decode())
+        self.assertIn('A text is displayed to the participant (user does not '
+                      'answer this question)',
                       response.content.decode())
 
         # Sample asserts for third questionnaire
