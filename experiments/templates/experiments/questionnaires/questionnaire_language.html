@@ -72,6 +72,10 @@
                                     <p>
                                         <em>{% trans "Participant chooses between Female, Male, No answer" %}</em>
                                     </p>
+                                {% elif data.question_limesurvey_type == 'I' %}
+                                    <p>
+                                        <em>{% trans "Participant choose between languages predefined" %}</em>
+                                    </p>
 {#                                {% else %}#}
 {#                                    <p>#}
 {#                                        <em>{% trans "The user enters a free text" %}</em>#}

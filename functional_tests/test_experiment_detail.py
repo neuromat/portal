@@ -499,7 +499,7 @@ class ExperimentDetailTest(FunctionalTest):
             questionnaires_content
         )
         self.assertIn('Five Point Choice', questionnaires_content)
-        # she sees an Array (Yes/No/Uncertain) question type
+        # she sees an Array (Yes/No/Uncertain) question
         self.assertIn(
             'Questão Array (Yes/No/Uncertain)', questionnaires_content
         )
@@ -509,7 +509,7 @@ class ExperimentDetailTest(FunctionalTest):
             'Uncertain, No answer)',
             questionnaires_content
         )
-        # she sees an Array (Increase/Same/Decrease) question type
+        # she sees an Array (Increase/Same/Decrease) question
         self.assertIn(
             'Questão Array (Increase/Same/Decrease)', questionnaires_content
         )
@@ -519,10 +519,16 @@ class ExperimentDetailTest(FunctionalTest):
             'Increase, Same, Decrease)',
             questionnaires_content
         )
-        # she sees a Gender question type
+        # she sees a Gender question
         self.assertIn('Questão Gender', questionnaires_content)
         self.assertIn(
             'Participant chooses between Female, Male, No answer',
+            questionnaires_content
+        )
+        # shee sees a Language Switch question
+        self.assertIn('Questão Language Switch', questionnaires_content)
+        self.assertIn(
+            'Participant choose between languages predefined',
             questionnaires_content
         )
 

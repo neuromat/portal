@@ -375,6 +375,12 @@ class ExperimentDetailTest(TestCase):
             'Participant chooses between Female, Male, No answer',
             response.content.decode()
         )
+        # I = Language Switch
+        self.assertIn('Questão Language Switch', response.content.decode())
+        self.assertIn(
+            'Participant choose between languages predefined',
+            response.content.decode()
+        )
 
         # Sample asserts for third questionnaire
         self.assertIn('Segundo Grupo', response.content.decode())
