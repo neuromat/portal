@@ -369,6 +369,12 @@ class ExperimentDetailTest(TestCase):
             'Increase, Same, Decrease<em>)</em>',
             response.content.decode()
         )
+        # G - Gender
+        self.assertIn('Questão Gender', response.content.decode())
+        self.assertIn(
+            'Participant chooses between Female, Male, No answer',
+            response.content.decode()
+        )
 
         # Sample asserts for third questionnaire
         self.assertIn('Segundo Grupo', response.content.decode())

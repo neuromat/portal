@@ -519,6 +519,12 @@ class ExperimentDetailTest(FunctionalTest):
             'Increase, Same, Decrease)',
             questionnaires_content
         )
+        # she sees a Gender question type
+        self.assertIn('Questão Gender', questionnaires_content)
+        self.assertIn(
+            'Participant chooses between Female, Male, No answer',
+            questionnaires_content
+        )
 
         ##
         # asserts for questions that has no metadata subquestions/answers
