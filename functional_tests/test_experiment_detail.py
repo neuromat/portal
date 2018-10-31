@@ -574,6 +574,14 @@ class ExperimentDetailTest(FunctionalTest):
         self.assertIn('Questão Huge Free Text', questionnaires_content)
         # TODO: complete with assertion for info text, like above
 
+        # she sees a List Dropdown question
+        self.assertIn('Questão List (dropdown)', questionnaires_content)
+        self.assertIn('código A3', questionnaires_content)
+        self.assertIn(
+            '(Participant chooses one option out of a dropdown list)',
+            questionnaires_content
+        )
+
         ##
         # asserts for questions that has no metadata subquestions/answers
         ##

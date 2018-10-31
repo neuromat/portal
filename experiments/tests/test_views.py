@@ -426,6 +426,14 @@ class ExperimentDetailTest(TestCase):
         self.assertIn('Questão Huge Free Text', response.content.decode())
         # TODO: complete with assertion for info text, like above
 
+        # ! - List (Dropdown)
+        self.assertIn('Questão List (dropdown)', response.content.decode())
+        self.assertIn('código A3', response.content.decode())
+        self.assertIn(
+            '(Participant chooses one option out of a dropdown list)',
+            response.content.decode()
+        )
+
         # Sample asserts for third questionnaire
         self.assertIn('Segundo Grupo', response.content.decode())
         self.assertIn('Refere dor após a lesão?', response.content.decode())
