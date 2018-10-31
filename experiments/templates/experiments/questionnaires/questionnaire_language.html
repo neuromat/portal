@@ -24,7 +24,10 @@
                                 <li>{{ data.question_description }}</li>
                                 {% if data.question_limesurvey_type == 'F' or data.question_limesurvey_type == '1' or data.question_limesurvey_type == 'H' %}
                                     {% include 'experiments/questionnaires/f_type.html' %}
-                                {% elif data.question_limesurvey_type == 'L' %}
+                                {% elif data.question_limesurvey_type == 'L' or data.question_limesurvey_type == 'O' %}
+                                    {% if data.question_limesurvey_type == 'O' %}
+                                        <em>{% trans "(Participant chooses one out of the options and can fill a text box with a comment)" %}</em><br>
+                                    {% endif %}
                                     {% include 'experiments/questionnaires/l_type.html' %}
                                 {% elif data.question_limesurvey_type == 'M' or data.question_limesurvey_type == 'B' or data.question_limesurvey_type == 'P' or data.question_limesurvey_type == 'A' or data.question_limesurvey_type == ';' or data.question_limesurvey_type == 'C' or data.question_limesurvey_type == 'E' or data.question_limesurvey_type == 'K' %}
                                     {% if data.question_limesurvey_type == 'A' %}

@@ -223,3 +223,5 @@ questionnaire_code,questionnaire_title,question_group,question_type,question_typ
 599846,INDC - Input Entry,Third Group,I,Language Switch,languageSwitch,languageSwitch,Questão Language Switch,,,,,,
 599846,INDC - Input Entry,Third Group,K,Multiple Numerical Input,multipleNumericalInp[SQ001],multipleNumericalInp,Questão Multiple numerical input,SQ001,Subquestion 1,,,,
 599846,INDC - Input Entry,Third Group,K,Multiple Numerical Input,multipleNumericalInp[SQ002],multipleNumericalInp,Questão Multiple numerical input,SQ002,Subquestion multiple numerical input,,,,
+599846,INDC - Input Entry,Third Group,O,List With Comment,listWithComment,listWithComment,Questão List with comment,,,,,A1,answerA1
+599846,INDC - Input Entry,Third Group,O,List With Comment,listWithComment,listWithComment,Questão List with comment,,,,,A2,answer list with comments

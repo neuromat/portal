@@ -543,6 +543,15 @@ class ExperimentDetailTest(FunctionalTest):
             questionnaires_content
         )
 
+        # she sees a List With Comment question
+        self.assertIn('Questão List with comment', questionnaires_content)
+        self.assertIn('answer list with comments', questionnaires_content)
+        self.assertIn(
+            '(Participant chooses one out of the options and can fill '
+            'a text box with a comment)',
+            questionnaires_content
+        )
+
         ##
         # asserts for questions that has no metadata subquestions/answers
         ##

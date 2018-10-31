@@ -392,6 +392,14 @@ class ExperimentDetailTest(TestCase):
             '(For each subquestion the participant enters a numerical value)',
             response.content.decode()
         )
+        # O - List With Comment
+        self.assertIn('Questão List with comment', response.content.decode())
+        self.assertIn('answer list with comments', response.content.decode())
+        self.assertIn(
+            '(Participant chooses one out of the options and can fill '
+            'a text box with a comment)',
+            response.content.decode()
+        )
 
         # Sample asserts for third questionnaire
         self.assertIn('Segundo Grupo', response.content.decode())
