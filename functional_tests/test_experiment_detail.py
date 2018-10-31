@@ -542,7 +542,6 @@ class ExperimentDetailTest(FunctionalTest):
             '(For each subquestion the participant enters a numerical value)',
             questionnaires_content
         )
-
         # she sees a List With Comment question
         self.assertIn('Questão List with comment', questionnaires_content)
         self.assertIn('answer list with comments', questionnaires_content)
@@ -551,7 +550,6 @@ class ExperimentDetailTest(FunctionalTest):
             'a text box with a comment)',
             questionnaires_content
         )
-
         # she sees a Multiple Short Text question
         self.assertIn('Questão Multiple short text', questionnaires_content)
         self.assertIn(
@@ -560,6 +558,12 @@ class ExperimentDetailTest(FunctionalTest):
         self.assertIn(
             'For each subquestion the participant enters a free text',
             questionnaires_content
+        )
+        # she sees a Ranking question
+        self.assertIn('Questão Ranking', questionnaires_content)
+        self.assertIn('Answer Ranking', questionnaires_content)
+        self.assertIn(
+            '(Participant ranks the options)', questionnaires_content
         )
 
         ##

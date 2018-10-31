@@ -409,6 +409,13 @@ class ExperimentDetailTest(TestCase):
             '(For each subquestion the participant enters a free text)',
             response.content.decode()
         )
+        # R - Ranking
+        self.assertIn('Questão Ranking', response.content.decode())
+        self.assertIn('Answer Ranking', response.content.decode())
+        self.assertIn(
+            '(Participant ranks the options)',
+            response.content.decode()
+        )
 
         # Sample asserts for third questionnaire
         self.assertIn('Segundo Grupo', response.content.decode())
