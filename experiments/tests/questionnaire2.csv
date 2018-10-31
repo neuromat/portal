@@ -217,3 +217,5 @@ questionnaire_code,questionnaire_title,question_group,question_type,question_typ
 599846,INDC - Input Entry,Third Group,5,5 Point Choice,fivePointChoice,fivePointChoice,Five Point Choice,,,,,,
 599846,INDC - Input Entry,Third Group,C,Array (Yes/No/Uncertain),arrayYesNoUncertain[SQ001],arrayYesNoUncertain,Questão Array (Yes/No/Uncertain),SQ001,subquestionSQ001,,,,
 599846,INDC - Input Entry,Third Group,C,Array (Yes/No/Uncertain),arrayYesNoUncertain[SQ002],arrayYesNoUncertain,Questão Array (Yes/No/Uncertain),SQ002,subquestionSQ002,,,,
+599846,INDC - Input Entry,Third Group,E,"Array (Increase, Same, Decrease)",arrayIncreaseSameDec[SQ001],arrayIncreaseSameDec,Questão Array (Increase/Same/Decrease),SQ001,subquestionSQ001,,,,
+599846,INDC - Input Entry,Third Group,E,"Array (Increase, Same, Decrease)",arrayIncreaseSameDec[SQ002],arrayIncreaseSameDec,Questão Array (Increase/Same/Decrease),SQ002,Subquestion (I/S/D),,,,

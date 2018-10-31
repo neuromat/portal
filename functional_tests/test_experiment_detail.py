@@ -499,8 +499,25 @@ class ExperimentDetailTest(FunctionalTest):
             questionnaires_content
         )
         self.assertIn('Five Point Choice', questionnaires_content)
+        # she sees an Array (Yes/No/Uncertain) question type
         self.assertIn(
             'Questão Array (Yes/No/Uncertain)', questionnaires_content
+        )
+        self.assertIn('subquestionSQ002', questionnaires_content)
+        self.assertIn(
+            '(For each subquestion the participant chooses between Yes, No, '
+            'Uncertain, No answer)',
+            questionnaires_content
+        )
+        # she sees an Array (Increase/Same/Decrease) question type
+        self.assertIn(
+            'Questão Array (Increase/Same/Decrease)', questionnaires_content
+        )
+        self.assertIn('Subquestion (I/S/D)', questionnaires_content)
+        self.assertIn(
+            '(For each subquestion the participant chooses between '
+            'Increase, Same, Decrease)',
+            questionnaires_content
         )
 
         ##
@@ -520,12 +537,6 @@ class ExperimentDetailTest(FunctionalTest):
         )
         self.assertIn(
             'Participant chooses a level from 1 to 5 or no level',
-            questionnaires_content
-        )
-        self.assertIn('subquestionSQ002', questionnaires_content)
-        self.assertIn(
-            '(For each subquestion the participant chooses between Yes, No, '
-            'Uncertain, No answer)',
             questionnaires_content
         )
 

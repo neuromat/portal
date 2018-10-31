@@ -359,6 +359,16 @@ class ExperimentDetailTest(TestCase):
             'Yes, No, Uncertain, No answer<em>)</em>',
             response.content.decode()
         )
+        # E - Array (Increase/Same/Decrease)
+        self.assertIn(
+            'Questão Array (Increase/Same/Decrease)', response.content.decode()
+        )
+        self.assertIn('Subquestion (I/S/D)', response.content.decode())
+        self.assertIn(
+            '(For each subquestion the participant chooses between</em> '
+            'Increase, Same, Decrease<em>)</em>',
+            response.content.decode()
+        )
 
         # Sample asserts for third questionnaire
         self.assertIn('Segundo Grupo', response.content.decode())
