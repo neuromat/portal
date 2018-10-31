@@ -400,6 +400,15 @@ class ExperimentDetailTest(TestCase):
             'a text box with a comment)',
             response.content.decode()
         )
+        # Q - Multiple Short Text
+        self.assertIn('Questão Multiple short text', response.content.decode())
+        self.assertIn(
+            'Subquestion multiple short question', response.content.decode()
+        )
+        self.assertIn(
+            '(For each subquestion the participant enters a free text)',
+            response.content.decode()
+        )
 
         # Sample asserts for third questionnaire
         self.assertIn('Segundo Grupo', response.content.decode())

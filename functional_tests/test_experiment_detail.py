@@ -552,6 +552,16 @@ class ExperimentDetailTest(FunctionalTest):
             questionnaires_content
         )
 
+        # she sees a Multiple Short Text question
+        self.assertIn('Questão Multiple short text', questionnaires_content)
+        self.assertIn(
+            'Subquestion multiple short question', questionnaires_content
+        )
+        self.assertIn(
+            'For each subquestion the participant enters a free text',
+            questionnaires_content
+        )
+
         ##
         # asserts for questions that has no metadata subquestions/answers
         ##
