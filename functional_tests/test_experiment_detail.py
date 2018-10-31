@@ -525,10 +525,21 @@ class ExperimentDetailTest(FunctionalTest):
             'Participant chooses between Female, Male, No answer',
             questionnaires_content
         )
-        # shee sees a Language Switch question
+        # she sees a Language Switch question
         self.assertIn('Questão Language Switch', questionnaires_content)
         self.assertIn(
             'Participant choose between languages predefined',
+            questionnaires_content
+        )
+        # she sees a Multiple Numerical Input question
+        self.assertIn(
+            'Questão Multiple numerical input', questionnaires_content
+        )
+        self.assertIn(
+            'Subquestion multiple numerical input', questionnaires_content
+        )
+        self.assertIn(
+            '(For each subquestion the participant enters a numerical value)',
             questionnaires_content
         )
 

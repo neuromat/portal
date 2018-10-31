@@ -221,3 +221,5 @@ questionnaire_code,questionnaire_title,question_group,question_type,question_typ
 599846,INDC - Input Entry,Third Group,E,"Array (Increase, Same, Decrease)",arrayIncreaseSameDec[SQ002],arrayIncreaseSameDec,Questão Array (Increase/Same/Decrease),SQ002,Subquestion (I/S/D),,,,
 599846,INDC - Input Entry,Third Group,G,Gender,gender,gender,Questão Gender,,,,,,
 599846,INDC - Input Entry,Third Group,I,Language Switch,languageSwitch,languageSwitch,Questão Language Switch,,,,,,
+599846,INDC - Input Entry,Third Group,K,Multiple Numerical Input,multipleNumericalInp[SQ001],multipleNumericalInp,Questão Multiple numerical input,SQ001,Subquestion 1,,,,
+599846,INDC - Input Entry,Third Group,K,Multiple Numerical Input,multipleNumericalInp[SQ002],multipleNumericalInp,Questão Multiple numerical input,SQ002,Subquestion multiple numerical input,,,,

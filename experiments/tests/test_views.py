@@ -375,10 +375,21 @@ class ExperimentDetailTest(TestCase):
             'Participant chooses between Female, Male, No answer',
             response.content.decode()
         )
-        # I = Language Switch
+        # I - Language Switch
         self.assertIn('Questão Language Switch', response.content.decode())
         self.assertIn(
             'Participant choose between languages predefined',
+            response.content.decode()
+        )
+        # K - Multiple Numerical Input
+        self.assertIn(
+            'Questão Multiple numerical input', response.content.decode()
+        )
+        self.assertIn(
+            'Subquestion multiple numerical input', response.content.decode()
+        )
+        self.assertIn(
+            '(For each subquestion the participant enters a numerical value)',
             response.content.decode()
         )
 
