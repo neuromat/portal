@@ -286,7 +286,7 @@ class ExperimentDetailTest(TestCase):
         self.assertIn('Questão Array dual scale', response.content.decode())
         self.assertIn('Subquestion 2', response.content.decode())
         self.assertIn('Answer 1', response.content.decode())
-        # asserts for array (5 point choice) question type
+        # asserts for Array (5 point choice) question type
         self.assertIn(
             'Questão Array (5 point choice)', response.content.decode()
         )
@@ -336,6 +336,27 @@ class ExperimentDetailTest(TestCase):
         self.assertIn('Five Point Choice', response.content.decode())
         self.assertIn(
             'Participant chooses a level from 1 to 5 or no level',
+            response.content.decode()
+        )
+        # A - Array (5 Point Choice)
+        self.assertIn(
+            'Questão Array (5 point choice)', response.content.decode()
+        )
+        self.assertIn('subquestionSQ001', response.content.decode())
+        self.assertIn(
+            '(For each subquestion the participant chooses a level from 1 to '
+            '5 or no level)',
+            response.content.decode()
+        )
+        # C - Array (Yes/No/Uncertain)
+        self.assertIn(
+            'Participant chooses a level from 1 to 5 or no level',
+            response.content.decode()
+        )
+        self.assertIn('subquestionSQ002', response.content.decode())
+        self.assertIn(
+            '<em>(For each subquestion the participant chooses between</em> '
+            'Yes, No, Uncertain, No answer<em>)</em>',
             response.content.decode()
         )
 

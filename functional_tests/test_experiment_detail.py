@@ -499,6 +499,9 @@ class ExperimentDetailTest(FunctionalTest):
             questionnaires_content
         )
         self.assertIn('Five Point Choice', questionnaires_content)
+        self.assertIn(
+            'Questão Array (Yes/No/Uncertain)', questionnaires_content
+        )
 
         ##
         # asserts for questions that has no metadata subquestions/answers
@@ -517,6 +520,12 @@ class ExperimentDetailTest(FunctionalTest):
         )
         self.assertIn(
             'Participant chooses a level from 1 to 5 or no level',
+            questionnaires_content
+        )
+        self.assertIn('subquestionSQ002', questionnaires_content)
+        self.assertIn(
+            '(For each subquestion the participant chooses between Yes, No, '
+            'Uncertain, No answer)',
             questionnaires_content
         )
 
