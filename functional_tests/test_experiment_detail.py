@@ -570,6 +570,9 @@ class ExperimentDetailTest(FunctionalTest):
         self.assertIn(
             'Participant enters a short free text', questionnaires_content
         )
+        # she sees a Huge Free Text question
+        self.assertIn('Questão Huge Free Text', questionnaires_content)
+        # TODO: complete with assertion for info text, like above
 
         ##
         # asserts for questions that has no metadata subquestions/answers

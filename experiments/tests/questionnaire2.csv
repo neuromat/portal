@@ -230,3 +230,4 @@ questionnaire_code,questionnaire_title,question_group,question_type,question_typ
 599846,INDC - Input Entry,Third Group,R,Ranking,ranking,ranking,Questão Ranking,,,,,A1,Answer 1
 599846,INDC - Input Entry,Third Group,R,Ranking,ranking,ranking,Questão Ranking,,,,,A2,Answer Ranking
 599846,INDC - Input Entry,Third Group,S,Short Free Text,shortFreeText,shortFreeText,Questão Short free text,,,,,,
+599846,INDC - Input Entry,Third Group,U,Huge Free Text,hugeFreeText,hugeFreeText,Questão Huge Free Text,,,,,,

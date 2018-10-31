@@ -422,6 +422,9 @@ class ExperimentDetailTest(TestCase):
             'Participant enters a short free text',
             response.content.decode()
         )
+        # U - Huge Free Text
+        self.assertIn('Questão Huge Free Text', response.content.decode())
+        # TODO: complete with assertion for info text, like above
 
         # Sample asserts for third questionnaire
         self.assertIn('Segundo Grupo', response.content.decode())
