@@ -528,7 +528,7 @@ class ExperimentDetailTest(FunctionalTest):
         # she sees a Language Switch question
         self.assertIn('Questão Language Switch', questionnaires_content)
         self.assertIn(
-            'Participant choose between languages predefined',
+            'Participant chooses between predefined languages',
             questionnaires_content
         )
         # she sees a Multiple Numerical Input question
@@ -564,6 +564,11 @@ class ExperimentDetailTest(FunctionalTest):
         self.assertIn('Answer Ranking', questionnaires_content)
         self.assertIn(
             '(Participant ranks the options)', questionnaires_content
+        )
+        # she sees a Short Free Text question
+        self.assertIn('Questão Short free text', questionnaires_content)
+        self.assertIn(
+            'Participant enters a short free text', questionnaires_content
         )
 
         ##

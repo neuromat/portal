@@ -378,7 +378,7 @@ class ExperimentDetailTest(TestCase):
         # I - Language Switch
         self.assertIn('Questão Language Switch', response.content.decode())
         self.assertIn(
-            'Participant choose between languages predefined',
+            'Participant chooses between predefined languages',
             response.content.decode()
         )
         # K - Multiple Numerical Input
@@ -414,6 +414,12 @@ class ExperimentDetailTest(TestCase):
         self.assertIn('Answer Ranking', response.content.decode())
         self.assertIn(
             '(Participant ranks the options)',
+            response.content.decode()
+        )
+        # S - Short Free Text
+        self.assertIn('Questão Short free text', response.content.decode())
+        self.assertIn(
+            'Participant enters a short free text',
             response.content.decode()
         )
 
