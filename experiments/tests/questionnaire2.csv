@@ -197,9 +197,9 @@ questionnaire_code,questionnaire_title,question_group,question_type,question_typ
 599846,INDC - Input Entry,Third Group,X,Text display,testdisplay,testdisplay,Text displayed to the participant,,,,, ,
 599846,INDC - Input Entry,Third Group,1,Array Dual Scale,arrayDualScale[SQ001],arrayDualScale,Questão Array dual scale,SQ001,Subquestion 1,,,A1,Answer 1
 599846,INDC - Input Entry,Third Group,1,Array Dual Scale,arrayDualScale[SQ001],arrayDualScale,Questão Array dual scale,SQ001,Subquestion 1,,,A2,Answer 2
-599846,INDC - Input Entry,Third Group,1,Array Dual Scale,arrayDualScale[SQ002],arrayDualScale,Questão Array dual scale,SQ002,Subquestion 2,,,A1,Answer 1
+599846,INDC - Input Entry,Third Group,1,Array Dual Scale,arrayDualScale[SQ002],arrayDualScale,Questão Array dual scale,SQ002,Subquestion Array Dual Scale,,,A1,Answer 1
 599846,INDC - Input Entry,Third Group,1,Array Dual Scale,arrayDualScale[SQ002],arrayDualScale,Questão Array dual scale,SQ002,Subquestion 2,,,A2,Answer 2
-599846,INDC - Input Entry,Third Group,1,Array Dual Scale,arrayDualScale[SQ001],arrayDualScale,Questão Array dual scale,SQ001,Subquestion 1,,,A1,Answer 1
+599846,INDC - Input Entry,Third Group,1,Array Dual Scale,arrayDualScale[SQ001],arrayDualScale,Questão Array dual scale,SQ001,Subquestion 1,,,A1,Answer Array dual scale
 599846,INDC - Input Entry,Third Group,1,Array Dual Scale,arrayDualScale[SQ001],arrayDualScale,Questão Array dual scale,SQ001,Subquestion 1,,,A2,Answer 2
 599846,INDC - Input Entry,Third Group,1,Array Dual Scale,arrayDualScale[SQ002],arrayDualScale,Questão Array dual scale,SQ002,Subquestion 2,,,A1,Answer 1
 599846,INDC - Input Entry,Third Group,1,Array Dual Scale,arrayDualScale[SQ002],arrayDualScale,Questão Array dual scale,SQ002,Subquestion 2,,,A2,Answer 2
@@ -214,3 +214,27 @@ questionnaire_code,questionnaire_title,question_group,question_type,question_typ
 599846,INDC - Input Entry,Third Group,;,Array (Flexible Labels) multiple texts,arrayTexts[SQ001],arrayTexts,Questão Array (Texts),SQ001,subquestionSQ001,,,,
 599846,INDC - Input Entry,Third Group,;,Array (Flexible Labels) multiple texts,arrayTexts[SQ002],arrayTexts,Questão Array (Texts),SQ002,subquestionSQ002,,,,
 599846,INDC - Input Entry,Third Group,;,Array (Flexible Labels) multiple texts,arrayTexts[SQ002],arrayTexts,Questão Array (Texts),SQ002,subquestionSQ002,,,,
+599846,INDC - Input Entry,Third Group,5,5 Point Choice,fivePointChoice,fivePointChoice,Five Point Choice,,,,,,
+599846,INDC - Input Entry,Third Group,C,Array (Yes/No/Uncertain),arrayYesNoUncertain[SQ001],arrayYesNoUncertain,Questão Array (Yes/No/Uncertain),SQ001,subquestionSQ001,,,,
+599846,INDC - Input Entry,Third Group,C,Array (Yes/No/Uncertain),arrayYesNoUncertain[SQ002],arrayYesNoUncertain,Questão Array (Yes/No/Uncertain),SQ002,subquestionSQ002,,,,
+599846,INDC - Input Entry,Third Group,E,"Array (Increase, Same, Decrease)",arrayIncreaseSameDec[SQ001],arrayIncreaseSameDec,Questão Array (Increase/Same/Decrease),SQ001,subquestionSQ001,,,,
+599846,INDC - Input Entry,Third Group,E,"Array (Increase, Same, Decrease)",arrayIncreaseSameDec[SQ002],arrayIncreaseSameDec,Questão Array (Increase/Same/Decrease),SQ002,Subquestion (I/S/D),,,,
+599846,INDC - Input Entry,Third Group,G,Gender,gender,gender,Questão Gender,,,,,,
+599846,INDC - Input Entry,Third Group,I,Language Switch,languageSwitch,languageSwitch,Questão Language Switch,,,,,,
+599846,INDC - Input Entry,Third Group,K,Multiple Numerical Input,multipleNumericalInp[SQ001],multipleNumericalInp,Questão Multiple numerical input,SQ001,Subquestion 1,,,,
+599846,INDC - Input Entry,Third Group,K,Multiple Numerical Input,multipleNumericalInp[SQ002],multipleNumericalInp,Questão Multiple numerical input,SQ002,Subquestion multiple numerical input,,,,
+599846,INDC - Input Entry,Third Group,O,List With Comment,listWithComment,listWithComment,Questão List with comment,,,,,A1,answerA1
+599846,INDC - Input Entry,Third Group,O,List With Comment,listWithComment,listWithComment,Questão List with comment,,,,,A2,answer list with comments
+599846,INDC - Input Entry,Third Group,Q,Multiple Short Text,multipleShortText[SQ001],multipleShortText,Questão Multiple short text,SQ001,Subquestion 1,,,,
+599846,INDC - Input Entry,Third Group,Q,Multiple Short Text,multipleShortText[SQ002],multipleShortText,Questão Multiple short text,SQ002,Subquestion multiple short question,,,,
+599846,INDC - Input Entry,Third Group,R,Ranking,ranking,ranking,Questão Ranking,,,,,A1,Answer 1
+599846,INDC - Input Entry,Third Group,R,Ranking,ranking,ranking,Questão Ranking,,,,,A2,Answer Ranking
+599846,INDC - Input Entry,Third Group,S,Short Free Text,shortFreeText,shortFreeText,Questão Short free text,,,,,,
+599846,INDC - Input Entry,Third Group,U,Huge Free Text,hugeFreeText,hugeFreeText,Questão Huge Free Text,,,,,,
+599846,INDC - Input Entry,Third Group,!,List (Dropdown),listDropdown,listDropdown,Questão List (dropdown),,,,,A1,código A1
+599846,INDC - Input Entry,Third Group,!,List (Dropdown),listDropdown,listDropdown,Questão List (dropdown),,,,,A2,código A2
+599846,INDC - Input Entry,Third Group,!,List (Dropdown),listDropdown,listDropdown,Questão List (dropdown),,,,,A3,código A3
+599846,INDC - Input Entry,Third Group,:,Array (Flexible Labels) multiple drop down,arrayNumbers[SQ001],arrayNumbers,Questão Array (Flexible Labels) multiple drop down,SQ001,subquestionSQ001,,,,
+599846,INDC - Input Entry,Third Group,:,Array (Flexible Labels) multiple drop down,arrayNumbers[SQ001],arrayNumbers,Questão Array (Flexible Labels) multiple drop down,SQ001,subquestionSQ001,,,,
+599846,INDC - Input Entry,Third Group,:,Array (Flexible Labels) multiple drop down,arrayNumbers[SQ002],arrayNumbers,Questão Array (Flexible Labels) multiple drop down,SQ002,subquestionSQ002,,,,
+599846,INDC - Input Entry,Third Group,:,Array (Flexible Labels) multiple drop down,arrayNumbers[SQ002],arrayNumbers,Questão Array (Flexible Labels) multiple drop down,SQ002,subquestionSQ002,,,,

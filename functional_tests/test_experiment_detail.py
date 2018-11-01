@@ -455,8 +455,8 @@ class ExperimentDetailTest(FunctionalTest):
             'questionnaires_tab').text
 
         ##
-        # sample asserts for first questionnaire
-        ##
+        # Sample asserts for first questionnaire
+        #
         self.assertIn('Primeiro Grupo', questionnaires_content)
         self.assertIn('Segundo Grupo', questionnaires_content)
         self.assertIn('História de fratura?', questionnaires_content)
@@ -471,16 +471,28 @@ class ExperimentDetailTest(FunctionalTest):
                       questionnaires_content)
 
         ##
-        # sample asserts for second questionnaire
-        ##
-        self.assertIn('What side of the injury?', questionnaires_content)
-        self.assertIn('Institution of the Study', questionnaires_content)
-        self.assertIn('Injury type (s):', questionnaires_content)
-        self.assertIn('Thrombosis', questionnaires_content)
-        self.assertIn('Attach exams.', questionnaires_content)
-        self.assertIn('Questão Array dual scale', questionnaires_content)
-        self.assertIn('Subquestion 2', questionnaires_content)
-        self.assertIn('Answer 1', questionnaires_content)
+        # Sample asserts for second questionnaire
+        #
+        # she sees an Array (Flexible Labels) multiple texts question
+        self.assertIn(
+            '(This question is a matrix based on the following fields)',
+            questionnaires_content
+        )
+        # she sees an Array (Texts) question
+        self.assertIn('Questão Array (Texts)', questionnaires_content)
+        # she sees an Array by column question
+        self.assertIn('Questão Array by column', questionnaires_content)
+        self.assertIn('Subquestion array by column 1', questionnaires_content)
+        self.assertIn('Answer array by column 2', questionnaires_content)
+        # she sees a Numerical Input question
+        self.assertIn('Questão Numerical Input', questionnaires_content)
+        self.assertIn(
+            'Participant answers with a numerical value',
+            questionnaires_content
+        )
+        # she sees a Five Point Choice question
+        self.assertIn('Five Point Choice', questionnaires_content)
+        # she sees an Array (5 point choice) question
         self.assertIn('Questão Array (5 point choice)', questionnaires_content)
         self.assertIn('subquestionSQ001', questionnaires_content)
         self.assertIn(
@@ -488,36 +500,133 @@ class ExperimentDetailTest(FunctionalTest):
             '5 or no level)',
             questionnaires_content
         )
-        self.assertIn('Questão Numerical Input', questionnaires_content)
-        self.assertIn('Questão Array by column', questionnaires_content)
-        self.assertIn('Subquestion array by column 1', questionnaires_content)
-        self.assertIn('Answer array by column 2', questionnaires_content)
-        self.assertIn('Questão Array (Texts)', questionnaires_content)
+        # she sees a File Upload question
+        self.assertIn('Attach exams.', questionnaires_content)
+        self.assertIn('Participant uploads file(s)', questionnaires_content)
+        # she sees an Array dual scale question
+        self.assertIn('Questão Array dual scale', questionnaires_content)
+        self.assertIn('Subquestion Array Dual Scale', questionnaires_content)
+        self.assertIn('Answer Array dual scale', questionnaires_content)
+        # she sees a Multiple choice question
+        self.assertIn('Institution of the Study', questionnaires_content)
+        self.assertIn('Injury type (s):', questionnaires_content)
+        self.assertIn('Thrombosis', questionnaires_content)
+        # she sees a List (Radio) question
+        self.assertIn('What side of the injury?', questionnaires_content)
+        # she sees an Array (Yes/No/Uncertain) question
+        self.assertIn(
+            'Questão Array (Yes/No/Uncertain)', questionnaires_content
+        )
         self.assertIn('subquestionSQ002', questionnaires_content)
         self.assertIn(
-            '(This question is a matrix based on the following fields)',
+            '(For each subquestion the participant chooses between Yes, No, '
+            'Uncertain, No answer)',
             questionnaires_content
         )
+        # she sees an Array (Increase/Same/Decrease) question
+        self.assertIn(
+            'Questão Array (Increase/Same/Decrease)', questionnaires_content
+        )
+        self.assertIn('Subquestion (I/S/D)', questionnaires_content)
+        self.assertIn(
+            '(For each subquestion the participant chooses between '
+            'Increase, Same, Decrease)',
+            questionnaires_content
+        )
+        # she sees a Gender question
+        self.assertIn('Questão Gender', questionnaires_content)
+        self.assertIn(
+            'Participant chooses between Female, Male, No answer',
+            questionnaires_content
+        )
+        # she sees a Language Switch question
+        self.assertIn('Questão Language Switch', questionnaires_content)
+        self.assertIn(
+            'Participant chooses between predefined languages',
+            questionnaires_content
+        )
+        # she sees a Multiple Numerical Input question
+        self.assertIn(
+            'Questão Multiple numerical input', questionnaires_content
+        )
+        self.assertIn(
+            'Subquestion multiple numerical input', questionnaires_content
+        )
+        self.assertIn(
+            '(For each subquestion the participant enters a numerical value)',
+            questionnaires_content
+        )
+        # she sees a List With Comment question
+        self.assertIn('Questão List with comment', questionnaires_content)
+        self.assertIn('answer list with comments', questionnaires_content)
+        self.assertIn(
+            '(Participant chooses one out of the options and can fill '
+            'a text box with a comment)',
+            questionnaires_content
+        )
+        # she sees a Multiple Short Text question
+        self.assertIn('Questão Multiple short text', questionnaires_content)
+        self.assertIn(
+            'Subquestion multiple short question', questionnaires_content
+        )
+        self.assertIn(
+            'For each subquestion the participant enters a free text',
+            questionnaires_content
+        )
+        # she sees a Ranking question
+        self.assertIn('Questão Ranking', questionnaires_content)
+        self.assertIn('Answer Ranking', questionnaires_content)
+        self.assertIn(
+            '(Participant ranks the options)', questionnaires_content
+        )
+        # she sees a Short Free Text question
+        self.assertIn('Questão Short free text', questionnaires_content)
+        self.assertIn(
+            'Participant enters a short free text', questionnaires_content
+        )
+        # she sees a Huge Free Text question
+        self.assertIn('Questão Huge Free Text', questionnaires_content)
+        # TODO: complete with assertion for info text, like above
 
-        ##
-        # asserts for questions that has no metadata subquestions/answers
-        ##
-        self.assertIn('Participant enters a free text', questionnaires_content)
-        self.assertIn('Participant uploads file(s)', questionnaires_content)
+        # she sees a List Dropdown question
+        self.assertIn('Questão List (dropdown)', questionnaires_content)
+        self.assertIn('código A3', questionnaires_content)
+        self.assertIn(
+            '(Participant chooses one option out of a dropdown list)',
+            questionnaires_content
+        )
+        # she sees an Array (Flexible Labels) multiple drop down question
+        self.assertIn(
+            'Questão Array (Flexible Labels) multiple drop down',
+            questionnaires_content
+        )
+        self.assertIn('subquestionSQ002', questionnaires_content)
+        self.assertIn(
+            '(This question is a matrix based on the following '
+            'fields. For each matrix cell the participant chooses '
+            'one option out of a dropdown list)',
+            questionnaires_content
+        )
+        # she sees a Yes or Not question
         self.assertIn('Participant answers yes or not', questionnaires_content)
+        # she sees a Text Display question (Boiler plate question in old
+        # versions of LimeSurvey)
         self.assertIn(
             'A text is displayed to the participant (user does not answer '
             'this question)',
             questionnaires_content
         )
+        # she sees a Long/Huge free text question
+        self.assertIn('Participant enters a free text', questionnaires_content)
+        # she sees a 5 point choice question
         self.assertIn(
-            'Participant answers with a numerical value',
+            'Participant chooses a level from 1 to 5 or no level',
             questionnaires_content
         )
 
         ##
-        # sample asserts for third questionnaire
-        ##
+        # Sample asserts for third questionnaire
+        #
         self.assertIn('Primeiro Grupo', questionnaires_content)
         self.assertIn('Terceiro Grupo', questionnaires_content)
         self.assertIn('Refere dor após a lesão?', questionnaires_content)
@@ -659,7 +768,7 @@ class ExperimentDetailTest(FunctionalTest):
                       questionnaires_content)
         self.assertIn('Teve alguma fratura associada à lesão?',
                       questionnaires_content)
-        self.assertIn('The user answers yes or not',
+        self.assertIn('Participant answers yes or not',
                       questionnaires_content)
 
     def test_clicking_in_fr_language_link_of_questionnaire_render_appropriate_language(self):
