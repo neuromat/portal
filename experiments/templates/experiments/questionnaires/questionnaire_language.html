@@ -35,7 +35,7 @@
                                         <em>{% trans "(Participant chooses one option out of a dropdown list)" %}</em>
                                     {% endif %}
                                     {% include 'experiments/questionnaires/l_type.html' %}
-                                {% elif data.question_limesurvey_type == 'M' or data.question_limesurvey_type == 'B' or data.question_limesurvey_type == 'P' or data.question_limesurvey_type == 'A' or data.question_limesurvey_type == ';' or data.question_limesurvey_type == 'C' or data.question_limesurvey_type == 'E' or data.question_limesurvey_type == 'K' or data.question_limesurvey_type == 'Q' %}
+                                {% elif data.question_limesurvey_type == 'M' or data.question_limesurvey_type == 'B' or data.question_limesurvey_type == 'P' or data.question_limesurvey_type == 'A' or data.question_limesurvey_type == ';' or data.question_limesurvey_type == 'C' or data.question_limesurvey_type == 'E' or data.question_limesurvey_type == 'K' or data.question_limesurvey_type == 'Q' or data.question_limesurvey_type == ':' %}
                                     {% if data.question_limesurvey_type == 'A' %}
                                         <em>{% trans "(For each subquestion the participant chooses a level from 1 to 5 or no level)" %}</em><br>
                                     {% endif %}
@@ -53,6 +53,9 @@
                                     {% endif %}
                                     {% if data.question_limesurvey_type == 'Q' %}
                                         <em>{% trans "(For each subquestion the participant enters a free text)" %}</em><br>
+                                    {% endif %}
+                                    {% if data.question_limesurvey_type == ':' %}
+                                        <em>{% trans "(This question is a matrix based on the following fields. For each matrix cell the participant chooses one option out of a dropdown list)" %}</em><br>
                                     {% endif %}
                                     {% include 'experiments/questionnaires/m_type.html' %}
                                 {% elif data.question_limesurvey_type == 'D' %}

@@ -234,3 +234,7 @@ questionnaire_code,questionnaire_title,question_group,question_type,question_typ
 599846,INDC - Input Entry,Third Group,!,List (Dropdown),listDropdown,listDropdown,Questão List (dropdown),,,,,A1,código A1
 599846,INDC - Input Entry,Third Group,!,List (Dropdown),listDropdown,listDropdown,Questão List (dropdown),,,,,A2,código A2
 599846,INDC - Input Entry,Third Group,!,List (Dropdown),listDropdown,listDropdown,Questão List (dropdown),,,,,A3,código A3
+599846,INDC - Input Entry,Third Group,:,Array (Flexible Labels) multiple drop down,arrayNumbers[SQ001],arrayNumbers,Questão Array (Flexible Labels) multiple drop down,SQ001,subquestionSQ001,,,,
+599846,INDC - Input Entry,Third Group,:,Array (Flexible Labels) multiple drop down,arrayNumbers[SQ001],arrayNumbers,Questão Array (Flexible Labels) multiple drop down,SQ001,subquestionSQ001,,,,
+599846,INDC - Input Entry,Third Group,:,Array (Flexible Labels) multiple drop down,arrayNumbers[SQ002],arrayNumbers,Questão Array (Flexible Labels) multiple drop down,SQ002,subquestionSQ002,,,,
+599846,INDC - Input Entry,Third Group,:,Array (Flexible Labels) multiple drop down,arrayNumbers[SQ002],arrayNumbers,Questão Array (Flexible Labels) multiple drop down,SQ002,subquestionSQ002,,,,

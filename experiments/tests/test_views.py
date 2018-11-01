@@ -433,6 +433,18 @@ class ExperimentDetailTest(TestCase):
             '(Participant chooses one option out of a dropdown list)',
             response.content.decode()
         )
+        # : - Array (Flexible Labels) multiple drop down
+        self.assertIn(
+            'Questão Array (Flexible Labels) multiple drop down',
+            response.content.decode()
+        )
+        self.assertIn('subquestionSQ002', response.content.decode())
+        self.assertIn(
+            '(This question is a matrix based on the following '
+            'fields. For each matrix cell the participant chooses '
+            'one option out of a dropdown list)',
+            response.content.decode()
+        )
 
         # Sample asserts for third questionnaire
         self.assertIn('Segundo Grupo', response.content.decode())

@@ -582,6 +582,19 @@ class ExperimentDetailTest(FunctionalTest):
             questionnaires_content
         )
 
+        # she sees an Array (Flexible Labels) multiple drop down question
+        self.assertIn(
+            'Questão Array (Flexible Labels) multiple drop down',
+            questionnaires_content
+        )
+        self.assertIn('subquestionSQ002', questionnaires_content)
+        self.assertIn(
+            '(This question is a matrix based on the following '
+            'fields. For each matrix cell the participant chooses '
+            'one option out of a dropdown list)',
+            questionnaires_content
+        )
+
         ##
         # asserts for questions that has no metadata subquestions/answers
         ##
