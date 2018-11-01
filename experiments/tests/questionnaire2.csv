@@ -197,9 +197,9 @@ questionnaire_code,questionnaire_title,question_group,question_type,question_typ
 599846,INDC - Input Entry,Third Group,X,Text display,testdisplay,testdisplay,Text displayed to the participant,,,,, ,
 599846,INDC - Input Entry,Third Group,1,Array Dual Scale,arrayDualScale[SQ001],arrayDualScale,Questão Array dual scale,SQ001,Subquestion 1,,,A1,Answer 1
 599846,INDC - Input Entry,Third Group,1,Array Dual Scale,arrayDualScale[SQ001],arrayDualScale,Questão Array dual scale,SQ001,Subquestion 1,,,A2,Answer 2
-599846,INDC - Input Entry,Third Group,1,Array Dual Scale,arrayDualScale[SQ002],arrayDualScale,Questão Array dual scale,SQ002,Subquestion 2,,,A1,Answer 1
+599846,INDC - Input Entry,Third Group,1,Array Dual Scale,arrayDualScale[SQ002],arrayDualScale,Questão Array dual scale,SQ002,Subquestion Array Dual Scale,,,A1,Answer 1
 599846,INDC - Input Entry,Third Group,1,Array Dual Scale,arrayDualScale[SQ002],arrayDualScale,Questão Array dual scale,SQ002,Subquestion 2,,,A2,Answer 2
-599846,INDC - Input Entry,Third Group,1,Array Dual Scale,arrayDualScale[SQ001],arrayDualScale,Questão Array dual scale,SQ001,Subquestion 1,,,A1,Answer 1
+599846,INDC - Input Entry,Third Group,1,Array Dual Scale,arrayDualScale[SQ001],arrayDualScale,Questão Array dual scale,SQ001,Subquestion 1,,,A1,Answer Array dual scale
 599846,INDC - Input Entry,Third Group,1,Array Dual Scale,arrayDualScale[SQ001],arrayDualScale,Questão Array dual scale,SQ001,Subquestion 1,,,A2,Answer 2
 599846,INDC - Input Entry,Third Group,1,Array Dual Scale,arrayDualScale[SQ002],arrayDualScale,Questão Array dual scale,SQ002,Subquestion 2,,,A1,Answer 1
 599846,INDC - Input Entry,Third Group,1,Array Dual Scale,arrayDualScale[SQ002],arrayDualScale,Questão Array dual scale,SQ002,Subquestion 2,,,A2,Answer 2

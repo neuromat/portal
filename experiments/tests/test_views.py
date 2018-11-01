@@ -209,109 +209,57 @@ class ExperimentDetailTest(TestCase):
         )
         self.experiment = create_experiment(1, owner, Experiment.APPROVED)
 
-    @staticmethod
-    def get_q_default_language_or_first(questionnaire):
-        # TODO: correct this to adapt to unique QuestionnaireDefaultLanguage
-        # TODO: model with OneToOne with Questionnaire
-        qdl = QuestionnaireDefaultLanguage.objects.filter(
-            questionnaire=questionnaire
-        ).first()
-        if qdl:
-            return qdl.questionnaire_language
-        else:
-            return QuestionnaireLanguage.objects.filter(
-                questionnaire=questionnaire
-            ).first()
-
-    def test_access_experiment_detail_after_GET_experiment(self):
-        slug = str(Experiment.objects.first().slug)
-        response = self.client.get('/experiments/' + slug + '/')
-        self.assertEqual(response.status_code, 200)
-
-    def test_uses_detail_template(self):
-        slug = str(Experiment.objects.first().slug)
-        response = self.client.get('/experiments/' + slug + '/')
-        self.assertTemplateUsed(response, 'experiments/detail.html')
-
-    def test_access_experiment_detail_returns_questionnaire_data_for_default_or_first_language(self):
-        experiment = Experiment.objects.last()
-        create_valid_questionnaires(experiment)
-
-        response = self.client.get('/experiments/' + experiment.slug + '/')
-
-        for group in experiment.groups.all():
-            self.assertContains(
-                response,
-                'Questionnaires for group ' + group.title
-            )
-            for questionnaire in group.steps.filter(type=Step.QUESTIONNAIRE):
-                # The rule is display default questionnaire language data or
-                # first questionnaire language data if not set default
-                # questionnaire language. So we mimic the function
-                # _get_q_default_language_or_first from views that do that.
-                # TODO: In tests helper we always create default
-                # TODO: questionnaire language as English. So we would test
-                # TODO: only if we had first language.
-                q_language = self.get_q_default_language_or_first(
-                    questionnaire
-                )
-                self.assertContains(
-                    response, 'Questionnaire ' + q_language.survey_name
-                )
-
-        # Sample asserts for first questionnaire (in Portuguese, as first
-        # questionnaire, first language, created in tests helper is in
-        # Portuguese).
+    def _asserts_for_first_questionnaire(self, response):
         self.assertIn('Primeiro Grupo', response.content.decode())
         self.assertIn('Segundo Grupo', response.content.decode())
         self.assertIn('História de fratura', response.content.decode())
-        self.assertIn('Já fez alguma cirurgia ortopédica?',
-                      response.content.decode())
-        self.assertIn('Fez alguma cirurgia de nervo?',
-                      response.content.decode())
-        self.assertIn('Identifique o evento que levou ao trauma do seu plexo '
-                      'braquial. É possível marcar mais do que um evento.',
-                      response.content.decode())
-        self.assertIn('Teve alguma fratura associada à lesão?',
-                      response.content.decode())
-
-        # sample asserts for second questionnaire
-        self.assertIn('First Group', response.content.decode())
-        self.assertIn('Third Group', response.content.decode())
-        self.assertIn('What side of the injury?', response.content.decode())
-        self.assertIn('Institution of the Study', response.content.decode())
-        self.assertIn('Injury type (s):', response.content.decode())
-        self.assertIn('Thrombosis', response.content.decode())
-        self.assertIn('Attach exams.', response.content.decode())
-        self.assertIn('Questão Array dual scale', response.content.decode())
-        self.assertIn('Subquestion 2', response.content.decode())
-        self.assertIn('Answer 1', response.content.decode())
-        # asserts for Array (5 point choice) question type
         self.assertIn(
-            'Questão Array (5 point choice)', response.content.decode()
+            'Já fez alguma cirurgia ortopédica?', response.content.decode()
         )
-        self.assertIn('subquestionSQ001', response.content.decode())
         self.assertIn(
-            '(For each subquestion the participant chooses a level from 1 to '
-            '5 or no level)',
+            'Fez alguma cirurgia de nervo?', response.content.decode()
+        )
+        self.assertIn(
+            'Identifique o evento que levou ao trauma do seu plexo '
+            'braquial. É possível marcar mais do que um evento.',
+            response.content.decode()
+        )
+        self.assertIn(
+            'Teve alguma fratura associada à lesão?',
             response.content.decode()
         )
 
-        ##
-        # Asserts for questions that has no metadata subquestions/answers
-        #
-        self.assertIn(
-            'Participant enters a free text', response.content.decode()
-        )
-        self.assertIn('Participant uploads file(s)',
-                      response.content.decode())
+    def _asserts_for_second_questionnaire(self, response):
+        self.assertIn('First Group', response.content.decode())
+        self.assertIn('Third Group', response.content.decode())
+        # Y - Yes/No
         self.assertIn('<em>Participant answers</em> yes <em>or</em> not',
                       response.content.decode())
+        # D - Date
         self.assertIn('Participant enters a date in a date field',
                       response.content.decode())
+        # X - Text display (Boiler plate question in old versions of
+        # LimeSurvey)
         self.assertIn('A text is displayed to the participant (user does not '
                       'answer this question)',
                       response.content.decode())
+        # 1 - Array Dual Scale
+        self.assertIn('Questão Array dual scale', response.content.decode())
+        self.assertIn(
+            'Subquestion Array Dual Scale', response.content.decode()
+        )
+        self.assertIn('Answer Array dual scale', response.content.decode())
+        # | - File Upload
+        self.assertIn('Attach exams.', response.content.decode())
+        self.assertIn(
+            'Participant uploads file(s)', response.content.decode()
+        )
+        # M - Multiple choice
+        self.assertIn('Institution of the Study', response.content.decode())
+        self.assertIn('Injury type (s):', response.content.decode())
+        self.assertIn('Thrombosis', response.content.decode())
+        # L - List (Radio)
+        self.assertIn('What side of the injury?', response.content.decode())
         # N - Numerical Input
         self.assertIn('Questão Numerical Input', response.content.decode())
         self.assertIn(
@@ -326,8 +274,8 @@ class ExperimentDetailTest(TestCase):
         self.assertIn('Answer array by column 2', response.content.decode())
 
         # ; - Array (Flexible Labels) multiple texts
+        # ; - Array (Flexible Labels) multiple texts
         self.assertIn('Questão Array (Texts)', response.content.decode())
-        self.assertIn('subquestionSQ002', response.content.decode())
         self.assertIn(
             '(This question is a matrix based on the following fields)',
             response.content.decode()
@@ -424,8 +372,11 @@ class ExperimentDetailTest(TestCase):
         )
         # U - Huge Free Text
         self.assertIn('Questão Huge Free Text', response.content.decode())
-        # TODO: complete with assertion for info text, like above
-
+        # T - Long Free Text
+        # U - Huge Free Text
+        self.assertIn(
+            'Participant enters a free text', response.content.decode()
+        )
         # ! - List (Dropdown)
         self.assertIn('Questão List (dropdown)', response.content.decode())
         self.assertIn('código A3', response.content.decode())
@@ -438,7 +389,6 @@ class ExperimentDetailTest(TestCase):
             'Questão Array (Flexible Labels) multiple drop down',
             response.content.decode()
         )
-        self.assertIn('subquestionSQ002', response.content.decode())
         self.assertIn(
             '(This question is a matrix based on the following '
             'fields. For each matrix cell the participant chooses '
@@ -446,7 +396,7 @@ class ExperimentDetailTest(TestCase):
             response.content.decode()
         )
 
-        # Sample asserts for third questionnaire
+    def _asserts_for_third_questionnaire(self, response):
         self.assertIn('Segundo Grupo', response.content.decode())
         self.assertIn('Refere dor após a lesão?', response.content.decode())
         self.assertIn('EVA da dor principal:', response.content.decode())
@@ -458,6 +408,67 @@ class ExperimentDetailTest(TestCase):
         self.assertIn('Artéria axilar', response.content.decode())
         self.assertIn('Quando foi submetido(a) à cirurgia(s) de plexo '
                       'braquial (mm/aaaa)?', response.content.decode())
+
+    @staticmethod
+    def get_q_default_language_or_first(questionnaire):
+        # TODO: correct this to adapt to unique QuestionnaireDefaultLanguage
+        # TODO: model with OneToOne with Questionnaire
+        qdl = QuestionnaireDefaultLanguage.objects.filter(
+            questionnaire=questionnaire
+        ).first()
+        if qdl:
+            return qdl.questionnaire_language
+        else:
+            return QuestionnaireLanguage.objects.filter(
+                questionnaire=questionnaire
+            ).first()
+
+    def test_access_experiment_detail_after_GET_experiment(self):
+        slug = str(Experiment.objects.first().slug)
+        response = self.client.get('/experiments/' + slug + '/')
+        self.assertEqual(response.status_code, 200)
+
+    def test_uses_detail_template(self):
+        slug = str(Experiment.objects.first().slug)
+        response = self.client.get('/experiments/' + slug + '/')
+        self.assertTemplateUsed(response, 'experiments/detail.html')
+
+    def test_access_experiment_detail_returns_questionnaire_data_for_default_or_first_language(self):
+        experiment = Experiment.objects.last()
+        create_valid_questionnaires(experiment)
+
+        response = self.client.get('/experiments/' + experiment.slug + '/')
+
+        for group in experiment.groups.all():
+            self.assertContains(
+                response,
+                'Questionnaires for group ' + group.title
+            )
+            for questionnaire in group.steps.filter(type=Step.QUESTIONNAIRE):
+                # The rule is display default questionnaire language data or
+                # first questionnaire language data if not set default
+                # questionnaire language. So we mimic the function
+                # _get_q_default_language_or_first from views that do that.
+                # TODO: In tests helper we always create default
+                # TODO: questionnaire language as English. So we would test
+                # TODO: only if we had first language.
+                q_language = self.get_q_default_language_or_first(
+                    questionnaire
+                )
+                self.assertContains(
+                    response, 'Questionnaire ' + q_language.survey_name
+                )
+
+        # sample asserts for first questionnaire
+        # (in Portuguese, as first questionnaire, first language, created in
+        # tests helper is in Portuguese).
+        self._asserts_for_first_questionnaire(response)
+
+        # sample asserts for second questionnaire
+        self._asserts_for_second_questionnaire(response)
+
+        # sample asserts for third questionnaire
+        self._asserts_for_third_questionnaire(response)
 
     def test_access_experiment_detail_returns_questionnaire_data_for_other_language(self):
         # TODO!
