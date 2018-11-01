@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-10-30 18:40-0300\n"
+"POT-Creation-Date: 2018-11-01 10:48-0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -734,7 +734,23 @@ msgstr "Nenhum resultado encontrado"
 msgid "Questionnaire"
 msgstr "Questionário"
 
-#: experiments/templates/experiments/questionnaires/questionnaire_language.html:31
+#: experiments/templates/experiments/questionnaires/questionnaire_language.html:29
+msgid ""
+"(Participant chooses one out of the options and can fill a text box with a "
+"comment)"
+msgstr ""
+"(O participante escolhe uma das opções e pode preencher uma caixa de texto "
+"com um comentário"
+
+#: experiments/templates/experiments/questionnaires/questionnaire_language.html:32
+msgid "(Participant ranks the options)"
+msgstr "(O participante classifica as opções)"
+
+#: experiments/templates/experiments/questionnaires/questionnaire_language.html:35
+msgid "(Participant chooses one option out of a dropdown list)"
+msgstr "(O participante escolhe uma opção de uma lista suspensa)"
+
+#: experiments/templates/experiments/questionnaires/questionnaire_language.html:40
 msgid ""
 "(For each subquestion the participant chooses a level from 1 to 5 or no "
 "level)"
@@ -742,58 +758,102 @@ msgstr ""
 "(Para cada subquestão, o participante escolhe um nível de 1 a 5 ou nenhum "
 "nível"
 
-#: experiments/templates/experiments/questionnaires/questionnaire_language.html:34
+#: experiments/templates/experiments/questionnaires/questionnaire_language.html:43
 msgid "(This question is a matrix based on the following fields)"
 msgstr "(Esta questão é uma matriz baseada nas seguintes opções)"
 
-#: experiments/templates/experiments/questionnaires/questionnaire_language.html:39
+#: experiments/templates/experiments/questionnaires/questionnaire_language.html:46
+#: experiments/templates/experiments/questionnaires/questionnaire_language.html:49
+msgid "For each subquestion the participant chooses between"
+msgstr ""
+"Para cada subquestão, o participante escolhe entre "
+
+#: experiments/templates/experiments/questionnaires/questionnaire_language.html:46
+msgid "Yes, No, Uncertain, No answer"
+msgstr "Sim, Não, Incerto, Sem resposta"
+
+#: experiments/templates/experiments/questionnaires/questionnaire_language.html:49
+msgid "Increase, Same, Decrease"
+msgstr "Aumento, Mesmo, Diminiuição"
+
+#: experiments/templates/experiments/questionnaires/questionnaire_language.html:52
+msgid "(For each subquestion the participant enters a numerical value)"
+msgstr ""
+"(Para cada subquestão, o participante entra com um valor numérico) "
+
+#: experiments/templates/experiments/questionnaires/questionnaire_language.html:55
+msgid "(For each subquestion the participant enters a free text)"
+msgstr ""
+"(Para cada subquestão, o participante entra com um texto livre) "
+
+#: experiments/templates/experiments/questionnaires/questionnaire_language.html:58
+msgid ""
+"(This question is a matrix based on the following fields. For each matrix "
+"cell the participant chooses one option out of a dropdown list)"
+msgstr ""
+"(Esta questão é uma matrix baseada nos seguintes campos. Para cada célula "
+"da matriz o participante escolhe uma opção da lista suspensa) "
+
+#: experiments/templates/experiments/questionnaires/questionnaire_language.html:63
 msgid "Participant enters a date in a date field"
 msgstr "O participante entra com uma data em um campo de data"
 
-#: experiments/templates/experiments/questionnaires/questionnaire_language.html:43
+#: experiments/templates/experiments/questionnaires/questionnaire_language.html:67
 msgid "Participant uploads file(s)"
 msgstr "O participante carrega um(ns) arquivo(s)"
 
-#: experiments/templates/experiments/questionnaires/questionnaire_language.html:47
+#: experiments/templates/experiments/questionnaires/questionnaire_language.html:71
 msgid "Participant answers"
 msgstr "O participante responde"
 
-#: experiments/templates/experiments/questionnaires/questionnaire_language.html:47
+#: experiments/templates/experiments/questionnaires/questionnaire_language.html:71
 msgid "yes"
 msgstr "sim"
 
-#: experiments/templates/experiments/questionnaires/questionnaire_language.html:47
+#: experiments/templates/experiments/questionnaires/questionnaire_language.html:71
 msgid "or"
 msgstr "ou"
 
-#: experiments/templates/experiments/questionnaires/questionnaire_language.html:47
+#: experiments/templates/experiments/questionnaires/questionnaire_language.html:71
 msgid "not"
 msgstr "não"
 
-#: experiments/templates/experiments/questionnaires/questionnaire_language.html:51
+#: experiments/templates/experiments/questionnaires/questionnaire_language.html:75
 msgid ""
 "A text is displayed to the participant (user does not answer this question)"
 msgstr ""
 "Um texto é mostrado ao participante (o usuário não responde esta questão)"
 
-#: experiments/templates/experiments/questionnaires/questionnaire_language.html:55
+#: experiments/templates/experiments/questionnaires/questionnaire_language.html:79
+msgid "Participant enters a short free text"
+msgstr "O participante entra com um pequeno texto livre"
+
+#: experiments/templates/experiments/questionnaires/questionnaire_language.html:83
 msgid "Participant enters a free text"
 msgstr "O participante entra com um texto livre"
 
-#: experiments/templates/experiments/questionnaires/questionnaire_language.html:59
+#: experiments/templates/experiments/questionnaires/questionnaire_language.html:87
 msgid "Participant answers with a numerical value"
 msgstr "O participante responde com um valor numérico"
 
-#: experiments/templates/experiments/questionnaires/questionnaire_language.html:63
+#: experiments/templates/experiments/questionnaires/questionnaire_language.html:91
 msgid "Participant chooses a level from 1 to 5 or no level"
-msgstr ""
-"O participante escolhe um nível de 1 a 5 ou nenhum nível"
+msgstr "O participante escolhe um nível de 1 a 5 ou nenhum nível"
 
-#: experiments/templates/experiments/questionnaires/questionnaire_language.html:79
+#: experiments/templates/experiments/questionnaires/questionnaire_language.html:95
+msgid "Participant chooses between Female, Male, No answer"
+msgstr "O participante escolhe entre Feminino, Masculino, Sem resposta"
+
+#: experiments/templates/experiments/questionnaires/questionnaire_language.html:100
+msgid "Participant chooses between predefined languages"
+msgstr "O participante escolhe entre idiomas predefinido"
+
+#: experiments/templates/experiments/questionnaires/questionnaire_language.html:116
 msgid ""
 "The questionnaire in this language is in invalid format, and can't be "
 "displayed"
-msgstr "Este questionário está em um formato inválido, e não pode ser exibido"
+msgstr "Este questionário, neste idioma, está em um formato inválido, e não "
+"pode ser exibido "
 
 #: experiments/templates/experiments/top.html:4
 msgid "NeuroMat"
@@ -847,8 +907,6 @@ msgid "Your password has been set.  You may go ahead and log in now."
 msgstr "Sua senha está definida. Você pode entrar no sistema agora."
 
 #: experiments/templates/registration/password_reset_complete.html:17
-#, fuzzy
-#| msgid "Log In"
 msgid "Log in"
 msgstr "Entrar"
 
@@ -861,20 +919,14 @@ msgstr ""
 "verificaração."
 
 #: experiments/templates/registration/password_reset_confirm.html:22
-#, fuzzy
-#| msgid "Forgot password?"
 msgid "New password:"
 msgstr "Nova senha:"
 
 #: experiments/templates/registration/password_reset_confirm.html:28
-#, fuzzy
-#| msgid "Forgot password?"
 msgid "Confirm password:"
 msgstr "Confirme a senha:"
 
 #: experiments/templates/registration/password_reset_confirm.html:33
-#, fuzzy
-#| msgid "Change status for"
 msgid "Change my password"
 msgstr "Alterar status para"
 
@@ -883,18 +935,25 @@ msgid ""
 "The password reset link was invalid, possibly because it has already been "
 "used.  Please request a new password reset."
 msgstr ""
+"O link para a redefinição de senha é inválido, possivelmente porque ele já "
+"foi usado. Por favor solicite uma nova redefinição de senha."
 
 #: experiments/templates/registration/password_reset_done.html:16
 msgid ""
 "We've emailed you instructions for setting your password, if an account "
 "exists with the email you entered. You should receive them shortly."
 msgstr ""
+"Enviamos-te um e-mail com instruções para definir sua senha, se uma conta "
+"existe com e-mail que você entrou. Você deve receber uma mensagem em breve."
 
 #: experiments/templates/registration/password_reset_done.html:17
 msgid ""
 "If you don't receive an email, please make sure you've entered the address "
 "you registered with, and check your spam folder."
 msgstr ""
+"Se você não recebeu um e-mail, por favor certifique-se de ter entrado com "
+"o endereço de e-mail com o qual você se registrou, e verifique sua pasta de "
+"spam."
 
 #: experiments/templates/registration/password_reset_form.html:16
 msgid "Password reset"
@@ -905,14 +964,14 @@ msgid ""
 "Forgotten your password? Enter your email address below, and we'll email "
 "instructions for setting a new one."
 msgstr ""
+"Esqueceu sua senha? Entre com seu e-mail abaixo, e nós enviaremos um e-mail "
+ "com instruções para definir uma nova senha."
 
 #: experiments/templates/registration/password_reset_form.html:24
 msgid "Email address:"
-msgstr ""
+msgstr "Endereço de e-mail:"
 
 #: experiments/templates/registration/password_reset_form.html:29
-#, fuzzy
-#| msgid "Forgot password?"
 msgid "Reset my password"
 msgstr "Esqueçeu sua senha?"
 
@@ -1119,10 +1178,8 @@ msgid "intramuscular electrode insulation material description"
 msgstr "descrição do material de isolamento do eletrodo muscular"
 
 #: experiments/templates/search/eegfiltersetting.html:10
-#, fuzzy
-#| msgid "EEG Setting"
 msgid "EEG Filter Setting"
-msgstr "Configurações de EEG"
+msgstr "Configurações de filtro de EEG"
 
 #: experiments/templates/search/eegfiltersetting.html:14
 msgid "filter type name"
@@ -1243,28 +1300,20 @@ msgid "textual description"
 msgstr "descrição textual"
 
 #: experiments/templates/search/experimentresearcher.html:11
-#, fuzzy
-#| msgid "filter type name"
 msgid "first name"
-msgstr "nome do tipo de filtro:"
+msgstr "primeiro nome"
 
 #: experiments/templates/search/experimentresearcher.html:13
-#, fuzzy
-#| msgid "material name"
 msgid "last name"
-msgstr "nome do material"
+msgstr "último nome"
 
 #: experiments/templates/search/experimentresearcher.html:15
-#, fuzzy
-#| msgid "Email"
 msgid "email"
-msgstr "Correio eletrônico"
+msgstr "e-mail"
 
 #: experiments/templates/search/experimentresearcher.html:17
-#, fuzzy
-#| msgid "text instruction"
 msgid "institution"
-msgstr "descrição textual"
+msgstr "instituição"
 
 #: experiments/templates/search/experiments.html:9
 #: experiments/templates/search/groups.html:11
