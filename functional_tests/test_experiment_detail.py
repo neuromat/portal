@@ -768,7 +768,7 @@ class ExperimentDetailTest(FunctionalTest):
                       questionnaires_content)
         self.assertIn('Teve alguma fratura associada à lesão?',
                       questionnaires_content)
-        self.assertIn('The user answers yes or not',
+        self.assertIn('Participant answers yes or not',
                       questionnaires_content)
 
     def test_clicking_in_fr_language_link_of_questionnaire_render_appropriate_language(self):
