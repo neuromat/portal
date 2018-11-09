@@ -18,7 +18,7 @@
                 <div class="panel panel-default nep-panel-question-group">
                     <h5>{{ question_group_key }}</h5>
                     <hr class="question-group">
-                    <ul>
+                    <ol>
                         {% for data in question_group_values.data %}
                             <li>{{ data.question_description }}</li>
                             {% if data.question_limesurvey_type == 'F' or data.question_limesurvey_type == '1' or data.question_limesurvey_type == 'H' %}
@@ -99,7 +99,7 @@
                                 </p>
                             {% endif %}
                         {% endfor %}
-                    </ul>
+                    </ol>
                 </div>
             {% endfor %}
         </section>

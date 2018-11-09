@@ -673,6 +673,9 @@ class ExperimentDetailTest(FunctionalTest):
             ).find_element_by_link_text('Details').click()
         )
 
+        # wait for accordion to spawn
+        # time.sleep(0.3)
+
         questionnaires_content = self.browser.find_element_by_id(
             'questionnaires_tab').text
 
@@ -685,11 +688,14 @@ class ExperimentDetailTest(FunctionalTest):
             'História prévia de dor[\s\S]+'
             'Identifique o evento que levou ao trauma do seu plexo '
             'braquial[\s\S]+'
+        )
+        self.assertRegex(
+            questionnaires_content,
             'Segundo Grupo[\s\S]+'
-            'Teve alguma fratura associada à lesão[\s\S]+'
-            'Realiza Fisioterapia regularmente[\s\S]+'
-            'Faz uso de dispositivo auxiliar[\s\S]+'
-            'Qual(is)[\s\S]+'
+            'Teve alguma fratura associada à lesão?[\s\S]+'
+            'Realiza Fisioterapia regularmente?[\s\S]+'
+            'Faz uso de dispositivo auxiliar?[\s\S]+'
+            'Qual(is)?[\s\S]+'
             'Texto mostrado ao participante'
         )
 
@@ -879,7 +885,7 @@ class ExperimentDetailTest(FunctionalTest):
                       questionnaires_content)
         self.assertIn('Avez-vous eu des fractures associées à la blessure?',
                       questionnaires_content)
-        self.assertIn('The user answers yes or not', questionnaires_content)
+        self.assertIn('Participant answers yes or not', questionnaires_content)
 
     def test_does_not_display_study_elements_if_they_not_exist(self):
         ##
@@ -1626,7 +1632,6 @@ class DownloadExperimentTest(FunctionalTest):
             + str(experiment.sent_date),
             file.read().decode('utf-8')
         )
-        print(file.read().decode('utf-8'))  # DEBUG
         self.assertIn(
             'SORIANO, Valdick. ' + experiment.title
             + '. Sent date: '

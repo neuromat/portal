@@ -1,10 +1,13 @@
 import csv
 import json
 import os
+import tempfile
 from decimal import Decimal
 from os import path, makedirs
 from sys import modules
 
+import pandas
+import shutil
 from django.conf import settings
 from django.db.models import Count
 from django.shortcuts import get_object_or_404
@@ -849,6 +852,26 @@ class ExportExecution:
 
         return export_rows_classification_of_disease
 
+    @staticmethod
+    def _sort_metadata(q_metadata):
+        temp_dir = tempfile.mkdtemp()
+        csv_metadata = os.path.join(temp_dir, 'metadata.csv')
+        csv_metadata_sorted = os.path.join(temp_dir, 'metadata_sorted.csv')
+        with open(csv_metadata, 'w') as f:
+            f.write(q_metadata)
+        df = pandas.read_csv(csv_metadata)
+        df = df.sort_values('question_order')  # csv has column question_order
+        df.to_csv(csv_metadata_sorted, index=False)
+        # group new sorted csv file lines in a list
+        with open(csv_metadata_sorted) as f:
+            lines = [line.split(',', 2) for line in f.readlines()]
+            text = [', '.join(line) for line in lines]
+        # make list a string
+        text = ''.join(text)
+
+        shutil.rmtree(temp_dir)
+        return text
+
     def include_data_from_group(self, experiment_id):
         error_msg = ""
         experiment = get_object_or_404(Experiment, pk=experiment_id)
@@ -1044,8 +1067,9 @@ class ExportExecution:
                             )
                         for questionnaire_language in \
                                 questionnaire_language_list:
-                            survey_metadata = \
+                            survey_metadata = self._sort_metadata(
                                 questionnaire_language.survey_metadata
+                            )
                             language_code = \
                                 questionnaire_language.language_code
 
