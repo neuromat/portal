@@ -9,7 +9,8 @@ from django.test import override_settings, TestCase
 from django.utils.text import slugify
 
 from downloads.views import download_create
-from experiments.models import Experiment, Gender
+from experiments.models import Experiment, Gender, Group, Questionnaire, \
+    QuestionnaireLanguage
 from experiments.tests.tests_helper import create_experiment, create_study, \
     create_participant, create_group, create_questionnaire, \
     create_questionnaire_language, create_questionnaire_responses, \
@@ -139,12 +140,41 @@ class DownloadCreateViewTest(TestCase):
             TEMP_MEDIA_ROOT, 'download', str(experiment.id), 'download.zip'
         )
         zipped_file = zipfile.ZipFile(zip_file, 'r')
-
+        # TODO: use path.join
         file = zipped_file.open('EXPERIMENT_DOWNLOAD/CITATION.txt', 'r')
         self.assertIn(
             'ROSS, Diana; BOULOS, Guilherme C.; COSTA, Edimilson. '
             + experiment.title + '. Sent date: ' + str(experiment.sent_date),
             file.read().decode('utf-8')
+        )
+
+    def test_download_zip_file_has_questionnaire_metadata_in_question_order(self):
+        experiment, group = self.create_download_subdirs()
+        questionnaire = Questionnaire.objects.get(group=group)
+        q_language = QuestionnaireLanguage.objects.get(
+            questionnaire=questionnaire
+        )
+        download_create(experiment.id, '')
+
+        # get the zipped file to test against questions order
+        zip_file = os.path.join(
+            TEMP_MEDIA_ROOT, 'download', str(experiment.id), 'download.zip'
+        )
+        zipped_file = zipfile.ZipFile(zip_file, 'r')
+        # TODO: use path.join
+        file = zipped_file.open(
+            'EXPERIMENT_DOWNLOAD/Group_' + slugify(group.title) +
+            '/Questionnaire_metadata/' + questionnaire.code + '_' +
+            slugify(q_language.survey_name) + '/Fields_' + questionnaire.code +
+            '_en.csv'
+        )
+        # The right order of the questions (in csv file is not it's not in
+        # right order
+        self.assertRegex(
+            file.read().decode('utf-8'),
+            'opcTabela2cotovel[\s\S]+'
+            'acquisitiondate[\s\S]+'
+            'opcTabela1ombro[\s\S]+'
         )
 
     def test_download_zip_file_has_researchers_citation_in_right_order(self):

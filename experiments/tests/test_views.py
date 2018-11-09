@@ -210,26 +210,33 @@ class ExperimentDetailTest(TestCase):
         self.experiment = create_experiment(1, owner, Experiment.APPROVED)
 
     def _asserts_for_first_questionnaire(self, response):
-        self.assertIn('Primeiro Grupo', response.content.decode())
-        self.assertIn('Segundo Grupo', response.content.decode())
-        self.assertIn('História de fratura', response.content.decode())
-        self.assertIn(
-            'Já fez alguma cirurgia ortopédica?', response.content.decode()
-        )
-        self.assertIn(
-            'Fez alguma cirurgia de nervo?', response.content.decode()
-        )
-        self.assertIn(
+        # assert for questions in right order for first group (groups can be
+        # displayed in different orders)
+        self.assertRegex(
+            response.content.decode(),
+            'Primeiro Grupo[\s\S]+'
+            'História de fratura[\s\S]+'
+            'Já fez alguma cirurgia ortopédica?[\s\S]+'
+            'Fez alguma cirurgia de nervo?[\s\S]+'
+            'História prévia de dor[\s\S]+'
             'Identifique o evento que levou ao trauma do seu plexo '
-            'braquial. É possível marcar mais do que um evento.',
-            response.content.decode()
+            'braquial[\s\S]+'
         )
-        self.assertIn(
-            'Teve alguma fratura associada à lesão?',
-            response.content.decode()
+        # assert for questions in right order for second group (groups can be
+        # displayed in different orders)
+        self.assertRegex(
+            response.content.decode(),
+            'Segundo Grupo[\s\S]+'
+            'Teve alguma fratura associada à lesão?[\s\S]+'
+            'Realiza Fisioterapia regularmente?[\s\S]+'
+            'Faz uso de dispositivo auxiliar?[\s\S]+'
+            'Qual(is)?[\s\S]+'
+            'Texto mostrado ao participante'
         )
 
     def _asserts_for_second_questionnaire(self, response):
+        ##
+        # Make exaustive assertions for all question types
         self.assertIn('First Group', response.content.decode())
         self.assertIn('Third Group', response.content.decode())
         # Y - Yes/No
@@ -459,7 +466,7 @@ class ExperimentDetailTest(TestCase):
                     response, 'Questionnaire ' + q_language.survey_name
                 )
 
-        # sample asserts for first questionnaire
+        # Sample asserts for first questionnaire
         # (in Portuguese, as first questionnaire, first language, created in
         # tests helper is in Portuguese).
         self._asserts_for_first_questionnaire(response)
@@ -503,11 +510,13 @@ class ExperimentDetailTest(TestCase):
         g1 = create_group(1, experiment)
         g2 = create_group(1, experiment)
         q1 = create_questionnaire(1, 'q1', g1)
+        # invalid questionnaire
         create_questionnaire_language(
             q1,
             settings.BASE_DIR + '/experiments/tests/questionnaire4.csv',
             'pt-BR'
         )
+        # valid questionnaire
         q2 = create_questionnaire(1, 'q2', g2)
         create_questionnaire_language(
             q2,

@@ -28,9 +28,10 @@ from experiments.tasks import rebuild_haystack_index
 
 def _get_nested_rec(key, group):
     rec = dict()
-    rec['question_code'] = key[0]
-    rec['question_limesurvey_type'] = key[1]
-    rec['question_description'] = key[2]
+    rec['question_order'] = key[0]
+    rec['question_code'] = key[1]
+    rec['question_limesurvey_type'] = key[2]
+    rec['question_description'] = key[3]
 
     for field in ['subquestion_description', 'option_description']:
         if isinstance(group[field].unique()[0], float) and \
@@ -47,8 +48,8 @@ def _isvalid(source_path):
     with open(source_path, 'r') as source:
         reader = csv.reader(source, skipinitialspace=True)
         for row in reader:
-            # the number of columns in csv file must be 14
-            if len(row) != 14:
+            # the number of columns in csv file must be 15
+            if len(row) != 15:
                 return False
 
     # tests for column titles
@@ -58,17 +59,18 @@ def _isvalid(source_path):
             if row[0] != 'questionnaire_code' or \
                     row[1] != 'questionnaire_title' or \
                     row[2] != 'question_group' or \
-                    row[3] != 'question_type' or \
-                    row[4] != 'question_type_description' or \
-                    row[5] != 'question_index' or \
-                    row[6] != 'question_code' or \
-                    row[7] != 'question_description' or \
-                    row[8] != 'subquestion_code' or \
-                    row[9] != 'subquestion_description' or \
-                    row[10] != 'question_scale' or \
-                    row[11] != 'question_scale_label' or \
-                    row[12] != 'option_code' or \
-                    row[13] != 'option_description':
+                    row[3] != 'question_order' or \
+                    row[4] != 'question_type' or \
+                    row[5] != 'question_type_description' or \
+                    row[6] != 'question_index' or \
+                    row[7] != 'question_code' or \
+                    row[8] != 'question_description' or \
+                    row[9] != 'subquestion_code' or \
+                    row[10] != 'subquestion_description' or \
+                    row[11] != 'question_scale' or \
+                    row[12] != 'question_scale_label' or \
+                    row[13] != 'option_code' or \
+                    row[14] != 'option_description':
                 return False
             break
 
@@ -91,14 +93,15 @@ def _get_questionnaire_metadata(metadata):
         with open(temp_dir + '/questionnaire_cleaned.csv', 'w') as result:
             writer = csv.writer(result)
             for r in reader:
-                writer.writerow((r[2], r[3], r[6], r[7], r[9], r[13]))
+                writer.writerow((r[2], r[3], r[4], r[7], r[8], r[10], r[14]))
 
     q_cleaned = pandas.read_csv(temp_dir + '/questionnaire_cleaned.csv')
 
     records = []
 
     # first, group questions by question_code
-    for key, grp in q_cleaned.groupby(['question_code',
+    for key, grp in q_cleaned.groupby(['question_order',
+                                       'question_code',
                                        'question_type',
                                        'question_description']):
         rec = _get_nested_rec(key, grp)

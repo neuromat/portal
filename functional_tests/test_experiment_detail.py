@@ -1,4 +1,5 @@
 import os
+import re
 import tempfile
 import time
 import zipfile
@@ -640,6 +641,64 @@ class ExperimentDetailTest(FunctionalTest):
         self.assertIn('Quando foi submetido(a) à cirurgia(s) de plexo '
                       'braquial (mm/aaaa)?', questionnaires_content)
 
+    def test_questionnaire_content_is_displayed_with_questions_in_right_order(self):
+        g1 = create_group(1, self.experiment)
+        q1 = create_questionnaire(1, 'q1', g1)
+        ##
+        # create questionnaire language data pt-br for questionnaire1
+        create_questionnaire_language(
+            q1,
+            settings.BASE_DIR + '/experiments/tests/questionnaire1_pt-br.csv',
+            # our tests helper always consider 'en' as Default Language,
+            # so we create this time as 'pt-br' to test creating questionnaire
+            # default language in test_api (by the moment only test_api tests
+            # creating questionnaire default language; can expand testing
+            # questionnaire related models)
+            'pt-br'
+        )
+
+        # Shayene acessa a página de detalhes de um experimento
+        self.browser.get(
+            self.live_server_url + '/experiments/' + self.experiment.slug
+        )
+
+        # When the new visitor clicks in the Questionnaires tab, then click
+        # in 'Details' button of the Questionnaires sections she sees
+        # the questionnaires' content as a series of questions and answers
+        # divided by groups of questions
+        self.browser.find_element_by_link_text('Questionnaires').click()
+        self.wait_for(
+            lambda: self.browser.find_element_by_id(
+                'questionnaires_tab'
+            ).find_element_by_link_text('Details').click()
+        )
+
+        # wait for accordion to spawn
+        # time.sleep(0.3)
+
+        questionnaires_content = self.browser.find_element_by_id(
+            'questionnaires_tab').text
+
+        # assert for questions in right order
+        self.assertRegex(
+            questionnaires_content,
+            'Primeiro Grupo[\s\S]+História de fratura[\s\S]+'
+            'Já fez alguma cirurgia ortopédica[\s\S]+'
+            'Fez alguma cirurgia de nervo[\s\S]+'
+            'História prévia de dor[\s\S]+'
+            'Identifique o evento que levou ao trauma do seu plexo '
+            'braquial[\s\S]+'
+        )
+        self.assertRegex(
+            questionnaires_content,
+            'Segundo Grupo[\s\S]+'
+            'Teve alguma fratura associada à lesão?[\s\S]+'
+            'Realiza Fisioterapia regularmente?[\s\S]+'
+            'Faz uso de dispositivo auxiliar?[\s\S]+'
+            'Qual(is)?[\s\S]+'
+            'Texto mostrado ao participante'
+        )
+
     def test_invalid_questionnaire_displays_message(self):
         ##
         # We've created invalid Questionnaire data in tests helper in first
@@ -826,7 +885,7 @@ class ExperimentDetailTest(FunctionalTest):
                       questionnaires_content)
         self.assertIn('Avez-vous eu des fractures associées à la blessure?',
                       questionnaires_content)
-        self.assertIn('The user answers yes or not', questionnaires_content)
+        self.assertIn('Participant answers yes or not', questionnaires_content)
 
     def test_does_not_display_study_elements_if_they_not_exist(self):
         ##
@@ -1573,7 +1632,6 @@ class DownloadExperimentTest(FunctionalTest):
             + str(experiment.sent_date),
             file.read().decode('utf-8')
         )
-        print(file.read().decode('utf-8'))  # DEBUG
         self.assertIn(
             'SORIANO, Valdick. ' + experiment.title
             + '. Sent date: '
