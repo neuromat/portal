@@ -3,12 +3,12 @@
 {% if q_language.survey_metadata != 'invalid_questionnaire' %}
     <div class="pull-right">
         <a href="#collapse{{ questionnaire_id }}"
-           role="button"
-           data-toggle="collapse"
-           data-parent="#accordion"
-           aria-expanded="false"
-           aria-controls="collapse{{ questionnaire_id }}"
-           class="nep-btn">
+                role="button"
+                data-toggle="collapse"
+                data-parent="#accordion"
+                aria-expanded="false"
+                aria-controls="collapse{{ questionnaire_id }}"
+                class="nep-btn">
             {% trans 'Details' %}
         </a>
     </div>
@@ -16,95 +16,88 @@
         <section id="questionnaire_title"><br>
             {% for question_group_key, question_group_values in q_language.survey_metadata.items %}
                 <div class="panel panel-default nep-panel-question-group">
+                    <h5>{{ question_group_key }}</h5>
+                    <hr class="question-group">
                     <ul>
-                        <h5>{{ question_group_key }}</h5>
-                        <hr class="question-group">
                         {% for data in question_group_values.data %}
-                            <ul>
-                                <li>{{ data.question_description }}</li>
-                                {% if data.question_limesurvey_type == 'F' or data.question_limesurvey_type == '1' or data.question_limesurvey_type == 'H' %}
-                                    {% include 'experiments/questionnaires/f_type.html' %}
-                                {% elif data.question_limesurvey_type == 'L' or data.question_limesurvey_type == 'O' or data.question_limesurvey_type == 'R' or data.question_limesurvey_type == '!' %}
-                                    {% if data.question_limesurvey_type == 'O' %}
-                                        <em>{% trans "(Participant chooses one out of the options and can fill a text box with a comment)" %}</em><br>
-                                    {% endif %}
-                                    {% if data.question_limesurvey_type == 'R' %}
-                                        <em>{% trans "(Participant ranks the options)" %}</em>
-                                    {% endif %}
-                                    {% if data.question_limesurvey_type == '!' %}
-                                        <em>{% trans "(Participant chooses one option out of a dropdown list)" %}</em>
-                                    {% endif %}
-                                    {% include 'experiments/questionnaires/l_type.html' %}
-                                {% elif data.question_limesurvey_type == 'M' or data.question_limesurvey_type == 'B' or data.question_limesurvey_type == 'P' or data.question_limesurvey_type == 'A' or data.question_limesurvey_type == ';' or data.question_limesurvey_type == 'C' or data.question_limesurvey_type == 'E' or data.question_limesurvey_type == 'K' or data.question_limesurvey_type == 'Q' or data.question_limesurvey_type == ':' %}
-                                    {% if data.question_limesurvey_type == 'A' %}
-                                        <em>{% trans "(For each subquestion the participant chooses a level from 1 to 5 or no level)" %}</em><br>
-                                    {% endif %}
-                                    {% if data.question_limesurvey_type == ';' %}
-                                        <em>{% trans "(This question is a matrix based on the following fields)" %}</em><br>
-                                    {% endif %}
-                                    {% if data.question_limesurvey_type == 'C' %}
-                                        <em>({% trans "For each subquestion the participant chooses between" %}</em> {% trans "Yes, No, Uncertain, No answer" %}<em>)</em><br>
-                                    {% endif %}
-                                    {% if data.question_limesurvey_type == 'E' %}
-                                        <em>({% trans "For each subquestion the participant chooses between" %}</em> {% trans "Increase, Same, Decrease" %}<em>)</em><br>
-                                    {% endif %}
-                                    {% if data.question_limesurvey_type == 'K' %}
-                                        <em>{% trans "(For each subquestion the participant enters a numerical value)" %}</em><br>
-                                    {% endif %}
-                                    {% if data.question_limesurvey_type == 'Q' %}
-                                        <em>{% trans "(For each subquestion the participant enters a free text)" %}</em><br>
-                                    {% endif %}
-                                    {% if data.question_limesurvey_type == ':' %}
-                                        <em>{% trans "(This question is a matrix based on the following fields. For each matrix cell the participant chooses one option out of a dropdown list)" %}</em><br>
-                                    {% endif %}
-                                    {% include 'experiments/questionnaires/m_type.html' %}
-                                {% elif data.question_limesurvey_type == 'D' %}
-                                    <p>
-                                        <em>{% trans "Participant enters a date in a date field" %}.</em>
-                                    </p>
-                                {% elif data.question_limesurvey_type == '|' %}
-                                    <p>
-                                        <em>{% trans "Participant uploads file(s)" %}.</em>
-                                    </p>
-                                {% elif data.question_limesurvey_type == 'Y' %}
-                                    <p>
-                                        <em>{% trans "Participant answers" %}</em> {% trans 'yes' %} <em>{% trans 'or' %}</em> {% trans 'not' %}
-                                    </p>
-                                {% elif data.question_limesurvey_type == 'X' %}
-                                    <p>
-                                        <em>{% trans "A text is displayed to the participant (user does not answer this question)" %}</em>
-                                    </p>
-                                {% elif data.question_limesurvey_type == 'S' %}
-                                    <p>
-                                        <em>{% trans "Participant enters a short free text" %}</em>
-                                    </p>
-                                {% elif data.question_limesurvey_type == 'T' or data.question_limesurvey_type == 'U' %}
-                                    <p>
-                                        <em>{% trans "Participant enters a free text" %}</em>
-                                    </p>
-                                {% elif data.question_limesurvey_type == 'N' %}
-                                    <p>
-                                        <em>{% trans "Participant answers with a numerical value" %}</em>
-                                    </p>
-                                {% elif data.question_limesurvey_type == '5' %}
-                                    <p>
-                                        <em>{% trans "Participant chooses a level from 1 to 5 or no level" %}</em>
-                                    </p>
-                                {% elif data.question_limesurvey_type == 'G' %}
-                                    <p>
-                                        <em>{% trans "Participant chooses between Female, Male, No answer" %}</em>
-                                    </p>
-                                {% elif data.question_limesurvey_type == 'I' %}
-                                    <p>
-                                        <em>
-                                            {% trans "Participant chooses between predefined languages" %}</em>
-                                    </p>
-{#                                {% else %}#}
-{#                                    <p>#}
-{#                                        <em>{% trans "The user enters a free text" %}</em>#}
-{#                                    </p>#}
+                            <li>{{ data.question_description }}</li>
+                            {% if data.question_limesurvey_type == 'F' or data.question_limesurvey_type == '1' or data.question_limesurvey_type == 'H' %}
+                                {% include 'experiments/questionnaires/f_type.html' %}
+                            {% elif data.question_limesurvey_type == 'L' or data.question_limesurvey_type == 'O' or data.question_limesurvey_type == 'R' or data.question_limesurvey_type == '!' %}
+                                {% if data.question_limesurvey_type == 'O' %}
+                                    <em>{% trans "(Participant chooses one out of the options and can fill a text box with a comment)" %}</em><br>
                                 {% endif %}
-                            </ul>
+                                {% if data.question_limesurvey_type == 'R' %}
+                                    <em>{% trans "(Participant ranks the options)" %}</em><br>
+                                {% endif %}
+                                {% if data.question_limesurvey_type == '!' %}
+                                    <em>{% trans "(Participant chooses one option out of a dropdown list)" %}</em><br>
+                                {% endif %}
+                                {% include 'experiments/questionnaires/l_type.html' %}
+                            {% elif data.question_limesurvey_type == 'M' or data.question_limesurvey_type == 'B' or data.question_limesurvey_type == 'P' or data.question_limesurvey_type == 'A' or data.question_limesurvey_type == ';' or data.question_limesurvey_type == 'C' or data.question_limesurvey_type == 'E' or data.question_limesurvey_type == 'K' or data.question_limesurvey_type == 'Q' or data.question_limesurvey_type == ':' %}
+                                {% if data.question_limesurvey_type == 'A' %}
+                                    <em>{% trans "(For each subquestion the participant chooses a level from 1 to 5 or no level)" %}</em><br>
+                                {% endif %}
+                                {% if data.question_limesurvey_type == ';' %}
+                                    <em>{% trans "(This question is a matrix based on the following fields)" %}</em><br>
+                                {% endif %}
+                                {% if data.question_limesurvey_type == 'C' %}
+                                    <em>({% trans "For each subquestion the participant chooses between" %}</em> {% trans "Yes, No, Uncertain, No answer" %}<em>)</em><br>
+                                {% endif %}
+                                {% if data.question_limesurvey_type == 'E' %}
+                                    <em>({% trans "For each subquestion the participant chooses between" %}</em> {% trans "Increase, Same, Decrease" %}<em>)</em><br>
+                                {% endif %}
+                                {% if data.question_limesurvey_type == 'K' %}
+                                    <em>{% trans "(For each subquestion the participant enters a numerical value)" %}</em><br>
+                                {% endif %}
+                                {% if data.question_limesurvey_type == 'Q' %}
+                                    <em>{% trans "(For each subquestion the participant enters a free text)" %}</em><br>
+                                {% endif %}
+                                {% if data.question_limesurvey_type == ':' %}
+                                    <em>{% trans "(This question is a matrix based on the following fields. For each matrix cell the participant chooses one option out of a dropdown list)" %}</em><br>
+                                {% endif %}
+                                {% include 'experiments/questionnaires/m_type.html' %}
+                            {% elif data.question_limesurvey_type == 'D' %}
+                                <p>
+                                    <em>{% trans "Participant enters a date in a date field" %}.</em>
+                                </p>
+                            {% elif data.question_limesurvey_type == '|' %}
+                                <p>
+                                    <em>{% trans "Participant uploads file(s)" %}.</em>
+                                </p>
+                            {% elif data.question_limesurvey_type == 'Y' %}
+                                <p>
+                                    <em>{% trans "Participant answers" %}</em> {% trans 'yes' %} <em>{% trans 'or' %}</em> {% trans 'not' %}
+                                </p>
+                            {% elif data.question_limesurvey_type == 'X' %}
+                                <p>
+                                    <em>{% trans "A text is displayed to the participant (user does not answer this question)" %}</em>
+                                </p>
+                            {% elif data.question_limesurvey_type == 'S' %}
+                                <p>
+                                    <em>{% trans "Participant enters a short free text" %}</em>
+                                </p>
+                            {% elif data.question_limesurvey_type == 'T' or data.question_limesurvey_type == 'U' %}
+                                <p>
+                                    <em>{% trans "Participant enters a free text" %}</em>
+                                </p>
+                            {% elif data.question_limesurvey_type == 'N' %}
+                                <p>
+                                    <em>{% trans "Participant answers with a numerical value" %}</em>
+                                </p>
+                            {% elif data.question_limesurvey_type == '5' %}
+                                <p>
+                                    <em>{% trans "Participant chooses a level from 1 to 5 or no level" %}</em>
+                                </p>
+                            {% elif data.question_limesurvey_type == 'G' %}
+                                <p>
+                                    <em>{% trans "Participant chooses between Female, Male, No answer" %}</em>
+                                </p>
+                            {% elif data.question_limesurvey_type == 'I' %}
+                                <p>
+                                    <em>{% trans "Participant chooses between predefined languages" %}</em>
+                                </p>
+                            {% endif %}
                         {% endfor %}
                     </ul>
                 </div>

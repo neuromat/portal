@@ -1,96 +1,96 @@
-questionnaire_code,questionnaire_title,question_group,question_type,question_type_description,question_index,question_code,question_description,subquestion_code,subquestion_description,question_scale,question_scale_label,option_code,option_description
-599846,INDC - Avaliação de Entrada,Primeiro Grupo,L,List (Radio),opsdor,opsdor,Refere dor após a lesão?, , ,,,A1,Sim
-599846,INDC - Avaliação de Entrada,Primeiro Grupo,L,List (Radio),opsdor,opsdor,Refere dor após a lesão?, , ,,,A2,Não
-599846,INDC - Avaliação de Entrada,Primeiro Grupo,L,List (Radio),opsdor,opsdor,Refere dor após a lesão?, , ,,,A3,Não Informado
-599846,INDC - Avaliação de Entrada,Primeiro Grupo,B,Array (10 Point Choice),opcEVA,opcEVA,EVA da dor principal:,SQ001,EVA,,, , 
-599846,INDC - Avaliação de Entrada,Primeiro Grupo,L,List (Radio),opclocalizalesao,opclocalizalesao,Qual a localização da lesão ao exame clínico?, , ,,,1,Tronco Superior
-599846,INDC - Avaliação de Entrada,Primeiro Grupo,L,List (Radio),opclocalizalesao,opclocalizalesao,Qual a localização da lesão ao exame clínico?, , ,,,2,Tronco Superior Estendido (C5- C7)
-599846,INDC - Avaliação de Entrada,Primeiro Grupo,L,List (Radio),opclocalizalesao,opclocalizalesao,Qual a localização da lesão ao exame clínico?, , ,,,3,Tronco Inferior
-599846,INDC - Avaliação de Entrada,Primeiro Grupo,L,List (Radio),opclocalizalesao,opclocalizalesao,Qual a localização da lesão ao exame clínico?, , ,,,4,C5- T1
-599846,INDC - Avaliação de Entrada,Primeiro Grupo,L,List (Radio),opclocalizalesao,opclocalizalesao,Qual a localização da lesão ao exame clínico?, , ,,,5,Não foi possível identificar (necessário exames complementares)
-599846,INDC - Avaliação de Entrada,Primeiro Grupo,L,List (Radio),snindicacirurgia,snindicacirurgia,Indicação para cirurgia?, , ,,,1,Sim
-599846,INDC - Avaliação de Entrada,Primeiro Grupo,L,List (Radio),snindicacirurgia,snindicacirurgia,Indicação para cirurgia?, , ,,,2,Não
-599846,INDC - Avaliação de Entrada,Primeiro Grupo,L,List (Radio),snindicacirurgia,snindicacirurgia,Indicação para cirurgia?, , ,,,3,Não definido
-599846,INDC - Avaliação de Entrada,Primeiro Grupo,L,List (Radio),liscomplicacoes,liscomplicacoes,Teve complicações?, , ,,,1,Sim
-599846,INDC - Avaliação de Entrada,Primeiro Grupo,L,List (Radio),liscomplicacoes,liscomplicacoes,Teve complicações?, , ,,,2,Não
-599846,INDC - Avaliação de Entrada,Primeiro Grupo,L,List (Radio),liscomplicacoes,liscomplicacoes,Teve complicações?, , ,,,3,Não sei
-599846,INDC - Avaliação de Entrada,Primeiro Grupo,T,Long Free Text,texcomplicacoes,texcomplicacoes,Quais?, , ,,, , 
-599846,INDC - Avaliação de Entrada,Primeiro Grupo,S,Short Free Text,texdor,texdor,Localização da dor principal:, , ,,, , 
-599846,INDC - Avaliação de Entrada,Segundo Grupo,L,List (Radio),lisdiagnostico,lisdiagnostico,Qual o diagnóstico sugerido?, , ,,,1,Tronco Superior
-599846,INDC - Avaliação de Entrada,Segundo Grupo,L,List (Radio),lisdiagnostico,lisdiagnostico,Qual o diagnóstico sugerido?, , ,,,2,Tronco Superior Estendido (C5-C7)
-599846,INDC - Avaliação de Entrada,Segundo Grupo,L,List (Radio),lisdiagnostico,lisdiagnostico,Qual o diagnóstico sugerido?, , ,,,3,Tronco Inferior
-599846,INDC - Avaliação de Entrada,Segundo Grupo,L,List (Radio),lisdiagnostico,lisdiagnostico,Qual o diagnóstico sugerido?, , ,,,4,C5-T1
-599846,INDC - Avaliação de Entrada,Segundo Grupo,F,Array (Flexible Labels),listrofismo,listrofismo,Qual região apresenta alteração do trofismo?,SQ001,Região escapular,,,A1,Atrofia
-599846,INDC - Avaliação de Entrada,Segundo Grupo,F,Array (Flexible Labels),listrofismo,listrofismo,Qual região apresenta alteração do trofismo?,SQ001,Região escapular,,,A2,Hipotrofia
-599846,INDC - Avaliação de Entrada,Segundo Grupo,F,Array (Flexible Labels),listrofismo,listrofismo,Qual região apresenta alteração do trofismo?,SQ001,Região escapular,,,A3,Hipertrofia
-599846,INDC - Avaliação de Entrada,Segundo Grupo,F,Array (Flexible Labels),listrofismo,listrofismo,Qual região apresenta alteração do trofismo?,SQ001,Região escapular,,,A4,Sem alteração
-599846,INDC - Avaliação de Entrada,Segundo Grupo,F,Array (Flexible Labels),listrofismo,listrofismo,Qual região apresenta alteração do trofismo?,SQ002,Região glenoumeral,,,A1,Atrofia
-599846,INDC - Avaliação de Entrada,Segundo Grupo,F,Array (Flexible Labels),listrofismo,listrofismo,Qual região apresenta alteração do trofismo?,SQ002,Região glenoumeral,,,A2,Hipotrofia
-599846,INDC - Avaliação de Entrada,Segundo Grupo,F,Array (Flexible Labels),listrofismo,listrofismo,Qual região apresenta alteração do trofismo?,SQ002,Região glenoumeral,,,A3,Hipertrofia
-599846,INDC - Avaliação de Entrada,Segundo Grupo,F,Array (Flexible Labels),listrofismo,listrofismo,Qual região apresenta alteração do trofismo?,SQ002,Região glenoumeral,,,A4,Sem alteração
-599846,INDC - Avaliação de Entrada,Segundo Grupo,F,Array (Flexible Labels),listrofismo,listrofismo,Qual região apresenta alteração do trofismo?,SQ003,Braço,,,A1,Atrofia
-599846,INDC - Avaliação de Entrada,Segundo Grupo,F,Array (Flexible Labels),listrofismo,listrofismo,Qual região apresenta alteração do trofismo?,SQ003,Braço,,,A2,Hipotrofia
-599846,INDC - Avaliação de Entrada,Segundo Grupo,F,Array (Flexible Labels),listrofismo,listrofismo,Qual região apresenta alteração do trofismo?,SQ003,Braço,,,A3,Hipertrofia
-599846,INDC - Avaliação de Entrada,Segundo Grupo,F,Array (Flexible Labels),listrofismo,listrofismo,Qual região apresenta alteração do trofismo?,SQ003,Braço,,,A4,Sem alteração
-599846,INDC - Avaliação de Entrada,Segundo Grupo,F,Array (Flexible Labels),listrofismo,listrofismo,Qual região apresenta alteração do trofismo?,SQ004,Antebraço,,,A1,Atrofia
-599846,INDC - Avaliação de Entrada,Segundo Grupo,F,Array (Flexible Labels),listrofismo,listrofismo,Qual região apresenta alteração do trofismo?,SQ004,Antebraço,,,A2,Hipotrofia
-599846,INDC - Avaliação de Entrada,Segundo Grupo,F,Array (Flexible Labels),listrofismo,listrofismo,Qual região apresenta alteração do trofismo?,SQ004,Antebraço,,,A3,Hipertrofia
-599846,INDC - Avaliação de Entrada,Segundo Grupo,F,Array (Flexible Labels),listrofismo,listrofismo,Qual região apresenta alteração do trofismo?,SQ004,Antebraço,,,A4,Sem alteração
-599846,INDC - Avaliação de Entrada,Segundo Grupo,F,Array (Flexible Labels),listrofismo,listrofismo,Qual região apresenta alteração do trofismo?,SQ005,Mão,,,A1,Atrofia
-599846,INDC - Avaliação de Entrada,Segundo Grupo,F,Array (Flexible Labels),listrofismo,listrofismo,Qual região apresenta alteração do trofismo?,SQ005,Mão,,,A2,Hipotrofia
-599846,INDC - Avaliação de Entrada,Segundo Grupo,F,Array (Flexible Labels),listrofismo,listrofismo,Qual região apresenta alteração do trofismo?,SQ005,Mão,,,A3,Hipertrofia
-599846,INDC - Avaliação de Entrada,Segundo Grupo,F,Array (Flexible Labels),listrofismo,listrofismo,Qual região apresenta alteração do trofismo?,SQ005,Mão,,,A4,Sem alteração
-599846,INDC - Avaliação de Entrada,Segundo Grupo,F,Array (Flexible Labels),opcsenstatil,opcsenstatil,Sensibilidade Superficial Tátil:,1,C3,,,1,Anestesia
-599846,INDC - Avaliação de Entrada,Segundo Grupo,F,Array (Flexible Labels),opcsenstatil,opcsenstatil,Sensibilidade Superficial Tátil:,1,C3,,,2,Hipoestesia
-599846,INDC - Avaliação de Entrada,Segundo Grupo,F,Array (Flexible Labels),opcsenstatil,opcsenstatil,Sensibilidade Superficial Tátil:,1,C3,,,3,Hiperestesia
-599846,INDC - Avaliação de Entrada,Segundo Grupo,F,Array (Flexible Labels),opcsenstatil,opcsenstatil,Sensibilidade Superficial Tátil:,1,C3,,,4,Normal
-599846,INDC - Avaliação de Entrada,Segundo Grupo,F,Array (Flexible Labels),opcsenstatil,opcsenstatil,Sensibilidade Superficial Tátil:,1,C3,,,5,Não Avaliado
-599846,INDC - Avaliação de Entrada,Segundo Grupo,F,Array (Flexible Labels),opcsenstatil,opcsenstatil,Sensibilidade Superficial Tátil:,2,C4,,,1,Anestesia
-599846,INDC - Avaliação de Entrada,Segundo Grupo,F,Array (Flexible Labels),opcsenstatil,opcsenstatil,Sensibilidade Superficial Tátil:,2,C4,,,2,Hipoestesia
-599846,INDC - Avaliação de Entrada,Segundo Grupo,F,Array (Flexible Labels),opcsenstatil,opcsenstatil,Sensibilidade Superficial Tátil:,2,C4,,,3,Hiperestesia
-599846,INDC - Avaliação de Entrada,Segundo Grupo,F,Array (Flexible Labels),opcsenstatil,opcsenstatil,Sensibilidade Superficial Tátil:,2,C4,,,4,Normal
-599846,INDC - Avaliação de Entrada,Segundo Grupo,F,Array (Flexible Labels),opcsenstatil,opcsenstatil,Sensibilidade Superficial Tátil:,2,C4,,,5,Não Avaliado
-599846,INDC - Avaliação de Entrada,Segundo Grupo,F,Array (Flexible Labels),opcsenstatil,opcsenstatil,Sensibilidade Superficial Tátil:,3,C5,,,1,Anestesia
-599846,INDC - Avaliação de Entrada,Segundo Grupo,F,Array (Flexible Labels),opcsenstatil,opcsenstatil,Sensibilidade Superficial Tátil:,3,C5,,,2,Hipoestesia
-599846,INDC - Avaliação de Entrada,Segundo Grupo,F,Array (Flexible Labels),opcsenstatil,opcsenstatil,Sensibilidade Superficial Tátil:,3,C5,,,3,Hiperestesia
-599846,INDC - Avaliação de Entrada,Segundo Grupo,F,Array (Flexible Labels),opcsenstatil,opcsenstatil,Sensibilidade Superficial Tátil:,3,C5,,,4,Normal
-599846,INDC - Avaliação de Entrada,Segundo Grupo,F,Array (Flexible Labels),opcsenstatil,opcsenstatil,Sensibilidade Superficial Tátil:,3,C5,,,5,Não Avaliado
-599846,INDC - Avaliação de Entrada,Segundo Grupo,F,Array (Flexible Labels),opcsenstatil,opcsenstatil,Sensibilidade Superficial Tátil:,4,C6,,,1,Anestesia
-599846,INDC - Avaliação de Entrada,Segundo Grupo,F,Array (Flexible Labels),opcsenstatil,opcsenstatil,Sensibilidade Superficial Tátil:,4,C6,,,2,Hipoestesia
-599846,INDC - Avaliação de Entrada,Segundo Grupo,F,Array (Flexible Labels),opcsenstatil,opcsenstatil,Sensibilidade Superficial Tátil:,4,C6,,,3,Hiperestesia
-599846,INDC - Avaliação de Entrada,Segundo Grupo,F,Array (Flexible Labels),opcsenstatil,opcsenstatil,Sensibilidade Superficial Tátil:,4,C6,,,4,Normal
-599846,INDC - Avaliação de Entrada,Segundo Grupo,F,Array (Flexible Labels),opcsenstatil,opcsenstatil,Sensibilidade Superficial Tátil:,4,C6,,,5,Não Avaliado
-599846,INDC - Avaliação de Entrada,Segundo Grupo,F,Array (Flexible Labels),opcsenstatil,opcsenstatil,Sensibilidade Superficial Tátil:,5,C7,,,1,Anestesia
-599846,INDC - Avaliação de Entrada,Segundo Grupo,F,Array (Flexible Labels),opcsenstatil,opcsenstatil,Sensibilidade Superficial Tátil:,5,C7,,,2,Hipoestesia
-599846,INDC - Avaliação de Entrada,Segundo Grupo,F,Array (Flexible Labels),opcsenstatil,opcsenstatil,Sensibilidade Superficial Tátil:,5,C7,,,3,Hiperestesia
-599846,INDC - Avaliação de Entrada,Segundo Grupo,F,Array (Flexible Labels),opcsenstatil,opcsenstatil,Sensibilidade Superficial Tátil:,5,C7,,,4,Normal
-599846,INDC - Avaliação de Entrada,Segundo Grupo,F,Array (Flexible Labels),opcsenstatil,opcsenstatil,Sensibilidade Superficial Tátil:,5,C7,,,5,Não Avaliado
-599846,INDC - Avaliação de Entrada,Segundo Grupo,F,Array (Flexible Labels),opcsenstatil,opcsenstatil,Sensibilidade Superficial Tátil:,6,C8,,,1,Anestesia
-599846,INDC - Avaliação de Entrada,Segundo Grupo,F,Array (Flexible Labels),opcsenstatil,opcsenstatil,Sensibilidade Superficial Tátil:,6,C8,,,2,Hipoestesia
-599846,INDC - Avaliação de Entrada,Segundo Grupo,F,Array (Flexible Labels),opcsenstatil,opcsenstatil,Sensibilidade Superficial Tátil:,6,C8,,,3,Hiperestesia
-599846,INDC - Avaliação de Entrada,Segundo Grupo,F,Array (Flexible Labels),opcsenstatil,opcsenstatil,Sensibilidade Superficial Tátil:,6,C8,,,4,Normal
-599846,INDC - Avaliação de Entrada,Segundo Grupo,F,Array (Flexible Labels),opcsenstatil,opcsenstatil,Sensibilidade Superficial Tátil:,6,C8,,,5,Não Avaliado
-599846,INDC - Avaliação de Entrada,Segundo Grupo,F,Array (Flexible Labels),opcsenstatil,opcsenstatil,Sensibilidade Superficial Tátil:,7,T1,,,1,Anestesia
-599846,INDC - Avaliação de Entrada,Segundo Grupo,F,Array (Flexible Labels),opcsenstatil,opcsenstatil,Sensibilidade Superficial Tátil:,7,T1,,,2,Hipoestesia
-599846,INDC - Avaliação de Entrada,Segundo Grupo,F,Array (Flexible Labels),opcsenstatil,opcsenstatil,Sensibilidade Superficial Tátil:,7,T1,,,3,Hiperestesia
-599846,INDC - Avaliação de Entrada,Segundo Grupo,F,Array (Flexible Labels),opcsenstatil,opcsenstatil,Sensibilidade Superficial Tátil:,7,T1,,,4,Normal
-599846,INDC - Avaliação de Entrada,Segundo Grupo,F,Array (Flexible Labels),opcsenstatil,opcsenstatil,Sensibilidade Superficial Tátil:,7,T1,,,5,Não Avaliado
-599846,INDC - Avaliação de Entrada,Segundo Grupo,F,Array (Flexible Labels),opcsenstatil,opcsenstatil,Sensibilidade Superficial Tátil:,8,T2,,,1,Anestesia
-599846,INDC - Avaliação de Entrada,Segundo Grupo,F,Array (Flexible Labels),opcsenstatil,opcsenstatil,Sensibilidade Superficial Tátil:,8,T2,,,2,Hipoestesia
-599846,INDC - Avaliação de Entrada,Segundo Grupo,F,Array (Flexible Labels),opcsenstatil,opcsenstatil,Sensibilidade Superficial Tátil:,8,T2,,,3,Hiperestesia
-599846,INDC - Avaliação de Entrada,Segundo Grupo,F,Array (Flexible Labels),opcsenstatil,opcsenstatil,Sensibilidade Superficial Tátil:,8,T2,,,4,Normal
-599846,INDC - Avaliação de Entrada,Segundo Grupo,F,Array (Flexible Labels),opcsenstatil,opcsenstatil,Sensibilidade Superficial Tátil:,8,T2,,,5,Não Avaliado
-599846,INDC - Avaliação de Entrada,Segundo Grupo,F,Array (Flexible Labels),opcsenstatil,opcsenstatil,Sensibilidade Superficial Tátil:,9,T3,,,1,Anestesia
-599846,INDC - Avaliação de Entrada,Segundo Grupo,F,Array (Flexible Labels),opcsenstatil,opcsenstatil,Sensibilidade Superficial Tátil:,9,T3,,,2,Hipoestesia
-599846,INDC - Avaliação de Entrada,Segundo Grupo,F,Array (Flexible Labels),opcsenstatil,opcsenstatil,Sensibilidade Superficial Tátil:,9,T3,,,3,Hiperestesia
-599846,INDC - Avaliação de Entrada,Segundo Grupo,F,Array (Flexible Labels),opcsenstatil,opcsenstatil,Sensibilidade Superficial Tátil:,9,T3,,,4,Normal
-599846,INDC - Avaliação de Entrada,Segundo Grupo,F,Array (Flexible Labels),opcsenstatil,opcsenstatil,Sensibilidade Superficial Tátil:,9,T3,,,5,Não Avaliado
-599846,INDC - Avaliação de Entrada,Terceiro Grupo,S,Short Free Text,texcirurnervo2,texcirurnervo2,Qual(is) nervo(s)?, , ,,, , 
-599846,INDC - Avaliação de Entrada,Terceiro Grupo,M,Multiple choice,lislesovascular2,lislesovascular2,Qual(is) artéria(s) e/ou vaso(s) foram acometidos?,1,Artéria subclávia,,, , 
-599846,INDC - Avaliação de Entrada,Terceiro Grupo,M,Multiple choice,lislesovascular2,lislesovascular2,Qual(is) artéria(s) e/ou vaso(s) foram acometidos?,2,Veia subclávia,,, , 
-599846,INDC - Avaliação de Entrada,Terceiro Grupo,M,Multiple choice,lislesovascular2,lislesovascular2,Qual(is) artéria(s) e/ou vaso(s) foram acometidos?,3,Artéria axilar,,, , 
-599846,INDC - Avaliação de Entrada,Terceiro Grupo,M,Multiple choice,lislesovascular2,lislesovascular2,Qual(is) artéria(s) e/ou vaso(s) foram acometidos?,4,Veia axilar,,, , 
-599846,INDC - Avaliação de Entrada,Terceiro Grupo,M,Multiple choice,lislesovascular2,lislesovascular2,Qual(is) artéria(s) e/ou vaso(s) foram acometidos?,5,Artéria braquial,,, , 
-599846,INDC - Avaliação de Entrada,Terceiro Grupo,M,Multiple choice,lislesovascular2,lislesovascular2,Qual(is) artéria(s) e/ou vaso(s) foram acometidos?,6,Não especificado,,, , 
-599846,INDC - Avaliação de Entrada,Terceiro Grupo,T,Long Free Text,texlocaltinel,texlocaltinel,Localização do Sinal de Tinel:, , ,,, , 
-599846,INDC - Avaliação de Entrada,Terceiro Grupo,D,Date,datcirurgiaanterior,datcirurgiaanterior,Quando foi submetido(a) à cirurgia(s) de plexo braquial (mm/aaaa)?, , ,,, , 
+questionnaire_code,questionnaire_title,question_group,question_order,question_type,question_type_description,question_index,question_code,question_description,subquestion_code,subquestion_description,question_scale,question_scale_label,option_code,option_description
+599846,INDC - Avaliação de Entrada,Primeiro Grupo,0,L,List (Radio),opsdor,opsdor,Refere dor após a lesão?, , ,,,A1,Sim
+599846,INDC - Avaliação de Entrada,Primeiro Grupo,0,L,List (Radio),opsdor,opsdor,Refere dor após a lesão?, , ,,,A2,Não
+599846,INDC - Avaliação de Entrada,Primeiro Grupo,0,L,List (Radio),opsdor,opsdor,Refere dor após a lesão?, , ,,,A3,Não Informado
+599846,INDC - Avaliação de Entrada,Primeiro Grupo,1,B,Array (10 Point Choice),opcEVA,opcEVA,EVA da dor principal:,SQ001,EVA,,, , 
+599846,INDC - Avaliação de Entrada,Primeiro Grupo,2,L,List (Radio),opclocalizalesao,opclocalizalesao,Qual a localização da lesão ao exame clínico?, , ,,,1,Tronco Superior
+599846,INDC - Avaliação de Entrada,Primeiro Grupo,2,L,List (Radio),opclocalizalesao,opclocalizalesao,Qual a localização da lesão ao exame clínico?, , ,,,2,Tronco Superior Estendido (C5- C7)
+599846,INDC - Avaliação de Entrada,Primeiro Grupo,2,L,List (Radio),opclocalizalesao,opclocalizalesao,Qual a localização da lesão ao exame clínico?, , ,,,3,Tronco Inferior
+599846,INDC - Avaliação de Entrada,Primeiro Grupo,2,L,List (Radio),opclocalizalesao,opclocalizalesao,Qual a localização da lesão ao exame clínico?, , ,,,4,C5- T1
+599846,INDC - Avaliação de Entrada,Primeiro Grupo,2,L,List (Radio),opclocalizalesao,opclocalizalesao,Qual a localização da lesão ao exame clínico?, , ,,,5,Não foi possível identificar (necessário exames complementares)
+599846,INDC - Avaliação de Entrada,Primeiro Grupo,3,L,List (Radio),snindicacirurgia,snindicacirurgia,Indicação para cirurgia?, , ,,,1,Sim
+599846,INDC - Avaliação de Entrada,Primeiro Grupo,3,L,List (Radio),snindicacirurgia,snindicacirurgia,Indicação para cirurgia?, , ,,,2,Não
+599846,INDC - Avaliação de Entrada,Primeiro Grupo,3,L,List (Radio),snindicacirurgia,snindicacirurgia,Indicação para cirurgia?, , ,,,3,Não definido
+599846,INDC - Avaliação de Entrada,Primeiro Grupo,4,L,List (Radio),liscomplicacoes,liscomplicacoes,Teve complicações?, , ,,,1,Sim
+599846,INDC - Avaliação de Entrada,Primeiro Grupo,4,L,List (Radio),liscomplicacoes,liscomplicacoes,Teve complicações?, , ,,,2,Não
+599846,INDC - Avaliação de Entrada,Primeiro Grupo,4,L,List (Radio),liscomplicacoes,liscomplicacoes,Teve complicações?, , ,,,3,Não sei
+599846,INDC - Avaliação de Entrada,Primeiro Grupo,5,T,Long Free Text,texcomplicacoes,texcomplicacoes,Quais?, , ,,, , 
+599846,INDC - Avaliação de Entrada,Primeiro Grupo,6,S,Short Free Text,texdor,texdor,Localização da dor principal:, , ,,, , 
+599846,INDC - Avaliação de Entrada,Segundo Grupo,7,L,List (Radio),lisdiagnostico,lisdiagnostico,Qual o diagnóstico sugerido?, , ,,,1,Tronco Superior
+599846,INDC - Avaliação de Entrada,Segundo Grupo,7,L,List (Radio),lisdiagnostico,lisdiagnostico,Qual o diagnóstico sugerido?, , ,,,2,Tronco Superior Estendido (C5-C7)
+599846,INDC - Avaliação de Entrada,Segundo Grupo,7,L,List (Radio),lisdiagnostico,lisdiagnostico,Qual o diagnóstico sugerido?, , ,,,3,Tronco Inferior
+599846,INDC - Avaliação de Entrada,Segundo Grupo,7,L,List (Radio),lisdiagnostico,lisdiagnostico,Qual o diagnóstico sugerido?, , ,,,4,C5-T1
+599846,INDC - Avaliação de Entrada,Segundo Grupo,8,F,Array (Flexible Labels),listrofismo,listrofismo,Qual região apresenta alteração do trofismo?,SQ001,Região escapular,,,A1,Atrofia
+599846,INDC - Avaliação de Entrada,Segundo Grupo,8,F,Array (Flexible Labels),listrofismo,listrofismo,Qual região apresenta alteração do trofismo?,SQ001,Região escapular,,,A2,Hipotrofia
+599846,INDC - Avaliação de Entrada,Segundo Grupo,8,F,Array (Flexible Labels),listrofismo,listrofismo,Qual região apresenta alteração do trofismo?,SQ001,Região escapular,,,A3,Hipertrofia
+599846,INDC - Avaliação de Entrada,Segundo Grupo,8,F,Array (Flexible Labels),listrofismo,listrofismo,Qual região apresenta alteração do trofismo?,SQ001,Região escapular,,,A4,Sem alteração
+599846,INDC - Avaliação de Entrada,Segundo Grupo,8,F,Array (Flexible Labels),listrofismo,listrofismo,Qual região apresenta alteração do trofismo?,SQ002,Região glenoumeral,,,A1,Atrofia
+599846,INDC - Avaliação de Entrada,Segundo Grupo,8,F,Array (Flexible Labels),listrofismo,listrofismo,Qual região apresenta alteração do trofismo?,SQ002,Região glenoumeral,,,A2,Hipotrofia
+599846,INDC - Avaliação de Entrada,Segundo Grupo,8,F,Array (Flexible Labels),listrofismo,listrofismo,Qual região apresenta alteração do trofismo?,SQ002,Região glenoumeral,,,A3,Hipertrofia
+599846,INDC - Avaliação de Entrada,Segundo Grupo,8,F,Array (Flexible Labels),listrofismo,listrofismo,Qual região apresenta alteração do trofismo?,SQ002,Região glenoumeral,,,A4,Sem alteração
+599846,INDC - Avaliação de Entrada,Segundo Grupo,8,F,Array (Flexible Labels),listrofismo,listrofismo,Qual região apresenta alteração do trofismo?,SQ003,Braço,,,A1,Atrofia
+599846,INDC - Avaliação de Entrada,Segundo Grupo,8,F,Array (Flexible Labels),listrofismo,listrofismo,Qual região apresenta alteração do trofismo?,SQ003,Braço,,,A2,Hipotrofia
+599846,INDC - Avaliação de Entrada,Segundo Grupo,8,F,Array (Flexible Labels),listrofismo,listrofismo,Qual região apresenta alteração do trofismo?,SQ003,Braço,,,A3,Hipertrofia
+599846,INDC - Avaliação de Entrada,Segundo Grupo,8,F,Array (Flexible Labels),listrofismo,listrofismo,Qual região apresenta alteração do trofismo?,SQ003,Braço,,,A4,Sem alteração
+599846,INDC - Avaliação de Entrada,Segundo Grupo,8,F,Array (Flexible Labels),listrofismo,listrofismo,Qual região apresenta alteração do trofismo?,SQ004,Antebraço,,,A1,Atrofia
+599846,INDC - Avaliação de Entrada,Segundo Grupo,8,F,Array (Flexible Labels),listrofismo,listrofismo,Qual região apresenta alteração do trofismo?,SQ004,Antebraço,,,A2,Hipotrofia
+599846,INDC - Avaliação de Entrada,Segundo Grupo,8,F,Array (Flexible Labels),listrofismo,listrofismo,Qual região apresenta alteração do trofismo?,SQ004,Antebraço,,,A3,Hipertrofia
+599846,INDC - Avaliação de Entrada,Segundo Grupo,8,F,Array (Flexible Labels),listrofismo,listrofismo,Qual região apresenta alteração do trofismo?,SQ004,Antebraço,,,A4,Sem alteração
+599846,INDC - Avaliação de Entrada,Segundo Grupo,8,F,Array (Flexible Labels),listrofismo,listrofismo,Qual região apresenta alteração do trofismo?,SQ005,Mão,,,A1,Atrofia
+599846,INDC - Avaliação de Entrada,Segundo Grupo,8,F,Array (Flexible Labels),listrofismo,listrofismo,Qual região apresenta alteração do trofismo?,SQ005,Mão,,,A2,Hipotrofia
+599846,INDC - Avaliação de Entrada,Segundo Grupo,8,F,Array (Flexible Labels),listrofismo,listrofismo,Qual região apresenta alteração do trofismo?,SQ005,Mão,,,A3,Hipertrofia
+599846,INDC - Avaliação de Entrada,Segundo Grupo,8,F,Array (Flexible Labels),listrofismo,listrofismo,Qual região apresenta alteração do trofismo?,SQ005,Mão,,,A4,Sem alteração
+599846,INDC - Avaliação de Entrada,Segundo Grupo,9,F,Array (Flexible Labels),opcsenstatil,opcsenstatil,Sensibilidade Superficial Tátil:,1,C3,,,1,Anestesia
+599846,INDC - Avaliação de Entrada,Segundo Grupo,9,F,Array (Flexible Labels),opcsenstatil,opcsenstatil,Sensibilidade Superficial Tátil:,1,C3,,,2,Hipoestesia
+599846,INDC - Avaliação de Entrada,Segundo Grupo,9,F,Array (Flexible Labels),opcsenstatil,opcsenstatil,Sensibilidade Superficial Tátil:,1,C3,,,3,Hiperestesia
+599846,INDC - Avaliação de Entrada,Segundo Grupo,9,F,Array (Flexible Labels),opcsenstatil,opcsenstatil,Sensibilidade Superficial Tátil:,1,C3,,,4,Normal
+599846,INDC - Avaliação de Entrada,Segundo Grupo,9,F,Array (Flexible Labels),opcsenstatil,opcsenstatil,Sensibilidade Superficial Tátil:,1,C3,,,5,Não Avaliado
+599846,INDC - Avaliação de Entrada,Segundo Grupo,9,F,Array (Flexible Labels),opcsenstatil,opcsenstatil,Sensibilidade Superficial Tátil:,2,C4,,,1,Anestesia
+599846,INDC - Avaliação de Entrada,Segundo Grupo,9,F,Array (Flexible Labels),opcsenstatil,opcsenstatil,Sensibilidade Superficial Tátil:,2,C4,,,2,Hipoestesia
+599846,INDC - Avaliação de Entrada,Segundo Grupo,9,F,Array (Flexible Labels),opcsenstatil,opcsenstatil,Sensibilidade Superficial Tátil:,2,C4,,,3,Hiperestesia
+599846,INDC - Avaliação de Entrada,Segundo Grupo,9,F,Array (Flexible Labels),opcsenstatil,opcsenstatil,Sensibilidade Superficial Tátil:,2,C4,,,4,Normal
+599846,INDC - Avaliação de Entrada,Segundo Grupo,9,F,Array (Flexible Labels),opcsenstatil,opcsenstatil,Sensibilidade Superficial Tátil:,2,C4,,,5,Não Avaliado
+599846,INDC - Avaliação de Entrada,Segundo Grupo,9,F,Array (Flexible Labels),opcsenstatil,opcsenstatil,Sensibilidade Superficial Tátil:,3,C5,,,1,Anestesia
+599846,INDC - Avaliação de Entrada,Segundo Grupo,9,F,Array (Flexible Labels),opcsenstatil,opcsenstatil,Sensibilidade Superficial Tátil:,3,C5,,,2,Hipoestesia
+599846,INDC - Avaliação de Entrada,Segundo Grupo,9,F,Array (Flexible Labels),opcsenstatil,opcsenstatil,Sensibilidade Superficial Tátil:,3,C5,,,3,Hiperestesia
+599846,INDC - Avaliação de Entrada,Segundo Grupo,9,F,Array (Flexible Labels),opcsenstatil,opcsenstatil,Sensibilidade Superficial Tátil:,3,C5,,,4,Normal
+599846,INDC - Avaliação de Entrada,Segundo Grupo,9,F,Array (Flexible Labels),opcsenstatil,opcsenstatil,Sensibilidade Superficial Tátil:,3,C5,,,5,Não Avaliado
+599846,INDC - Avaliação de Entrada,Segundo Grupo,9,F,Array (Flexible Labels),opcsenstatil,opcsenstatil,Sensibilidade Superficial Tátil:,4,C6,,,1,Anestesia
+599846,INDC - Avaliação de Entrada,Segundo Grupo,9,F,Array (Flexible Labels),opcsenstatil,opcsenstatil,Sensibilidade Superficial Tátil:,4,C6,,,2,Hipoestesia
+599846,INDC - Avaliação de Entrada,Segundo Grupo,9,F,Array (Flexible Labels),opcsenstatil,opcsenstatil,Sensibilidade Superficial Tátil:,4,C6,,,3,Hiperestesia
+599846,INDC - Avaliação de Entrada,Segundo Grupo,9,F,Array (Flexible Labels),opcsenstatil,opcsenstatil,Sensibilidade Superficial Tátil:,4,C6,,,4,Normal
+599846,INDC - Avaliação de Entrada,Segundo Grupo,9,F,Array (Flexible Labels),opcsenstatil,opcsenstatil,Sensibilidade Superficial Tátil:,4,C6,,,5,Não Avaliado
+599846,INDC - Avaliação de Entrada,Segundo Grupo,9,F,Array (Flexible Labels),opcsenstatil,opcsenstatil,Sensibilidade Superficial Tátil:,5,C7,,,1,Anestesia
+599846,INDC - Avaliação de Entrada,Segundo Grupo,9,F,Array (Flexible Labels),opcsenstatil,opcsenstatil,Sensibilidade Superficial Tátil:,5,C7,,,2,Hipoestesia
+599846,INDC - Avaliação de Entrada,Segundo Grupo,9,F,Array (Flexible Labels),opcsenstatil,opcsenstatil,Sensibilidade Superficial Tátil:,5,C7,,,3,Hiperestesia
+599846,INDC - Avaliação de Entrada,Segundo Grupo,9,F,Array (Flexible Labels),opcsenstatil,opcsenstatil,Sensibilidade Superficial Tátil:,5,C7,,,4,Normal
+599846,INDC - Avaliação de Entrada,Segundo Grupo,9,F,Array (Flexible Labels),opcsenstatil,opcsenstatil,Sensibilidade Superficial Tátil:,5,C7,,,5,Não Avaliado
+599846,INDC - Avaliação de Entrada,Segundo Grupo,9,F,Array (Flexible Labels),opcsenstatil,opcsenstatil,Sensibilidade Superficial Tátil:,6,C8,,,1,Anestesia
+599846,INDC - Avaliação de Entrada,Segundo Grupo,9,F,Array (Flexible Labels),opcsenstatil,opcsenstatil,Sensibilidade Superficial Tátil:,6,C8,,,2,Hipoestesia
+599846,INDC - Avaliação de Entrada,Segundo Grupo,9,F,Array (Flexible Labels),opcsenstatil,opcsenstatil,Sensibilidade Superficial Tátil:,6,C8,,,3,Hiperestesia
+599846,INDC - Avaliação de Entrada,Segundo Grupo,9,F,Array (Flexible Labels),opcsenstatil,opcsenstatil,Sensibilidade Superficial Tátil:,6,C8,,,4,Normal
+599846,INDC - Avaliação de Entrada,Segundo Grupo,9,F,Array (Flexible Labels),opcsenstatil,opcsenstatil,Sensibilidade Superficial Tátil:,6,C8,,,5,Não Avaliado
+599846,INDC - Avaliação de Entrada,Segundo Grupo,9,F,Array (Flexible Labels),opcsenstatil,opcsenstatil,Sensibilidade Superficial Tátil:,7,T1,,,1,Anestesia
+599846,INDC - Avaliação de Entrada,Segundo Grupo,9,F,Array (Flexible Labels),opcsenstatil,opcsenstatil,Sensibilidade Superficial Tátil:,7,T1,,,2,Hipoestesia
+599846,INDC - Avaliação de Entrada,Segundo Grupo,9,F,Array (Flexible Labels),opcsenstatil,opcsenstatil,Sensibilidade Superficial Tátil:,7,T1,,,3,Hiperestesia
+599846,INDC - Avaliação de Entrada,Segundo Grupo,9,F,Array (Flexible Labels),opcsenstatil,opcsenstatil,Sensibilidade Superficial Tátil:,7,T1,,,4,Normal
+599846,INDC - Avaliação de Entrada,Segundo Grupo,9,F,Array (Flexible Labels),opcsenstatil,opcsenstatil,Sensibilidade Superficial Tátil:,7,T1,,,5,Não Avaliado
+599846,INDC - Avaliação de Entrada,Segundo Grupo,9,F,Array (Flexible Labels),opcsenstatil,opcsenstatil,Sensibilidade Superficial Tátil:,8,T2,,,1,Anestesia
+599846,INDC - Avaliação de Entrada,Segundo Grupo,9,F,Array (Flexible Labels),opcsenstatil,opcsenstatil,Sensibilidade Superficial Tátil:,8,T2,,,2,Hipoestesia
+599846,INDC - Avaliação de Entrada,Segundo Grupo,9,F,Array (Flexible Labels),opcsenstatil,opcsenstatil,Sensibilidade Superficial Tátil:,8,T2,,,3,Hiperestesia
+599846,INDC - Avaliação de Entrada,Segundo Grupo,9,F,Array (Flexible Labels),opcsenstatil,opcsenstatil,Sensibilidade Superficial Tátil:,8,T2,,,4,Normal
+599846,INDC - Avaliação de Entrada,Segundo Grupo,9,F,Array (Flexible Labels),opcsenstatil,opcsenstatil,Sensibilidade Superficial Tátil:,8,T2,,,5,Não Avaliado
+599846,INDC - Avaliação de Entrada,Segundo Grupo,9,F,Array (Flexible Labels),opcsenstatil,opcsenstatil,Sensibilidade Superficial Tátil:,9,T3,,,1,Anestesia
+599846,INDC - Avaliação de Entrada,Segundo Grupo,9,F,Array (Flexible Labels),opcsenstatil,opcsenstatil,Sensibilidade Superficial Tátil:,9,T3,,,2,Hipoestesia
+599846,INDC - Avaliação de Entrada,Segundo Grupo,9,F,Array (Flexible Labels),opcsenstatil,opcsenstatil,Sensibilidade Superficial Tátil:,9,T3,,,3,Hiperestesia
+599846,INDC - Avaliação de Entrada,Segundo Grupo,9,F,Array (Flexible Labels),opcsenstatil,opcsenstatil,Sensibilidade Superficial Tátil:,9,T3,,,4,Normal
+599846,INDC - Avaliação de Entrada,Segundo Grupo,9,F,Array (Flexible Labels),opcsenstatil,opcsenstatil,Sensibilidade Superficial Tátil:,9,T3,,,5,Não Avaliado
+599846,INDC - Avaliação de Entrada,Terceiro Grupo,10,S,Short Free Text,texcirurnervo2,texcirurnervo2,Qual(is) nervo(s)?, , ,,, , 
+599846,INDC - Avaliação de Entrada,Terceiro Grupo,11,M,Multiple choice,lislesovascular2,lislesovascular2,Qual(is) artéria(s) e/ou vaso(s) foram acometidos?,1,Artéria subclávia,,, , 
+599846,INDC - Avaliação de Entrada,Terceiro Grupo,11,M,Multiple choice,lislesovascular2,lislesovascular2,Qual(is) artéria(s) e/ou vaso(s) foram acometidos?,2,Veia subclávia,,, , 
+599846,INDC - Avaliação de Entrada,Terceiro Grupo,11,M,Multiple choice,lislesovascular2,lislesovascular2,Qual(is) artéria(s) e/ou vaso(s) foram acometidos?,3,Artéria axilar,,, , 
+599846,INDC - Avaliação de Entrada,Terceiro Grupo,11,M,Multiple choice,lislesovascular2,lislesovascular2,Qual(is) artéria(s) e/ou vaso(s) foram acometidos?,4,Veia axilar,,, , 
+599846,INDC - Avaliação de Entrada,Terceiro Grupo,11,M,Multiple choice,lislesovascular2,lislesovascular2,Qual(is) artéria(s) e/ou vaso(s) foram acometidos?,5,Artéria braquial,,, , 
+599846,INDC - Avaliação de Entrada,Terceiro Grupo,11,M,Multiple choice,lislesovascular2,lislesovascular2,Qual(is) artéria(s) e/ou vaso(s) foram acometidos?,6,Não especificado,,, , 
+599846,INDC - Avaliação de Entrada,Terceiro Grupo,12,T,Long Free Text,texlocaltinel,texlocaltinel,Localização do Sinal de Tinel:, , ,,, , 
+599846,INDC - Avaliação de Entrada,Terceiro Grupo,13,D,Date,datcirurgiaanterior,datcirurgiaanterior,Quando foi submetido(a) à cirurgia(s) de plexo braquial (mm/aaaa)?, , ,,, , 

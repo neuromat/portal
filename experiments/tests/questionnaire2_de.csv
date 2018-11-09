@@ -1,195 +1,195 @@
-questionnaire_code,questionnaire_title,question_group,question_type,question_type_description,question_index,question_code,question_description,subquestion_code,subquestion_description,question_scale,question_scale_label,option_code,option_description
-599846,INDC - Eingangsleistung,Erste Gruppe,D,Date,datlesao,datlesao,Datum der Verletzung:, , ,,, , 
-599846,INDC - Eingangsleistung,Erste Gruppe,L,List (Radio),opcladolesao,opcladolesao,Welche Seite der Verletzung?, , ,,,1,Recht
-599846,INDC - Eingangsleistung,Erste Gruppe,L,List (Radio),opcladolesao,opcladolesao,Welche Seite der Verletzung?, , ,,,2,Links
-599846,INDC - Eingangsleistung,Erste Gruppe,L,List (Radio),opcladolesao,opcladolesao,Welche Seite der Verletzung?, , ,,,3,Beide
-599846,INDC - Eingangsleistung,Erste Gruppe,M,Multiple choice,lislocalfisio,lislocalfisio,Lokal:,INDC,Institution der Studie,,, ,
-599846,INDC - Eingangsleistung,Erste Gruppe,L,List (Radio),opcfreqfisio,opcfreqfisio,Wöchentliche Frequenz:, ,,,,1,1 mal
-599846,INDC - Eingangsleistung,Erste Gruppe,L,List (Radio),opcfreqfisio,opcfreqfisio,Wöchentliche Frequenz:, ,,,,2,2 Mal
-599846,INDC - Eingangsleistung,Erste Gruppe,L,List (Radio),opcfreqfisio,opcfreqfisio,Wöchentliche Frequenz:, ,,,,3,Drei Mal
-599846,INDC - Eingangsleistung,Erste Gruppe,L,List (Radio),opcfreqfisio,opcfreqfisio,Wöchentliche Frequenz:, ,,,,4,4 Mal
-599846,INDC - Eingangsleistung,Erste Gruppe,L,List (Radio),opcfreqfisio,opcfreqfisio,Wöchentliche Frequenz:, ,,,,5,5 mal
-599846,INDC - Eingangsleistung,Erste Gruppe,L,List (Radio),opcfreqfisio,opcfreqfisio,Wöchentliche Frequenz:, ,,,,6,6 mal
-599846,INDC - Eingangsleistung,Erste Gruppe,L,List (Radio),opcfreqfisio,opcfreqfisio,Wöchentliche Frequenz:, ,,,,7,7 mal oder mehr
-599846,INDC - Eingangsleistung,Erste Gruppe,T,Long Free Text,texhistoriadoenca,texhistoriadoenca,Geschichte der gegenwärtigen Krankheit:, ,,,, ,
-599846,INDC - Eingangsleistung,Erste Gruppe,L,List (Radio),snTCE,snTCE,Hatten Sie TBI mit der Verletzung verbunden?, ,,,,A1,Ja
-599846,INDC - Eingangsleistung,Erste Gruppe,L,List (Radio),snTCE,snTCE,Hatten Sie TBI mit der Verletzung verbunden?, ,,,,A2,Nein
-599846,INDC - Eingangsleistung,Erste Gruppe,L,List (Radio),snTCE,snTCE,Hatten Sie TBI mit der Verletzung verbunden?, ,,,,A3,Nicht informiert
-599846,INDC - Eingangsleistung,Erste Gruppe,L,List (Radio),sndreno,sndreno,Hast du einen Brustkorb benutzt?, ,,,,1,Ja
-599846,INDC - Eingangsleistung,Erste Gruppe,L,List (Radio),sndreno,sndreno,Hast du einen Brustkorb benutzt?, ,,,,2,Nein
-599846,INDC - Eingangsleistung,Erste Gruppe,L,List (Radio),sndreno,sndreno,Hast du einen Brustkorb benutzt?, ,,,,3,Nicht informiert
-599846,INDC - Eingangsleistung,Erste Gruppe,L,List (Radio),snlesovascular,snlesovascular,"Hatten sie Gefäßverletzungen, die mit Plexus brachialis in Verbindung gebracht wurden?", ,,,,1,Ja
-599846,INDC - Eingangsleistung,Erste Gruppe,L,List (Radio),snlesovascular,snlesovascular,"Hatten sie Gefäßverletzungen, die mit Plexus brachialis in Verbindung gebracht wurden?", ,,,,2,Nein
-599846,INDC - Eingangsleistung,Erste Gruppe,L,List (Radio),snlesovascular,snlesovascular,"Hatten sie Gefäßverletzungen, die mit Plexus brachialis in Verbindung gebracht wurden?", ,,,,3,Nicht informiert
-599846,INDC - Eingangsleistung,Erste Gruppe,M,Multiple choice,lislesovascular3,lislesovascular3,Verletzungstyp (e):,SQ001,Unterbrechung,,, ,
-599846,INDC - Eingangsleistung,Erste Gruppe,M,Multiple choice,lislesovascular3,lislesovascular3,Verletzungstyp (e):,SQ002,Fistel,,, ,
-599846,INDC - Eingangsleistung,Erste Gruppe,M,Multiple choice,lislesovascular3,lislesovascular3,Verletzungstyp (e):,SQ003,Thrombose,,, ,
-599846,INDC - Eingangsleistung,Erste Gruppe,M,Multiple choice,lislesovascular3,lislesovascular3,Verletzungstyp (e):,SQ004,Keine Angabe,,, ,
-599846,INDC - Eingangsleistung,Erste Gruppe,T,Long Free Text,texlesovascular4,texlesovascular4,Art der Rekonstruktion (en):, ,,,, ,
-599846,INDC - Eingangsleistung,Erste Gruppe,|,File Upload,docexameTCE,docexameTCE,Prüfungen hinzufügen., ,,,, ,
-599846,INDC - Eingangsleistung,Erste Gruppe,L,List (Radio),opsTO,opsTO,Führen Sie regelmäßig Ergotherapie durch?, ,,,,A1,Ja
-599846,INDC - Eingangsleistung,Erste Gruppe,L,List (Radio),opsTO,opsTO,Führen Sie regelmäßig Ergotherapie durch?, ,,,,A2,Nein
-599846,INDC - Eingangsleistung,Erste Gruppe,L,List (Radio),opsTO,opsTO,Führen Sie regelmäßig Ergotherapie durch?, ,,,,A3,Nicht informiert
-599846,INDC - Eingangsleistung,Erste Gruppe,M,Multiple choice,lislocalTO,lislocalTO,Lokal:,SQ001,Institution der Studie,,, ,
-599846,INDC - Eingangsleistung,Erste Gruppe,L,List (Radio),opcfreqTO,opcfreqTO,Wöchentliche Frequenz:, ,,,,1,1 mal
-599846,INDC - Eingangsleistung,Erste Gruppe,L,List (Radio),opcfreqTO,opcfreqTO,Wöchentliche Frequenz:, ,,,,2,2 Mal
-599846,INDC - Eingangsleistung,Erste Gruppe,L,List (Radio),opcfreqTO,opcfreqTO,Wöchentliche Frequenz:, ,,,,3,Drei Mal
-599846,INDC - Eingangsleistung,Erste Gruppe,L,List (Radio),opcfreqTO,opcfreqTO,Wöchentliche Frequenz:, ,,,,4,4 Mal
-599846,INDC - Eingangsleistung,Erste Gruppe,L,List (Radio),opcfreqTO,opcfreqTO,Wöchentliche Frequenz:, ,,,,5,5 mal
-599846,INDC - Eingangsleistung,Erste Gruppe,L,List (Radio),opcfreqTO,opcfreqTO,Wöchentliche Frequenz:, ,,,,6,6 mal
-599846,INDC - Eingangsleistung,Erste Gruppe,L,List (Radio),opcfreqTO,opcfreqTO,Wöchentliche Frequenz:, ,,,,7,7 mal oder mehr
-599846,INDC - Eingangsleistung,Erste Gruppe,L,List (Radio),sndesacordado,sndesacordado,Warst du bewusstlos?, ,,,,1,Ja
-599846,INDC - Eingangsleistung,Erste Gruppe,L,List (Radio),sndesacordado,sndesacordado,Warst du bewusstlos?, ,,,,2,Nein
-599846,INDC - Eingangsleistung,Erste Gruppe,L,List (Radio),sndesacordado,sndesacordado,Warst du bewusstlos?, ,,,,3,Nicht informiert
-599846,INDC - Eingangsleistung,Erste Gruppe,S,Short Free Text,textempodesacordado,textempodesacordado,Wie lang?, ,,,, ,
-599846,INDC - Eingangsleistung,Erste Gruppe,L,List (Radio),opsmedicamentos,opsmedicamentos,Benutzen Sie Medikamente?, ,,,,A1,Ja
-599846,INDC - Eingangsleistung,Erste Gruppe,L,List (Radio),opsmedicamentos,opsmedicamentos,Benutzen Sie Medikamente?, ,,,,A2,Nein
-599846,INDC - Eingangsleistung,Erste Gruppe,L,List (Radio),opsmedicamentos,opsmedicamentos,Benutzen Sie Medikamente?, ,,,,A3,Nicht informiert
-599846,INDC - Eingangsleistung,Erste Gruppe,P,Multiple choice with comments,lismedicamentos,lismedicamentos,Welche Droge (n)?,1,Opioide,,, ,
-599846,INDC - Eingangsleistung,Erste Gruppe,P,Multiple choice with comments,lismedicamentos,lismedicamentos,Welche Droge (n)?,2,Antidepressiva,,, ,
-599846,INDC - Eingangsleistung,Erste Gruppe,P,Multiple choice with comments,lismedicamentos,lismedicamentos,Welche Droge (n)?,3,Antikonvulsiva,,, ,
-599846,INDC - Eingangsleistung,Erste Gruppe,P,Multiple choice with comments,lismedicamentos,lismedicamentos,Welche Droge (n)?,4,Neuroleptika,,, ,
-599846,INDC - Eingangsleistung,Erste Gruppe,P,Multiple choice with comments,lismedicamentos,lismedicamentos,Welche Droge (n)?,5,Nahrungsergänzungsmittel / Vitamine,,, ,
-599846,INDC - Eingangsleistung,Erste Gruppe,P,Multiple choice with comments,lismedicamentos,lismedicamentos,Welche Droge (n)?,6,Natürliche Substanzen / Tees,,, ,
-599846,INDC - Eingangsleistung,Erste Gruppe,P,Multiple choice with comments,lismedicamentos,lismedicamentos,Welche Droge (n)?,7,Weiß nicht,,, ,
-599846,INDC - Eingangsleistung,Erste Gruppe,Y,Yes/No,sncirurgiasanterio,sncirurgiasanterio,Hatten Sie jemals eine Plexus brachialis Operation?, ,,,, ,
-599846,INDC - Eingangsleistung,Erste Gruppe,T,Long Free Text,texprocedimeanterior,texprocedimeanterior,Welche Verfahren wurden durchgeführt?, ,,,, ,
-599846,INDC - Eingangsleistung,Erste Gruppe,F,Array (Flexible Labels),sninspecao,sninspecao,Inspektion,a,Glenoumerale Subluxation,,,n,Nein
-599846,INDC - Eingangsleistung,Erste Gruppe,F,Array (Flexible Labels),sninspecao,sninspecao,Inspektion,a,Glenoumerale Subluxation,,,n1,Nicht bewertet
-599846,INDC - Eingangsleistung,Erste Gruppe,F,Array (Flexible Labels),sninspecao,sninspecao,Inspektion,a,Glenoumerale Subluxation,,,s,Ja
-599846,INDC - Eingangsleistung,Erste Gruppe,F,Array (Flexible Labels),sninspecao,sninspecao,Inspektion,b,Scrotal Haltung,,,n,Nein
-599846,INDC - Eingangsleistung,Erste Gruppe,F,Array (Flexible Labels),sninspecao,sninspecao,Inspektion,b,Scrotal Haltung,,,n1,Nicht bewertet
-599846,INDC - Eingangsleistung,Erste Gruppe,F,Array (Flexible Labels),sninspecao,sninspecao,Inspektion,b,Scrotal Haltung,,,s,Ja
-599846,INDC - Eingangsleistung,Erste Gruppe,F,Array (Flexible Labels),sninspecao,sninspecao,Inspektion,c,Horner Zeichen,,,n,Nein
-599846,INDC - Eingangsleistung,Erste Gruppe,F,Array (Flexible Labels),sninspecao,sninspecao,Inspektion,c,Horner Zeichen,,,n1,Nicht bewertet
-599846,INDC - Eingangsleistung,Erste Gruppe,F,Array (Flexible Labels),sninspecao,sninspecao,Inspektion,c,Horner Zeichen,,,s,Ja
-599846,INDC - Eingangsleistung,Erste Gruppe,F,Array (Flexible Labels),sninspecao,sninspecao,Inspektion,d,Ödem,,,n,Nein
-599846,INDC - Eingangsleistung,Erste Gruppe,F,Array (Flexible Labels),sninspecao,sninspecao,Inspektion,d,Ödem,,,n1,Nicht bewertet
-599846,INDC - Eingangsleistung,Erste Gruppe,F,Array (Flexible Labels),sninspecao,sninspecao,Inspektion,d,Ödem,,,s,Ja
-599846,INDC - Eingangsleistung,Erste Gruppe,F,Array (Flexible Labels),sninspecao,sninspecao,Inspektion,f,Narbe,,,n,Nein
-599846,INDC - Eingangsleistung,Erste Gruppe,F,Array (Flexible Labels),sninspecao,sninspecao,Inspektion,f,Narbe,,,n1,Nicht bewertet
-599846,INDC - Eingangsleistung,Erste Gruppe,F,Array (Flexible Labels),sninspecao,sninspecao,Inspektion,f,Narbe,,,s,Ja
-599846,INDC - Eingangsleistung,Erste Gruppe,F,Array (Flexible Labels),sninspecao,sninspecao,Inspektion,g,Trophische Veränderung,,,n,Nein
-599846,INDC - Eingangsleistung,Erste Gruppe,F,Array (Flexible Labels),sninspecao,sninspecao,Inspektion,g,Trophische Veränderung,,,n1,Nicht bewertet
-599846,INDC - Eingangsleistung,Erste Gruppe,F,Array (Flexible Labels),sninspecao,sninspecao,Inspektion,g,Trophische Veränderung,,,s,Ja
-599846,INDC - Eingangsleistung,Erste Gruppe,T,Long Free Text,texlocalcicatriz,texlocalcicatriz,Beschreibung und Lage der Narbe:, ,,,, ,
-599846,INDC - Eingangsleistung,Zweite Gruppe,L,List (Radio),snsinaltinel,snsinaltinel,Hat es Tinnitus-Signal?, ,,,,A1,Ja
-599846,INDC - Eingangsleistung,Zweite Gruppe,L,List (Radio),snsinaltinel,snsinaltinel,Hat es Tinnitus-Signal?, ,,,,A2,Nein
-599846,INDC - Eingangsleistung,Zweite Gruppe,L,List (Radio),snsinaltinel,snsinaltinel,Hat es Tinnitus-Signal?, ,,,,A3,Nicht bewertet
-599846,INDC - Eingangsleistung,Zweite Gruppe,F,Array (Flexible Labels),snrestricaoarticula,snrestricaoarticula,Gelenkbeschränkung,1,Schulter,,,1,Ja
-599846,INDC - Eingangsleistung,Zweite Gruppe,F,Array (Flexible Labels),snrestricaoarticula,snrestricaoarticula,Gelenkbeschränkung,1,Schulter,,,2,Nein
-599846,INDC - Eingangsleistung,Zweite Gruppe,F,Array (Flexible Labels),snrestricaoarticula,snrestricaoarticula,Gelenkbeschränkung,1,Schulter,,,3,Nicht bewertet
-599846,INDC - Eingangsleistung,Zweite Gruppe,F,Array (Flexible Labels),snrestricaoarticula,snrestricaoarticula,Gelenkbeschränkung,2,Ellbogen,,,1,Ja
-599846,INDC - Eingangsleistung,Zweite Gruppe,F,Array (Flexible Labels),snrestricaoarticula,snrestricaoarticula,Gelenkbeschränkung,2,Ellbogen,,,2,Nein
-599846,INDC - Eingangsleistung,Zweite Gruppe,F,Array (Flexible Labels),snrestricaoarticula,snrestricaoarticula,Gelenkbeschränkung,2,Ellbogen,,,3,Nicht bewertet
-599846,INDC - Eingangsleistung,Zweite Gruppe,F,Array (Flexible Labels),snrestricaoarticula,snrestricaoarticula,Gelenkbeschränkung,3,Griff,,,1,Ja
-599846,INDC - Eingangsleistung,Zweite Gruppe,F,Array (Flexible Labels),snrestricaoarticula,snrestricaoarticula,Gelenkbeschränkung,3,Griff,,,2,Nein
-599846,INDC - Eingangsleistung,Zweite Gruppe,F,Array (Flexible Labels),snrestricaoarticula,snrestricaoarticula,Gelenkbeschränkung,3,Griff,,,3,Nicht bewertet
-599846,INDC - Eingangsleistung,Zweite Gruppe,F,Array (Flexible Labels),snrestricaoarticula,snrestricaoarticula,Gelenkbeschränkung,4,Finger,,,1,Ja
-599846,INDC - Eingangsleistung,Zweite Gruppe,F,Array (Flexible Labels),snrestricaoarticula,snrestricaoarticula,Gelenkbeschränkung,4,Finger,,,2,Nein
-599846,INDC - Eingangsleistung,Zweite Gruppe,F,Array (Flexible Labels),snrestricaoarticula,snrestricaoarticula,Gelenkbeschränkung,4,Finger,,,3,Nicht bewertet
-599846,INDC - Eingangsleistung,Zweite Gruppe,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ001,Schulterbeugung,,,A1,0
-599846,INDC - Eingangsleistung,Zweite Gruppe,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ001,Schulterbeugung,,,A2,1
-599846,INDC - Eingangsleistung,Zweite Gruppe,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ001,Schulterbeugung,,,A3,2
-599846,INDC - Eingangsleistung,Zweite Gruppe,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ001,Schulterbeugung,,,A4,3
-599846,INDC - Eingangsleistung,Zweite Gruppe,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ001,Schulterbeugung,,,A5,4
-599846,INDC - Eingangsleistung,Zweite Gruppe,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ001,Schulterbeugung,,,A6,5
-599846,INDC - Eingangsleistung,Zweite Gruppe,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ001,Schulterbeugung,,,A7,Nicht bewertet
-599846,INDC - Eingangsleistung,Zweite Gruppe,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ002,Schulterentzündung,,,A1,0
-599846,INDC - Eingangsleistung,Zweite Gruppe,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ002,Schulterentzündung,,,A2,1
-599846,INDC - Eingangsleistung,Zweite Gruppe,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ002,Schulterentzündung,,,A3,2
-599846,INDC - Eingangsleistung,Zweite Gruppe,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ002,Schulterentzündung,,,A4,3
-599846,INDC - Eingangsleistung,Zweite Gruppe,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ002,Schulterentzündung,,,A5,4
-599846,INDC - Eingangsleistung,Zweite Gruppe,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ002,Schulterentzündung,,,A6,5
-599846,INDC - Eingangsleistung,Zweite Gruppe,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ002,Schulterentzündung,,,A7,Nicht bewertet
-599846,INDC - Eingangsleistung,Zweite Gruppe,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ003,Externe Schulterrotation,,,A1,0
-599846,INDC - Eingangsleistung,Zweite Gruppe,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ003,Externe Schulterrotation,,,A2,1
-599846,INDC - Eingangsleistung,Zweite Gruppe,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ003,Externe Schulterrotation,,,A3,2
-599846,INDC - Eingangsleistung,Zweite Gruppe,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ003,Externe Schulterrotation,,,A4,3
-599846,INDC - Eingangsleistung,Zweite Gruppe,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ003,Externe Schulterrotation,,,A5,4
-599846,INDC - Eingangsleistung,Zweite Gruppe,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ003,Externe Schulterrotation,,,A6,5
-599846,INDC - Eingangsleistung,Zweite Gruppe,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ003,Externe Schulterrotation,,,A7,Nicht bewertet
-599846,INDC - Eingangsleistung,Zweite Gruppe,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ004,Interne Schulterrotation,,,A1,0
-599846,INDC - Eingangsleistung,Zweite Gruppe,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ004,Interne Schulterrotation,,,A2,1
-599846,INDC - Eingangsleistung,Zweite Gruppe,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ004,Interne Schulterrotation,,,A3,2
-599846,INDC - Eingangsleistung,Zweite Gruppe,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ004,Interne Schulterrotation,,,A4,3
-599846,INDC - Eingangsleistung,Zweite Gruppe,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ004,Interne Schulterrotation,,,A5,4
-599846,INDC - Eingangsleistung,Zweite Gruppe,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ004,Interne Schulterrotation,,,A6,5
-599846,INDC - Eingangsleistung,Zweite Gruppe,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ004,Interne Schulterrotation,,,A7,Nicht bewertet
-599846,INDC - Eingangsleistung,Zweite Gruppe,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ005,Erhöhung der Scapula,,,A1,0
-599846,INDC - Eingangsleistung,Zweite Gruppe,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ005,Erhöhung der Scapula,,,A2,1
-599846,INDC - Eingangsleistung,Zweite Gruppe,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ005,Erhöhung der Scapula,,,A3,2
-599846,INDC - Eingangsleistung,Zweite Gruppe,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ005,Erhöhung der Scapula,,,A4,3
-599846,INDC - Eingangsleistung,Zweite Gruppe,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ005,Erhöhung der Scapula,,,A5,4
-599846,INDC - Eingangsleistung,Zweite Gruppe,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ005,Erhöhung der Scapula,,,A6,5
-599846,INDC - Eingangsleistung,Zweite Gruppe,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ005,Erhöhung der Scapula,,,A7,Nicht bewertet
-599846,INDC - Eingangsleistung,Zweite Gruppe,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ006,Abduktion und obere Rotation der Scapula,,,A1,0
-599846,INDC - Eingangsleistung,Zweite Gruppe,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ006,Abduktion und obere Rotation der Scapula,,,A2,1
-599846,INDC - Eingangsleistung,Zweite Gruppe,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ006,Abduktion und obere Rotation der Scapula,,,A3,2
-599846,INDC - Eingangsleistung,Zweite Gruppe,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ006,Abduktion und obere Rotation der Scapula,,,A4,3
-599846,INDC - Eingangsleistung,Zweite Gruppe,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ006,Abduktion und obere Rotation der Scapula,,,A5,4
-599846,INDC - Eingangsleistung,Zweite Gruppe,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ006,Abduktion und obere Rotation der Scapula,,,A6,5
-599846,INDC - Eingangsleistung,Zweite Gruppe,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ006,Abduktion und obere Rotation der Scapula,,,A7,Nicht bewertet
-599846,INDC - Eingangsleistung,Zweite Gruppe,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ007,Ellbogenbeugung,,,A1,0
-599846,INDC - Eingangsleistung,Zweite Gruppe,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ007,Ellbogenbeugung,,,A2,1
-599846,INDC - Eingangsleistung,Zweite Gruppe,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ007,Ellbogenbeugung,,,A3,2
-599846,INDC - Eingangsleistung,Zweite Gruppe,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ007,Ellbogenbeugung,,,A4,3
-599846,INDC - Eingangsleistung,Zweite Gruppe,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ007,Ellbogenbeugung,,,A5,4
-599846,INDC - Eingangsleistung,Zweite Gruppe,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ007,Ellbogenbeugung,,,A6,5
-599846,INDC - Eingangsleistung,Zweite Gruppe,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ007,Ellbogenbeugung,,,A7,Nicht bewertet
-599846,INDC - Eingangsleistung,Zweite Gruppe,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ008,Ellbogenverlängerung,,,A1,0
-599846,INDC - Eingangsleistung,Zweite Gruppe,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ008,Ellbogenverlängerung,,,A2,1
-599846,INDC - Eingangsleistung,Zweite Gruppe,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ008,Ellbogenverlängerung,,,A3,2
-599846,INDC - Eingangsleistung,Zweite Gruppe,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ008,Ellbogenverlängerung,,,A4,3
-599846,INDC - Eingangsleistung,Zweite Gruppe,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ008,Ellbogenverlängerung,,,A5,4
-599846,INDC - Eingangsleistung,Zweite Gruppe,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ008,Ellbogenverlängerung,,,A6,5
-599846,INDC - Eingangsleistung,Zweite Gruppe,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ008,Ellbogenverlängerung,,,A7,Nicht bewertet
-599846,INDC - Eingangsleistung,Zweite Gruppe,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ009,Faustverlängerung,,,A1,0
-599846,INDC - Eingangsleistung,Zweite Gruppe,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ009,Faustverlängerung,,,A2,1
-599846,INDC - Eingangsleistung,Zweite Gruppe,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ009,Faustverlängerung,,,A3,2
-599846,INDC - Eingangsleistung,Zweite Gruppe,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ009,Faustverlängerung,,,A4,3
-599846,INDC - Eingangsleistung,Zweite Gruppe,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ009,Faustverlängerung,,,A5,4
-599846,INDC - Eingangsleistung,Zweite Gruppe,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ009,Faustverlängerung,,,A6,5
-599846,INDC - Eingangsleistung,Zweite Gruppe,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ009,Faustverlängerung,,,A7,Nicht bewertet
-599846,INDC - Eingangsleistung,Zweite Gruppe,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ010,Faustbiegen,,,A1,0
-599846,INDC - Eingangsleistung,Zweite Gruppe,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ010,Faustbiegen,,,A2,1
-599846,INDC - Eingangsleistung,Zweite Gruppe,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ010,Faustbiegen,,,A3,2
-599846,INDC - Eingangsleistung,Zweite Gruppe,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ010,Faustbiegen,,,A4,3
-599846,INDC - Eingangsleistung,Zweite Gruppe,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ010,Faustbiegen,,,A5,4
-599846,INDC - Eingangsleistung,Zweite Gruppe,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ010,Faustbiegen,,,A6,5
-599846,INDC - Eingangsleistung,Zweite Gruppe,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ010,Faustbiegen,,,A7,Nicht bewertet
-599846,INDC - Eingangsleistung,Zweite Gruppe,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ011,Fingerbiegen,,,A1,0
-599846,INDC - Eingangsleistung,Zweite Gruppe,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ011,Fingerbiegen,,,A2,1
-599846,INDC - Eingangsleistung,Zweite Gruppe,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ011,Fingerbiegen,,,A3,2
-599846,INDC - Eingangsleistung,Zweite Gruppe,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ011,Fingerbiegen,,,A4,3
-599846,INDC - Eingangsleistung,Zweite Gruppe,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ011,Fingerbiegen,,,A5,4
-599846,INDC - Eingangsleistung,Zweite Gruppe,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ011,Fingerbiegen,,,A6,5
-599846,INDC - Eingangsleistung,Zweite Gruppe,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ011,Fingerbiegen,,,A7,Nicht bewertet
-599846,INDC - Eingangsleistung,Zweite Gruppe,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ012,Fingerverlängerung,,,A1,0
-599846,INDC - Eingangsleistung,Zweite Gruppe,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ012,Fingerverlängerung,,,A2,1
-599846,INDC - Eingangsleistung,Zweite Gruppe,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ012,Fingerverlängerung,,,A3,2
-599846,INDC - Eingangsleistung,Zweite Gruppe,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ012,Fingerverlängerung,,,A4,3
-599846,INDC - Eingangsleistung,Zweite Gruppe,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ012,Fingerverlängerung,,,A5,4
-599846,INDC - Eingangsleistung,Zweite Gruppe,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ012,Fingerverlängerung,,,A6,5
-599846,INDC - Eingangsleistung,Zweite Gruppe,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ012,Fingerverlängerung,,,A7,Nicht bewertet
-599846,INDC - Eingangsleistung,Zweite Gruppe,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ013,Fingerabduktion,,,A1,0
-599846,INDC - Eingangsleistung,Zweite Gruppe,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ013,Fingerabduktion,,,A2,1
-599846,INDC - Eingangsleistung,Zweite Gruppe,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ013,Fingerabduktion,,,A3,2
-599846,INDC - Eingangsleistung,Zweite Gruppe,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ013,Fingerabduktion,,,A4,3
-599846,INDC - Eingangsleistung,Zweite Gruppe,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ013,Fingerabduktion,,,A5,4
-599846,INDC - Eingangsleistung,Zweite Gruppe,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ013,Fingerabduktion,,,A6,5
-599846,INDC - Eingangsleistung,Zweite Gruppe,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ013,Fingerabduktion,,,A7,Nicht bewertet
-599846,INDC - Eingangsleistung,Zweite Gruppe,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ014,Adduktion der Finger,,,A1,0
-599846,INDC - Eingangsleistung,Zweite Gruppe,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ014,Adduktion der Finger,,,A2,1
-599846,INDC - Eingangsleistung,Zweite Gruppe,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ014,Adduktion der Finger,,,A3,2
-599846,INDC - Eingangsleistung,Zweite Gruppe,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ014,Adduktion der Finger,,,A4,3
-599846,INDC - Eingangsleistung,Zweite Gruppe,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ014,Adduktion der Finger,,,A5,4
-599846,INDC - Eingangsleistung,Zweite Gruppe,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ014,Adduktion der Finger,,,A6,5
-599846,INDC - Eingangsleistung,Zweite Gruppe,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ014,Adduktion der Finger,,,A7,Nicht bewertet
-599846,INDC - Eingangsleistung,Zweite Gruppe,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ015,Einverständnis von Daumen,,,A1,0
-599846,INDC - Eingangsleistung,Zweite Gruppe,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ015,Einverständnis von Daumen,,,A2,1
-599846,INDC - Eingangsleistung,Zweite Gruppe,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ015,Einverständnis von Daumen,,,A3,2
-599846,INDC - Eingangsleistung,Zweite Gruppe,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ015,Einverständnis von Daumen,,,A4,3
-599846,INDC - Eingangsleistung,Zweite Gruppe,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ015,Einverständnis von Daumen,,,A5,4
-599846,INDC - Eingangsleistung,Zweite Gruppe,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ015,Einverständnis von Daumen,,,A6,5
-599846,INDC - Eingangsleistung,Zweite Gruppe,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ015,Einverständnis von Daumen,,,A7,Nicht bewertet
+questionnaire_code,questionnaire_title,question_group,question_order,question_type,question_type_description,question_index,question_code,question_description,subquestion_code,subquestion_description,question_scale,question_scale_label,option_code,option_description
+599846,INDC - Eingangsleistung,Erste Gruppe,0,D,Date,datlesao,datlesao,Datum der Verletzung:, , ,,, , 
+599846,INDC - Eingangsleistung,Erste Gruppe,1,L,List (Radio),opcladolesao,opcladolesao,Welche Seite der Verletzung?, , ,,,1,Recht
+599846,INDC - Eingangsleistung,Erste Gruppe,1,L,List (Radio),opcladolesao,opcladolesao,Welche Seite der Verletzung?, , ,,,2,Links
+599846,INDC - Eingangsleistung,Erste Gruppe,1,L,List (Radio),opcladolesao,opcladolesao,Welche Seite der Verletzung?, , ,,,3,Beide
+599846,INDC - Eingangsleistung,Erste Gruppe,2,M,Multiple choice,lislocalfisio,lislocalfisio,Lokal:,INDC,Institution der Studie,,, ,
+599846,INDC - Eingangsleistung,Erste Gruppe,3,L,List (Radio),opcfreqfisio,opcfreqfisio,Wöchentliche Frequenz:, ,,,,1,1 mal
+599846,INDC - Eingangsleistung,Erste Gruppe,3,L,List (Radio),opcfreqfisio,opcfreqfisio,Wöchentliche Frequenz:, ,,,,2,2 Mal
+599846,INDC - Eingangsleistung,Erste Gruppe,3,L,List (Radio),opcfreqfisio,opcfreqfisio,Wöchentliche Frequenz:, ,,,,3,Drei Mal
+599846,INDC - Eingangsleistung,Erste Gruppe,3,L,List (Radio),opcfreqfisio,opcfreqfisio,Wöchentliche Frequenz:, ,,,,4,4 Mal
+599846,INDC - Eingangsleistung,Erste Gruppe,3,L,List (Radio),opcfreqfisio,opcfreqfisio,Wöchentliche Frequenz:, ,,,,5,5 mal
+599846,INDC - Eingangsleistung,Erste Gruppe,3,L,List (Radio),opcfreqfisio,opcfreqfisio,Wöchentliche Frequenz:, ,,,,6,6 mal
+599846,INDC - Eingangsleistung,Erste Gruppe,3,L,List (Radio),opcfreqfisio,opcfreqfisio,Wöchentliche Frequenz:, ,,,,7,7 mal oder mehr
+599846,INDC - Eingangsleistung,Erste Gruppe,4,T,Long Free Text,texhistoriadoenca,texhistoriadoenca,Geschichte der gegenwärtigen Krankheit:, ,,,, ,
+599846,INDC - Eingangsleistung,Erste Gruppe,5,L,List (Radio),snTCE,snTCE,Hatten Sie TBI mit der Verletzung verbunden?, ,,,,A1,Ja
+599846,INDC - Eingangsleistung,Erste Gruppe,5,L,List (Radio),snTCE,snTCE,Hatten Sie TBI mit der Verletzung verbunden?, ,,,,A2,Nein
+599846,INDC - Eingangsleistung,Erste Gruppe,5,L,List (Radio),snTCE,snTCE,Hatten Sie TBI mit der Verletzung verbunden?, ,,,,A3,Nicht informiert
+599846,INDC - Eingangsleistung,Erste Gruppe,6,L,List (Radio),sndreno,sndreno,Hast du einen Brustkorb benutzt?, ,,,,1,Ja
+599846,INDC - Eingangsleistung,Erste Gruppe,6,L,List (Radio),sndreno,sndreno,Hast du einen Brustkorb benutzt?, ,,,,2,Nein
+599846,INDC - Eingangsleistung,Erste Gruppe,6,L,List (Radio),sndreno,sndreno,Hast du einen Brustkorb benutzt?, ,,,,3,Nicht informiert
+599846,INDC - Eingangsleistung,Erste Gruppe,7,L,List (Radio),snlesovascular,snlesovascular,"Hatten sie Gefäßverletzungen, die mit Plexus brachialis in Verbindung gebracht wurden?", ,,,,1,Ja
+599846,INDC - Eingangsleistung,Erste Gruppe,7,L,List (Radio),snlesovascular,snlesovascular,"Hatten sie Gefäßverletzungen, die mit Plexus brachialis in Verbindung gebracht wurden?", ,,,,2,Nein
+599846,INDC - Eingangsleistung,Erste Gruppe,7,L,List (Radio),snlesovascular,snlesovascular,"Hatten sie Gefäßverletzungen, die mit Plexus brachialis in Verbindung gebracht wurden?", ,,,,3,Nicht informiert
+599846,INDC - Eingangsleistung,Erste Gruppe,8,M,Multiple choice,lislesovascular3,lislesovascular3,Verletzungstyp (e):,SQ001,Unterbrechung,,, ,
+599846,INDC - Eingangsleistung,Erste Gruppe,8,M,Multiple choice,lislesovascular3,lislesovascular3,Verletzungstyp (e):,SQ002,Fistel,,, ,
+599846,INDC - Eingangsleistung,Erste Gruppe,8,M,Multiple choice,lislesovascular3,lislesovascular3,Verletzungstyp (e):,SQ003,Thrombose,,, ,
+599846,INDC - Eingangsleistung,Erste Gruppe,8,M,Multiple choice,lislesovascular3,lislesovascular3,Verletzungstyp (e):,SQ004,Keine Angabe,,, ,
+599846,INDC - Eingangsleistung,Erste Gruppe,9,T,Long Free Text,texlesovascular4,texlesovascular4,Art der Rekonstruktion (en):, ,,,, ,
+599846,INDC - Eingangsleistung,Erste Gruppe,10,|,File Upload,docexameTCE,docexameTCE,Prüfungen hinzufügen., ,,,, ,
+599846,INDC - Eingangsleistung,Erste Gruppe,11,L,List (Radio),opsTO,opsTO,Führen Sie regelmäßig Ergotherapie durch?, ,,,,A1,Ja
+599846,INDC - Eingangsleistung,Erste Gruppe,11,L,List (Radio),opsTO,opsTO,Führen Sie regelmäßig Ergotherapie durch?, ,,,,A2,Nein
+599846,INDC - Eingangsleistung,Erste Gruppe,11,L,List (Radio),opsTO,opsTO,Führen Sie regelmäßig Ergotherapie durch?, ,,,,A3,Nicht informiert
+599846,INDC - Eingangsleistung,Erste Gruppe,12,M,Multiple choice,lislocalTO,lislocalTO,Lokal:,SQ001,Institution der Studie,,, ,
+599846,INDC - Eingangsleistung,Erste Gruppe,13,L,List (Radio),opcfreqTO,opcfreqTO,Wöchentliche Frequenz:, ,,,,1,1 mal
+599846,INDC - Eingangsleistung,Erste Gruppe,13,L,List (Radio),opcfreqTO,opcfreqTO,Wöchentliche Frequenz:, ,,,,2,2 Mal
+599846,INDC - Eingangsleistung,Erste Gruppe,13,L,List (Radio),opcfreqTO,opcfreqTO,Wöchentliche Frequenz:, ,,,,3,Drei Mal
+599846,INDC - Eingangsleistung,Erste Gruppe,13,L,List (Radio),opcfreqTO,opcfreqTO,Wöchentliche Frequenz:, ,,,,4,4 Mal
+599846,INDC - Eingangsleistung,Erste Gruppe,13,L,List (Radio),opcfreqTO,opcfreqTO,Wöchentliche Frequenz:, ,,,,5,5 mal
+599846,INDC - Eingangsleistung,Erste Gruppe,13,L,List (Radio),opcfreqTO,opcfreqTO,Wöchentliche Frequenz:, ,,,,6,6 mal
+599846,INDC - Eingangsleistung,Erste Gruppe,13,L,List (Radio),opcfreqTO,opcfreqTO,Wöchentliche Frequenz:, ,,,,7,7 mal oder mehr
+599846,INDC - Eingangsleistung,Erste Gruppe,14,L,List (Radio),sndesacordado,sndesacordado,Warst du bewusstlos?, ,,,,1,Ja
+599846,INDC - Eingangsleistung,Erste Gruppe,14,L,List (Radio),sndesacordado,sndesacordado,Warst du bewusstlos?, ,,,,2,Nein
+599846,INDC - Eingangsleistung,Erste Gruppe,14,L,List (Radio),sndesacordado,sndesacordado,Warst du bewusstlos?, ,,,,3,Nicht informiert
+599846,INDC - Eingangsleistung,Erste Gruppe,15,S,Short Free Text,textempodesacordado,textempodesacordado,Wie lang?, ,,,, ,
+599846,INDC - Eingangsleistung,Erste Gruppe,16,L,List (Radio),opsmedicamentos,opsmedicamentos,Benutzen Sie Medikamente?, ,,,,A1,Ja
+599846,INDC - Eingangsleistung,Erste Gruppe,16,L,List (Radio),opsmedicamentos,opsmedicamentos,Benutzen Sie Medikamente?, ,,,,A2,Nein
+599846,INDC - Eingangsleistung,Erste Gruppe,16,L,List (Radio),opsmedicamentos,opsmedicamentos,Benutzen Sie Medikamente?, ,,,,A3,Nicht informiert
+599846,INDC - Eingangsleistung,Erste Gruppe,17,P,Multiple choice with comments,lismedicamentos,lismedicamentos,Welche Droge (n)?,1,Opioide,,, ,
+599846,INDC - Eingangsleistung,Erste Gruppe,17,P,Multiple choice with comments,lismedicamentos,lismedicamentos,Welche Droge (n)?,2,Antidepressiva,,, ,
+599846,INDC - Eingangsleistung,Erste Gruppe,17,P,Multiple choice with comments,lismedicamentos,lismedicamentos,Welche Droge (n)?,3,Antikonvulsiva,,, ,
+599846,INDC - Eingangsleistung,Erste Gruppe,17,P,Multiple choice with comments,lismedicamentos,lismedicamentos,Welche Droge (n)?,4,Neuroleptika,,, ,
+599846,INDC - Eingangsleistung,Erste Gruppe,17,P,Multiple choice with comments,lismedicamentos,lismedicamentos,Welche Droge (n)?,5,Nahrungsergänzungsmittel / Vitamine,,, ,
+599846,INDC - Eingangsleistung,Erste Gruppe,17,P,Multiple choice with comments,lismedicamentos,lismedicamentos,Welche Droge (n)?,6,Natürliche Substanzen / Tees,,, ,
+599846,INDC - Eingangsleistung,Erste Gruppe,17,P,Multiple choice with comments,lismedicamentos,lismedicamentos,Welche Droge (n)?,7,Weiß nicht,,, ,
+599846,INDC - Eingangsleistung,Erste Gruppe,18,Y,Yes/No,sncirurgiasanterio,sncirurgiasanterio,Hatten Sie jemals eine Plexus brachialis Operation?, ,,,, ,
+599846,INDC - Eingangsleistung,Erste Gruppe,19,T,Long Free Text,texprocedimeanterior,texprocedimeanterior,Welche Verfahren wurden durchgeführt?, ,,,, ,
+599846,INDC - Eingangsleistung,Erste Gruppe,20,F,Array (Flexible Labels),sninspecao,sninspecao,Inspektion,a,Glenoumerale Subluxation,,,n,Nein
+599846,INDC - Eingangsleistung,Erste Gruppe,20,F,Array (Flexible Labels),sninspecao,sninspecao,Inspektion,a,Glenoumerale Subluxation,,,n1,Nicht bewertet
+599846,INDC - Eingangsleistung,Erste Gruppe,20,F,Array (Flexible Labels),sninspecao,sninspecao,Inspektion,a,Glenoumerale Subluxation,,,s,Ja
+599846,INDC - Eingangsleistung,Erste Gruppe,20,F,Array (Flexible Labels),sninspecao,sninspecao,Inspektion,b,Scrotal Haltung,,,n,Nein
+599846,INDC - Eingangsleistung,Erste Gruppe,20,F,Array (Flexible Labels),sninspecao,sninspecao,Inspektion,b,Scrotal Haltung,,,n1,Nicht bewertet
+599846,INDC - Eingangsleistung,Erste Gruppe,20,F,Array (Flexible Labels),sninspecao,sninspecao,Inspektion,b,Scrotal Haltung,,,s,Ja
+599846,INDC - Eingangsleistung,Erste Gruppe,20,F,Array (Flexible Labels),sninspecao,sninspecao,Inspektion,c,Horner Zeichen,,,n,Nein
+599846,INDC - Eingangsleistung,Erste Gruppe,20,F,Array (Flexible Labels),sninspecao,sninspecao,Inspektion,c,Horner Zeichen,,,n1,Nicht bewertet
+599846,INDC - Eingangsleistung,Erste Gruppe,20,F,Array (Flexible Labels),sninspecao,sninspecao,Inspektion,c,Horner Zeichen,,,s,Ja
+599846,INDC - Eingangsleistung,Erste Gruppe,20,F,Array (Flexible Labels),sninspecao,sninspecao,Inspektion,d,Ödem,,,n,Nein
+599846,INDC - Eingangsleistung,Erste Gruppe,20,F,Array (Flexible Labels),sninspecao,sninspecao,Inspektion,d,Ödem,,,n1,Nicht bewertet
+599846,INDC - Eingangsleistung,Erste Gruppe,20,F,Array (Flexible Labels),sninspecao,sninspecao,Inspektion,d,Ödem,,,s,Ja
+599846,INDC - Eingangsleistung,Erste Gruppe,20,F,Array (Flexible Labels),sninspecao,sninspecao,Inspektion,f,Narbe,,,n,Nein
+599846,INDC - Eingangsleistung,Erste Gruppe,20,F,Array (Flexible Labels),sninspecao,sninspecao,Inspektion,f,Narbe,,,n1,Nicht bewertet
+599846,INDC - Eingangsleistung,Erste Gruppe,20,F,Array (Flexible Labels),sninspecao,sninspecao,Inspektion,f,Narbe,,,s,Ja
+599846,INDC - Eingangsleistung,Erste Gruppe,20,F,Array (Flexible Labels),sninspecao,sninspecao,Inspektion,g,Trophische Veränderung,,,n,Nein
+599846,INDC - Eingangsleistung,Erste Gruppe,20,F,Array (Flexible Labels),sninspecao,sninspecao,Inspektion,g,Trophische Veränderung,,,n1,Nicht bewertet
+599846,INDC - Eingangsleistung,Erste Gruppe,20,F,Array (Flexible Labels),sninspecao,sninspecao,Inspektion,g,Trophische Veränderung,,,s,Ja
+599846,INDC - Eingangsleistung,Erste Gruppe,21,T,Long Free Text,texlocalcicatriz,texlocalcicatriz,Beschreibung und Lage der Narbe:, ,,,, ,
+599846,INDC - Eingangsleistung,Zweite Gruppe,22,L,List (Radio),snsinaltinel,snsinaltinel,Hat es Tinnitus-Signal?, ,,,,A1,Ja
+599846,INDC - Eingangsleistung,Zweite Gruppe,22,L,List (Radio),snsinaltinel,snsinaltinel,Hat es Tinnitus-Signal?, ,,,,A2,Nein
+599846,INDC - Eingangsleistung,Zweite Gruppe,22,L,List (Radio),snsinaltinel,snsinaltinel,Hat es Tinnitus-Signal?, ,,,,A3,Nicht bewertet
+599846,INDC - Eingangsleistung,Zweite Gruppe,23,F,Array (Flexible Labels),snrestricaoarticula,snrestricaoarticula,Gelenkbeschränkung,1,Schulter,,,1,Ja
+599846,INDC - Eingangsleistung,Zweite Gruppe,23,F,Array (Flexible Labels),snrestricaoarticula,snrestricaoarticula,Gelenkbeschränkung,1,Schulter,,,2,Nein
+599846,INDC - Eingangsleistung,Zweite Gruppe,23,F,Array (Flexible Labels),snrestricaoarticula,snrestricaoarticula,Gelenkbeschränkung,1,Schulter,,,3,Nicht bewertet
+599846,INDC - Eingangsleistung,Zweite Gruppe,23,F,Array (Flexible Labels),snrestricaoarticula,snrestricaoarticula,Gelenkbeschränkung,2,Ellbogen,,,1,Ja
+599846,INDC - Eingangsleistung,Zweite Gruppe,23,F,Array (Flexible Labels),snrestricaoarticula,snrestricaoarticula,Gelenkbeschränkung,2,Ellbogen,,,2,Nein
+599846,INDC - Eingangsleistung,Zweite Gruppe,23,F,Array (Flexible Labels),snrestricaoarticula,snrestricaoarticula,Gelenkbeschränkung,2,Ellbogen,,,3,Nicht bewertet
+599846,INDC - Eingangsleistung,Zweite Gruppe,23,F,Array (Flexible Labels),snrestricaoarticula,snrestricaoarticula,Gelenkbeschränkung,3,Griff,,,1,Ja
+599846,INDC - Eingangsleistung,Zweite Gruppe,23,F,Array (Flexible Labels),snrestricaoarticula,snrestricaoarticula,Gelenkbeschränkung,3,Griff,,,2,Nein
+599846,INDC - Eingangsleistung,Zweite Gruppe,23,F,Array (Flexible Labels),snrestricaoarticula,snrestricaoarticula,Gelenkbeschränkung,3,Griff,,,3,Nicht bewertet
+599846,INDC - Eingangsleistung,Zweite Gruppe,23,F,Array (Flexible Labels),snrestricaoarticula,snrestricaoarticula,Gelenkbeschränkung,4,Finger,,,1,Ja
+599846,INDC - Eingangsleistung,Zweite Gruppe,23,F,Array (Flexible Labels),snrestricaoarticula,snrestricaoarticula,Gelenkbeschränkung,4,Finger,,,2,Nein
+599846,INDC - Eingangsleistung,Zweite Gruppe,23,F,Array (Flexible Labels),snrestricaoarticula,snrestricaoarticula,Gelenkbeschränkung,4,Finger,,,3,Nicht bewertet
+599846,INDC - Eingangsleistung,Zweite Gruppe,24,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ001,Schulterbeugung,,,A1,0
+599846,INDC - Eingangsleistung,Zweite Gruppe,24,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ001,Schulterbeugung,,,A2,1
+599846,INDC - Eingangsleistung,Zweite Gruppe,24,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ001,Schulterbeugung,,,A3,2
+599846,INDC - Eingangsleistung,Zweite Gruppe,24,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ001,Schulterbeugung,,,A4,3
+599846,INDC - Eingangsleistung,Zweite Gruppe,24,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ001,Schulterbeugung,,,A5,4
+599846,INDC - Eingangsleistung,Zweite Gruppe,24,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ001,Schulterbeugung,,,A6,5
+599846,INDC - Eingangsleistung,Zweite Gruppe,24,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ001,Schulterbeugung,,,A7,Nicht bewertet
+599846,INDC - Eingangsleistung,Zweite Gruppe,24,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ002,Schulterentzündung,,,A1,0
+599846,INDC - Eingangsleistung,Zweite Gruppe,24,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ002,Schulterentzündung,,,A2,1
+599846,INDC - Eingangsleistung,Zweite Gruppe,24,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ002,Schulterentzündung,,,A3,2
+599846,INDC - Eingangsleistung,Zweite Gruppe,24,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ002,Schulterentzündung,,,A4,3
+599846,INDC - Eingangsleistung,Zweite Gruppe,24,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ002,Schulterentzündung,,,A5,4
+599846,INDC - Eingangsleistung,Zweite Gruppe,24,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ002,Schulterentzündung,,,A6,5
+599846,INDC - Eingangsleistung,Zweite Gruppe,24,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ002,Schulterentzündung,,,A7,Nicht bewertet
+599846,INDC - Eingangsleistung,Zweite Gruppe,24,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ003,Externe Schulterrotation,,,A1,0
+599846,INDC - Eingangsleistung,Zweite Gruppe,24,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ003,Externe Schulterrotation,,,A2,1
+599846,INDC - Eingangsleistung,Zweite Gruppe,24,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ003,Externe Schulterrotation,,,A3,2
+599846,INDC - Eingangsleistung,Zweite Gruppe,24,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ003,Externe Schulterrotation,,,A4,3
+599846,INDC - Eingangsleistung,Zweite Gruppe,24,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ003,Externe Schulterrotation,,,A5,4
+599846,INDC - Eingangsleistung,Zweite Gruppe,24,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ003,Externe Schulterrotation,,,A6,5
+599846,INDC - Eingangsleistung,Zweite Gruppe,24,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ003,Externe Schulterrotation,,,A7,Nicht bewertet
+599846,INDC - Eingangsleistung,Zweite Gruppe,24,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ004,Interne Schulterrotation,,,A1,0
+599846,INDC - Eingangsleistung,Zweite Gruppe,24,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ004,Interne Schulterrotation,,,A2,1
+599846,INDC - Eingangsleistung,Zweite Gruppe,24,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ004,Interne Schulterrotation,,,A3,2
+599846,INDC - Eingangsleistung,Zweite Gruppe,24,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ004,Interne Schulterrotation,,,A4,3
+599846,INDC - Eingangsleistung,Zweite Gruppe,24,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ004,Interne Schulterrotation,,,A5,4
+599846,INDC - Eingangsleistung,Zweite Gruppe,24,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ004,Interne Schulterrotation,,,A6,5
+599846,INDC - Eingangsleistung,Zweite Gruppe,24,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ004,Interne Schulterrotation,,,A7,Nicht bewertet
+599846,INDC - Eingangsleistung,Zweite Gruppe,24,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ005,Erhöhung der Scapula,,,A1,0
+599846,INDC - Eingangsleistung,Zweite Gruppe,24,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ005,Erhöhung der Scapula,,,A2,1
+599846,INDC - Eingangsleistung,Zweite Gruppe,24,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ005,Erhöhung der Scapula,,,A3,2
+599846,INDC - Eingangsleistung,Zweite Gruppe,24,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ005,Erhöhung der Scapula,,,A4,3
+599846,INDC - Eingangsleistung,Zweite Gruppe,24,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ005,Erhöhung der Scapula,,,A5,4
+599846,INDC - Eingangsleistung,Zweite Gruppe,24,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ005,Erhöhung der Scapula,,,A6,5
+599846,INDC - Eingangsleistung,Zweite Gruppe,24,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ005,Erhöhung der Scapula,,,A7,Nicht bewertet
+599846,INDC - Eingangsleistung,Zweite Gruppe,24,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ006,Abduktion und obere Rotation der Scapula,,,A1,0
+599846,INDC - Eingangsleistung,Zweite Gruppe,24,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ006,Abduktion und obere Rotation der Scapula,,,A2,1
+599846,INDC - Eingangsleistung,Zweite Gruppe,24,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ006,Abduktion und obere Rotation der Scapula,,,A3,2
+599846,INDC - Eingangsleistung,Zweite Gruppe,24,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ006,Abduktion und obere Rotation der Scapula,,,A4,3
+599846,INDC - Eingangsleistung,Zweite Gruppe,24,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ006,Abduktion und obere Rotation der Scapula,,,A5,4
+599846,INDC - Eingangsleistung,Zweite Gruppe,24,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ006,Abduktion und obere Rotation der Scapula,,,A6,5
+599846,INDC - Eingangsleistung,Zweite Gruppe,24,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ006,Abduktion und obere Rotation der Scapula,,,A7,Nicht bewertet
+599846,INDC - Eingangsleistung,Zweite Gruppe,24,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ007,Ellbogenbeugung,,,A1,0
+599846,INDC - Eingangsleistung,Zweite Gruppe,24,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ007,Ellbogenbeugung,,,A2,1
+599846,INDC - Eingangsleistung,Zweite Gruppe,24,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ007,Ellbogenbeugung,,,A3,2
+599846,INDC - Eingangsleistung,Zweite Gruppe,24,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ007,Ellbogenbeugung,,,A4,3
+599846,INDC - Eingangsleistung,Zweite Gruppe,24,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ007,Ellbogenbeugung,,,A5,4
+599846,INDC - Eingangsleistung,Zweite Gruppe,24,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ007,Ellbogenbeugung,,,A6,5
+599846,INDC - Eingangsleistung,Zweite Gruppe,24,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ007,Ellbogenbeugung,,,A7,Nicht bewertet
+599846,INDC - Eingangsleistung,Zweite Gruppe,24,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ008,Ellbogenverlängerung,,,A1,0
+599846,INDC - Eingangsleistung,Zweite Gruppe,24,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ008,Ellbogenverlängerung,,,A2,1
+599846,INDC - Eingangsleistung,Zweite Gruppe,24,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ008,Ellbogenverlängerung,,,A3,2
+599846,INDC - Eingangsleistung,Zweite Gruppe,24,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ008,Ellbogenverlängerung,,,A4,3
+599846,INDC - Eingangsleistung,Zweite Gruppe,24,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ008,Ellbogenverlängerung,,,A5,4
+599846,INDC - Eingangsleistung,Zweite Gruppe,24,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ008,Ellbogenverlängerung,,,A6,5
+599846,INDC - Eingangsleistung,Zweite Gruppe,24,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ008,Ellbogenverlängerung,,,A7,Nicht bewertet
+599846,INDC - Eingangsleistung,Zweite Gruppe,24,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ009,Faustverlängerung,,,A1,0
+599846,INDC - Eingangsleistung,Zweite Gruppe,24,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ009,Faustverlängerung,,,A2,1
+599846,INDC - Eingangsleistung,Zweite Gruppe,24,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ009,Faustverlängerung,,,A3,2
+599846,INDC - Eingangsleistung,Zweite Gruppe,24,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ009,Faustverlängerung,,,A4,3
+599846,INDC - Eingangsleistung,Zweite Gruppe,24,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ009,Faustverlängerung,,,A5,4
+599846,INDC - Eingangsleistung,Zweite Gruppe,24,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ009,Faustverlängerung,,,A6,5
+599846,INDC - Eingangsleistung,Zweite Gruppe,24,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ009,Faustverlängerung,,,A7,Nicht bewertet
+599846,INDC - Eingangsleistung,Zweite Gruppe,24,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ010,Faustbiegen,,,A1,0
+599846,INDC - Eingangsleistung,Zweite Gruppe,24,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ010,Faustbiegen,,,A2,1
+599846,INDC - Eingangsleistung,Zweite Gruppe,24,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ010,Faustbiegen,,,A3,2
+599846,INDC - Eingangsleistung,Zweite Gruppe,24,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ010,Faustbiegen,,,A4,3
+599846,INDC - Eingangsleistung,Zweite Gruppe,24,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ010,Faustbiegen,,,A5,4
+599846,INDC - Eingangsleistung,Zweite Gruppe,24,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ010,Faustbiegen,,,A6,5
+599846,INDC - Eingangsleistung,Zweite Gruppe,24,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ010,Faustbiegen,,,A7,Nicht bewertet
+599846,INDC - Eingangsleistung,Zweite Gruppe,24,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ011,Fingerbiegen,,,A1,0
+599846,INDC - Eingangsleistung,Zweite Gruppe,24,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ011,Fingerbiegen,,,A2,1
+599846,INDC - Eingangsleistung,Zweite Gruppe,24,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ011,Fingerbiegen,,,A3,2
+599846,INDC - Eingangsleistung,Zweite Gruppe,24,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ011,Fingerbiegen,,,A4,3
+599846,INDC - Eingangsleistung,Zweite Gruppe,24,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ011,Fingerbiegen,,,A5,4
+599846,INDC - Eingangsleistung,Zweite Gruppe,24,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ011,Fingerbiegen,,,A6,5
+599846,INDC - Eingangsleistung,Zweite Gruppe,24,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ011,Fingerbiegen,,,A7,Nicht bewertet
+599846,INDC - Eingangsleistung,Zweite Gruppe,24,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ012,Fingerverlängerung,,,A1,0
+599846,INDC - Eingangsleistung,Zweite Gruppe,24,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ012,Fingerverlängerung,,,A2,1
+599846,INDC - Eingangsleistung,Zweite Gruppe,24,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ012,Fingerverlängerung,,,A3,2
+599846,INDC - Eingangsleistung,Zweite Gruppe,24,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ012,Fingerverlängerung,,,A4,3
+599846,INDC - Eingangsleistung,Zweite Gruppe,24,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ012,Fingerverlängerung,,,A5,4
+599846,INDC - Eingangsleistung,Zweite Gruppe,24,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ012,Fingerverlängerung,,,A6,5
+599846,INDC - Eingangsleistung,Zweite Gruppe,24,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ012,Fingerverlängerung,,,A7,Nicht bewertet
+599846,INDC - Eingangsleistung,Zweite Gruppe,24,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ013,Fingerabduktion,,,A1,0
+599846,INDC - Eingangsleistung,Zweite Gruppe,24,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ013,Fingerabduktion,,,A2,1
+599846,INDC - Eingangsleistung,Zweite Gruppe,24,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ013,Fingerabduktion,,,A3,2
+599846,INDC - Eingangsleistung,Zweite Gruppe,24,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ013,Fingerabduktion,,,A4,3
+599846,INDC - Eingangsleistung,Zweite Gruppe,24,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ013,Fingerabduktion,,,A5,4
+599846,INDC - Eingangsleistung,Zweite Gruppe,24,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ013,Fingerabduktion,,,A6,5
+599846,INDC - Eingangsleistung,Zweite Gruppe,24,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ013,Fingerabduktion,,,A7,Nicht bewertet
+599846,INDC - Eingangsleistung,Zweite Gruppe,24,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ014,Adduktion der Finger,,,A1,0
+599846,INDC - Eingangsleistung,Zweite Gruppe,24,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ014,Adduktion der Finger,,,A2,1
+599846,INDC - Eingangsleistung,Zweite Gruppe,24,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ014,Adduktion der Finger,,,A3,2
+599846,INDC - Eingangsleistung,Zweite Gruppe,24,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ014,Adduktion der Finger,,,A4,3
+599846,INDC - Eingangsleistung,Zweite Gruppe,24,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ014,Adduktion der Finger,,,A5,4
+599846,INDC - Eingangsleistung,Zweite Gruppe,24,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ014,Adduktion der Finger,,,A6,5
+599846,INDC - Eingangsleistung,Zweite Gruppe,24,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ014,Adduktion der Finger,,,A7,Nicht bewertet
+599846,INDC - Eingangsleistung,Zweite Gruppe,24,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ015,Einverständnis von Daumen,,,A1,0
+599846,INDC - Eingangsleistung,Zweite Gruppe,24,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ015,Einverständnis von Daumen,,,A2,1
+599846,INDC - Eingangsleistung,Zweite Gruppe,24,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ015,Einverständnis von Daumen,,,A3,2
+599846,INDC - Eingangsleistung,Zweite Gruppe,24,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ015,Einverständnis von Daumen,,,A4,3
+599846,INDC - Eingangsleistung,Zweite Gruppe,24,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ015,Einverständnis von Daumen,,,A5,4
+599846,INDC - Eingangsleistung,Zweite Gruppe,24,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ015,Einverständnis von Daumen,,,A6,5
+599846,INDC - Eingangsleistung,Zweite Gruppe,24,F,Array (Flexible Labels),opcforcamuscular,opcforcamuscular,Stärke für manuelle Muskeltests nach Segmenten.,SQ015,Einverständnis von Daumen,,,A7,Nicht bewertet
