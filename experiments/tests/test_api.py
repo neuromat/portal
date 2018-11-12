@@ -21,10 +21,11 @@ from experiments.models import Experiment, Study, Group, Researcher, \
     ClassificationOfDiseases, Questionnaire, Step, \
     QuestionnaireLanguage, QuestionnaireDefaultLanguage, Publication, \
     ExperimentalProtocol, ExperimentResearcher
-from experiments.tests.tests_helper import global_setup_ut, apply_setup, \
-    create_experiment, create_group, create_questionnaire, \
+from experiments.tests.tests_helper import create_experiment, create_group, \
+    create_questionnaire, \
     create_experiment_researcher, create_next_version_experiment, PASSWORD, \
-    create_owner, create_trustee_user, create_study, create_researcher
+    create_owner, create_trustee_user, create_study, create_researcher, \
+    create_publication
 
 TEMP_MEDIA_ROOT = tempfile.mkdtemp()
 
@@ -825,64 +826,69 @@ class GroupAPITest(APITestCase):
         self.client.logout()
 
 
-@apply_setup(global_setup_ut)
 class PublicationsAPITest(APITestCase):
 
     def setUp(self):
-        global_setup_ut()
-        Experiment.objects.create(
-            title='Ein Experiment', nes_id=10,
-            owner=User.objects.get(username='lab1'),
-            version=1, sent_date=datetime.utcnow(),
-            status=Experiment.RECEIVING,
-            trustee=User.objects.get(username='claudia')
-        )
+        self.owner = create_owner(username='labX')
+        self.experiment = create_experiment(1, self.owner)
+        self.publication = create_publication(self.experiment)
 
     def test_GET_returns_all_publications_short_url(self):
-        p_list = list()
-        for publication in Publication.objects.all():
-            p_list.append({
-                'id': publication.id,
-                'title': publication.title,
-                'citation': publication.citation,
-                'url': publication.url,
-                'experiment': publication.experiment.title
-            })
-
+        publication2 = create_publication(self.experiment)
         list_url = reverse('api_publications-list')
         response = self.client.get(list_url)
-        self.assertEqual(json.loads(response.content.decode('utf8')), p_list)
+        self.assertEqual(
+            json.loads(response.content.decode('utf8')),
+            [
+                {
+                    'id': self.publication.id,
+                    'title': self.publication.title,
+                    'citation': self.publication.citation,
+                    'url': self.publication.url,
+                    'experiment': self.publication.experiment.title
+                },
+                {
+                    'id': publication2.id,
+                    'title': publication2.title,
+                    'citation': publication2.citation,
+                    'url': publication2.url,
+                    'experiment': publication2.experiment.title
+                }
+            ]
+        )
 
     def test_GET_returns_all_publications_long_url(self):
-        p_list = list()
-        for publication in Publication.objects.all():
-            p_list.append({
-                'id': publication.id,
-                'title': publication.title,
-                'citation': publication.citation,
-                'url': publication.url,
-                'experiment': publication.experiment.title
-            })
-
-        # last experiment approved has publications created in tests helper
-        experiment = Experiment.objects.filter(
-            status=Experiment.APPROVED
-        ).last()
-
+        publication2 = create_publication(self.experiment)
         list_url = reverse(
             'api_experiment_publications-list',
-            kwargs={'experiment_nes_id': experiment.nes_id}
+            kwargs={'experiment_nes_id': self.experiment.nes_id}
         )
         response = self.client.get(list_url)
-        self.assertEqual(json.loads(response.content.decode('utf8')), p_list)
+        self.assertEqual(
+            json.loads(response.content.decode('utf8')),
+            [
+                {
+                    'id': self.publication.id,
+                    'title': self.publication.title,
+                    'citation': self.publication.citation,
+                    'url': self.publication.url,
+                    'experiment': self.publication.experiment.title
+                },
+                {
+                    'id': publication2.id,
+                    'title': publication2.title,
+                    'citation': publication2.citation,
+                    'url': publication2.url,
+                    'experiment': publication2.experiment.title
+                }
+            ]
+        )
 
     def test_POSTing_a_new_publication(self):
-        # we've created an experiment in setUp method
-        experiment = Experiment.objects.last()
-        self.client.login(username=experiment.owner, password='nep-lab1')
+        self.client.login(username=self.experiment.owner, password=PASSWORD)
         list_url = reverse(
             'api_experiment_publications-list',
-            kwargs={'experiment_nes_id': experiment.nes_id}
+            kwargs={'experiment_nes_id': self.experiment.nes_id}
         )
         response = self.client.post(
             list_url,
@@ -897,16 +903,10 @@ class PublicationsAPITest(APITestCase):
         new_publication = Publication.objects.last()
         self.assertEqual(new_publication.title, 'Ein Titel')
 
-    def test_POSTing_new_publication_associates_with_last_experiment_version(
-            self):
-        # we've created an experiment in setUp method
-        experiment_v1 = Experiment.objects.last()
-        experiment_v2 = Experiment.objects.create(
-            nes_id=experiment_v1.nes_id, version=2,
-            sent_date=datetime.utcnow(), owner=experiment_v1.owner
-        )
+    def test_POSTing_new_publication_associates_with_last_experiment_version(self):
+        experiment_v2 = create_next_version_experiment(self.experiment)
         self.client.login(
-            username=experiment_v1.owner.username, password='nep-lab1'
+            username=self.owner.username, password=PASSWORD
         )
         list_url = reverse('api_experiment_publications-list', kwargs={
             'experiment_nes_id': experiment_v2.nes_id})
@@ -926,7 +926,9 @@ class PublicationsAPITest(APITestCase):
 class QuestionnaireStepAPITest(APITestCase):
 
     def setUp(self):
-        global_setup_ut()
+        self.owner = create_owner(username='labX')
+        self.experiment = create_experiment(1, self.owner)
+        self.group = create_group(1, self.experiment)
 
     @skip
     def test_get_returns_all_questionnairesteps_short_url(self):
@@ -939,12 +941,12 @@ class QuestionnaireStepAPITest(APITestCase):
         pass
 
     def test_POSTing_a_new_questionnairestep(self):
-        owner = User.objects.get(username='lab1')
-        experiment = Experiment.objects.get(nes_id=1, owner=owner)
-        group = Group.objects.filter(experiment=experiment).first()
-        self.client.login(username=owner.username, password='nep-lab1')
-        list_url = reverse('api_questionnaire_step-list',
-                           kwargs={'pk': group.id})
+        self.client.login(
+            username=self.owner.username, password=PASSWORD
+        )
+        list_url = reverse(
+            'api_questionnaire_step-list', kwargs={'pk': self.group.id}
+        )
         response = self.client.post(
             list_url,
             {
@@ -964,11 +966,9 @@ class QuestionnaireStepAPITest(APITestCase):
 class QuestionnaireLanguageAPITest(APITestCase):
 
     def setUp(self):
-        global_setup_ut()
-        owner = User.objects.create_user(
-            username='labor1', password='nep-labor1'
-        )
-        create_experiment(1, owner, Experiment.APPROVED)
+        self.owner = create_owner(username='labX')
+        self.experiment = create_experiment(1, self.owner)
+        self.group = create_group(1, self.experiment)
 
     @skip
     def test_get_returns_all_questionnairelanguages_short_url(self):
@@ -981,9 +981,8 @@ class QuestionnaireLanguageAPITest(APITestCase):
         pass
 
     def test_POSTing_a_new_questionnairelanguage_not_default(self):
-        owner = User.objects.get(username='lab1')
-        questionnaire = Questionnaire.objects.first()
-        self.client.login(username=owner.username, password='nep-lab1')
+        questionnaire = create_questionnaire(1, 'code0', self.group)
+        self.client.login(username=self.owner.username, password=PASSWORD)
         list_url = reverse('api_questionnaire_language-list',
                            kwargs={'pk': questionnaire.id})
         response = self.client.post(
@@ -1006,14 +1005,12 @@ class QuestionnaireLanguageAPITest(APITestCase):
         )
 
     def test_POSTing_a_new_questionnairelanguage_default(self):
-        experiment = Experiment.objects.last()
-        owner = User.objects.last()
-        group = create_group(1, experiment)
-        questionnaire = create_questionnaire(1, 'q1', group)
+        questionnaire = create_questionnaire(1, 'q1', self.group)
 
-        self.client.login(username=owner.username, password='nep-labor1')
-        list_url = reverse('api_questionnaire_language-list',
-                           kwargs={'pk': questionnaire.id})
+        self.client.login(username=self.owner.username, password=PASSWORD)
+        list_url = reverse(
+            'api_questionnaire_language-list', kwargs={'pk': questionnaire.id}
+        )
         response = self.client.post(
             list_url,
             {
