@@ -635,175 +635,106 @@ class ExperimentResearcherAPITest(APITestCase):
         self.assertEqual(new_experiment_researcher.experiment.version, 2)
 
 
-@apply_setup(global_setup_ut)
 class GroupAPITest(APITestCase):
 
     def setUp(self):
-        global_setup_ut()
+        self.owner = create_owner(username='labX')
+        self.experiment = create_experiment(1, self.owner)
+        self.group = create_group(1, self.experiment)
 
     def test_get_returns_all_groups_short_url(self):
-        # We've created 5 groups in global_setup_ut()
-        groups = []
-        for group in Group.objects.all():
-            groups.append(group)
+        group2 = create_group(1, self.experiment)
         list_url = reverse('api_groups-list')
         response = self.client.get(list_url)
         self.assertEqual(
             json.loads(response.content.decode('utf8')),
             [
                 {
-                    'id': groups[0].id,
-                    'title': groups[0].title,
-                    'description': groups[0].description,
-                    'experiment': groups[0].experiment.title,
+                    'id': self.group.id,
+                    'title': self.group.title,
+                    'description': self.group.description,
+                    'experiment': self.group.experiment.title,
                     'inclusion_criteria':
-                        list(groups[0].inclusion_criteria.all())
-                },
-                {
-                    'id': groups[1].id,
-                    'title': groups[1].title,
-                    'description': groups[1].description,
-                    'experiment': groups[1].experiment.title,
-                    'inclusion_criteria':
-                        list(groups[1].inclusion_criteria.all())
-                },
-                {
-                    'id': groups[2].id,
-                    'title': groups[2].title,
-                    'description': groups[2].description,
-                    'experiment': groups[2].experiment.title,
-                    'inclusion_criteria':
-                        list(groups[2].inclusion_criteria.all())
-                },
-                {
-                    'id': groups[3].id,
-                    'title': groups[3].title,
-                    'description': groups[3].description,
-                    'experiment': groups[3].experiment.title,
-                    'inclusion_criteria':
-                        list(groups[3].inclusion_criteria.all())
-                },
-                {
-                    'id': groups[4].id,
-                    'title': groups[4].title,
-                    'description': groups[4].description,
-                    'experiment': groups[4].experiment.title,
-                    'inclusion_criteria':
-                        list(groups[4].inclusion_criteria.all())
-                },
-                {
-                    'id': groups[5].id,
-                    'title': groups[5].title,
-                    'description': groups[5].description,
-                    'experiment': groups[5].experiment.title,
-                    'inclusion_criteria':
-                        list(groups[5].inclusion_criteria.all())
-                },
-            ]
-        )
-
-    def test_get_returns_all_groups_long_url(self):
-        owner1 = User.objects.get(username='lab1')
-        experiment = Experiment.objects.get(nes_id=1, owner=owner1)
-        # We've created 5 groups in global_setup_ut()
-        groups = []
-        for group in Group.objects.all():
-            groups.append(group)
-        list_url = reverse('api_experiment_groups-list',
-                           kwargs={'experiment_nes_id': experiment.nes_id})
-        response = self.client.get(list_url)
-        self.assertEqual(
-            json.loads(response.content.decode('utf8')),
-            [
-                {
-                    'id': groups[0].id,
-                    'title': groups[0].title,
-                    'description': groups[0].description,
-                    'experiment': groups[0].experiment.title,
-                    'inclusion_criteria':
-                        list(groups[0].inclusion_criteria.all())
-                },
-                {
-                    'id': groups[1].id,
-                    'title': groups[1].title,
-                    'description': groups[1].description,
-                    'experiment': groups[1].experiment.title,
-                    'inclusion_criteria':
-                        list(groups[1].inclusion_criteria.all())
-                },
-                {
-                    'id': groups[2].id,
-                    'title': groups[2].title,
-                    'description': groups[2].description,
-                    'experiment': groups[2].experiment.title,
-                    'inclusion_criteria':
-                        list(groups[2].inclusion_criteria.all())
-                },
-                {
-                    'id': groups[3].id,
-                    'title': groups[3].title,
-                    'description': groups[3].description,
-                    'experiment': groups[3].experiment.title,
-                    'inclusion_criteria':
-                        list(groups[3].inclusion_criteria.all())
-                },
-                {
-                    'id': groups[4].id,
-                    'title': groups[4].title,
-                    'description': groups[4].description,
-                    'experiment': groups[4].experiment.title,
-                    'inclusion_criteria':
-                        list(groups[4].inclusion_criteria.all())
-                },
-                {
-                    'id': groups[5].id,
-                    'title': groups[5].title,
-                    'description': groups[5].description,
-                    'experiment': groups[5].experiment.title,
-                    'inclusion_criteria':
-                        list(groups[5].inclusion_criteria.all())
-                },
-            ]
-        )
-
-    def test_get_returns_groups_of_an_experiment(self):
-        experiment = create_experiment(1)
-        group1 = create_group(1, experiment)
-        group2 = create_group(1, experiment)
-
-        list_url = reverse('api_experiment_groups-list',
-                           kwargs={'experiment_nes_id': experiment.nes_id})
-        self.client.login(
-            username=experiment.owner.username, password=PASSWORD
-        )
-        response = self.client.get(list_url)
-        self.assertEqual(
-            json.loads(response.content.decode('utf8')),
-            [
-                {
-                    'id': group1.id,
-                    'title': group1.title,
-                    'description': group1.description,
-                    'experiment': group1.experiment.title,
-                    'inclusion_criteria': list(group1.inclusion_criteria.all())
+                        list(self.group.inclusion_criteria.all())
                 },
                 {
                     'id': group2.id,
                     'title': group2.title,
                     'description': group2.description,
                     'experiment': group2.experiment.title,
+                    'inclusion_criteria':
+                        list(group2.inclusion_criteria.all())
+                }
+            ]
+        )
+
+    def test_get_returns_all_groups_long_url(self):
+        group2 = create_group(1, self.experiment)
+        list_url = reverse(
+            'api_experiment_groups-list',
+            kwargs={'experiment_nes_id': self.experiment.nes_id}
+        )
+        response = self.client.get(list_url)
+        self.assertEqual(
+            json.loads(response.content.decode('utf8')),
+            [
+                {
+                    'id': self.group.id,
+                    'title': self.group.title,
+                    'description': self.group.description,
+                    'experiment': self.group.experiment.title,
+                    'inclusion_criteria':
+                        list(self.group.inclusion_criteria.all())
+                },
+                {
+                    'id': group2.id,
+                    'title': group2.title,
+                    'description': group2.description,
+                    'experiment': group2.experiment.title,
+                    'inclusion_criteria':
+                        list(group2.inclusion_criteria.all())
+                }
+            ]
+        )
+
+    def test_get_returns_groups_of_an_experiment(self):
+        experiment2 = create_experiment(1)
+        group2 = create_group(1, experiment2)
+        group3 = create_group(1, experiment2)
+
+        list_url = reverse('api_experiment_groups-list',
+                           kwargs={'experiment_nes_id': experiment2.nes_id})
+        self.client.login(
+            username=experiment2.owner.username, password=PASSWORD
+        )
+        response = self.client.get(list_url)
+        self.assertEqual(
+            json.loads(response.content.decode('utf8')),
+            [
+                {
+                    'id': group2.id,
+                    'title': group2.title,
+                    'description': group2.description,
+                    'experiment': group2.experiment.title,
                     'inclusion_criteria': list(group2.inclusion_criteria.all())
+                },
+                {
+                    'id': group3.id,
+                    'title': group3.title,
+                    'description': group3.description,
+                    'experiment': group3.experiment.title,
+                    'inclusion_criteria': list(group3.inclusion_criteria.all())
                 }
             ]
         )
         self.client.logout()
 
     def test_POSTing_a_new_group(self):
-        owner = User.objects.get(username='lab1')
-        experiment = Experiment.objects.get(nes_id=1, owner=owner)
-        self.client.login(username=owner.username, password='nep-lab1')
-        list_url = reverse('api_experiment_groups-list',
-                           kwargs={'experiment_nes_id': experiment.nes_id})
+        self.client.login(username=self.owner.username, password=PASSWORD)
+        list_url = reverse(
+            'api_experiment_groups-list',
+            kwargs={'experiment_nes_id': self.experiment.nes_id}
+        )
         response = self.client.post(
             list_url,
             {
@@ -817,16 +748,12 @@ class GroupAPITest(APITestCase):
         self.assertEqual(new_group.title, 'A title')
 
     def test_POSTing_new_group_associates_with_last_experiment_version(self):
-        owner = User.objects.get(username='lab1')
-        experiment_v1 = Experiment.objects.get(owner=owner, nes_id=1,
-                                               version=1)
-        experiment_v2 = Experiment.objects.create(
-            nes_id=experiment_v1.nes_id, version=2,
-            sent_date=datetime.utcnow(), owner=owner
+        experiment_v2 = create_next_version_experiment(self.experiment)
+        self.client.login(username=self.owner.username, password=PASSWORD)
+        list_url = reverse(
+            'api_experiment_groups-list',
+            kwargs={'experiment_nes_id': self.experiment.nes_id}
         )
-        self.client.login(username=owner.username, password='nep-lab1')
-        list_url = reverse('api_experiment_groups-list',
-                           kwargs={'experiment_nes_id': experiment_v1.nes_id})
         self.client.post(
             list_url,
             {
@@ -840,20 +767,16 @@ class GroupAPITest(APITestCase):
         self.assertEqual(new_group.experiment.id, experiment_v2.id)
 
     def test_POSTing_new_group_adds_pre_existent_classification_of_diseases(self):
-        owner = User.objects.get(username='lab1')
-        experiment = Experiment.objects.get(nes_id=1, owner=owner)
-        self.client.login(username=owner.username, password='nep-lab1')
-        list_url = reverse('api_experiment_groups-list',
-                           kwargs={'experiment_nes_id': experiment.nes_id})
+        self.client.login(username=self.owner.username, password=PASSWORD)
+        list_url = reverse(
+            'api_experiment_groups-list',
+            kwargs={'experiment_nes_id': self.experiment.nes_id}
+        )
         response = self.client.post(
             list_url,
             {
                 'title': 'A title',
                 'description': 'A description',
-                # we post inclusion_criteria's that exists in
-                # ClassificationOfDiseases table. We create entries in tests
-                # helper (this table is pre-populated in db in production
-                # and homologation environments )
                 'inclusion_criteria': [
                     {'code': 'A00'}, {'code': 'A1782'}, {'code': 'A3681'},
                     {'code': 'A74'}
@@ -870,21 +793,16 @@ class GroupAPITest(APITestCase):
         self.client.logout()
 
     def test_POSTing_new_group_with_non_existing_code_saves_not_recognized_code(self):
-        # cod = classification of diseases
-        owner = User.objects.get(username='lab1')
-        experiment = Experiment.objects.get(nes_id=1, owner=owner)
-        self.client.login(username=owner.username, password='nep-lab1')
-        list_url = reverse('api_experiment_groups-list',
-                           kwargs={'experiment_nes_id': experiment.nes_id})
+        self.client.login(username=self.owner.username, password=PASSWORD)
+        list_url = reverse(
+            'api_experiment_groups-list',
+            kwargs={'experiment_nes_id': self.experiment.nes_id}
+        )
         response = self.client.post(
             list_url,
             {
                 'title': 'A title',
                 'description': 'A description',
-                # we post inclusion_criteria's that exists in
-                # ClassificationOfDiseases table. We create entries in tests
-                # helper (this table is pre-populated in db in production
-                # and homologation environments )
                 'inclusion_criteria': [
                     {'code': 'A009647'}, {'code': 'Z034754'}
                 ]
