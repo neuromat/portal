@@ -197,8 +197,9 @@ TEST_HAYSTACK_CONNECTIONS = {
 }
 
 
-# TODO: we are testing only questionnaire view part. Complete with other
-# TODO: tests: groups, studies, settings etc
+# TODO:
+# we are testing only questionnaire view part. Complete with other tests:
+# groups, studies, settings etc
 class ExperimentDetailTest(TestCase):
 
     def setUp(self):
@@ -731,15 +732,13 @@ class ChangeExperimentSlugTest(TestCase):
 
 
 @override_settings(HAYSTACK_CONNECTIONS=TEST_HAYSTACK_CONNECTIONS)
-@apply_setup(global_setup_ut)
 class SearchTest(TestCase):
 
     def setUp(self):
-        global_setup_ut()
-        owner = User.objects.create_user(
+        self.owner = User.objects.create_user(
             username='labor2', password='nep-labor2'
         )
-        create_experiment(1, owner, Experiment.APPROVED)
+        self.experiment = create_experiment(1, self.owner, Experiment.APPROVED)
         haystack.connections.reload('default')
         self.haystack_index('rebuild_index')
 
@@ -785,9 +784,9 @@ class SearchTest(TestCase):
             self):
         # TODO: testing calling celery task directly. Didn't work posting
         # TODO: approved experiment. Test with POST!
-        experiment = Experiment.objects.filter(
-            status=Experiment.UNDER_ANALYSIS
-        ).first()
+        experiment = create_experiment(
+            1, self.owner, Experiment.UNDER_ANALYSIS
+        )
         experiment.status = Experiment.APPROVED
         experiment.save()
 
@@ -802,11 +801,11 @@ class SearchTest(TestCase):
 
         # Tests helper creates an experiment UNDER_ANALYSIS with 'Experiment
         # 2' as experiment title
-        results = SearchQuerySet().filter(content='Experiment 2')
+        results = SearchQuerySet().filter(content=experiment.title)
         # TODO: by now we have 4 models being indexed
         self.assertEqual(results.count(), 1)
         self.assertEqual(results[0].model_name, 'experiment')
-        self.assertEqual(results[0].object.title, 'Experiment 2')
+        self.assertEqual(results[0].object.title, experiment.title)
 
     # TODO: test other searched objects
     def test_search_eegsetting_returns_correct_number_of_objects(self):
@@ -839,7 +838,7 @@ class SearchTest(TestCase):
         # TODO: Objects created in global_setup_ut().
         # TODO: Remove global_setup_ut() and
         # TODO: make model instances created by demand in each test.
-        self.check_matches_on_response(4, search_text)
+        self.check_matches_on_response(3, search_text)
 
     def test_search_stimulus_step_returns_correct_objects(self):
         test_search.SearchTest().create_objects_to_test_search_stimulus_step()
