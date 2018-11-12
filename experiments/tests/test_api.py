@@ -24,7 +24,7 @@ from experiments.models import Experiment, Study, Group, Researcher, \
 from experiments.tests.tests_helper import global_setup_ut, apply_setup, \
     create_experiment, create_group, create_questionnaire, \
     create_experiment_researcher, create_next_version_experiment, PASSWORD, \
-    create_owner, create_trustee_user, create_study
+    create_owner, create_trustee_user, create_study, create_researcher
 
 TEMP_MEDIA_ROOT = tempfile.mkdtemp()
 
@@ -439,27 +439,30 @@ class StudyAPITest(APITestCase):
         #     self.client.logout()
 
 
-@apply_setup(global_setup_ut)
 class ResearcherAPITest(APITestCase):
 
     def setUp(self):
-        global_setup_ut()
+        self.owner = create_owner(username='labX')
+        self.experiment = create_experiment(1, self.owner)
+        self.study = create_study(1, self.experiment)
+        self.researcher = create_researcher(self.study)
 
     def test_get_returns_all_researchers_short_url(self):
-        researcher1 = Researcher.objects.first()
-        researcher2 = Researcher.objects.last()
+        experiment2 = create_experiment(1, self.owner)
+        study2 = create_study(1, experiment2)
+        researcher2 = create_researcher(study2)
         list_url = reverse('api_study_researchers-list')
         response = self.client.get(list_url)
         self.assertEqual(
             json.loads(response.content.decode('utf8')),
             [
                 {
-                    'id': researcher1.id,
-                    'first_name': researcher1.first_name,
-                    'last_name': researcher1.last_name,
-                    'email': researcher1.email,
-                    'study': researcher1.study.title,
-                    'citation_name': researcher1.citation_name
+                    'id': self.researcher.id,
+                    'first_name': self.researcher.first_name,
+                    'last_name': self.researcher.last_name,
+                    'email': self.researcher.email,
+                    'study': self.researcher.study.title,
+                    'citation_name': self.researcher.citation_name
                 },
                 {
                     'id': researcher2.id,
@@ -473,31 +476,29 @@ class ResearcherAPITest(APITestCase):
         )
 
     def test_get_returns_researcher_long_url(self):
-        study = Study.objects.last()
-        researcher = Researcher.objects.create(study=study)
         list_url = reverse('api_study_researcher-list',
-                           kwargs={'pk': study.id})
+                           kwargs={'pk': self.study.id})
         response = self.client.get(list_url)
         self.assertEqual(
             json.loads(response.content.decode('utf8')),
             [
                 {
-                    'id': researcher.id,
-                    'first_name': researcher.first_name,
-                    'last_name': researcher.last_name,
-                    'email': researcher.email,
-                    'study': researcher.study.title,
-                    'citation_name': researcher.citation_name
+                    'id': self.researcher.id,
+                    'first_name': self.researcher.first_name,
+                    'last_name': self.researcher.last_name,
+                    'email': self.researcher.email,
+                    'study': self.researcher.study.title,
+                    'citation_name': self.researcher.citation_name
                 }
             ]
         )
 
     def test_POSTing_a_new_researcher(self):
-        study = Study.objects.last()
-        owner = User.objects.get(username='lab1')
-        self.client.login(username=owner.username, password='nep-lab1')
+        experiment2 = create_experiment(1, self.owner)
+        study2 = create_study(1, experiment2)
+        self.client.login(username=self.owner.username, password=PASSWORD)
         list_url = reverse('api_study_researcher-list',
-                           kwargs={'pk': study.id})
+                           kwargs={'pk': study2.id})
         response = self.client.post(
             list_url,
             {
