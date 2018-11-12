@@ -21,12 +21,11 @@ from haystack.query import SearchQuerySet
 
 from experiments import views
 from experiments.forms import ChangeSlugForm
-from experiments.models import Experiment, Step, Questionnaire, \
+from experiments.models import Experiment, Step, \
     QuestionnaireDefaultLanguage, QuestionnaireLanguage, Group, ContextTree, \
     EEGSetting, EMGSetting, EEGElectrodePosition, ElectrodeModel, \
     SurfaceElectrode, IntramuscularElectrode, Instruction
-from experiments.tests.tests_helper import apply_setup, global_setup_ut, \
-    create_experiment_related_objects, \
+from experiments.tests.tests_helper import create_experiment_related_objects, \
     create_download_dir_structure_and_files, \
     remove_selected_subdir, create_experiment, create_trustee_user, \
     create_next_version_experiment, random_utf8_string, create_context_tree, \
