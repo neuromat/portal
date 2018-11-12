@@ -199,11 +199,9 @@ TEST_HAYSTACK_CONNECTIONS = {
 
 # TODO: we are testing only questionnaire view part. Complete with other
 # TODO: tests: groups, studies, settings etc
-@apply_setup(global_setup_ut)
 class ExperimentDetailTest(TestCase):
 
     def setUp(self):
-        global_setup_ut()
         owner = User.objects.create_user(
             username='labor3', password='nep-labor3'
         )
@@ -417,7 +415,7 @@ class ExperimentDetailTest(TestCase):
                       'braquial (mm/aaaa)?', response.content.decode())
 
     @staticmethod
-    def get_q_default_language_or_first(questionnaire):
+    def _get_q_default_language_or_first(questionnaire):
         # TODO: correct this to adapt to unique QuestionnaireDefaultLanguage
         # TODO: model with OneToOne with Questionnaire
         qdl = QuestionnaireDefaultLanguage.objects.filter(
@@ -459,7 +457,7 @@ class ExperimentDetailTest(TestCase):
                 # TODO: In tests helper we always create default
                 # TODO: questionnaire language as English. So we would test
                 # TODO: only if we had first language.
-                q_language = self.get_q_default_language_or_first(
+                q_language = self._get_q_default_language_or_first(
                     questionnaire
                 )
                 self.assertContains(
@@ -489,19 +487,19 @@ class ExperimentDetailTest(TestCase):
         self.assertFalse(response.context['questionnaires'])
 
     def test_access_experiment_with_invalid_questionnaire_returns_invalid_questionnaire(self):
-        # First approved experiment has an invalid questionnaire in first
-        # group. See tests helper
-        experiment = Experiment.objects.filter(
-            status=Experiment.APPROVED).first()
-        group = experiment.groups.first()
-        step = group.steps.get(type=Step.QUESTIONNAIRE)
-        questionnaire = Questionnaire.objects.get(step_ptr=step)
+        group = create_group(1, self.experiment)
+        q = create_questionnaire(1, 'q4', group)
+        create_questionnaire_language(
+            q, settings.BASE_DIR + '/experiments/tests/questionnaire4.csv',
+            'en'
+        )
 
-        response = self.client.get('/experiments/' + experiment.slug + '/')
+        response = self.client.get(
+            '/experiments/' + self.experiment.slug + '/'
+        )
 
         self.assertEqual(
-            response.context['questionnaires']
-            [group.title][questionnaire.id]['survey_metadata'],
+            response.context['questionnaires'][group.title][q.id]['survey_metadata'],
             'invalid_questionnaire'
         )
 
