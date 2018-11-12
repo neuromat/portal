@@ -265,36 +265,34 @@ class ExperimentAPITest(APITestCase):
         shutil.rmtree(TEMP_MEDIA_ROOT)
 
 
-@apply_setup(global_setup_ut)
 class StudyAPITest(APITestCase):
 
     def setUp(self):
-        global_setup_ut()
+        self.owner = create_owner('lab1')
+        self.experiment = create_experiment(1, self.owner)
+        self.study = create_study(1, self.experiment)
 
     def test_get_returns_all_studies_short_url(self):
-        owner1 = User.objects.get(username='lab1')
-        owner2 = User.objects.get(username='lab2')
+        owner2 = create_owner('lab2')
 
-        experiment1 = Experiment.objects.get(nes_id=1, owner=owner1)
-        experiment2 = Experiment.objects.get(nes_id=1, owner=owner2)
-        experiment3 = Experiment.objects.get(nes_id=2, owner=owner2)
+        experiment2 = create_experiment(1, owner2)
+        experiment3 = create_experiment(1, owner2)
 
-        study1 = Study.objects.get(experiment=experiment1)
-        study2 = Study.objects.get(experiment=experiment2)
-        study3 = Study.objects.get(experiment=experiment3)
+        study2 = create_study(1, experiment2)
+        study3 = create_study(1, experiment3)
         list_url = reverse('api_studies-list')
         response = self.client.get(list_url)
         self.assertEqual(
             json.loads(response.content.decode('utf8')),
             [
                 {
-                    'id': study1.id,
-                    'title': study1.title,
-                    'description': study1.description,
-                    'start_date': study1.start_date.strftime('%Y-%m-%d'),
-                    'end_date': study1.end_date,
-                    'experiment': study1.experiment.title,
-                    'keywords': list(study1.keywords.values('name'))
+                    'id': self.study.id,
+                    'title': self.study.title,
+                    'description': self.study.description,
+                    'start_date': self.study.start_date.strftime('%Y-%m-%d'),
+                    'end_date': self.study.end_date,
+                    'experiment': self.study.experiment.title,
+                    'keywords': list(self.study.keywords.values('name'))
                 },
                 {
                     'id': study2.id,
@@ -318,30 +316,27 @@ class StudyAPITest(APITestCase):
         )
 
     def test_get_returns_all_studies_long_url_not_logged(self):
-        owner1 = User.objects.get(username='lab1')
-        owner2 = User.objects.get(username='lab2')
+        owner2 = create_owner('lab2')
 
-        experiment1 = Experiment.objects.get(nes_id=1, owner=owner1)
-        experiment2 = Experiment.objects.get(nes_id=1, owner=owner2)
-        experiment3 = Experiment.objects.get(nes_id=2, owner=owner2)
+        experiment2 = create_experiment(1, owner2)
+        experiment3 = create_experiment(1, owner2)
 
-        study1 = Study.objects.get(experiment=experiment1)
-        study2 = Study.objects.get(experiment=experiment2)
-        study3 = Study.objects.get(experiment=experiment3)
+        study2 = create_study(1, experiment2)
+        study3 = create_study(1, experiment3)
         list_url = reverse('api_experiment_studies-list',
-                           kwargs={'experiment_nes_id': experiment1.nes_id})
+                           kwargs={'experiment_nes_id': self.experiment.nes_id})
         response = self.client.get(list_url)
         self.assertEqual(
             json.loads(response.content.decode('utf8')),
             [
                 {
-                    'id': study1.id,
-                    'title': study1.title,
-                    'description': study1.description,
-                    'start_date': study1.start_date.strftime('%Y-%m-%d'),
-                    'end_date': study1.end_date,
-                    'experiment': study1.experiment.title,
-                    'keywords': list(study1.keywords.values('name'))
+                    'id': self.study.id,
+                    'title': self.study.title,
+                    'description': self.study.description,
+                    'start_date': self.study.start_date.strftime('%Y-%m-%d'),
+                    'end_date': self.study.end_date,
+                    'experiment': self.study.experiment.title,
+                    'keywords': list(self.study.keywords.values('name'))
                 },
                 {
                     'id': study2.id,
@@ -365,37 +360,32 @@ class StudyAPITest(APITestCase):
         )
 
     def test_get_returns_all_studies_long_url_logged(self):
-        owner = User.objects.get(username='lab2')
-        experiment = Experiment.objects.get(nes_id=1, owner=owner)
-        study = Study.objects.get(experiment=experiment)
         list_url = reverse('api_experiment_studies-list',
-                           kwargs={'experiment_nes_id': experiment.nes_id})
-        self.client.login(username=owner.username, password='nep-lab2')
+                           kwargs={'experiment_nes_id': self.experiment.nes_id})
+        self.client.login(username=self.owner.username, password=PASSWORD)
         response = self.client.get(list_url)
         self.assertEqual(
             json.loads(response.content.decode('utf8')),
             [
                 {
-                    'id': study.id,
-                    'title': study.title,
-                    'description': study.description,
-                    'start_date': study.start_date.strftime('%Y-%m-%d'),
-                    'end_date': study.end_date,
-                    'experiment': 'Experiment 2',
-                    'keywords': list(study.keywords.values('name'))
+                    'id': self.study.id,
+                    'title': self.study.title,
+                    'description': self.study.description,
+                    'start_date': self.study.start_date.strftime('%Y-%m-%d'),
+                    'end_date': self.study.end_date,
+                    'experiment': self.experiment.title,
+                    'keywords': list(self.study.keywords.values('name'))
                 },
             ]
         )
 
     def test_POSTing_a_new_study(self):
-        owner = User.objects.get(username='lab1')
-        experiment = Experiment.objects.create(
-            title='An experiment', nes_id=17, owner=owner,
-            version=1, sent_date=datetime.utcnow()
+        experiment = create_experiment(1, self.owner)
+        self.client.login(username=self.owner.username, password=PASSWORD)
+        list_url = reverse(
+            'api_experiment_studies-list',
+            kwargs={'experiment_nes_id': experiment.nes_id}
         )
-        self.client.login(username=owner.username, password='nep-lab1')
-        list_url = reverse('api_experiment_studies-list',
-                           kwargs={'experiment_nes_id': experiment.nes_id})
         response = self.client.post(
             list_url,
             {
