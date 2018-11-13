@@ -1,10 +1,14 @@
 import random
 import re
+import tempfile
 import time
 
 import sys
 from unittest import skip
 
+import os
+
+import shutil
 from django.core import mail
 from django.core.management import call_command
 from selenium.common.exceptions import NoSuchElementException
@@ -12,17 +16,16 @@ from selenium.webdriver.common.keys import Keys
 
 from experiments.models import Experiment
 from experiments.tests.tests_helper import random_utf8_string, \
-    global_setup_ft, apply_setup, create_trustee_user
+    create_trustee_user, create_experiment, \
+    create_study, create_researcher, create_ethics_committee_info
 from functional_tests.base import FunctionalTestTrustee
 
 
-@apply_setup(global_setup_ft)
 class TrusteeTest(FunctionalTestTrustee):
 
     def setUp(self):
-        create_trustee_user('claudia')
-        create_trustee_user('roque')
-        global_setup_ft()
+        self.trustee1 = create_trustee_user('claudia')
+        self.trustee2 = create_trustee_user('roque')
         super(TrusteeTest, self).setUp()
 
     def _access_experiment_detail_page(self, experiment):
@@ -34,21 +37,6 @@ class TrusteeTest(FunctionalTestTrustee):
                 "//a[@href='/experiments/" + experiment.slug + "/']"
             ).click()
         )
-
-    def _access_change_slug_modal(self):
-        experiment = Experiment.objects.filter(
-            status=Experiment.TO_BE_ANALYSED
-        ).first()
-
-        self._access_experiment_detail_page(experiment)
-
-        # The trustee clicks in experiment url link to change the url
-        self.wait_for(
-            lambda: self.browser.find_element_by_class_name(
-                'fa-pencil-square-o'
-            ).click()
-        )
-        return experiment
 
     # TODO: repeated from test_search.SearchTest
     def search_for(self, string):
@@ -68,7 +56,14 @@ class TrusteeTest(FunctionalTestTrustee):
         self.assertEqual(n, count)
 
     def test_trustee_can_view_initial_page(self):
-        experiment = Experiment.objects.first()
+        ##
+        # Create experiments with other status to test below
+        ##
+        experiment2 = create_experiment(1, self.owner, Experiment.APPROVED)
+        experiment3 = create_experiment(1, self.owner, Experiment.UNDER_ANALYSIS)
+        experiment4 = create_experiment(1, self.owner, Experiment.NOT_APPROVED)
+
+        self.browser.refresh()
 
         # She is redirected to home page but now logged in.
         # She sees a list of experiments that has to be analysed and
@@ -86,39 +81,26 @@ class TrusteeTest(FunctionalTestTrustee):
         rows = table.find_element_by_tag_name(
             'tbody'
         ).find_elements_by_tag_name('tr')
+
+        # She verifies that there are experiments with all possible status
+        # to be displayed
         self.assertTrue(
             any(row.find_elements_by_tag_name('td')[5].text ==
-                experiment.get_status_display() for row in rows)
+                self.experiment.get_status_display() for row in rows)
         )
-        # She verifies that the first experiment is to be analysed,
-        # and two are under analysis. There is one that has been approved and
-        # one more that has not been approved - experiments list template
-        # for trustees displays first experiments to be analysed,
-        # then experiments under analysis and, at last, approved and not
-        # approved ones.
-        i = 0
-        for row in rows:
-            if i < 2:
-                self.assertTrue(
-                    row.find_elements_by_tag_name('td')[5].text ==
-                    Experiment.STATUS_OPTIONS[1][1])  # 'To be analysed'
-            if i == 2:
-                self.assertTrue(
-                    row.find_elements_by_tag_name('td')[5].text ==
-                    Experiment.STATUS_OPTIONS[2][1])  # 'Under analysis'
-            if i == 3:
-                self.assertTrue(
-                    row.find_elements_by_tag_name('td')[5].text ==
-                    Experiment.STATUS_OPTIONS[2][1])  # 'Under analysis'
-            if i == 4:
-                self.assertTrue(
-                    row.find_elements_by_tag_name('td')[5].text ==
-                    Experiment.STATUS_OPTIONS[4][1])  # 'Not approved'
-            if i == 5:
-                self.assertTrue(
-                    row.find_elements_by_tag_name('td')[5].text ==
-                    Experiment.STATUS_OPTIONS[3][1])  # 'Approved'
-            i = i + 1
+        self.assertTrue(
+            any(row.find_elements_by_tag_name('td')[5].text ==
+                experiment2.get_status_display() for row in rows)
+        )
+        self.assertTrue(
+            any(row.find_elements_by_tag_name('td')[5].text ==
+                experiment3.get_status_display() for row in rows)
+        )
+        self.assertTrue(
+            any(row.find_elements_by_tag_name('td')[5].text ==
+                experiment4.get_status_display() for row in rows)
+        )
+
 
     def test_trustee_can_see_experiment_downloads_column(self):
         # She sees that fourth column is "Downloads". These column
@@ -147,6 +129,19 @@ class TrusteeTest(FunctionalTestTrustee):
         )
 
     def test_trustee_when_viewing_stauses_to_change_can_see_only_status_allowed_to_change(self):
+        ##
+        # Create experiments with other status to test below
+        ##
+        experiment2 = create_experiment(1, self.owner, Experiment.APPROVED)
+        experiment2.trustee = random.choice([self.trustee1, self.trustee2])
+        experiment2.save()
+        experiment3 = create_experiment(1, self.owner, Experiment.UNDER_ANALYSIS)
+        experiment3.trustee = self.trustee1
+        experiment3.save()
+        experiment4 = create_experiment(1, self.owner, Experiment.NOT_APPROVED)
+        experiment4.trustee = random.choice([self.trustee1, self.trustee2])
+        experiment4.save()
+        self.browser.refresh()
 
         statuses = dict(Experiment.STATUS_OPTIONS)
 
@@ -168,7 +163,7 @@ class TrusteeTest(FunctionalTestTrustee):
             self.browser.find_element_by_id('id_status_choices').text
         ))
 
-        # She press ESC to quit modal and clicks in an experiment status
+        # She presses ESC to quit modal and clicks in an experiment status
         # that is under analysis. Now a modal with all status options but
         # "Receiving" appears
         ##
@@ -181,10 +176,7 @@ class TrusteeTest(FunctionalTestTrustee):
         # We have to wait again, for modal been completely escaped
         ##
         time.sleep(0.5)
-        self.browser.find_element_by_link_text(
-            'Under analysis').find_element_by_xpath(
-            "//a[@data-experiment_trustee='claudia']"
-        ).click()
+        self.browser.find_element_by_link_text('Under analysis').click()
         self.wait_for(lambda: self.assertIn(
             str(statuses[Experiment.TO_BE_ANALYSED]),
             self.browser.find_element_by_id('id_status_choices').text
@@ -231,10 +223,31 @@ class TrusteeTest(FunctionalTestTrustee):
             ''
         ))
 
-    def test_trustee_can_see_experiments_to_be_analysed_sign(self):
-        experiments_to_be_analysed = Experiment.objects.filter(
-            status=Experiment.TO_BE_ANALYSED
-        ).count()
+    def test_trustee_can_see_experiments_to_be_analysed_badge_1(self):
+        """
+            There are experiments to be analized
+        """
+        self.wait_for(
+            lambda: self.browser.find_element_by_id('new_experiments')
+        )
+        new_experiments = self.browser.find_element_by_id('new_experiments')
+        badger = new_experiments.get_attribute('class').find('badger')
+        self.assertLess(-1, badger)
+
+    def test_trustee_can_see_experiments_to_be_analysed_badge_2(self):
+        """
+            There are NOT experiments to be analized
+        """
+        ##
+        # Create experiments with other status to test below
+        ##
+        create_experiment(1, self.owner, Experiment.APPROVED)
+        create_experiment(1, self.owner, Experiment.UNDER_ANALYSIS)
+        create_experiment(1, self.owner, Experiment.NOT_APPROVED)
+        self.browser.refresh()
+
+        self.experiment.status = Experiment.APPROVED
+        self.experiment.save()
         self.wait_for(
             lambda: self.browser.find_element_by_id('new_experiments')
         )
@@ -242,33 +255,31 @@ class TrusteeTest(FunctionalTestTrustee):
         # TODO: we are using a bad technique - badger is greater or equal to
         # TODO: zero or -1
         badger = new_experiments.get_attribute('class').find('badger')
-        if experiments_to_be_analysed:
-            self.assertLess(-1, badger)
-        else:
-            self.assertLess(badger, 0)
+        self.assertGreater(badger, 0)
 
     def test_send_email_when_trustee_change_status(self):
+        self.experiment.status = Experiment.UNDER_ANALYSIS
+        self.experiment.trustee = self.trustee1
+        self.experiment.save()
+        study = create_study(1, self.experiment)
+        create_researcher(study)
+        self.browser.refresh()
+
         # Obs.: we are implementing for changing status to APPROVED
         # TODO: see if it's worth to implement changing to other status
         # Claudia clicks on a status "Under analysis" of an experiment and
         # change it to "Approved"
         self.wait_for(lambda: self.browser.find_element_by_link_text(
-            'Under analysis').find_element_by_xpath(
-            "//a[@data-experiment_trustee='claudia']"
-        ))
-        experiment_link = self.browser.find_element_by_link_text(
-            'Under analysis').find_element_by_xpath(
-            "//a[@data-experiment_trustee='claudia']"
+            'Under analysis')
         )
-        experiment_id = experiment_link.get_attribute('data-experiment_id')
-        experiment = Experiment.objects.get(pk=experiment_id)
-        experiment_link.click()
+        self.browser.find_element_by_link_text('Under analysis').click()
         ##
         # We wait for modal pops up
         ##
         time.sleep(0.5)
         status_choices_form = self.browser.find_element_by_id(
-            'id_status_choices')
+            'id_status_choices'
+        )
         status_choices_form.find_element_by_xpath(
             '//input[@type="radio" and  @value=' + '"' +
             Experiment.APPROVED + '"]').click()
@@ -279,8 +290,8 @@ class TrusteeTest(FunctionalTestTrustee):
         # experiment was approved
         self.wait_for(lambda: self.assertIn(
             'An email was sent to ' +
-            experiment.study.researcher.first_name +
-            ' ' + experiment.study.researcher.last_name +
+            self.experiment.study.researcher.first_name +
+            ' ' + self.experiment.study.researcher.last_name +
             ' warning that the experiment changed status to Approved.',
             self.browser.find_element_by_tag_name('body').text
         ))
@@ -293,13 +304,13 @@ class TrusteeTest(FunctionalTestTrustee):
         # The email was sent to the researcher. The guy checks her email and
         # finds a message
         email = mail.outbox[0]
-        self.assertIn(experiment.study.researcher.email, email.to)
+        self.assertIn(self.experiment.study.researcher.email, email.to)
         self.assertEqual(email.subject,
                          'Your experiment was approved')
         # Inside it, there's a message with congratulations and a link to
         # the Portal
         self.assertIn('We are pleased to inform you that your experiment ' +
-                      experiment.title +
+                      self.experiment.title +
                       ' was approved by Neuromat Open Database Evaluation '
                       'Committee. All data of the submitted experiment '
                       'will be available freely to the public '
@@ -320,35 +331,44 @@ class TrusteeTest(FunctionalTestTrustee):
         self.assertEqual(self.live_server_url, url)
 
     def test_change_status_from_to_be_analysed_to_under_analysis(self):
+        ##
+        # Need to create study and researcher with email
+        ##
+        study = create_study(1, self.experiment)
+        create_researcher(study)
+
         # Statuses table cells are links. She clicks in an experiment status
         # that has to be analysed and see a modal that display the modal
         # title that shows experiment title in quotes.
         self.wait_for(
-            lambda: self.browser.find_element_by_link_text('To be analysed')
+            lambda: self.browser.find_element_by_link_text(
+                'To be analysed'
+            ).click()
         )
-        experiment_link = self.browser.find_element_by_link_text(
-            'To be analysed')
-        experiment_id = experiment_link.get_attribute('data-experiment_id')
-        experiment = Experiment.objects.get(id=experiment_id)
-        experiment_link.click()
+        # experiment_link = self.browser.find_element_by_link_text(
+        #     'To be analysed'
+        # ).click()
+        # experiment_id = experiment_link.get_attribute('data-experiment_id')
+        # experiment = Experiment.objects.get(id=experiment_id)
+        # experiment_link.click()
         time.sleep(0.5)
         modal_status = self.browser.find_element_by_id('status_modal')
         modal_status_title = modal_status.find_element_by_id(
             'modal_status_title').text
         self.assertIn('Change status for experiment', modal_status_title)
-        self.assertIn('"' + experiment.title + '"', modal_status_title)
+        self.assertIn('"' + self.experiment.title + '"', modal_status_title)
         # In modal body she sees that she can chose a new status for the
         # experiment. As she wants to analyse the experiment, she changes
         # the status to "Under analysis".
-        modal_status_body = modal_status.find_element_by_id(
-            'status_body').text
+        modal_status_body = modal_status.find_element_by_id('status_body').text
         self.assertIn('Please select an option:', modal_status_body)
         self.assertIn('To be analysed', modal_status_body)
         status_choices_form = self.browser.find_element_by_id(
             'id_status_choices')
         status_choices_form.find_element_by_xpath(
             '//input[@type="radio" and  @value=' + '"' +
-            Experiment.UNDER_ANALYSIS + '"]').click()
+            Experiment.UNDER_ANALYSIS + '"]'
+        ).click()
         submit_button = self.browser.find_element_by_id('submit')
         submit_button.send_keys(Keys.ENTER)
 
@@ -356,37 +376,36 @@ class TrusteeTest(FunctionalTestTrustee):
         # message telling her that the experiment is now under analysis.
         # In table she sees that the experiment is "Under analysis".
         # TODO:
-        # some times Experiment.STATUS_OPTIONS[2][1] not equal what
+        # some times Experiment.STATUS_OPTIONS[2][1] is not equal what
         # we want?
         self.wait_for(lambda: self.assertEqual(
             self.browser.find_element_by_xpath(
-                "//a[@data-experiment_id='" + str(experiment.id) + "']"
+                "//a[@data-experiment_id='" + str(self.experiment.id) + "']"
             ).text,
             Experiment.STATUS_OPTIONS[2][1]
         ))
         self.wait_for(lambda: self.assertIn(
-            'An email was sent to ' + experiment.study.researcher.first_name +
-            ' ' + experiment.study.researcher.last_name +
+            'An email was sent to ' +
+            self.experiment.study.researcher.first_name +
+            ' ' + self.experiment.study.researcher.last_name +
             ' warning that the experiment is under analysis.',
             self.browser.find_element_by_tag_name('body').text
         ))
 
     def test_change_status_to_not_approved_prohibted_without_justification(self):
+        self.experiment.status = Experiment.UNDER_ANALYSIS
+        self.experiment.trustee = self.trustee1
+        self.experiment.save()
+        self.browser.refresh()
+
         # Claudia has examined an experiment that has not conditions to be
         # published in portal. So after her analysis, he decide to not
         # approved it.
         self.wait_for(
             lambda: self.browser.find_element_by_link_text(
-            'Under analysis').find_element_by_xpath(
-            "//a[@data-experiment_trustee='claudia']"
-        ))
-        experiment_link = self.browser.find_element_by_link_text(
-            'Under analysis').find_element_by_xpath(
-            "//a[@data-experiment_trustee='claudia']"
+                'Under analysis'
+            ).click()
         )
-        experiment_id = experiment_link.get_attribute('data-experiment_id')
-        # experiment = Experiment.objects.get(pk=experiment_id)
-        experiment_link.click()
         ##
         # Waiting for modal pops up
         ##
@@ -433,6 +452,17 @@ class TrusteeTest(FunctionalTestTrustee):
         #               self.browser.find_element_by_tag_name('body').text)
 
     def test_change_status_to_not_approved_with_justification_displays_warning_message(self):
+        ##
+        # Need to create study and researcher with email
+        ##
+        study = create_study(1, self.experiment)
+        create_researcher(study)
+
+        self.experiment.status = Experiment.UNDER_ANALYSIS
+        self.experiment.trustee = self.trustee1
+        self.experiment.save()
+        self.browser.refresh()
+
         # Claudia has examined an experiment that has not conditions to be
         # published in portal. So after her analysis, he decide to not
         # approved it. She is aware that she has to fill a justification
@@ -440,17 +470,8 @@ class TrusteeTest(FunctionalTestTrustee):
         self.wait_for(
             lambda: self.browser.find_element_by_link_text(
                 'Under analysis'
-            ).find_element_by_xpath(
-                "//a[@data-experiment_trustee='claudia'] "
-            )
+            ).click()
         )
-        experiment_link = self.browser.find_element_by_link_text(
-            'Under analysis').find_element_by_xpath(
-            "//a[@data-experiment_trustee='claudia'] "
-        )
-        experiment_id = experiment_link.get_attribute('data-experiment_id')
-        experiment = Experiment.objects.get(id=experiment_id)
-        experiment_link.click()
         ##
         # Waiting for modal pops up
         ##
@@ -472,35 +493,37 @@ class TrusteeTest(FunctionalTestTrustee):
         submit_button.send_keys(Keys.ENTER)
         self.wait_for(lambda: self.assertEqual(
             self.browser.find_element_by_xpath(
-                "//a[@data-experiment_id='" + str(experiment.id) + "']"
+                "//a[@data-experiment_id='" + str(self.experiment.id) + "']"
             ).text,
             Experiment.STATUS_OPTIONS[4][1]
         ))
         self.wait_for(lambda: self.assertIn(
             'An email was sent to ' +
-            experiment.study.researcher.first_name +
-            ' ' + experiment.study.researcher.last_name +
+            self.experiment.study.researcher.first_name +
+            ' ' + self.experiment.study.researcher.last_name +
             ' warning that the experiment was rejected.',
             self.browser.find_element_by_tag_name('body').text
         ))
 
     def test_change_status_to_the_same_status_doesnt_displays_warning_message(self):
+        ##
+        # Need to create study and researcher with email
+        ##
+        study = create_study(1, self.experiment)
+        create_researcher(study)
+
+        self.experiment.status = Experiment.UNDER_ANALYSIS
+        self.experiment.trustee = self.trustee1
+        self.experiment.save()
+        self.browser.refresh()
+
         # Claudia clicks an experiment that has a given status, and submit
         # the modal form to change status with same status.
         self.wait_for(
             lambda: self.browser.find_element_by_link_text(
                 'Under analysis'
-            ).find_element_by_xpath(
-                "//a[@data-experiment_trustee='claudia']"
-            )
+            ).click()
         )
-        experiment_link = self.browser.find_element_by_link_text(
-            'Under analysis').find_element_by_xpath(
-            "//a[@data-experiment_trustee='claudia']"
-        )
-        experiment_id = experiment_link.get_attribute('data-experiment_id')
-        experiment = Experiment.objects.get(pk=experiment_id)
-        experiment_link.click()
 
         # The modal to change experiment status pop up, and she chooses
         # UNDER_ANALYSIS, the same status as before.
@@ -508,7 +531,8 @@ class TrusteeTest(FunctionalTestTrustee):
             lambda: self.browser.find_element_by_id('id_status_choices')
         )
         status_choices_form = self.browser.find_element_by_id(
-            'id_status_choices')
+            'id_status_choices'
+        )
         self.wait_for(
             lambda: status_choices_form.find_element_by_xpath(
                 '//input[@type="radio" and  @value=' + '"' +
@@ -518,36 +542,32 @@ class TrusteeTest(FunctionalTestTrustee):
         self.browser.find_element_by_id('submit').send_keys(Keys.ENTER)
         self.wait_for(lambda: self.assertEqual(
             self.browser.find_element_by_xpath(
-                "//a[@data-experiment_id='" + str(experiment.id) + "']"
+                "//a[@data-experiment_id='" + str(self.experiment.id) + "']"
             ).text,
             Experiment.STATUS_OPTIONS[2][1]
         ))
         self.wait_for(lambda: self.assertNotIn(
             'An email was sent to ' +
-            experiment.study.researcher.first_name +
-            ' ' + experiment.study.researcher.last_name +
+            self.experiment.study.researcher.first_name +
+            ' ' + self.experiment.study.researcher.last_name +
             ' warning that the experiment is under analysis.',
             self.browser.find_element_by_tag_name('body').text
         ))
 
     def test_change_status_from_under_analysis_to_to_be_analysed_displays_warning_message(self):
+        self.experiment.status = Experiment.UNDER_ANALYSIS
+        self.experiment.trustee = self.trustee1
+        self.experiment.save()
+        self.browser.refresh()
+
         # Claudia clicks an experiment that she is already analysing. She is
         # in doubt about some aspect of it, and wants to pass it to other
         # trustee.
         self.wait_for(
             lambda: self.browser.find_element_by_link_text(
                 'Under analysis'
-            ).find_element_by_xpath(
-                "//a[@data-experiment_trustee='claudia']"
-            )
+            ).click()
         )
-        experiment_link = self.browser.find_element_by_link_text(
-            'Under analysis').find_element_by_xpath(
-            "//a[@data-experiment_trustee='claudia']"
-        )
-        experiment_id = experiment_link.get_attribute('data-experiment_id')
-        experiment = Experiment.objects.get(pk=experiment_id)
-        experiment_link.click()
         ##
         # Waiting for modal pops up
         ##
@@ -557,34 +577,37 @@ class TrusteeTest(FunctionalTestTrustee):
         # TO_BE_ANALYSED to liberate the experiment to be analysed by other
         # trustee.
         status_choices_form = self.browser.find_element_by_id(
-            'id_status_choices')
+            'id_status_choices'
+        )
         status_choices_form.find_element_by_xpath(
             '//input[@type="radio" and  @value=' + '"' +
-            Experiment.TO_BE_ANALYSED + '"]').click()
+            Experiment.TO_BE_ANALYSED + '"]'
+        ).click()
         self.browser.find_element_by_id('submit').send_keys(Keys.ENTER)
         self.wait_for(lambda: self.assertEqual(
             self.browser.find_element_by_xpath(
-                "//a[@data-experiment_id='" + str(experiment.id) + "']"
+                "//a[@data-experiment_id='" + str(self.experiment.id) + "']"
             ).text,
             Experiment.STATUS_OPTIONS[1][1]
         ))
         self.wait_for(lambda: self.assertIn(
-            'The experiment data ' + experiment.title +
+            'The experiment data ' + self.experiment.title +
             ' was made available to be analysed by other trustee.',
             self.browser.find_element_by_tag_name('body').text
         ))
 
     def test_can_change_status_from_under_analysis_to_other_only_if_trustee_is_the_owner(self):
+        self.experiment.status = Experiment.UNDER_ANALYSIS
+        self.experiment.trustee = self.trustee2
+        self.experiment.save()
+        self.browser.refresh()
+
         # Claudia see an experiment that is UNDER_ANALYSIS and
         # click on it. He sees a modal warning that the experiment has already
         # under analysis by other trustee.
-        # Obs.:
-        # 1) requires create user 'roque' to this test
-        # 2) requires login in test with user different of 'roque'
         self.wait_for(
             lambda: self.browser.find_element_by_link_text(
-                'Under analysis').find_element_by_xpath(
-                "//a[@data-experiment_trustee='roque'] "
+                'Under analysis'
             ).click()
         )
         # The modal to change experiment status pop up, but it has only a
@@ -597,10 +620,9 @@ class TrusteeTest(FunctionalTestTrustee):
         ))
 
     def test_can_view_ethics_committee_info(self):
+        temp_file = os.path.join(tempfile.mkdtemp())
         # Last experiment approved has ethics committee info (tests helper)
-        experiment = Experiment.objects.filter(
-            status=Experiment.APPROVED
-        ).last()
+        create_ethics_committee_info(self.experiment)
 
         # The trustee click in the experiment of the list that has ethics
         # commitee info data
@@ -608,7 +630,7 @@ class TrusteeTest(FunctionalTestTrustee):
             lambda: self.browser.find_element_by_link_text(
                 'View'
             ).find_element_by_xpath(
-                "//a[@href='/experiments/" + experiment.slug + "/']"
+                "//a[@href='/experiments/" + self.experiment.slug + "/']"
             ).click()
         )
 
@@ -616,7 +638,7 @@ class TrusteeTest(FunctionalTestTrustee):
         # approval site, and a link to download the ethics committee file
         # (because this experiment has that data posted via api)
         self.wait_for(lambda: self.assertEqual(
-            experiment.ethics_committee_url,
+            self.experiment.ethics_committee_url,
             self.browser.find_element_by_link_text(
                 'Approval of the ethics committee'
             ).get_attribute('href')
@@ -627,20 +649,33 @@ class TrusteeTest(FunctionalTestTrustee):
         # here in test, but prepends url in template system
         ##
         self.wait_for(lambda: self.assertIn(
-            experiment.ethics_committee_file.url,
+            self.experiment.ethics_committee_file.url,
             self.browser.find_element_by_link_text(
                 'Approval of the ethics committee file'
             ).get_attribute('href')
         ))
 
+        shutil.rmtree(temp_file)
+
     def test_change_status_from_under_analysis_to_approved_reindex_haystack(self):
+        ##
+        # Need to create study and researcher with email: for change status
+        # view
+        ##
+        study = create_study(1, self.experiment)
+        create_researcher(study)
+
+        self.experiment.status = Experiment.UNDER_ANALYSIS
+        self.experiment.trustee = self.trustee1
+        self.experiment.title = 'Ein Titel'  # for searching below
+        self.experiment.save()
+        self.browser.refresh()
 
         # The trustee Claudia changes an experiment under analysis to approved
         self.wait_for(
             lambda: self.browser.find_element_by_link_text(
                 'Under analysis'
-            ).find_element_by_xpath(
-                '//a[@data-experiment_trustee="claudia"]').click()
+            ).click()
         )
         self.wait_for(
             lambda:
@@ -657,6 +692,7 @@ class TrusteeTest(FunctionalTestTrustee):
             Experiment.APPROVED + '"]').click()
         submit_button = self.browser.find_element_by_id('submit')
         submit_button.send_keys(Keys.ENTER)
+        time.sleep(0.5)  # until change status modal disapeer
 
         # TODO: we're running rebuild_index manually, because the celery
         # TODO: task is not beeing recognized by tests. See:
@@ -683,7 +719,7 @@ class TrusteeTest(FunctionalTestTrustee):
         # after Claudia logged out from Portal, and searches for
         # the experiment that Claudia has just changed from under analysis
         # to approved.
-        self.search_for('\"Experiment analysed by Claudia\"')
+        self.search_for(self.experiment.title)
 
         # When a trustee changes experiment status from under analysis to
         # approved the system makes search reindexing, so the researcher will
@@ -696,15 +732,16 @@ class TrusteeTest(FunctionalTestTrustee):
         experiment_text = self.browser.find_element_by_class_name(
             'experiment-matches'
         ).text
-        self.assertIn('Experiment analysed by Claudia', experiment_text)
+        self.assertIn(self.experiment.title, experiment_text)
 
     def test_hover_mouse_over_notification_bell_display_tooltip(self):
         ##
-        # First we get the total of experiments to be analysed
+        # Create other experiment to be analysed
         ##
-        experiments = Experiment.objects.filter(
-            status=Experiment.TO_BE_ANALYSED
-        ).count()
+        create_experiment(1, self.trustee2)
+        self.browser.refresh()
+
+        to_be_analysed = Experiment.objects.count()
 
         # When the trustee pass the mouse over the notification bell at top
         # of the page, she sees a tooltip that displays how many experiments
@@ -717,13 +754,20 @@ class TrusteeTest(FunctionalTestTrustee):
         self.assertEqual('tooltip', tooltip_toggle)
         tooltip_text = notification_bell.get_attribute('title')
         self.assertEqual(
-            'There is(are) ' + str(experiments) +
+            'There is(are) ' + str(to_be_analysed) +
             ' experiment(s) to be analysed',
             tooltip_text
         )
 
     def test_url_editor_modal_displays_correct_content(self):
-        experiment = self._access_change_slug_modal()
+        self._access_experiment_detail_page(self.experiment)
+
+        # The trustee clicks in experiment url link to change the url
+        self.wait_for(
+            lambda: self.browser.find_element_by_class_name(
+                'fa-pencil-square-o'
+            ).click()
+        )
 
         # In modal there are some content about the current url, a label for
         # an input text form that trustee type the new slug, a sentence
@@ -737,11 +781,11 @@ class TrusteeTest(FunctionalTestTrustee):
         modal = self.browser.find_element_by_id('change_url_modal')
         self.assertIn(
                 'Current url: ' + self.live_server_url + '/experiments/' +
-                experiment.slug,
+                self.experiment.slug,
                 modal.text
         )
         self.assertIn(
-            'Current slug: ' + experiment.slug, modal.text
+            'Current slug: ' + self.experiment.slug, modal.text
 
         )
         self.assertIn(
@@ -759,14 +803,19 @@ class TrusteeTest(FunctionalTestTrustee):
         self.assertEqual('Save', submit_button.get_attribute('value'))
 
     def test_submit_non_unique_slug_displays_error_message(self):
-        self._access_change_slug_modal()
+        self._access_experiment_detail_page(self.experiment)
+
+        # The trustee clicks in experiment url link to change the url
+        self.wait_for(
+            lambda: self.browser.find_element_by_class_name(
+                'fa-pencil-square-o'
+            ).click()
+        )
 
         ##
-        # Get another experiment slug
+        # Create another experiment
         ##
-        other_experiment = Experiment.objects.filter(
-            status=Experiment.TO_BE_ANALYSED
-        ).last()
+        other_experiment = create_experiment(1, self.trustee1)
 
         # The trustee enter a slug that already exists
         self.wait_for(
@@ -784,7 +833,14 @@ class TrusteeTest(FunctionalTestTrustee):
         ))
 
     def test_submit_empty_slug_displays_error_message(self):
-        self._access_change_slug_modal()
+        self._access_experiment_detail_page(self.experiment)
+
+        # The trustee clicks in experiment url link to change the url
+        self.wait_for(
+            lambda: self.browser.find_element_by_class_name(
+                'fa-pencil-square-o'
+            ).click()
+        )
 
         ##
         # Wait until element is visible, then remove element "required" from
@@ -792,7 +848,8 @@ class TrusteeTest(FunctionalTestTrustee):
         ##
         self.wait_for(
             lambda: self.browser.find_element_by_id(
-                'id_slug').click()
+                'id_slug'
+            ).click()
         )
         self.browser.execute_script(
             'document.getElementById("id_slug").required = false;'
@@ -816,7 +873,14 @@ class TrusteeTest(FunctionalTestTrustee):
         # TODO: chars works and the test fails. As we can't disable the
         # TODO: script code after DOM has render it. Tested mannualy without
         # TODO: javascript.
-        self._access_change_slug_modal()
+        self._access_experiment_detail_page(self.experiment)
+
+        # The trustee clicks in experiment url link to change the url
+        self.wait_for(
+            lambda: self.browser.find_element_by_class_name(
+                'fa-pencil-square-o'
+            ).click()
+        )
 
         # The trustee tryes to enter some invalid slug and submit it
         self.wait_for(
@@ -836,7 +900,14 @@ class TrusteeTest(FunctionalTestTrustee):
         ))
 
     def test_submit_slug_with_less_than_three_characters_displays_error_message(self):
-        self._access_change_slug_modal()
+        self._access_experiment_detail_page(self.experiment)
+
+        # The trustee clicks in experiment url link to change the url
+        self.wait_for(
+            lambda: self.browser.find_element_by_class_name(
+                'fa-pencil-square-o'
+            ).click()
+        )
 
         # The trustee tryes to enter a slug with less than three characters
         self.wait_for(
@@ -856,7 +927,14 @@ class TrusteeTest(FunctionalTestTrustee):
         ))
 
     def test_submit_valid_slug_returns_redirect_with_success_message(self):
-        self._access_change_slug_modal()
+        self._access_experiment_detail_page(self.experiment)
+
+        # The trustee clicks in experiment url link to change the url
+        self.wait_for(
+            lambda: self.browser.find_element_by_class_name(
+                'fa-pencil-square-o'
+            ).click()
+        )
 
         # The trustee enters a valid slug and submit it
         self.wait_for(
@@ -874,13 +952,20 @@ class TrusteeTest(FunctionalTestTrustee):
         ))
 
     def test_submit_same_slug_returns_redirect_with_no_message(self):
-        experiment = self._access_change_slug_modal()
+        self._access_experiment_detail_page(self.experiment)
+
+        # The trustee clicks in experiment url link to change the url
+        self.wait_for(
+            lambda: self.browser.find_element_by_class_name(
+                'fa-pencil-square-o'
+            ).click()
+        )
 
         # The trustee enters the same slug as current one
         self.wait_for(
             lambda: self.browser.find_element_by_id(
                 'id_slug'
-            ).send_keys(experiment.slug)
+            ).send_keys(self.experiment.slug)
         )
         self.browser.find_element_by_id('id_slug').send_keys(Keys.ENTER)
 
