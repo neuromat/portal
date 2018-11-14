@@ -1038,6 +1038,7 @@ class SearchTest(TestCase):
         experiment = Experiment.objects.last()
         group = create_group(1, experiment)
         q = create_questionnaire(1, 'q', group)
+        # TODO: use path.join
         create_questionnaire_language(
             q,
             settings.BASE_DIR + '/experiments/tests/questionnaire1.csv',
