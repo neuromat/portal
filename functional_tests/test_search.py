@@ -939,6 +939,9 @@ class SearchTest(FunctionalTest):
         self.assertEqual(2, count)
 
     def test_search_display_backhome_button(self):
+        haystack.connections.reload('default')
+        self.haystack_index('rebuild_index')
+
         # When Joselina makes searches, a button to back homepage is
         # displayed on the right side, above the list of search results
         self.search_for('brachial plexus')
