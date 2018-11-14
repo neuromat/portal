@@ -11,7 +11,7 @@ from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.common.keys import Keys
 
 from downloads.views import DOWNLOAD_ERROR_MESSAGE, download_create
-from experiments.models import Questionnaire, Step, Gender
+from experiments.models import Questionnaire, Step, Gender, Experiment
 from experiments.tests.tests_helper import create_group, \
     create_participant, create_download_dir_structure_and_files, \
     remove_selected_subdir, create_experimental_protocol, \
@@ -958,6 +958,8 @@ class ExperimentDetailTest(FunctionalTest):
             )
 
     def test_can_view_versions_tab(self):
+        self.experiment.status = Experiment.APPROVED
+        self.experiment.save()
         experiment_v2 = create_next_version_experiment(self.experiment)
 
         ##
@@ -991,6 +993,8 @@ class ExperimentDetailTest(FunctionalTest):
             self.browser.find_element_by_link_text('Versions')
 
     def test_can_view_versions_tab_content(self):
+        self.experiment.status = Experiment.APPROVED
+        self.experiment.save()
         experiment_v2 = create_next_version_experiment(
             self.experiment, 'Text explaining changes in version 2'
         )

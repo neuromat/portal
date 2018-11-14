@@ -1171,7 +1171,7 @@ def remove_selected_subdir(selected, experiment, participant, group,
     if 'participant_p' in selected:
         shutil.rmtree(os.path.join(
             experiment_download_dir, 'Group_' + group_title_slugifyed,
-            'Per_participant_data', 'Participant_' + participant.code
+            'Per_participant_data', 'Participant_' + str(participant.code)
         ))
     # If group has questionnaires remove 'Questionnaire_metadata' subdir
     # randomly.
