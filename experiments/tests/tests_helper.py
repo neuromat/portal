@@ -1201,15 +1201,3 @@ def random_utf8_string(length):
         result = result + a
     result.decode('unicode-escape')
     return result.decode()
-
-
-def apply_setup(setup_func):
-    """
-    Defines a decorator that uses global setup method.
-    :param setup_func: global setup function
-    :return: wrapper 
-    """
-    def wrap(cls):
-        cls.setup = setup_func
-        return cls
-    return wrap
