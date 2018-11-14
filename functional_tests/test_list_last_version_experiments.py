@@ -132,7 +132,6 @@ class NewVisitorTest(FunctionalTest):
                       'Attributions 4.0', footer_license_text)
 
     def test_can_view_initial_page_when_there_is_new_version_not_approved(self):
-
         ##
         # Create a new version for self.experiment
         ##

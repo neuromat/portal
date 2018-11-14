@@ -1,5 +1,4 @@
 import os
-import re
 import tempfile
 import time
 import zipfile
@@ -7,30 +6,27 @@ from random import choice
 from unittest import skip
 
 import shutil
-from django.contrib.auth.models import User
-from django.core.exceptions import ObjectDoesNotExist
 from django.test import override_settings
 from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.common.keys import Keys
 
 from downloads.views import DOWNLOAD_ERROR_MESSAGE, download_create
-from experiments.models import Experiment, Questionnaire, Step, Group, Gender
-from experiments.tests.tests_helper import create_experiment, create_group, \
+from experiments.models import Questionnaire, Step, Gender, Experiment
+from experiments.tests.tests_helper import create_group, \
     create_participant, create_download_dir_structure_and_files, \
     remove_selected_subdir, create_experimental_protocol, \
     create_questionnaire, create_questionnaire_language, create_study, \
     create_eeg_data, create_eeg_setting, create_eeg_step, \
     create_valid_questionnaires, create_publication, \
-    create_experiment_researcher, create_researcher, global_setup_ft, \
-    apply_setup, create_trustee_user, create_next_version_experiment, \
-    create_ethics_committee_info
+    create_experiment_researcher, create_researcher, \
+    create_trustee_user, create_next_version_experiment, \
+    create_ethics_committee_info, create_genders, create_step
 from functional_tests.base import FunctionalTest
 from nep import settings
 
 TEMP_MEDIA_ROOT = os.path.join(tempfile.mkdtemp())
 
 
-@apply_setup(global_setup_ft)
 class ExperimentDetailTest(FunctionalTest):
 
     def _access_experiment_detail_page(self, experiment):
@@ -674,7 +670,7 @@ class ExperimentDetailTest(FunctionalTest):
         )
 
         # wait for accordion to spawn
-        # time.sleep(0.3)
+        time.sleep(0.3)
 
         questionnaires_content = self.browser.find_element_by_id(
             'questionnaires_tab').text
@@ -962,6 +958,8 @@ class ExperimentDetailTest(FunctionalTest):
             )
 
     def test_can_view_versions_tab(self):
+        self.experiment.status = Experiment.APPROVED
+        self.experiment.save()
         experiment_v2 = create_next_version_experiment(self.experiment)
 
         ##
@@ -995,6 +993,8 @@ class ExperimentDetailTest(FunctionalTest):
             self.browser.find_element_by_link_text('Versions')
 
     def test_can_view_versions_tab_content(self):
+        self.experiment.status = Experiment.APPROVED
+        self.experiment.save()
         experiment_v2 = create_next_version_experiment(
             self.experiment, 'Text explaining changes in version 2'
         )
@@ -1064,13 +1064,12 @@ class ExperimentDetailTest(FunctionalTest):
 
 
 @override_settings(MEDIA_ROOT=TEMP_MEDIA_ROOT)
-@apply_setup(global_setup_ft)
 class DownloadExperimentTest(FunctionalTest):
 
     def setUp(self):
+        create_genders()
         create_trustee_user('claudia')
         create_trustee_user('roque')
-        global_setup_ft()
         super(DownloadExperimentTest, self).setUp()
         # license is in media/download/LICENSE.txt
         os.makedirs(os.path.join(TEMP_MEDIA_ROOT, 'download'))
@@ -1124,10 +1123,7 @@ class DownloadExperimentTest(FunctionalTest):
         )
 
     def test_can_see_link_to_download_all_experiment_data_at_once(self):
-        experiment = Experiment.objects.filter(
-            status=Experiment.APPROVED
-        ).last()
-        self.access_downloads_tab_content(experiment)
+        self.access_downloads_tab_content(self.experiment)
 
         # In right side of the Download tab content, she sees a button
         # to download all data at once
@@ -1139,19 +1135,35 @@ class DownloadExperimentTest(FunctionalTest):
         )
 
     def test_can_see_section_content_of_downloads_tab(self):
-        ##
-        # Last approved experiment created has the objects that we need for
-        # all groups, besides questionnaires and experimental protocols for
-        # some groups.
-        ##
-        experiment = Experiment.objects.filter(
-            status=Experiment.APPROVED
-        ).last()
+        create_study(1, self.experiment)
+        g1 = create_group(1, self.experiment)
+        g2 = create_group(1, self.experiment)
+        create_experimental_protocol(g2)
+        g3 = create_group(1, self.experiment)
+        create_experimental_protocol(g3)
+        q1 = create_questionnaire(1, 'q_test', g3)
+        create_questionnaire_language(
+            q1,
+            settings.BASE_DIR + '/experiments/tests/questionnaire1_pt-br.csv',
+            'pt-br'
+        )
+        g4 = create_group(1, self.experiment)
+        p1 = create_participant(1, g4, Gender.objects.first())
+        p2 = create_participant(1, g4, Gender.objects.last())
+        eeg_step = create_step(1, g4, Step.EEG)
+        eeg_setting = create_eeg_setting(1, self.experiment)
+        create_eeg_data(eeg_setting, eeg_step, p2)
 
-        downloads_tab_content = self.access_downloads_tab_content(experiment)
+        # Josileine acessa a aba Downloads
+        downloads_tab_content = self.access_downloads_tab_content(
+            self.experiment
+        )
+        ##
         # wait for tree-multiselect plugin to render multiselection
+        ##
         time.sleep(0.5)
 
+        # She sees a tree with selections to run download
         self.wait_for(
             lambda:
             self.assertEqual(
@@ -1160,88 +1172,48 @@ class DownloadExperimentTest(FunctionalTest):
             )
         )
 
-        ##
-        # Variable to count how many groups has experimental protocol that
-        # will be tested below.
-        ##
-        experimental_protocol_counter = 0
-        ##
-        # Variable to count how many groups has questionnaires that
-        # will be tested below.
-        ##
-        per_questionnaire_counter = 0
-        for group in experiment.groups.all():
-            ##
-            # We test download selection by user, only for efective data in a
-            # group. If not, test for warning message
-            ##
-            if not hasattr(group, 'experimental_protocol') \
-                    and not group.steps.filter(
-                type=Step.QUESTIONNAIRE
-            ).count() > 0 and not group.participants.all():
-                self.assertIn(
-                    'There are not data for group ' + group.title,
-                    downloads_tab_content.text
-                )
-            else:
-                self.assertIn(
-                    'Group ' + group.title, downloads_tab_content.text
-                )
-                if hasattr(group, 'experimental_protocol'):
-                    experimental_protocol_counter += 1
-                for participant in group.participants.all():
-                    ##
-                    # List participants only if they have data collection.
-                    # Can test against downloads_tab_content because we've
-                    # created different participants for each group in the
-                    # tests.
-                    ##
-                    if participant.has_data_collection():
-                        self.assertIn(
-                            'Participant ' + participant.code,
-                            downloads_tab_content.text
-                        )
-                    else:
-                        self.assertNotIn(
-                            'Participant ' + participant.code,
-                            downloads_tab_content.text
-                        )
-                if group.steps.filter(type=Step.QUESTIONNAIRE).count() > 0:
-                    per_questionnaire_counter += 1
-
-        ##
-        # test for correct number of Experimental Protocol Data options
-        ##
-        self.assertEqual(
-            experimental_protocol_counter,
-            downloads_tab_content.text.count('Experimental Protocol Data')
+        # Group g1 have neither experimental protocol nor at least
+        # one participant so for Group g1, Josileine sees a message that
+        # this group has no data
+        self.assertIn(
+            'There are not data for group ' + g1.title,
+            downloads_tab_content.text
         )
 
-        ##
-        # test for correct number of Per Questionnaire Data options
-        ##
+        # Groups g2, g3, and g4 have at experimental protocol,
+        # or participant, so Josileine see selections for that groups
+        for group in [g2, g3, g4]:
+            self.assertIn(
+                'Group ' + group.title, downloads_tab_content.text
+            )
+
+        # Group g2 and g3 have experimental protocol, so Josileine sees a
+        # selection for experimental protocol data in that two groups
         self.assertEqual(
-            per_questionnaire_counter,
-            downloads_tab_content.text.count('Per Questionnaire Data')
+            2, downloads_tab_content.text.count('Experimental Protocol Data')
+        )
+
+        # Group g3 has questionnaire, so Josileine see one entry selection
+        # to that group about questionnaire data
+        self.assertIn('Per Questionnaire Data', downloads_tab_content.text)
+
+        # Group g4 has two participants, one with data collection and other
+        # without data collection, so Josileine sees an entry for one
+        # participant and doesn't see an entry for the other participant
+        self.assertNotIn(
+            'Participant ' + str(p1.code), downloads_tab_content.text
+        )
+        self.assertIn(
+            'Participant ' + str(p2.code), downloads_tab_content.text
         )
 
     def test_can_see_groups_data_in_downloads_tab_content_only_if_there_are_groups(self):
         ##
-        # Let's create an experiment only with Experiment data, without
-        # groups data. With it, we simulate that Portal received an
-        # experiment, only with Experiment data.
+        # Experiment has not data besides strict experiment data
         ##
-        owner = User.objects.get(username='lab1')
-        create_experiment(1, owner, Experiment.APPROVED)
-        experiment = Experiment.objects.last()
-
-        ##
-        # We have to refresh page to include this new experiment in
-        # Experiments List
-        ##
-        self.browser.refresh()
-
-        downloads_tab_content = self.access_downloads_tab_content(experiment)
+        downloads_tab_content = self.access_downloads_tab_content(
+            self.experiment
+        )
 
         # Now, as there're no data for groups, she sees a message telling
         # her that there is only basic experiment data available to download
@@ -1262,19 +1234,14 @@ class DownloadExperimentTest(FunctionalTest):
 
     def test_can_see_groups_items_in_downloads_tab_content_only_if_they_exist(self):
         ##
-        # Let's create an experiment with Experiment and Groups data. With
-        # it, we simulate that Portal received an experiment, only with
+        # Simulate that Portal received an experiment, only with
         # Experiment and Group data. One group created has no data besides
         # Group data, the other has 1 participant associated
         ##
         # create_genders()  # when eliminating global_ft() return with
-        owner = User.objects.get(username='lab1')
-        create_experiment(1, owner, Experiment.APPROVED)
-        experiment = Experiment.objects.last()
-        create_group(1, experiment)
-        group_with_nothing = Group.objects.last()
-        create_group(1, experiment)
-        create_participant(1, Group.objects.last(), Gender.objects.last())
+        g1 = create_group(1, self.experiment)
+        g2 = create_group(1, self.experiment)
+        create_participant(1, g2, Gender.objects.last())
 
         ##
         # We have to refresh page to include this new experiment in
@@ -1282,17 +1249,19 @@ class DownloadExperimentTest(FunctionalTest):
         ##
         self.browser.refresh()
 
-        downloads_tab_content = self.access_downloads_tab_content(experiment)
+        downloads_tab_content = self.access_downloads_tab_content(
+            self.experiment
+        )
 
         # As the last group created has only basic participant information (
         # without data collection for it), that group is not listed.
         self.assertNotIn(
-            'Group ' + experiment.groups.last().title,
+            'Group ' + self.experiment.groups.last().title,
             downloads_tab_content.text
         )
         self.assertIn(
             'There are not data for group ' +
-            group_with_nothing.title +
+            g1.title +
             ". But there's still basic Experiment data. Click in 'Download' "
             "button to download it.",
             downloads_tab_content.text
@@ -1304,11 +1273,7 @@ class DownloadExperimentTest(FunctionalTest):
         # because they are been tested indirectly by negation in this test
 
     def test_can_see_download_experiment_data_form_submit_button(self):
-        experiment = Experiment.objects.filter(
-            status=Experiment.APPROVED
-        ).first()
-
-        self.access_downloads_tab_content(experiment)
+        self.access_downloads_tab_content(self.experiment)
 
         # Josileine sees the button to download experiment data options that
         # she's just selected.
@@ -1316,17 +1281,15 @@ class DownloadExperimentTest(FunctionalTest):
         self.assertEqual('Download', button.get_attribute('value'))
 
     def test_clicking_in_download_all_experiment_data_without_compressed_file_returns_error_message(self):
-        experiment = Experiment.objects.filter(
-            status=Experiment.APPROVED
-        ).last()
-
+        ##
         # create temporary experiment download subdir
+        ##
         os.makedirs(
-            os.path.join(TEMP_MEDIA_ROOT, 'download', str(experiment.pk))
+            os.path.join(TEMP_MEDIA_ROOT, 'download', str(self.experiment.pk))
         )
 
         # Josileine accesses Experiment Detail Downloads tab
-        self.access_downloads_tab_content(experiment)
+        self.access_downloads_tab_content(self.experiment)
 
         # wait for tree-multiselect plugin to render multiselection
         time.sleep(0.5)
@@ -1361,14 +1324,21 @@ class DownloadExperimentTest(FunctionalTest):
         # not options selected to download. After we made this script.
         # So, to run this test we'd have to deactivate javascript to run it.
         # But if we deactivate javascript we can't even click in Downloads
-        # tab. So we're skipping this test. See
+        # tab. So we're skipping this test by now. See
         # https://stackoverflow.com/questions/13655486/how-can-i-disable-javascript-in-firefox-with-selenium
         ##
-        experiment = Experiment.objects.filter(
-            status=Experiment.APPROVED
-        ).first()
 
-        self.access_downloads_tab_content(experiment)
+        ##
+        # create some data to download
+        ##
+        create_study(1, self.experiment)
+        create_group(1, self.experiment)
+        g2 = create_group(1, self.experiment)
+        create_experimental_protocol(g2)
+        g3 = create_group(1, self.experiment)
+        create_experimental_protocol(g3)
+
+        self.access_downloads_tab_content(self.experiment)
 
         # Josileine goes directly to Download button and click on it.
         self.browser.find_element_by_id('download_button').click()
@@ -1381,58 +1351,41 @@ class DownloadExperimentTest(FunctionalTest):
         ))
 
     def test_if_there_is_not_a_subdir_in_download_dir_structure_return_message(self):
-        # TODO: getting momentarily from tests_helper
-        experiment = Experiment.objects.get(
-            title='Brachial Plexus (with EMG Setting)'
+        ##
+        # create some data to download
+        ##
+        create_study(1, self.experiment)
+        g1 = create_group(1, self.experiment)
+        create_experimental_protocol(g1)
+        p1 = create_participant(1, g1, Gender.objects.last())
+        q1 = create_questionnaire(1, 'code', g1)
+        create_questionnaire_language(
+            q1,
+            settings.BASE_DIR +
+            '/experiments/tests/questionnaire1_pt-br.csv',
+            'pt-br'
         )
-        for group in experiment.groups.all():
-            try:
-                group.experimental_protocol
-            except ObjectDoesNotExist:
-                create_experimental_protocol(group)
-            if not group.steps.filter(type=Step.QUESTIONNAIRE):
-                create_questionnaire(1, 'code', group)
-                q = Questionnaire.objects.last()
-                create_questionnaire_language(
-                    q,
-                    settings.BASE_DIR +
-                    '/experiments/tests/questionnaire1.csv',
-                    'en'
-                )
 
         ##
         # Create participants data collection
         ##
-        for group in experiment.groups.all():
-            for participant in group.participants.all():
-                eeg_setting = create_eeg_setting(1, experiment)
-                eeg_step = create_eeg_step(group, eeg_setting)
-                create_eeg_data(eeg_setting, eeg_step, participant)
+        eeg_setting = create_eeg_setting(1, self.experiment)
+        eeg_step = create_eeg_step(g1, eeg_setting)
+        create_eeg_data(eeg_setting, eeg_step, p1)
 
-        create_download_dir_structure_and_files(experiment, TEMP_MEDIA_ROOT)
-
-        ##
-        # Get the variables that we will need below
-        ##
-        group = experiment.groups.order_by('?').first()
-        participant = group.participants.order_by('?').first()
-        # there's a group that has no participants
-        while True:
-            if participant:
-                break
-            else:
-                group = experiment.groups.order_by('?').first()
-                participant = group.participants.order_by('?').first()
+        create_download_dir_structure_and_files(
+            self.experiment, TEMP_MEDIA_ROOT
+        )
 
         # Josileine accesses Experiment Detail Downloads tab
-        self.access_downloads_tab_content(experiment)
+        self.access_downloads_tab_content(self.experiment)
         # wait for tree-multiselect plugin to render multiselection
         time.sleep(0.5)  # TODO: implicit wait. Fix this!
 
         options = [
-            'experimental_protocol_g' + str(group.id),
-            'questionnaires_g' + str(group.id),
-            'participant_p' + str(participant.id) + '_g' + str(group.id)
+            'experimental_protocol_g' + str(g1.id),
+            'questionnaires_g' + str(g1.id),
+            'participant_p' + str(p1.id) + '_g' + str(g1.id)
         ]
         selected = choice(options)
 
@@ -1442,7 +1395,7 @@ class DownloadExperimentTest(FunctionalTest):
         # structure after experiment is ready to be analysed.
         ##
         remove_selected_subdir(
-            selected, experiment, participant, group, TEMP_MEDIA_ROOT
+            selected, self.experiment, p1, g1, TEMP_MEDIA_ROOT
         )
 
         # She selects one option to download and click in Download button
@@ -1472,14 +1425,13 @@ class DownloadExperimentTest(FunctionalTest):
         ##
         # Test when there are experiment researchers
         ##
-        experiment = Experiment.objects.last()
-        study = create_study(1, experiment)
+        study = create_study(1, self.experiment)
         create_researcher(study, 'Renan', 'da Silva')
-        create_experiment_researcher(experiment, 'Anibal', 'das Dores')
-        create_experiment_researcher(experiment, 'Joseph', 'Hildegard')
-        create_experiment_researcher(experiment, 'Antônio', 'Farias')
+        create_experiment_researcher(self.experiment, 'Anibal', 'das Dores')
+        create_experiment_researcher(self.experiment, 'Joseph', 'Hildegard')
+        create_experiment_researcher(self.experiment, 'Antônio', 'Farias')
 
-        self.access_downloads_tab_content(experiment)
+        self.access_downloads_tab_content(self.experiment)
 
         # After access Download tab in Experiment detail page, she clicks in
         # Download all experiment data link
@@ -1496,39 +1448,44 @@ class DownloadExperimentTest(FunctionalTest):
 
         self.license_text_asserts(license_modal)
 
-        # TODO: uncomment from here when defined how citation will be
-        # # In the modal there is also how to cite that experiment in her own
-        # # work
-        # self.assertIn('How to cite this experiment:', license_modal.text)
-        # ##
-        # # this is to mimic how datetime is displayed in template by default
-        # ##
-        # sent_date = \
-        #     experiment.sent_date.strftime("%b. %d, %Y").lstrip("0").replace(
-        #         " 0", " ")
-        # self.assertIn(
-        #     'das Dores'.upper() + ', Anibal; ' +
-        #     'Hildegard'.upper() + ', Joseph; ' +
-        #     'Farias'.upper() + ', Antônio ' +
-        #     experiment.title + '. Sent date: ' + str(sent_date) + '.',
-        #     license_modal.text
-        # )
-        # self.assertNotIn(
-        #     experiment.study.researcher.last_name.upper() + ', ' +
-        #     experiment.study.researcher.first_name,
-        #     license_modal.text
-        # )
+        # In the modal there is also how to cite that experiment in her own
+        # work
+        self.assertIn('How to cite this experiment:', license_modal.text)
+        ##
+        # this is to mimic how datetime is displayed in template by default
+        ##
+        sent_date = \
+            self.experiment.sent_date.strftime("%b. %d, %Y").lstrip("0").replace(
+                " 0", " "
+            )
+        self.assertIn(
+            'das Dores'.upper() + ', Anibal', license_modal.text
+        )
+        self.assertIn(
+            'Hildegard'.upper() + ', Joseph', license_modal.text
+        )
+        self.assertIn(
+            'Farias'.upper() + ', Antônio', license_modal.text
+        )
+        self.assertIn(
+            self.experiment.title + '. Sent date: ' + str(sent_date),
+            license_modal.text
+        )
+        self.assertNotIn(
+            self.experiment.study.researcher.last_name.upper() + ', ' +
+            self.experiment.study.researcher.first_name,
+            license_modal.text
+        )
 
     def test_clicking_in_download_all_experiment_data_link_pops_up_a_modal_with_license_warning_2(self):
         ##
         # Test when there is no experiment researchers, only the study
         # researcher
         ##
-        experiment = Experiment.objects.last()
-        study = create_study(1, experiment)
+        study = create_study(1, self.experiment)
         create_researcher(study, 'Renan', 'da Silva')
 
-        self.access_downloads_tab_content(experiment)
+        self.access_downloads_tab_content(self.experiment)
 
         # After access Download tab in Experiment detail page, she clicks in
         # Download all experiment data link
@@ -1545,34 +1502,30 @@ class DownloadExperimentTest(FunctionalTest):
 
         self.license_text_asserts(license_modal)
 
-        # TODO: uncomment from here when defined how citation will be
-        # # In the modal there is also how to cite that experiment in her own
-        # # work
-        # self.assertIn('How to cite this experiment:', license_modal.text)
-        # ##
-        # # this is to mimic how datetime is displayed in template by default
-        # ##
-        # sent_date = \
-        #     experiment.sent_date.strftime("%B %d, %Y").lstrip("0").replace(
-        #         " 0", " ")
-        # self.assertIn(
-        #     experiment.study.researcher.last_name.upper() + ', ' +
-        #     experiment.study.researcher.first_name,
-        #     license_modal.text
-        # )
-        # self.assertNotIn(
-        #     'das Dores'.upper() + ', Anibal; ' +
-        #     'Hildegard'.upper() + ', Joseph; ' +
-        #     'Farias'.upper() + ', Antônio ' +
-        #     experiment.title + '. Sent date: ' + str(sent_date) + '.',
-        #     license_modal.text
-        # )
+        # In the modal there is also how to cite that experiment in her own
+        # work
+        self.assertIn('How to cite this experiment:', license_modal.text)
+        ##
+        # this is to mimic how datetime is displayed in template by default
+        ##
+        sent_date = \
+            self.experiment.sent_date.strftime("%b. %d, %Y").lstrip("0").replace(
+                " 0", " ")
+
+        self.assertIn(
+            self.experiment.study.researcher.last_name.upper() + ', ' +
+            self.experiment.study.researcher.first_name,
+            license_modal.text
+        )
+        self.assertIn(
+            self.experiment.title + '. Sent date: ' + str(sent_date) + '.',
+            license_modal.text
+        )
 
     def test_clicking_in_download_button_pops_up_a_modal_with_license_warning(self):
-        experiment = Experiment.objects.last()
-        group = create_group(1, experiment)
+        group = create_group(1, self.experiment)
         create_experimental_protocol(group)
-        self.access_downloads_tab_content(experiment)
+        self.access_downloads_tab_content(self.experiment)
 
         # Josileine selects an item to download and clicks in download button
         self.wait_for(
@@ -1594,21 +1547,20 @@ class DownloadExperimentTest(FunctionalTest):
         self.license_text_asserts(license_modal)
 
     def test_how_to_cite_in_license_modal_is_equal_to_how_to_cite_in_citation_file_1(self):
-        experiment = Experiment.objects.last()
-        create_study(1, experiment)
-        create_researcher(experiment.study, 'Valdick', 'Soriano')
-        download_create(experiment.id, '')
+        create_study(1, self.experiment)
+        create_researcher(self.experiment.study, 'Valdick', 'Soriano')
+        download_create(self.experiment.id, '')
 
         # get the zipped file to test against its content
         zip_file = os.path.join(
-            TEMP_MEDIA_ROOT, 'download', str(experiment.id),
+            TEMP_MEDIA_ROOT, 'download', str(self.experiment.id),
             'download.zip'
         )
         zipped_file = zipfile.ZipFile(zip_file, 'r')
         file = zipped_file.open('EXPERIMENT_DOWNLOAD/CITATION.txt', 'r')
 
         # Joseleine access the download tab of the last approved experiment
-        self.access_downloads_tab_content(experiment)
+        self.access_downloads_tab_content(self.experiment)
 
         # After access Download tab in Experiment detail page, she clicks in
         # Download all experiment data link
@@ -1627,46 +1579,46 @@ class DownloadExperimentTest(FunctionalTest):
         # "How to cite" in license modal is equal to the "How to cite" in
         # CITATION.txt file
         self.assertIn(
-            'SORIANO, Valdick. ' + experiment.title
-            + '. Sent date: '
-            + str(experiment.sent_date),
+            'SORIANO, Valdick. ' + self.experiment.title + '. Sent date: '
+            + str(self.experiment.sent_date),
             file.read().decode('utf-8')
         )
         self.assertIn(
-            'SORIANO, Valdick. ' + experiment.title
+            'SORIANO, Valdick. ' + self.experiment.title
             + '. Sent date: '
-            + str(experiment.sent_date.strftime('%b. %d, %Y').lstrip('0').replace(' 0', ' ')),
+            + str(self.experiment.sent_date.strftime('%b. %d, %Y').lstrip('0').replace(
+                ' 0', ' '
+            )),
             license_modal.text
         )
 
     def test_how_to_cite_in_license_modal_is_equal_to_how_to_cite_in_citation_file_2(self):
-        experiment = Experiment.objects.last()
-        create_study(1, experiment)
-        create_researcher(experiment.study, 'Valdick', 'Soriano')
-        researcher1 = create_experiment_researcher(experiment, 'Diana', 'Ross')
+        create_study(1, self.experiment)
+        create_researcher(self.experiment.study, 'Valdick', 'Soriano')
+        researcher1 = create_experiment_researcher(self.experiment, 'Diana', 'Ross')
         researcher1.citation_order = 21
         researcher1.citation_name = 'ROSS B., Diana'
         researcher1.save()
         create_experiment_researcher(
-            experiment, 'Guilherme', 'Boulos'
+            self.experiment, 'Guilherme', 'Boulos'
         )
         researcher3 = create_experiment_researcher(
-            experiment, 'Edimilson', 'Costa'
+            self.experiment, 'Edimilson', 'Costa'
         )
         researcher3.citation_order = 3
         researcher3.save()
-        download_create(experiment.id, '')
+        download_create(self.experiment.id, '')
 
         # get the zipped file to test against its content
         zip_file = os.path.join(
-            TEMP_MEDIA_ROOT, 'download', str(experiment.id),
+            TEMP_MEDIA_ROOT, 'download', str(self.experiment.id),
             'download.zip'
         )
         zipped_file = zipfile.ZipFile(zip_file, 'r')
         file = zipped_file.open('EXPERIMENT_DOWNLOAD/CITATION.txt', 'r')
 
         # Joseleine access the download tab of the last approved experiment
-        self.access_downloads_tab_content(experiment)
+        self.access_downloads_tab_content(self.experiment)
 
         # After access Download tab in Experiment detail page, she clicks in
         # Download all experiment data link
@@ -1685,14 +1637,17 @@ class DownloadExperimentTest(FunctionalTest):
         # "How to cite" in license modal is equal to the "How to cite" in
         # CITATION.txt file
         self.assertIn(
-            'COSTA, Edimilson; ROSS B., Diana; BOULOS, Guilherme. '
-            + experiment.title + '. Sent date: ' + str(experiment.sent_date),
+            'COSTA, Edimilson; ROSS B., Diana; BOULOS, Guilherme. ' +
+            self.experiment.title + '. Sent date: ' +
+            str(self.experiment.sent_date),
             file.read().decode('utf-8')
         )
         self.assertIn(
             'COSTA, Edimilson; ROSS B., Diana; BOULOS, Guilherme. '
-            + experiment.title + '. Sent date: '
-            + str(experiment.sent_date.strftime('%b. %d, %Y').lstrip('0').replace(' 0', ' ')),
+            + self.experiment.title + '. Sent date: '
+            + str(self.experiment.sent_date.strftime('%b. %d, %Y').lstrip('0').replace(
+                ' 0', ' '
+            )),
             license_modal.text
         )
 

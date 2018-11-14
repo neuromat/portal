@@ -12,7 +12,7 @@ from experiments.models import Experiment, Study, Group, Researcher, \
 # imports. Kepping in Collaborator in same line.
 from experiments.models import Gender, ClassificationOfDiseases, Keyword, \
     Step, TMSSetting, TMSDevice, CoilModel, TMSDeviceSetting
-from experiments.tests.tests_helper import create_classification_of_deseases, \
+from experiments.tests.tests_helper import create_classification_of_diseases, \
     create_questionnaire, create_researcher
 from experiments.tests.tests_helper import create_experimental_protocol
 from experiments.tests.tests_helper import create_group, \
@@ -168,7 +168,7 @@ for study in Study.objects.all():
     study.keywords.add(kw1, kw2, kw3)
 
 # Create some entries for ClassificationOfDiseases
-create_classification_of_deseases(10)
+create_classification_of_diseases(10)
 
 # Create genders
 gender1 = Gender.objects.create(name='male')

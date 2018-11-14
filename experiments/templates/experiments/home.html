@@ -2,7 +2,8 @@
 
 {% block style %}
     {% load static %}
-    <link rel="stylesheet" href="{% static 'bootstrap-select-1.12.4-dist/css/bootstrap-select.min.css' %}">
+    {# define id to functional tests #}
+    <link id="id_bs_select_css" rel="stylesheet" href="{% static 'bootstrap-select-1.12.4-dist/css/bootstrap-select.min.css' %}">
 {% endblock %}
 
 {% block header %}
@@ -38,7 +39,8 @@
     {## Scripts related to experiments/header_home.html #}
     {##}
     {% load static %}
-    <script src="{% static 'bootstrap-select-1.12.4-dist/js/bootstrap-select.js' %}"></script>
+    {# define id to functional tests #}
+    <script id="id_bs_select_js" src="{% static 'bootstrap-select-1.12.4-dist/js/bootstrap-select.js' %}"></script>
     {##}
     {## Script related to list_trustee.html  #}
     {## Prevent click in experiment if its status is approved or not approved. #}

@@ -12,8 +12,8 @@ from random import choice
 from experiments.models import Experiment, Study, Group, Researcher, \
     RejectJustification, Publication, ExperimentalProtocol, Step, \
     StepAdditionalFile, Gender, File, Participant, ExperimentResearcher
-from experiments.tests.tests_helper import global_setup_ut, apply_setup, \
-    create_experiment, create_group, create_binary_file, create_eeg_setting, \
+from experiments.tests.tests_helper import create_experiment, create_group, \
+    create_binary_file, create_eeg_setting, \
     create_eeg_electrode_localization_system, create_context_tree, \
     create_step, create_stimulus_step, create_experimental_protocol, \
     create_tms_setting, create_tms_data, create_participant, create_genders,\
@@ -100,11 +100,7 @@ class ResearcherModelTest(TestCase):
     # TODO: test cannot save researcher without study
 
 
-@apply_setup(global_setup_ut)
 class StudyModelTest(TestCase):
-
-    def setUp(self):
-        global_setup_ut()
 
     def test_default_attributes(self):
         study = Study()
@@ -253,11 +249,13 @@ class ExperimentModelTest(TestCase):
         )
 
 
-@apply_setup(global_setup_ut)
 class GroupModelTest(TestCase):
 
     def setUp(self):
-        global_setup_ut()
+        owner = User.objects.create_user(
+            username='labor3', password='nep-labor3'
+        )
+        self.experiment = create_experiment(1, owner, Experiment.APPROVED)
 
     def test_default_attributes(self):
         group = Group()
@@ -265,18 +263,15 @@ class GroupModelTest(TestCase):
         self.assertEqual(group.description, '')
 
     def test_group_is_related_to_experiment(self):
-        experiment = Experiment.objects.first()
         group = Group.objects.create(
             title='Group A', description='A description',
-            experiment=experiment
+            experiment=self.experiment
         )
-        self.assertIn(group, experiment.groups.all())
+        self.assertIn(group, self.experiment.groups.all())
 
     def test_cannot_save_empty_attributes(self):
-        experiment = Experiment.objects.first()
         group = Group.objects.create(
-            title='', description='',
-            experiment=experiment
+            title='', description='', experiment=self.experiment
         )
         with self.assertRaises(ValidationError):
             group.save()
@@ -356,19 +351,21 @@ class ExperimentResearcherModel(TestCase):
         )
 
 
-@apply_setup(global_setup_ut)
 class RejectJustificationModel(TestCase):
 
     def setUp(self):
-        global_setup_ut()
+        self.owner = User.objects.create_user(
+            username='labor3', password='nep-labor3'
+        )
 
     def test_default_attributes(self):
         justification = RejectJustification()
         self.assertEqual(justification.message, '')
 
     def test_cannot_save_empty_attributes(self):
-        experiment = Experiment.objects.filter(
-            status=Experiment.UNDER_ANALYSIS).first()
+        experiment = create_experiment(
+            1, self.owner, Experiment.UNDER_ANALYSIS
+        )
         justification = RejectJustification.objects.create(
             message='', experiment=experiment
         )
@@ -377,8 +374,9 @@ class RejectJustificationModel(TestCase):
             justification.full_clean()
 
     def test_justification_message_is_related_to_one_experiment(self):
-        experiment = Experiment.objects.filter(
-            status=Experiment.UNDER_ANALYSIS).first()
+        experiment = create_experiment(
+            1, self.owner, Experiment.UNDER_ANALYSIS
+        )
         justification = RejectJustification(
             message='A justification', experiment=experiment
         )
@@ -386,11 +384,15 @@ class RejectJustificationModel(TestCase):
         self.assertEqual(justification, experiment.justification)
 
 
-@apply_setup(global_setup_ut)
 class PublicationModel(TestCase):
 
     def setUp(self):
-        global_setup_ut()
+        owner = User.objects.create_user(
+            username='labor3', password='nep-labor3'
+        )
+        self.experiment = create_experiment(
+            1, owner, Experiment.TO_BE_ANALYSED
+        )
 
     def test_default_attributes(self):
         publication = Publication()
@@ -399,31 +401,24 @@ class PublicationModel(TestCase):
         self.assertEqual(publication.url, None)
 
     def test_publication_is_related_to_experiment(self):
-        experiment = Experiment.objects.filter(
-            status=Experiment.TO_BE_ANALYSED
-        ).first()
         publication = Publication(
-            title='Ein Titel', citation='Ein Zitat', experiment=experiment
+            title='Ein Titel', citation='Ein Zitat',
+            experiment=self.experiment
         )
         publication.save()
-        self.assertIn(publication, experiment.publications.all())
+        self.assertIn(publication, self.experiment.publications.all())
 
     def test_cannot_save_empty_attributes(self):
-        experiment = Experiment.objects.filter(
-            status=Experiment.TO_BE_ANALYSED
-        ).first()
-        publication = Publication(title='', citation='', experiment=experiment)
+        publication = Publication(
+            title='', citation='', experiment=self.experiment
+        )
         with self.assertRaises(ValidationError):
             publication.save()
             publication.full_clean()
 
 
-@apply_setup(global_setup_ut)
 class ExperimentalProtocolModel(TestCase):
     TEMP_MEDIA_ROOT = tempfile.mkdtemp()
-
-    def setUp(self):
-        global_setup_ut()
 
     def tearDown(self):
         shutil.rmtree(self.TEMP_MEDIA_ROOT)

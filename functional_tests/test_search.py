@@ -5,13 +5,13 @@ import haystack
 from django.conf import settings
 from django.core.management import call_command
 from django.test import override_settings
-from selenium.webdriver.common.keys import Keys
 
 from experiments.models import Study, Experiment, Group, Step, EMGSetting, \
     GoalkeeperGame, ContextTree, EEGSetting, Stimulus, GenericDataCollection, \
     EMGElectrodePlacementSetting, EMGElectrodePlacement, EMGSurfacePlacement, \
     EMGIntramuscularPlacement, EMGNeedlePlacement, EEGElectrodePosition, \
-    ElectrodeModel, SurfaceElectrode, IntramuscularElectrode, Instruction
+    ElectrodeModel, SurfaceElectrode, IntramuscularElectrode, Instruction, \
+    Gender
 from experiments.tests.tests_helper import create_experiment, \
     create_emg_setting, create_group, create_goalkeepergame_step, \
     create_context_tree, create_eeg_setting, create_eeg_electrodenet, \
@@ -25,8 +25,12 @@ from experiments.tests.tests_helper import create_experiment, \
     create_eeg_electrode_position, create_surface_electrode, \
     create_intramuscular_electrode, create_instruction_step, create_step, \
     create_publication, create_valid_questionnaires, \
-    create_experiment_researcher, global_setup_ft, apply_setup, \
-    create_trustee_user
+    create_experiment_researcher, \
+    create_trustee_user, create_study, create_researcher, create_keyword, \
+    create_classification_of_diseases, create_next_version_experiment, \
+    create_emg_step, create_participant, create_genders, \
+    create_eeg_step, create_tms_setting, create_tms_device_setting, \
+    create_tms_device, create_coil_model, create_tms_data
 from functional_tests.base import FunctionalTest
 
 import time
@@ -45,16 +49,16 @@ TEST_HAYSTACK_CONNECTIONS = {
 
 
 @override_settings(HAYSTACK_CONNECTIONS=TEST_HAYSTACK_CONNECTIONS)
-@apply_setup(global_setup_ft)
 class SearchTest(FunctionalTest):
 
     def setUp(self):
-        create_trustee_user('claudia')
-        create_trustee_user('roque')
-        global_setup_ft()
+        create_genders()
+        self.trustee1 = create_trustee_user('claudia')
+        self.trustee2 = create_trustee_user('roque')
         super(SearchTest, self).setUp()
-        haystack.connections.reload('default')
-        self.haystack_index('rebuild_index')
+        # search works only with approved experiments
+        self.experiment.status = Experiment.APPROVED
+        self.experiment.save()
 
     def tearDown(self):
         super(SearchTest, self).tearDown()
@@ -279,6 +283,16 @@ class SearchTest(FunctionalTest):
     def test_click_in_a_search_result_display_experiment_detail_page(self):
         # TODO: the test tests for some match types, not all. Wold be better
         # TODO: to test for each and all match types.
+        self.experiment.status = Experiment.APPROVED
+        self.experiment.title = 'brachial'
+        self.experiment.save()
+        study = create_study(1, self.experiment)
+        study.title = 'brachial'
+        study.save()
+        create_researcher(study)
+
+        haystack.connections.reload('default')
+        self.haystack_index('rebuild_index')
 
         # The researcher searches for 'brachial' term
         self.search_for('brachial')
@@ -305,6 +319,52 @@ class SearchTest(FunctionalTest):
         )
 
     def test_search_two_words_returns_correct_objects(self):
+        ##
+        # Create objects to search below
+        ##
+        self.experiment.title = 'Brachial Plexus'
+        self.experiment.save()
+        e2 = create_experiment(1, self.trustee1, Experiment.APPROVED)
+        e2.title = 'Brachial Plexus'
+        e2.save()
+        e3 = create_experiment(1, self.trustee1, Experiment.APPROVED)
+        e3.title = 'Brachial Plexus'
+        e3.save()
+        e4 = create_experiment(1, self.trustee1, Experiment.APPROVED)
+        e4.title = 'Brachial Plexus (with EMG Setting)'
+        e4.description = 'Ein Beschreibung. Brachial plexus repair by ' \
+                         'peripheral nerve ' \
+                         'grafts directly into the spinal cord in rats ' \
+                         'Behavioral and anatomical evidence of ' \
+                         'functional recovery. The EEG text.'
+        e4.save()
+        create_keyword('brachial plexus')
+        study = create_study(1, self.experiment)
+        study.description = 'The brachial artery is the major blood vessel ' \
+                            'of the (upper) arm. It\'s correlated with ' \
+                            'plexus. This study should have an experiment ' \
+                            'with EEG.'
+        study.keywords.add('brachial plexus')
+        create_researcher(study)
+        study.save()
+        group = create_group(1, self.experiment)
+        group.description = 'Plexus brachial is written in wrong order. ' \
+                            'Correct is Brachial plexus.'
+        ic = create_classification_of_diseases()
+        ic.code = 'BP'
+        ic.description = 'brachial Plexus'
+        ic.abbreviated_description = 'brachial Plexus'
+        ic.save()
+        group.inclusion_criteria.add(ic)
+        group.save()
+        group2 = create_group(1, e4)
+        group2.title = 'Brachial only'
+        group2.description = 'Brachial plexus is a set of nerves.'
+        group2.save()
+
+        haystack.connections.reload('default')
+        self.haystack_index('rebuild_index')
+
         # Joselina, a neuroscience researcher at Numec is delighted with the
         # NED Portal. She decides to search for experiments that contains
         # "Braquial Plexus" in whatever part of the portal. The search
@@ -383,9 +443,15 @@ class SearchTest(FunctionalTest):
         )
 
     def test_search_returns_only_last_version_experiments(self):
+        next_version = create_next_version_experiment(self.experiment)
+        next_version.description = 'Ein Beschreibung'
+        next_version.save()
+
+        haystack.connections.reload('default')
+        self.haystack_index('rebuild_index')
 
         # The researcher searches for 'Brachial Plexus'
-        self.search_for('Brachial Plexus')
+        self.search_for(next_version.description)
 
         # She want's to see only last experiments versions -
         # as tests helper creates version 2 of an experiment, only version 2
@@ -393,30 +459,52 @@ class SearchTest(FunctionalTest):
         # tests for duplicate result, not for the correct version.
         self.wait_for(lambda: self.browser.find_element_by_id('search_table'))
         table = self.browser.find_element_by_id('search_table')
-        # we make experiment.description = Ein Beschreibung in tests helper
         experiment_rows = \
             table.find_elements_by_class_name('experiment-matches')
         count = 0
         for experiment in experiment_rows:
-            if 'Ein Beschreibung' in experiment.text:
+            if next_version.description in experiment.text:
                 count = count + 1
         self.assertEqual(1, count)
 
     def test_search_returns_only_approved_experiments(self):
+        ##
+        # Create objects to search below
+        ##
+        e2 = create_experiment(1, self.trustee1, Experiment.APPROVED)
+        e2.title = 'Brachial Plexus'
+        e2.save()
+        e3 = create_experiment(1, self.trustee1, Experiment.APPROVED)
+        e3.description = 'Brachial Plexus'
+        e3.save()
+
+        haystack.connections.reload('default')
+        self.haystack_index('rebuild_index')
 
         # The researcher searches for 'Brachial Plexus'
         self.search_for('Brachial Plexus')
 
-        # As there are 4 experiments with 'Brachial Plexus' in title,
-        # two approved, one under analysis, and one to be analysed (created
-        # in tests helper), it's supposed to two matches occurs (the
-        # experiments approved), the Experiment's tha has matches for
-        # 'Brachial Plexus' haystack search results.
         self.wait_for(lambda: self.verify_n_objects_in_table_rows(
             2, 'experiment-matches'
         ))
 
     def test_search_with_one_filter_returns_correct_objects(self):
+        ##
+        # Create objects to search below
+        ##
+        self.experiment.title = 'Brachial Plexus'
+        self.experiment.save()
+        e2 = create_experiment(1, self.trustee1, Experiment.APPROVED)
+        e2.title = 'Brachial Plexus'
+        e2.save()
+        group = create_group(1, e2)
+        group.title = 'Brachial Plexus'
+        group.save()
+        emg_setting = create_emg_setting(e2)
+        create_emg_step(group, emg_setting)
+
+        haystack.connections.reload('default')
+        self.haystack_index('rebuild_index')
 
         # Joselina is happy. When she searched for Brachial Plexus, she found
         # the experiment she recently sent to portal through NES. She wants to
@@ -426,11 +514,19 @@ class SearchTest(FunctionalTest):
         # and selects EMG in select box. Then she clicks in search button.
         search_box = self.browser.find_element_by_id('id_q')
         search_box.send_keys('Brachial Plexus')
+        # IMPORTANT: need to remove bootstrap select javascript/css plugins
+        # to select filter(s)
+        self.browser.execute_script(
+            'document.getElementById("id_bs_select_css").remove();'
+            'document.getElementById("id_bs_select_js").remove();'
+        )
         self.browser.find_element_by_xpath(
             "//select/option[@value='" + Step.EMG + "']"
-        ).send_keys(Keys.ENTER)
-        self.browser.find_element_by_id('submit_terms').click()
-        time.sleep(1)
+        ).click()
+        self.wait_for(
+            lambda: self.browser.find_element_by_id('submit_terms').click()
+        )
+
         ##
         # As there are 2 experiments with 'Brachial Plexus' in title,
         # it's expected that Joselina sees only one Experiment search
@@ -438,24 +534,52 @@ class SearchTest(FunctionalTest):
         # Setting.
         # The page refreshes displaying the results.
         ##
-        # self.verify_n_objects_in_table_rows(1, 'experiment-matches')
-        self.verify_n_objects_in_table_rows(2, 'group-matches')
+        self.verify_n_objects_in_table_rows(1, 'experiment-matches')
+        self.verify_n_objects_in_table_rows(1, 'group-matches')
 
     def test_search_with_two_filters_returns_correct_objects(self):
+        ##
+        # Create objects to search below
+        ##
+        self.experiment.title = 'Brachial Plexus'
+        self.experiment.save()
+        group1 = create_group(1, self.experiment)
+        group1.title = 'Brachial Plexus'
+        group1.save()
+        emg_setting = create_emg_setting(self.experiment)
+        create_emg_step(group1, emg_setting)
+        e2 = create_experiment(1, self.trustee1, Experiment.APPROVED)
+        e2.title = 'Brachial Plexus'
+        e2.save()
+        group2 = create_group(1, e2)
+        group2.title = 'Brachial Plexus'
+        group2.save()
+        emg_setting = create_emg_setting(e2)
+        create_emg_step(group2, emg_setting)
+        eeg_setting = create_eeg_setting(1, e2)
+        create_eeg_step(group2, eeg_setting)
+
+        haystack.connections.reload('default')
+        self.haystack_index('rebuild_index')
+
         # Ok, Joselina now wants to search experiments that has EEG and EMG
         # in groups data collection. In multiple choices box she clicks in
         # EEG and EMG
         search_box = self.browser.find_element_by_id('id_q')
         search_box.send_keys('Brachial Plexus')
-        self.browser.find_element_by_id('filter_box').send_keys(Keys.ENTER)
+        # IMPORTANT: need to remove bootstrap select javascript/css plugins
+        # to select filter(s)
+        self.browser.execute_script(
+            'document.getElementById("id_bs_select_css").remove();'
+            'document.getElementById("id_bs_select_js").remove();'
+        )
         self.browser.find_element_by_xpath(
             "//select/option[@value='" + Step.EEG + "']"
-        ).send_keys(Keys.ENTER)
+        ).click()
         self.browser.find_element_by_xpath(
             "//select/option[@value='" + Step.EMG + "']"
-        ).send_keys(Keys.ENTER)
+        ).click()
         self.browser.find_element_by_id('submit_terms').click()
-        time.sleep(2)
 
         ##
         # There's an experiment group that has one EEG step and one EMG
@@ -464,21 +588,33 @@ class SearchTest(FunctionalTest):
         # despcription, an EEG step but not an EMG step. So she will see only
         # one of the two groups.
         ##
+        self.verify_n_objects_in_table_rows(1, 'experiment-matches')
         self.verify_n_objects_in_table_rows(1, 'group-matches')
 
     def test_search_with_AND_modifier_returns_correct_objects(self):
+        ##
+        # Create objects to search below
+        ##
+        self.experiment.title = 'Brachial Plexus'
+        self.experiment.description = 'EEG'
+        self.experiment.save()
+        study = create_study(1, self.experiment)
+        study.description = 'brachial something EEG'
+        study.save()
+        create_researcher(study)
+        e2 = create_experiment(1, self.trustee1, Experiment.APPROVED)
+        e2.title = 'Brachial Plexus'
+        e2.save()
+
+        haystack.connections.reload('default')
+        self.haystack_index('rebuild_index')
+
         # In a tooltip that pops up when hovering the mouse upon
         # search box input text, Joselina sees that she can apply modifiers
         # to do advanced search.
         # So, she types "brachial AND EEG" in that.
         self.search_for('brachial AND EEG')
 
-        ##
-        # As we created, in tests helper, an experiment with 'Brachial' in
-        # experiment  title, 'EEG' in experiment description, and a study
-        # with 'brachial ... EEG' in its description, the search results bring
-        # an experiment and a study.
-        ##
         self.wait_for(lambda: self.verify_n_objects_in_table_rows(
             1, 'experiment-matches'
         ))
@@ -493,25 +629,38 @@ class SearchTest(FunctionalTest):
         self.assertIn('EEG', study)
 
     def test_search_with_OR_modifier_returns_correct_objects(self):
+        ##
+        # Create objects to search below
+        ##
+        self.experiment.title = 'EMG Experiment'
+        self.experiment.description = 'Ops, it\'s EEG in fact'
+        self.experiment.save()
+        study = create_study(1, self.experiment)
+        study.description = 'brachial something EEG'
+        study.save()
+        create_researcher(study)
+        e2 = create_experiment(1, self.trustee1, Experiment.APPROVED)
+        e2.title = 'Goal Keeper Game experiment'
+        e2.save()
+
+        haystack.connections.reload('default')
+        self.haystack_index('rebuild_index')
+
         # In a tooltip that pops up when hovering the mouse upon
         # search box input text, Joselina sees that she can apply modifiers
         # to do advanced search.
         # So, she types "EMG OR EEG".
         ##
-        # TODO: when change order - 'EEG OR EMG', test fails. Why?
+        # TODO: when change order - 'EEG OR EMG', test fails. Fix it?
         ##
         self.search_for('EMG OR EEG')
 
-        ##
-        # In tests helper, we have an experiment that has 'EMG' in title,
-        # and 'EEG' in description. There's a study with 'EEG' in study
-        # description. So, she's got two rows in Search Results.
-        ##
         self.wait_for(lambda: self.verify_n_objects_in_table_rows(
             1, 'experiment-matches'
         ))
         experiment = self.browser.find_element_by_class_name(
-            'experiment-matches').text
+            'experiment-matches'
+        ).text
         self.assertIn('EMG', experiment)
         self.assertIn('EEG', experiment)
         self.verify_n_objects_in_table_rows(1, 'study-matches')
@@ -520,6 +669,26 @@ class SearchTest(FunctionalTest):
         self.assertIn('EEG', study)
 
     def test_search_with_NOT_modifier_returns_correct_objects(self):
+        ##
+        # Create objects to search below
+        ##
+        self.experiment.title = 'brachial'
+        self.experiment.description = 'plexus'
+        self.experiment.save()
+        study = create_study(1, self.experiment)
+        study.description = 'brachial plexus'
+        study.save()
+        create_researcher(study)
+        e2 = create_experiment(1, self.trustee1, Experiment.APPROVED)
+        e2.title = 'brachial plexus'
+        e2.save()
+        group = create_group(1, e2)
+        group.title = 'Brachial only'
+        group.save()
+
+        haystack.connections.reload('default')
+        self.haystack_index('rebuild_index')
+
         # In a tooltip that pops up when hovering the mouse upon
         # search box input text, Joselina sees that she can apply modifiers
         # to do advanced search.
@@ -527,15 +696,17 @@ class SearchTest(FunctionalTest):
         self.search_for('brachial NOT plexus')
 
         ##
-        # In tests helper, we've created a group with only 'Brachial only'
+        # We've created a group with only 'Brachial only'
         # in title. As other objects that has 'brachial' as a substring in
         # some field, has 'plexus' as a substring in some another field,
         # we obtain just one row in Search results: that group with
         # 'Brachial only' in title.
         ##
-        self.wait_for(lambda: self.verify_n_objects_in_table_rows(
-            0, 'experiment-matches'
-        ))
+        self.wait_for(
+            lambda: self.verify_n_objects_in_table_rows(
+                0, 'experiment-matches'
+            )
+        )
         self.verify_n_objects_in_table_rows(0, 'study-matches')
         self.verify_n_objects_in_table_rows(0, 'experimentalprotocol-matches')
         self.verify_n_objects_in_table_rows(1, 'group-matches')
@@ -545,6 +716,30 @@ class SearchTest(FunctionalTest):
         self.assertIn('Brachial', group_text)
 
     def test_search_with_quotes_returns_correct_objects(self):
+        ##
+        # Create objects to search below
+        # TODO:
+        # search for "Plexus brachial" returns an entry for
+        # experiment with self.experiment.title = 'Plexus' and
+        # self.experiment.description = 'brachial'. Fix it!
+        ##
+        self.experiment.title = 'Plexus'
+        # self.experiment.description = 'brachial' (see TODO)
+        self.experiment.save()
+        study = create_study(1, self.experiment)
+        study.description = 'Plexus'
+        study.save()
+        create_researcher(study)
+        e2 = create_experiment(1, self.trustee1, Experiment.APPROVED)
+        e2.title = 'brachial Plexus'
+        e2.save()
+        group = create_group(1, e2)
+        group.description = 'Plexus brachial'
+        group.save()
+
+        haystack.connections.reload('default')
+        self.haystack_index('rebuild_index')
+
         # Joselina sees in tooltip, when hovering mouse onto it, that she
         # can search by exact terms inside quotes.
         self.search_for('\"Plexus brachial\"')
@@ -588,17 +783,41 @@ class SearchTest(FunctionalTest):
         self.assertEqual('tooltip', tooltip_data_toggle)
 
     def test_search_only_with_two_filters_returns_correct_results(self):
+        ##
+        # Create objects to search below
+        ##
+        group1 = create_group(1, self.experiment)
+        emg_setting = create_emg_setting(self.experiment)
+        create_emg_step(group1, emg_setting)
+        e2 = create_experiment(1, self.trustee1, Experiment.APPROVED)
+        e2.title = 'Experiment changed to test filter only'
+        e2.save()
+        group2 = create_group(1, e2)
+        emg_setting = create_emg_setting(e2)
+        create_emg_step(group2, emg_setting)
+        eeg_setting = create_eeg_setting(1, e2)
+        create_eeg_step(group2, eeg_setting)
+
+        haystack.connections.reload('default')
+        self.haystack_index('rebuild_index')
+
+        ##
+        # IMPORTANT: need to remove bootstrap select javascript/css plugins
+        # to select filter(s)
+        ##
+        self.browser.execute_script(
+            'document.getElementById("id_bs_select_css").remove();'
+            'document.getElementById("id_bs_select_js").remove();'
+        )
         # Joselina wishes to search only experiments that has EMG and EEG
-        # steps, regardless of search terms.
-        self.browser.find_element_by_id('filter_box').send_keys(Keys.ENTER)
+        # steps, regardless of search terms
         self.browser.find_element_by_xpath(
             "//select/option[@value='" + Step.EEG + "']"
-        ).send_keys(Keys.ENTER)
+        ).click()
         self.browser.find_element_by_xpath(
             "//select/option[@value='" + Step.EMG + "']"
-        ).send_keys(Keys.ENTER)
+        ).click()
         self.browser.find_element_by_id('submit_terms').click()
-        time.sleep(2)
 
         # As we have only one experiment with EMG and EEG steps, Joselina gets
         # only one row tha corresponds to that the experiment
@@ -617,14 +836,39 @@ class SearchTest(FunctionalTest):
                       experiment_text)
 
     def test_search_only_with_one_filter_returns_correct_results_1(self):
+        ##
+        # Create objects to search below
+        ##
+        group1 = create_group(1, self.experiment)
+        emg_setting = create_emg_setting(self.experiment)
+        create_emg_step(group1, emg_setting)
+        e2 = create_experiment(1, self.trustee1, Experiment.APPROVED)
+        e2.title = 'Experiment changed to test filter only'
+        e2.save()
+        group2 = create_group(1, e2)
+        emg_setting = create_emg_setting(e2)
+        create_emg_step(group2, emg_setting)
+        eeg_setting = create_eeg_setting(1, e2)
+        create_eeg_step(group2, eeg_setting)
+
+        haystack.connections.reload('default')
+        self.haystack_index('rebuild_index')
+
+        ##
+        # IMPORTANT: need to remove bootstrap select javascript/css plugins
+        # to select filter(s)
+        ##
+        self.browser.execute_script(
+            'document.getElementById("id_bs_select_css").remove();'
+            'document.getElementById("id_bs_select_js").remove();'
+        )
+
         # Joselina wishes to search only experiments that has EEG
-        # stpes, regardless of search terms.
-        self.browser.find_element_by_id('filter_box').send_keys(Keys.ENTER)
+        # steps, regardless of search terms
         self.browser.find_element_by_xpath(
             "//select/option[@value='" + Step.EEG + "']"
-        ).send_keys(Keys.ENTER)
+        ).click()
         self.browser.find_element_by_id('submit_terms').click()
-        time.sleep(2)
 
         # As we have only one experiment with EEG step, Joselina
         # gets only one row that corresponds to that the experiment
@@ -635,18 +879,47 @@ class SearchTest(FunctionalTest):
         experiment_text = self.browser.find_element_by_class_name(
             'experiment-matches'
         ).text
-        self.assertIn('Experiment changed to test filter only',
-                      experiment_text)
+        self.assertIn(
+            'Experiment changed to test filter only', experiment_text
+        )
 
     def test_search_only_with_one_filter_returns_correct_results_2(self):
+        ##
+        # Create objects to search below
+        ##
+        self.experiment.title = 'Brachial Plexus (with EMG Setting)'
+        self.experiment.save()
+        group1 = create_group(1, self.experiment)
+        emg_setting = create_emg_setting(self.experiment)
+        create_emg_step(group1, emg_setting)
+        e2 = create_experiment(1, self.trustee1, Experiment.APPROVED)
+        e2.title = 'Experiment changed to test filter only'
+        e2.save()
+        group2 = create_group(1, e2)
+        emg_setting = create_emg_setting(e2)
+        create_emg_step(group2, emg_setting)
+        eeg_setting = create_eeg_setting(1, e2)
+        create_eeg_step(group2, eeg_setting)
+        create_experiment(1, self.trustee1, Experiment.APPROVED)
+
+        haystack.connections.reload('default')
+        self.haystack_index('rebuild_index')
+
+        ##
+        # IMPORTANT: need to remove bootstrap select javascript/css plugins
+        # to select filter(s)
+        ##
+        self.browser.execute_script(
+            'document.getElementById("id_bs_select_css").remove();'
+            'document.getElementById("id_bs_select_js").remove();'
+        )
+
         # Joselina wishes to search only experiments that has EMG
         # steps, regardless of search terms.
-        self.browser.find_element_by_id('filter_box').send_keys(Keys.ENTER)
         self.browser.find_element_by_xpath(
             "//select/option[@value='" + Step.EMG + "']"
-        ).send_keys(Keys.ENTER)
+        ).click()
         self.browser.find_element_by_id('submit_terms').click()
-        time.sleep(2)
 
         # As we have two experiments with EMG steps, Joselina
         # gets two rows that corresponds to that experiments
@@ -666,6 +939,9 @@ class SearchTest(FunctionalTest):
         self.assertEqual(2, count)
 
     def test_search_display_backhome_button(self):
+        haystack.connections.reload('default')
+        self.haystack_index('rebuild_index')
+
         # When Joselina makes searches, a button to back homepage is
         # displayed on the right side, above the list of search results
         self.search_for('brachial plexus')
@@ -697,6 +973,27 @@ class SearchTest(FunctionalTest):
         )
 
     def test_search_tmssetting_returns_correct_objects(self):
+        ##
+        # Create objects to search below
+        ##
+        group1 = create_group(1, self.experiment)
+        emg_setting = create_emg_setting(self.experiment)
+        create_emg_step(group1, emg_setting)
+        e2 = create_experiment(1, self.trustee1, Experiment.APPROVED)
+        e2.title = 'Experiment changed to test filter only'
+        e2.save()
+        group2 = create_group(1, e2)
+        emg_setting = create_emg_setting(e2)
+        create_emg_step(group2, emg_setting)
+        eeg_setting = create_eeg_setting(1, e2)
+        create_eeg_step(group2, eeg_setting)
+        tms_setting = create_tms_setting(1, e2)
+        tms_setting.name = 'tmssettingname'
+        tms_setting.save()
+
+        haystack.connections.reload('default')
+        self.haystack_index('rebuild_index')
+
         # Joselina searches for a TMS Setting whose name is 'tmssettingname'
         self.search_for('tmssettingname')
 
@@ -715,15 +1012,44 @@ class SearchTest(FunctionalTest):
         self.assertIn('tmssettingname', tmssetting_text)
 
     def test_search_tmsdevicesetting_returns_correct_objects(self):
+        ##
+        # Create objects to search below
+        ##
+        group1 = create_group(1, self.experiment)
+        emg_setting = create_emg_setting(self.experiment)
+        create_emg_step(group1, emg_setting)
+        e2 = create_experiment(1, self.trustee1, Experiment.APPROVED)
+        e2.title = 'Experiment changed to test filter only'
+        e2.save()
+        group2 = create_group(1, e2)
+        emg_setting = create_emg_setting(e2)
+        create_emg_step(group2, emg_setting)
+        eeg_setting = create_eeg_setting(1, e2)
+        create_eeg_step(group2, eeg_setting)
+        tms_setting = create_tms_setting(1, e2)
+        tms_device = create_tms_device()
+        coil_model = create_coil_model()
+        tms_ds = create_tms_device_setting(tms_setting, tms_device, coil_model)
+        ##
+        # TODO:
+        # change model to work with constant not literal. See Experiment
+        # model.
+        ##
+        tms_ds.pulse_stimulus_type = 'single_pulse'
+        tms_ds.save()
+
+        haystack.connections.reload('default')
+        self.haystack_index('rebuild_index')
+
         # Joselina searches for a TMS Device Setting whose name is
         # 'tmsdevicesettingname'
         # TODO: test for choice representation!
         self.search_for('single_pulse')
 
-        # As there is three TMSDeviceSetting object with that name, she sees
+        # As there is one TMSDeviceSetting object with that name, she sees
         # just one row in Search Results list
         self.wait_for(lambda: self.verify_n_objects_in_table_rows(
-            3, 'tmsdevicesetting-matches'
+            1, 'tmsdevicesetting-matches'
         ))
         self.verify_n_objects_in_table_rows(0, 'tmssetting-matches')
         self.verify_n_objects_in_table_rows(0, 'experiment-matches')
@@ -736,15 +1062,35 @@ class SearchTest(FunctionalTest):
         self.assertIn('Single pulse', tmsdevicesetting_text)
 
     def test_search_tmsdevice_returns_correct_objects(self):
+        ##
+        # Create objects to search below
+        ##
+        tms_setting1 = create_tms_setting(1, self.experiment)
+        tms_device1 = create_tms_device()
+        tms_device1.manufacturer_name = 'Magstim'
+        tms_device1.save()
+        coil_model = create_coil_model()
+        create_tms_device_setting(tms_setting1, tms_device1, coil_model)
+        e2 = create_experiment(1, self.trustee1, Experiment.APPROVED)
+        tms_setting2 = create_tms_setting(1, e2)
+        tms_device2 = create_tms_device()
+        tms_device2.manufacturer_name = 'Siemens'
+        tms_device2.save()
+        coil_model = create_coil_model()
+        create_tms_device_setting(tms_setting2, tms_device2, coil_model)
+
+        haystack.connections.reload('default')
+        self.haystack_index('rebuild_index')
+
         # Joselina searches for an experiment in which was used a TMS Device
         # whose manufacturer name is 'Siemens'
         self.search_for('Siemens')
 
         # As there is one TMSDevice object that has Magstim as manufacturer,
-        # but three TMSDeviceSetting objects that has that TMSDevice object as
-        # a Foreign Key, she sees three rows in Search Results list
+        # and one TMSDeviceSetting objects that has that TMSDevice object as
+        # a Foreign Key, she sees 1 row in Search Results list
         self.wait_for(lambda: self.verify_n_objects_in_table_rows(
-            3, 'tmsdevice-matches'
+            1, 'tmsdevice-matches'
         ))
         self.verify_n_objects_in_table_rows(0, 'tmsdevicesetting-matches')
         self.verify_n_objects_in_table_rows(0, 'tmssetting-matches')
@@ -752,20 +1098,40 @@ class SearchTest(FunctionalTest):
         self.verify_n_objects_in_table_rows(0, 'study-matches')
         self.verify_n_objects_in_table_rows(0, 'group-matches')
         self.verify_n_objects_in_table_rows(0, 'experimentalprotocol-matches')
-        tmsdevicesetting_text = self.browser.find_element_by_class_name(
+        tmsdevice_text = self.browser.find_element_by_class_name(
             'tmsdevice-matches'
         ).text
-        self.assertIn('Siemens', tmsdevicesetting_text)
+        self.assertIn('Siemens', tmsdevice_text)
 
     def test_search_coilmodel_returns_correct_objects(self):
+        ##
+        # Create objects to search below
+        ##
+        tms_setting1 = create_tms_setting(1, self.experiment)
+        tms_device1 = create_tms_device()
+        coil_model1 = create_coil_model()
+        coil_model1.name = 'Super Coil Model'
+        coil_model1.save()
+        create_tms_device_setting(tms_setting1, tms_device1, coil_model1)
+        e2 = create_experiment(1, self.trustee1, Experiment.APPROVED)
+        tms_setting2 = create_tms_setting(1, e2)
+        tms_device2 = create_tms_device()
+        coil_model2 = create_coil_model()
+        coil_model2.name = 'Other name'
+        coil_model2.save()
+        create_tms_device_setting(tms_setting2, tms_device2, coil_model2)
+
+        haystack.connections.reload('default')
+        self.haystack_index('rebuild_index')
+
         # Joselina searches for an experiment in which was used a Coil Model
         # whose name is 'Magstim'
-        self.search_for('Magstim')
-        # As there is one CoilModel object that has Magstim as manufacturer,
-        # but three TMSDeviceSetting objects that has that CoilModel object as
-        # a Foreign Key, she sees three rows in Search Results list
+        self.search_for('Super Coil Model')
+        # As there is one CoilModel whose name is 'Super Coil Model',
+        # and other whose name is 'Other name', she sees one row in Search
+        # Results list
         self.wait_for(lambda: self.verify_n_objects_in_table_rows(
-            3, 'coilmodel-matches'
+            1, 'coilmodel-matches'
         ))
         self.verify_n_objects_in_table_rows(0, 'tmsdevice-matches')
         self.verify_n_objects_in_table_rows(0, 'tmsdevicesetting-matches')
@@ -777,21 +1143,34 @@ class SearchTest(FunctionalTest):
         tmsdevicesetting_text = self.browser.find_element_by_class_name(
             'coilmodel-matches'
         ).text
-        self.assertIn('Magstim', tmsdevicesetting_text)
+        self.assertIn('Super Coil Model', tmsdevicesetting_text)
 
     def test_search_tmsdata_returns_correct_objects(self):
-        # Obs.: the tests commented bellow "passed" manually in localhost,
-        # by creating entries in faker_populator.
+        ##
+        # Create objects to search below
+        ##
+        group1 = create_group(1, self.experiment)
+        tms_setting1 = create_tms_setting(1, self.experiment)
+        p2 = create_participant(1, group1, Gender.objects.first())
+        create_tms_data(1, tms_setting1, p2)
+        e2 = create_experiment(1, self.trustee1, Experiment.APPROVED)
+        group2 = create_group(1, e2)
+        tms_setting2 = create_tms_setting(1, e2)
+        p2 = create_participant(1, group2, Gender.objects.first())
+        tms_data = create_tms_data(1, tms_setting2, p2)
+        tms_data.brain_area_name = 'cerebral cortex'
+        tms_data.save()
+
+        haystack.connections.reload('default')
+        self.haystack_index('rebuild_index')
 
         # Joselina searches for an experiment whose TMSData of a participant
         # has collecting data from 'cerebral cortex'
         self.search_for('cerebral cortex')
-        # As there is three TMSData object with 'cereberal cortex' as the
-        # brain_area_name field, one of them associated with a TMSSetting
-        # object, and other two associated with another TMSSetting object
-        # she sees two rows in Search Results list
+        # As there is one TMSData object with 'cereberal cortex' as the
+        # brain_area_name field, she sees one rows in Search Results list
         self.wait_for(lambda: self.verify_n_objects_in_table_rows(
-            3, 'tmsdata-matches'
+            1, 'tmsdata-matches'
         ))
         self.verify_n_objects_in_table_rows(0, 'coilmodel-matches')
         self.verify_n_objects_in_table_rows(0, 'tmsdevice-matches')
@@ -808,6 +1187,7 @@ class SearchTest(FunctionalTest):
 
     def test_search_eegsetting_returns_correct_objects(self):
         self.create_objects_to_test_search_eeg_setting()
+        haystack.connections.reload('default')
         self.haystack_index('rebuild_index')
 
         # Joselina wants to search for experiments whose EEGSetting name is
@@ -820,6 +1200,7 @@ class SearchTest(FunctionalTest):
         self.check_matches(3, 'eegsetting-matches', 'eegsettingname')
 
     def test_search_eegelectrodenet_equipment_returns_correct_objects(self):
+        haystack.connections.reload('default')
         self.create_objects_to_test_search_eeg_setting()
 
         for eeg_setting in EEGSetting.objects.all():
@@ -838,6 +1219,7 @@ class SearchTest(FunctionalTest):
 
     def test_search_emgsetting_returns_correct_objects(self):
         self.create_objects_to_test_search_emgsetting()
+        haystack.connections.reload('default')
         self.haystack_index('rebuild_index')
 
         # Joselina wants to search for experiments whose EMGSetting name is
@@ -857,6 +1239,7 @@ class SearchTest(FunctionalTest):
             eeg_solution.manufacturer_name = 'Hersteller'
             eeg_solution.save()
 
+        haystack.connections.reload('default')
         self.haystack_index('rebuild_index')
 
         # Severino wants to search for experiments that has certain
@@ -874,6 +1257,7 @@ class SearchTest(FunctionalTest):
             eeg_filter_setting.eeg_filter_type_name = 'FilterTyp'
             eeg_filter_setting.save()
 
+        haystack.connections.reload('default')
         self.haystack_index('rebuild_index')
 
         # Severino wants to search for experiments that has certain
@@ -893,6 +1277,7 @@ class SearchTest(FunctionalTest):
             emg_ditital_filter_setting.filter_type_name = 'FilterTyp'
             emg_ditital_filter_setting.save()
 
+        haystack.connections.reload('default')
         self.haystack_index('rebuild_index')
 
         # Severino wants to search for experiments that has certain
@@ -912,6 +1297,7 @@ class SearchTest(FunctionalTest):
             eeg_electrode_localization_system.name = 'Elektrodenlokalisierung'
             eeg_electrode_localization_system.save()
 
+        haystack.connections.reload('default')
         self.haystack_index('rebuild_index')
 
         # Severino wants to search for experiments that has certain
@@ -927,6 +1313,7 @@ class SearchTest(FunctionalTest):
     def test_search_questionnaire_data_returns_correct_objects_1(self):
         experiment = Experiment.objects.last()
         create_valid_questionnaires(experiment)
+        haystack.connections.reload('default')
         self.haystack_index('rebuild_index')
 
         # Joselina wants to search for experiments that contains some
@@ -959,6 +1346,7 @@ class SearchTest(FunctionalTest):
     def test_search_questionnaire_data_returns_correct_objects_2(self):
         experiment = Experiment.objects.last()
         create_valid_questionnaires(experiment)
+        haystack.connections.reload('default')
         self.haystack_index('rebuild_index')
 
         # Joselina wants to search for experiments that contains some
@@ -991,6 +1379,7 @@ class SearchTest(FunctionalTest):
     def test_search_questionnaire_data_returns_correct_objects_3(self):
         experiment = Experiment.objects.last()
         create_valid_questionnaires(experiment)
+        haystack.connections.reload('default')
         self.haystack_index('rebuild_index')
 
         # Joselina wants to search for experiments that contains a phrase
@@ -1023,6 +1412,7 @@ class SearchTest(FunctionalTest):
     def test_search_questionnaire_data_returns_correct_objects_4(self):
         experiment = Experiment.objects.last()
         create_valid_questionnaires(experiment)
+        haystack.connections.reload('default')
         self.haystack_index('rebuild_index')
 
         # Joselina wants to search for experiments that contains some
@@ -1072,6 +1462,7 @@ class SearchTest(FunctionalTest):
         ##
         # Rebuid index to incorporate experiment publication change
         ##
+        haystack.connections.reload('default')
         self.haystack_index('rebuild_index')
 
         # Joselina wants to search for experiments that are associated with
@@ -1109,6 +1500,7 @@ class SearchTest(FunctionalTest):
         for step in Step.objects.all():
             step.identification = search_text
             step.save()
+        haystack.connections.reload('default')
         self.haystack_index('rebuild_index')
 
         # Joselina wants to search for a given stimulus step
@@ -1117,10 +1509,11 @@ class SearchTest(FunctionalTest):
         # TODO: it was craeted a total of 8 steps in global_setup_ft(). So,
         # TODO: we add those to our checking. Eliminate global_setup_ft() and
         # TODO: make model instances created by demand in each test.
-        self.check_matches(8, 'step-matches', search_text)
+        self.check_matches(3, 'step-matches', search_text)
 
     def test_search_stimulus_step_returns_correct_objects(self):
         self.create_objects_to_test_search_stimulus_step()
+        haystack.connections.reload('default')
         self.haystack_index('rebuild_index')
 
         # Joselina wants to search for a given stimulus step
@@ -1137,6 +1530,7 @@ class SearchTest(FunctionalTest):
         for instruction_step in Instruction.objects.all():
             instruction_step.text = search_text
             instruction_step.save()
+        haystack.connections.reload('default')
         self.haystack_index('rebuild_index')
 
         # Joselina wants to search for a given stimulus step
@@ -1149,6 +1543,7 @@ class SearchTest(FunctionalTest):
 
     def test_search_genericdatacollection_step_returns_correct_objects(self):
         self.create_objects_to_test_search_genericdatacollection_step()
+        haystack.connections.reload('default')
         self.haystack_index('rebuild_index')
 
         # Joselina wants to search for a given stimulus step
@@ -1164,6 +1559,7 @@ class SearchTest(FunctionalTest):
 
     def test_search_goalkeepergame_step_returns_correct_objects(self):
         self.create_objects_to_test_search_goalkeepergame_step()
+        haystack.connections.reload('default')
         self.haystack_index('rebuild_index')
 
         # Joselina wants to search for a given context tree of a Goal Keeper
@@ -1196,6 +1592,7 @@ class SearchTest(FunctionalTest):
             context_tree.setting_text = 'wunderbarcontexttree'
             context_tree.save()
 
+        haystack.connections.reload('default')
         self.haystack_index('rebuild_index')
 
         # Edson searchs for a given context tree experiment setting
@@ -1209,6 +1606,7 @@ class SearchTest(FunctionalTest):
         self.create_objects_to_test_search_emgelectrodeplacementsetting(
             'emg_electrode_placement'
         )
+        haystack.connections.reload('default')
         self.haystack_index('rebuild_index')
 
         # Joselina wants to search for a given stimulus step
@@ -1226,6 +1624,7 @@ class SearchTest(FunctionalTest):
         self.create_objects_to_test_search_emgelectrodeplacementsetting_with_emg_electrode_placement(
             search_text
         )
+        haystack.connections.reload('default')
         self.haystack_index('rebuild_index')
 
         # Joselina wants to search for a given stimulus step
@@ -1243,6 +1642,7 @@ class SearchTest(FunctionalTest):
         self.create_objects_to_test_search_emgelectrodeplacementsetting_with_emg_surface_placement(
             search_text
         )
+        haystack.connections.reload('default')
         self.haystack_index('rebuild_index')
 
         # Joselina wants to search for a given stimulus step
@@ -1260,6 +1660,7 @@ class SearchTest(FunctionalTest):
         self.create_objects_to_test_search_emgelectrodeplacementsetting_with_emg_intramuscular_placement(
             search_text
         )
+        haystack.connections.reload('default')
         self.haystack_index('rebuild_index')
 
         # Joselina wants to search for a given stimulus step
@@ -1277,6 +1678,7 @@ class SearchTest(FunctionalTest):
         self.create_objects_to_test_search_emgelectrodeplacementsetting_with_emg_needle_placement(
             search_text
         )
+        haystack.connections.reload('default')
         self.haystack_index('rebuild_index')
 
         # Joselina wants to search for a given stimulus step
@@ -1296,6 +1698,7 @@ class SearchTest(FunctionalTest):
             eeg_electrode_position.name = search_text
             eeg_electrode_position.save()
 
+        haystack.connections.reload('default')
         self.haystack_index('rebuild_index')
 
         # Joselina wants to search for a give electrode position name
@@ -1318,6 +1721,7 @@ class SearchTest(FunctionalTest):
             electrode_model.name = search_text
             electrode_model.save()
 
+        haystack.connections.reload('default')
         self.haystack_index('rebuild_index')
 
         # Joselina wants to search for a given electrode model
@@ -1341,6 +1745,7 @@ class SearchTest(FunctionalTest):
             surface_electrode.electrode_shape_name = search_text
             surface_electrode.save()
 
+        haystack.connections.reload('default')
         self.haystack_index('rebuild_index')
 
         # Joselina wants to search for a given surface electrode
@@ -1360,6 +1765,7 @@ class SearchTest(FunctionalTest):
             intramuscular_electrode.strand = search_text
             intramuscular_electrode.save()
 
+        haystack.connections.reload('default')
         self.haystack_index('rebuild_index')
 
         # Joselina wants to search for a given intramuscular electrode
@@ -1374,6 +1780,7 @@ class SearchTest(FunctionalTest):
         create_experiment_researcher(
             experiment, first_name='Guilherme', last_name='Boulos'
         )
+        haystack.connections.reload('default')
         self.haystack_index('rebuild_index')
 
         # Joselina wants to search for an experiment that has Boulos as one
@@ -1387,7 +1794,7 @@ class SearchTest(FunctionalTest):
         # Now she wants to search by first name, that is 'Guilherme'
         search_text = 'Guilherme'
         self.search_for(search_text)
-        time.sleep(1)  # TODO: remove explicit delay
+        time.sleep(0.5)  # TODO: remove explicit delay
 
         # As there's one experiment with given researcher, she sees one result
         self.check_matches(1, 'experiment_researcher-matches', search_text)
