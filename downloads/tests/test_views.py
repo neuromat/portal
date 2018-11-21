@@ -9,7 +9,7 @@ from django.test import override_settings, TestCase
 from django.utils.text import slugify
 
 from downloads.views import download_create
-from experiments.models import Experiment, Gender, Group, Questionnaire, \
+from experiments.models import Experiment, Gender, Questionnaire, \
     QuestionnaireLanguage
 from experiments.tests.tests_helper import create_experiment, create_study, \
     create_participant, create_group, create_questionnaire, \

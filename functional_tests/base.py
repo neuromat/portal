@@ -29,9 +29,9 @@ class FunctionalTest(StaticLiveServerTestCase):
 
     def setUp(self):
         self.owner = User.objects.create_user(
-            username='labor1', password='nep-lab1'
+            username='labor1', password=PASSWORD
         )
-        self.experiment = create_experiment(1, self.owner, Experiment.APPROVED)
+        self.experiment = create_experiment(1, self.owner)
 
         profile = webdriver.FirefoxProfile()
         profile.set_preference('intl.accept_languages', 'en')
@@ -76,6 +76,10 @@ class FunctionalTest(StaticLiveServerTestCase):
 class FunctionalTestTrustee(StaticLiveServerTestCase):
 
     def setUp(self):
+        self.owner = User.objects.create_user(
+            username='labor1', password=PASSWORD
+        )
+        self.experiment = create_experiment(1, self.owner)
 
         profile = webdriver.FirefoxProfile()
         profile.set_preference('intl.accept_languages', 'en')

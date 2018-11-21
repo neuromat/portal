@@ -230,18 +230,17 @@ def create_experimental_protocol(group):
     return exp_prot
 
 
-def create_classification_of_deseases(qtty):
+def create_classification_of_diseases():
     """
     :param qtty: number of objects to create 
     """
     fake = Factory.create()
 
-    for i in range(qtty):
-        ClassificationOfDiseases.objects.create(
-            code=randint(1, 1000), description=fake.text(),
-            abbreviated_description=fake.text(max_nb_chars=100),
-            parent=None
-        )
+    return ClassificationOfDiseases.objects.create(
+        code=randint(1, 1000), description=fake.text(),
+        abbreviated_description=fake.text(max_nb_chars=100),
+        parent=None
+    )
 
 
 def create_experiment_researcher(experiment, first_name=None, last_name=None):
@@ -515,14 +514,13 @@ def create_tms_setting(qtty, experiment):
     return tms_settings
 
 
-def create_tms_device(qtty):
+def create_tms_device():
     """
     :param qtty: number of tms device objects to create
     """
     fake = Factory.create()
 
-    for i in range(qtty):
-        TMSDevice.objects.create(
+    return TMSDevice.objects.create(
             manufacturer_name=fake.word(),
             equipment_type=fake.word(),
             identification=fake.word(),
@@ -532,13 +530,12 @@ def create_tms_device(qtty):
         )
 
 
-def create_coil_model(qtty):
+def create_coil_model():
     """
     :param qtty: number of coil model objects to create
     """
     fake = Factory.create()
-    for i in range(qtty):
-        CoilModel.objects.create(
+    return CoilModel.objects.create(
             name=fake.word(), coil_shape_name=fake.word(),
             coil_design=choice(['air_core_coil', 'biphase']),
             description=fake.text(), material_name=fake.word(),
@@ -546,19 +543,18 @@ def create_coil_model(qtty):
         )
 
 
-def create_tms_device_setting(qtty, tms_setting, tms_device, coil_model):
+def create_tms_device_setting(tms_setting, tms_device, coil_model):
     """
     :param qtty: number of tms device setting objects to create
     :param tms_setting: TMSSetting model instance
     :param tms_device: TMSDevice model instance
     :param coil_model: CoilModel model instance
     """
-    for i in range(qtty):
-        TMSDeviceSetting.objects.create(
-            tms_setting=tms_setting, tms_device=tms_device, coil_model=coil_model,
-            pulse_stimulus_type=choice(['single_pulse', 'paired_pulse',
-                                        'repetitive_pulse'])
-        )
+    return TMSDeviceSetting.objects.create(
+        tms_setting=tms_setting, tms_device=tms_device, coil_model=coil_model,
+        pulse_stimulus_type=choice(['single_pulse', 'paired_pulse',
+                                    'repetitive_pulse'])
+    )
 
 
 def create_tms_data(qtty, tmssetting, participant):
@@ -1175,7 +1171,7 @@ def remove_selected_subdir(selected, experiment, participant, group,
     if 'participant_p' in selected:
         shutil.rmtree(os.path.join(
             experiment_download_dir, 'Group_' + group_title_slugifyed,
-            'Per_participant_data', 'Participant_' + participant.code
+            'Per_participant_data', 'Participant_' + str(participant.code)
         ))
     # If group has questionnaires remove 'Questionnaire_metadata' subdir
     # randomly.
@@ -1198,312 +1194,6 @@ def remove_selected_subdir(selected, experiment, participant, group,
         ))
 
 
-def global_setup_ft():
-    """
-    This global setup creates basic object models that are used in 
-    functional tests.
-    """
-    # Create 2 API clients
-    owner1 = models.User.objects.create_user(
-        username='lab1', password='nep-lab1'
-    )
-    owner2 = models.User.objects.create_user(
-        username='lab2', password='nep-lab2'
-    )
-
-    # Create group Trustees
-    create_trustee_user()
-
-    # Create experiments for 2 owners, randomly
-    create_experiment(1, choice([owner1, owner2]),
-                      Experiment.TO_BE_ANALYSED)
-    experiment1 = Experiment.objects.last()
-    create_study(1, experiment1)
-    create_group(randint(2, 3), experiment1)
-
-    create_experiment(1, choice([owner1, owner2]),
-                      Experiment.TO_BE_ANALYSED)
-    experiment2 = Experiment.objects.last()
-    create_study(1, experiment2)
-    create_group(randint(2, 3), experiment2)
-    # To test search
-    experiment2.title = 'Brachial Plexus'
-    experiment2.save()
-
-    create_experiment(1, choice([owner1, owner2]),
-                      Experiment.UNDER_ANALYSIS)
-    experiment3 = Experiment.objects.last()
-    create_study(1, experiment3)
-    create_group(randint(2, 3), experiment3)
-    create_experiment(1, choice([owner1, owner2]),
-                      Experiment.UNDER_ANALYSIS)
-    experiment4 = Experiment.objects.last()
-    create_study(1, experiment4)
-    create_group(randint(2, 3), experiment4)
-    # To test search
-    experiment4.title = 'Brachial Plexus'
-    experiment4.save()
-
-    # TODO: refactor to create the 4 experiments at once (how it was
-    # TODO: before)
-    # TODO: see TODO's in create_study and create_group methods
-    create_experiment(1, choice([owner1, owner2]),
-                      Experiment.APPROVED)
-    experiment5 = Experiment.objects.last()
-    create_study(1, experiment5)
-    create_group(randint(2, 3), experiment5)
-    create_experiment(1, choice([owner1, owner2]),
-                      Experiment.APPROVED)
-    experiment6 = Experiment.objects.last()
-    create_study(1, experiment6)
-    create_group(randint(2, 3), experiment6)
-    create_experiment(1, choice([owner1, owner2]),
-                      Experiment.APPROVED)
-    experiment7 = Experiment.objects.last()
-    create_study(1, experiment7)
-    create_group(randint(2, 3), experiment7)
-    create_experiment(1, choice([owner1, owner2]),
-                      Experiment.APPROVED)
-    experiment8 = Experiment.objects.last()
-    create_study(1, experiment8)
-    create_group(randint(2, 3), experiment8)
-    # Put some non-random strings in one approved experiment to test search
-    experiment8.title = 'Brachial Plexus'
-    experiment8.description = 'Ein Beschreibung.'
-    experiment8.save()
-    # Create version 2 of the experiment to test search - necessary to change
-    # some field other than title, to include a non-random text, because we
-    # are highlitghing the terms searched, and this put span's elements in
-    # html with search results, causing dificulty to search 'Brachial
-    # Plexus' in experiment title in test_search.py.
-    # Related to: test_search_returns_only_last_version_experiment test.
-    # experiment.pk = None # ???
-    experiment8.version = 2
-    experiment8.save()
-
-    # To test search: we've created one experiment approved with 'Brachial
-    # Plexus' in its title. We now create another experiment approved also
-    # with 'Brachial Plexus' in title, and with EMG settings, to test
-    # searching with filter.
-    create_experiment(1, choice([owner1, owner2]),
-                      Experiment.APPROVED)
-    experiment9 = Experiment.objects.last()
-    create_study(1, experiment9)
-    create_group(randint(2, 3), experiment9)
-    experiment9.title = 'Brachial Plexus (with EMG Setting)'
-    experiment9.description = 'Ein Beschreibung. Brachial plexus repair by ' \
-                             'peripheral nerve ' \
-                             'grafts directly into the spinal cord in rats ' \
-                             'Behavioral and anatomical evidence of ' \
-                             'functional recovery. The EEG text.'
-    experiment9.save()
-    create_step(1, experiment9.groups.first(), Step.EMG)
-
-    # We change first experiment study approved to contain 'brachial' in
-    # study description, so it have to be found by search test
-    # Create some keywords to associate with studies
-    create_keyword('brachial plexus')
-    study = Study.objects.filter(
-        experiment__status=Experiment.APPROVED
-    ).first()
-    study.description = 'The brachial artery is the major blood vessel of ' \
-                        'the (upper) arm. It\'s correlated with plexus. ' \
-                        'This study should have an experiment with EEG.'
-    # We put a keyword with the string 'brachial plexus' in the study to
-    # also be found by search test
-    study.keywords.add('brachial plexus')
-    study.save()
-
-    # To test search
-    group = Group.objects.filter(
-        experiment__status=Experiment.APPROVED
-    ).first()
-    group.description = 'Plexus brachial is written in wrong order. Correct ' \
-                        'is Brachial plexus.'
-    group.save()
-    create_step(1, group, Step.EEG)
-    create_step(1, group, Step.EMG)
-    # To test search
-    group.experiment.title = 'Experiment changed to test filter only'
-    group.experiment.save()
-
-    # TODO: test for matches Classification of Diseases
-    ic = ClassificationOfDiseases.objects.create(
-        code='BP', description='brachial Plexus',
-        abbreviated_description='brachial Plexus',
-        parent=None
-    )
-    group.inclusion_criteria.add(ic)
-    group.save()
-
-    # To test search
-    group = Group.objects.filter(
-        experiment__status=Experiment.APPROVED
-    ).last()
-    group.description = 'Brachial plexus is a set of nerves.'
-    group.save()
-    create_step(1, group, Step.EMG)
-
-    # To test search
-    create_group(
-        1, Experiment.objects.filter(status=Experiment.APPROVED).first()
-    )
-    group = Group.objects.last()
-    group.title = 'Brachial only'
-    group.save()
-
-    # We create one experiment approved with ethics committee information
-    create_ethics_committee_info(Experiment.objects.last())
-    create_experiment(1, choice([owner1, owner2]),
-                      Experiment.NOT_APPROVED)
-    experiment10 = Experiment.objects.last()
-    create_study(1, experiment10)
-    create_group(randint(2, 3), experiment10)
-
-    # Associate trustee to experiments under analysis (requires create
-    # experiments before)
-    associate_experiments_to_trustees()
-
-    # To test search
-    experiment11 = Experiment.objects.get(
-        trustee=models.User.objects.get(username='claudia')
-    )
-    experiment11.title = 'Experiment analysed by Claudia'
-    experiment11.save()
-
-    # Associate keywords with studies
-    for study in Study.objects.all():
-        kw1 = choice(Keyword.objects.all())
-        kw2 = choice(Keyword.objects.all())
-        kw3 = choice(Keyword.objects.all())
-        study.keywords.add(kw1, kw2, kw3)
-
-    # Create genders
-    gender1 = Gender.objects.create(name='male')
-    gender2 = Gender.objects.create(name='female')
-
-    # Create some invalid entries for ClassificationOfDiseases model.
-    # They are invalid because in create_classification_of_diseases method
-    # the code are generated with a faker.
-    create_classification_of_deseases(1)
-    cd = ClassificationOfDiseases.objects.last()
-    cd.description = 'Code not recognized'
-    cd.save()
-    create_classification_of_deseases(1)
-    cd = ClassificationOfDiseases.objects.last()
-    cd.description = 'Code not recognized'
-    cd.save()
-
-    # Create valid entries for ClassificationOfDiseases model.
-    # We give valid codes to the objects created.
-    create_classification_of_deseases(1)
-    cd = ClassificationOfDiseases.objects.last()
-    cd.code = 'A00'
-    cd.save()
-    create_classification_of_deseases(1)
-    cd = ClassificationOfDiseases.objects.last()
-    cd.code = 'A1782'
-    cd.save()
-    create_classification_of_deseases(1)
-    cd = ClassificationOfDiseases.objects.last()
-    cd.code = 'A3681'
-    cd.save()
-    create_classification_of_deseases(1)
-    cd = ClassificationOfDiseases.objects.last()
-    cd.code = 'A74'
-    cd.save()
-
-    # Create randint(3, 7) participants for all groups (requires create
-    # groups before), and experimental protocols
-    for group in Group.objects.all():
-        create_experimental_protocol(group)
-        create_participant(
-            randint(3, 7), group,
-            gender1 if randint(1, 2) == 1 else gender2
-        )
-        ic1 = choice(ClassificationOfDiseases.objects.all())
-        ic2 = choice(ClassificationOfDiseases.objects.all())
-        group.inclusion_criteria.add(ic1, ic2)
-
-    # Create researchers associated to studies created in
-    # create_experiment_and_study method
-    # Requires running create_experiment_study_group before
-    create_researchers()
-
-    ##
-    # To test searching TMS things
-    ##
-    # Create TMSSetting from an experiment Approved, to test search
-    experiment12 = Experiment.objects.filter(
-        status=Experiment.APPROVED).first()
-    create_tms_setting(1, experiment12)  # 1º TMSSetting
-    tms_setting = TMSSetting.objects.last()
-    tms_setting.name = 'tmssettingname'
-    tms_setting.save()
-    # Create TMSDeviceSetting from a TMSSetting to test search
-    # Required creating TMSSetting from experiment Approved, first
-    create_tms_device(1)  # 1º TMSDevice
-    tms_device = TMSDevice.objects.last()
-    tms_device.manufacturer_name = 'Siemens'
-    tms_device.save()
-    create_coil_model(1)  # 1º CoilModel
-    coil_model = CoilModel.objects.last()
-    coil_model.name = 'Magstim'
-    coil_model.save()
-    # 1º TMSDeviceSetting
-    create_tms_device_setting(1, tms_setting, tms_device, coil_model)  #
-    tms_device_setting = TMSDeviceSetting.objects.last()
-    tms_device_setting.pulse_stimulus_type = 'single_pulse'
-    tms_device_setting.save()
-    # Create another TMSSetting and associate with same TMSDeviceSetting
-    # created above to test searching TMSDevice and CoilModel
-    create_tms_setting(1, experiment12)  # 2º TMSSetting
-    tms_setting = TMSSetting.objects.last()
-    # 2º TMSDeviceSetting
-    create_tms_device_setting(1, tms_setting, tms_device, coil_model)
-    tms_device_setting = TMSDeviceSetting.objects.last()
-    tms_device_setting.pulse_stimulus_type = 'single_pulse'
-    tms_device_setting.save()
-    # Create others TMSDevice and CoilModel associated with TMSDeviceSetting >
-    # TMSSetting > Experiment
-    create_tms_setting(1, experiment12)  # 3º TMSSetting
-    tms_setting = TMSSetting.objects.last()
-    # TODO: IMPORTANT! when creating a new TMSDevice and a new CoilModel to
-    # TODO: associate with new TMSDeviceSetting, the tests with filters in
-    # TODO: test_search fails. See
-    create_tms_device(1)  # 2º TMSDevice
-    tms_device = TMSDevice.objects.last()
-    tms_device.manufacturer_name = 'Siemens'
-    tms_device.save()
-    create_coil_model(1)  # 2º CoilModel
-    coil_model = CoilModel.objects.last()
-    coil_model.name = 'Magstim'
-    coil_model.save()
-    # 3º TMSDeviceSetting
-    create_tms_device_setting(1, tms_setting, tms_device, coil_model)
-    tms_device_setting = TMSDeviceSetting.objects.last()
-    tms_device_setting.pulse_stimulus_type = 'single_pulse'
-    tms_device_setting.save()
-    # Create TMSData objects to test search
-    create_tmsdata_objects_to_test_search()
-
-    # Create invalid Questionnaire object
-    # (requires invalid files 'questionnaire4.csv' in 'experiments/tests'
-    # subdirectory)
-    experiment = Experiment.objects.filter(
-        status=Experiment.APPROVED
-    ).first()
-    group = experiment.groups.first()
-    create_questionnaire(1, 'q4', group)
-    questionnaire4 = Questionnaire.objects.last()
-    # create questionnaire language data default for questionnaire4
-    create_questionnaire_language(
-        questionnaire4,
-        settings.BASE_DIR + '/experiments/tests/questionnaire4.csv',
-        'en'
-    )
-
-
 def random_utf8_string(length):
     result = b''
     for i in range(length):
@@ -1511,136 +1201,3 @@ def random_utf8_string(length):
         result = result + a
     result.decode('unicode-escape')
     return result.decode()
-
-
-def global_setup_ut():
-    """
-    This global setup creates basic object models that are used in 
-    unittests.
-    """
-    owner1 = models.User.objects.create_user(username='lab1',
-                                             password='nep-lab1')
-    owner2 = models.User.objects.create_user(username='lab2',
-                                             password='nep-lab2')
-
-    # Create group Trustees
-    create_trustee_user('claudia')
-
-    experiment1 = Experiment.objects.create(
-        title='Experiment 1', nes_id=1, owner=owner1,
-        version=1, sent_date=datetime.utcnow(),
-        status=Experiment.TO_BE_ANALYSED,
-    )
-    experiment2 = Experiment.objects.create(
-        title='Experiment 2', nes_id=1, owner=owner2,
-        version=1, sent_date=datetime.utcnow(),
-        status=Experiment.UNDER_ANALYSIS,
-        trustee=models.User.objects.get(username='claudia'),
-    )
-    experiment3 = Experiment.objects.create(
-        title='Experiment 3', nes_id=2, owner=owner2,
-        version=1, sent_date=datetime.utcnow(),
-        status=Experiment.TO_BE_ANALYSED,
-    )
-    experiment4 = Experiment.objects.create(
-        title='Experiment 4', nes_id=3, owner=owner1,
-        version=1, sent_date=datetime.utcnow(),
-        status=Experiment.APPROVED,
-    )
-    create_ethics_committee_info(experiment3)
-
-    create_group(2, experiment1)
-    create_group(1, experiment2)
-
-    # TODO: create with the method already existing. Same for below
-    study1 = Study.objects.create(start_date=datetime.utcnow(),
-                                  experiment=experiment1)
-    study2 = Study.objects.create(start_date=datetime.utcnow(),
-                                  experiment=experiment2)
-    # Create a study and doesn't associate it with researcher bellow.
-    # This is to testing creating researcher associate it with a study in
-    # test_models.py
-    Study.objects.create(start_date=datetime.utcnow(),
-                         experiment=experiment3)
-
-    Researcher.objects.create(first_name='Raimundo', last_name='Nonato',
-                              email='rnonato@example.com', study=study1,
-                              citation_name='NONATO, Raimundo')
-    Researcher.objects.create(first_name='Raimunda', last_name='da Silva',
-                              email='rsilva@example.com', study=study2,
-                              citation_name='SILVA, Raimunda da')
-
-    # Create some keywords to associate with studies
-    create_keyword(10)
-    # Associate keywords with studies
-    for study in Study.objects.all():
-        kw1 = choice(Keyword.objects.all())
-        kw2 = choice(Keyword.objects.all())
-        kw3 = choice(Keyword.objects.all())
-        study.keywords.add(kw1, kw2, kw3)
-
-    # Create invalid Questionnaire object
-    # (requires file 'questionnaire4.csv', being generated in
-    # 'experiments/tests' subdirectory)
-    create_group(1, experiment4)
-    group = experiment4.groups.last()
-    create_questionnaire(1, 'q4', group)
-    # create questionnaire language data default for questionnaire4
-    questionnaire4 = Questionnaire.objects.last()
-    create_questionnaire_language(
-        questionnaire4,
-        settings.BASE_DIR + '/experiments/tests/questionnaire4.csv',
-        'en'
-    )
-
-    # Create an invalid and a valid Questionnaire objects
-    # (requires the files 'questionnaire5.csv' and 'questionnaire6.csv,
-    # being generated in 'experiments/tests' subdirectory)
-    create_group(2, experiment3)
-    group = experiment3.groups.first()
-    create_questionnaire(1, 'q5', group)
-    questionnaire5 = Questionnaire.objects.last()
-    # create questionnaire language data default for questionnaire5
-    create_questionnaire_language(
-        questionnaire5,
-        settings.BASE_DIR + '/experiments/tests/questionnaire5.csv',
-        'en'
-    )
-    group = experiment3.groups.last()
-    create_questionnaire(1, 'q6', group)
-    questionnaire6 = Questionnaire.objects.last()
-    create_questionnaire_language(
-        questionnaire6,
-        settings.BASE_DIR + '/experiments/tests/questionnaire6.csv',
-        'en'
-    )
-
-    # Create some entries in ClassificationOfDiseases to test adding real codes
-    create_classification_of_deseases(1)
-    cd = ClassificationOfDiseases.objects.last()
-    cd.code = 'A00'
-    cd.save()
-    create_classification_of_deseases(1)
-    cd = ClassificationOfDiseases.objects.last()
-    cd.code = 'A1782'
-    cd.save()
-    create_classification_of_deseases(1)
-    cd = ClassificationOfDiseases.objects.last()
-    cd.code = 'A3681'
-    cd.save()
-    create_classification_of_deseases(1)
-    cd = ClassificationOfDiseases.objects.last()
-    cd.code = 'A74'
-    cd.save()
-
-
-def apply_setup(setup_func):
-    """
-    Defines a decorator that uses global setup method.
-    :param setup_func: global setup function
-    :return: wrapper 
-    """
-    def wrap(cls):
-        cls.setup = setup_func
-        return cls
-    return wrap
