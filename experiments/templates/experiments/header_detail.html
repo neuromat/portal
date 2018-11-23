@@ -37,11 +37,13 @@
             {% endif %}
         {% endif %}
         {% if experiment.data_acquisition_done %}
+            &nbsp;
             <div id="id_detail_acquisition" class="pull-right">
             <span class="label label-success">
                 {% trans "Data acquisition was completed" %}</span>
             </div>
         {% else %}
+            &nbsp;
             <div id="id_detail_acquisition" class="pull-right">
             <span class="label label-warning">
                 {% trans "Current number of participants" %}:
