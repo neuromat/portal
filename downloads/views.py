@@ -146,7 +146,7 @@ def download_view(request, experiment_id):
         pattern_questionnaires = re.compile("questionnaires_g[0-9]+$")
         pattern_participant = re.compile("participant_p[0-9]+_g[0-9]+$")
         if pattern_exp_protocol.match(item):
-            # add Experimental_protocol subdir for the specific group in temp
+            # Add Experimental_protocol subdir for the specific group in temp
             # dir
             try:
                 shutil.copytree(os.path.join(
@@ -338,7 +338,6 @@ def download_create(experiment_id, template_name):
                     zip_file.write(
                         filename.encode('utf-8'), path.join(directory, fname)
                     )
-            zip_file.close()
 
         export_instance_directory = settings.MEDIA_ROOT + '/'
         temp_directory = path.join(
