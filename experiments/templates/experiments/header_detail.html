@@ -13,28 +13,15 @@
         {% endif %}
     </div>
     <div id="id_detail_description" class="detail-description">{{ experiment.description }}</div>
-    {% if experiment.data_acquisition_done %}
-        <div id="id_detail_acquisition" class="pull-right">
-            <span class="label label-success">
-                {% trans "Data acquisition was completed" %}</span>
-        </div>
-    {% else %}
-        <div id="id_detail_acquisition" class="pull-right">
-            <span class="label label-warning">
-                {% trans "Current number of participants" %}:
-                {{ total_participants }}&nbsp;({% trans "and counting" %})
-            </span>
-        </div>
-    {% endif %}
     {% if experiment.project_url %}
         <a class="nep-btn-secondary" href="{{ experiment.project_url }}"> <span class="glyphicon glyphicon-info-sign"> </span> {% trans "Project Info" %}</a>&nbsp;
         {# TODO: Uggly "gambis": needs to solve via css. Fix this! #}
     {% else %}
         <a href="#">&nbsp;</a>
     {% endif %}
-    {% load experiment_extras %}
-    {% if user.is_authenticated and user|has_group:'trustees' %}
-        <aside id="ethics_committee_info">
+    <aside id="ethics_committee_info">
+        {% load experiment_extras %}
+        {% if user.is_authenticated and user|has_group:'trustees' %}
             {% if experiment.ethics_committee_url %}
                 <a href="{{ experiment.ethics_committee_url }}">{% trans "Approval of the ethics committee" %}</a>&nbsp;
                 &nbsp;&nbsp;
@@ -43,15 +30,24 @@
                 &nbsp;
             {% endif %}
             {% if experiment.ethics_committee_file %}
-                <a href="{{ experiment.ethics_committee_file.url }}"
-                   class="nep-btn"
-                >{% trans "Approval of the ethics committee file" %}</a>
+                <a href="{{ experiment.ethics_committee_file.url }}" class="nep-btn">{% trans "Approval of the ethics committee file" %}</a>
             {% else %}
                 <span class="label label-danger">
                     {% trans "Approval of the ethics committee not available" %}</span>
             {% endif %}
-        </aside>
-    {% endif %}
+        {% endif %}
+        {% if experiment.data_acquisition_done %}
+            &nbsp; <!-- put space for label doesn't cross hr below -->
+            <div id="id_detail_acquisition" class="pull-right">
+                <span class="label label-success">{% trans "Data acquisition was completed" %}</span>
+            </div>
+        {% else %}
+            &nbsp; <!-- put space for label doesn't cross hr below -->
+            <div id="id_detail_acquisition" class="pull-right">
+                <span class="label label-warning">{% trans "Current number of participants" %}:{{ total_participants }}&nbsp;({% trans "and counting" %})</span>
+            </div>
+        {% endif %}
+    </aside>
     <hr class="detail-header-hr">
     <div id="id_detail_study" class="pull-left">{% trans "From study" %}: <a
             href="#" data-toggle="modal" data-target="#study_modal">{{ experiment.study.title }}</a>
