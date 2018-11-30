@@ -6,6 +6,8 @@ from random import choice
 from unittest import skip
 
 import shutil
+
+from django.conf import settings
 from django.test import override_settings
 from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.common.keys import Keys
@@ -13,21 +15,27 @@ from selenium.webdriver.common.keys import Keys
 from downloads.views import DOWNLOAD_ERROR_MESSAGE, download_create
 from experiments.models import Questionnaire, Step, Gender, Experiment
 from experiments.tests.tests_helper import create_group, \
-    create_participant, create_download_dir_structure_and_files, \
+    create_participant, \
     remove_selected_subdir, create_experimental_protocol, \
     create_questionnaire, create_questionnaire_language, create_study, \
-    create_eeg_data, create_eeg_setting, create_eeg_step, \
+    create_eeg_data, create_eeg_setting, \
     create_valid_questionnaires, create_publication, \
     create_experiment_researcher, create_researcher, \
     create_trustee_user, create_next_version_experiment, \
-    create_ethics_committee_info, create_genders, create_step
+    create_ethics_committee_info, create_genders, create_step, \
+    create_questionnaire_responses
 from functional_tests.base import FunctionalTest
-from nep import settings
 
-TEMP_MEDIA_ROOT = os.path.join(tempfile.mkdtemp())
+
+TEMP_MEDIA_ROOT = tempfile.mkdtemp()
 
 
 class ExperimentDetailTest(FunctionalTest):
+
+    def setUp(self):
+        create_trustee_user('claudia')
+        create_trustee_user('roque')
+        super(ExperimentDetailTest, self).setUp()
 
     def _access_experiment_detail_page(self, experiment):
         # The new visitor is in home page and see the list of experiments.
@@ -37,11 +45,6 @@ class ExperimentDetailTest(FunctionalTest):
             "//a[@href='/experiments/" + experiment.slug + "/']"
         )
         link.click()
-
-    def setUp(self):
-        create_trustee_user('claudia')
-        create_trustee_user('roque')
-        super(ExperimentDetailTest, self).setUp()
 
     # TODO: break by tabs
     @override_settings(MEDIA_ROOT=TEMP_MEDIA_ROOT)
@@ -332,7 +335,9 @@ class ExperimentDetailTest(FunctionalTest):
                 self.fail(publication.url + ' is not a link')
 
     def test_can_view_questionaire_tab(self):
-        create_valid_questionnaires(self.experiment)
+        g1 = create_group(1, self.experiment)
+        g2 = create_group(1, self.experiment)
+        create_valid_questionnaires([g1, g2])
 
         # The new visitor is in home page and sees the list of experiments.
         # She clicks in a "View" link and is redirected to experiment
@@ -362,7 +367,9 @@ class ExperimentDetailTest(FunctionalTest):
             self.browser.find_element_by_link_text('Questionnaires')
 
     def test_can_view_group_questionnaires_and_questionnaires_titles(self):
-        create_valid_questionnaires(self.experiment)
+        g1 = create_group(1, self.experiment)
+        g2 = create_group(1, self.experiment)
+        create_valid_questionnaires([g1, g2])
 
         ##
         # get groups objects with questionnaire steps
@@ -404,7 +411,9 @@ class ExperimentDetailTest(FunctionalTest):
                 )
 
     def test_detail_button_expands_questionnaire_to_display_questions_and_answers(self):
-        create_valid_questionnaires(self.experiment)
+        g1 = create_group(1, self.experiment)
+        g2 = create_group(1, self.experiment)
+        create_valid_questionnaires([g1, g2])
 
         # When the new visitor visits an experiment that has questionnaires,
         # in right side of each questionnaire title is a 'Detail'
@@ -425,7 +434,9 @@ class ExperimentDetailTest(FunctionalTest):
         self.assertEqual(button_details.text, 'Details')
 
     def test_can_view_questionnaires_content(self):
-        create_valid_questionnaires(self.experiment)
+        g1 = create_group(1, self.experiment)
+        g2 = create_group(1, self.experiment)
+        create_valid_questionnaires([g1, g2])
 
         # The new visitor is in home page and sees the list of experiments.
         # She clicks in the "View" link corresponded to the experiment and is
@@ -735,7 +746,9 @@ class ExperimentDetailTest(FunctionalTest):
                       questionnaires_content)
 
     def test_can_see_all_language_links_of_questionnaires_if_available(self):
-        create_valid_questionnaires(self.experiment)
+        g1 = create_group(1, self.experiment)
+        g2 = create_group(1, self.experiment)
+        create_valid_questionnaires([g1, g2])
 
         # The visitor clicks in the experiment with questionnaire in home page
         self.browser.find_element_by_xpath(
@@ -770,7 +783,9 @@ class ExperimentDetailTest(FunctionalTest):
         self.assertEqual(q_lang_codes.count('de'), 1)
 
     def test_clicking_in_pt_br_language_link_of_questionnaire_render_appropriate_language(self):
-        create_valid_questionnaires(self.experiment)
+        g1 = create_group(1, self.experiment)
+        g2 = create_group(1, self.experiment)
+        create_valid_questionnaires([g1, g2])
         questionnaire = Questionnaire.objects.get(code='q1')
 
         # The visitor clicks in the experiment with questionnaire in home page
@@ -827,7 +842,9 @@ class ExperimentDetailTest(FunctionalTest):
                       questionnaires_content)
 
     def test_clicking_in_fr_language_link_of_questionnaire_render_appropriate_language(self):
-        create_valid_questionnaires(self.experiment)
+        g1 = create_group(1, self.experiment)
+        g2 = create_group(1, self.experiment)
+        create_valid_questionnaires([g1, g2])
         questionnaire = Questionnaire.objects.get(code='q1')
 
         # The visitor clicks in the experiment with questionnaire in home page
@@ -1352,30 +1369,40 @@ class DownloadExperimentTest(FunctionalTest):
 
     def test_if_there_is_not_a_subdir_in_download_dir_structure_return_message(self):
         ##
-        # create some data to download
-        ##
+        # Create stuff to build download file below
         create_study(1, self.experiment)
         g1 = create_group(1, self.experiment)
-        create_experimental_protocol(g1)
-        p1 = create_participant(1, g1, Gender.objects.last())
-        q1 = create_questionnaire(1, 'code', g1)
+        root_step1 = create_step(1, g1, Step.BLOCK)
+        exp_prot1 = create_experimental_protocol(g1)
+        exp_prot1.root_step = root_step1
+        exp_prot1.save()
+        p1 = create_participant(1, g1, Gender.objects.get(name='male'))
+        q1 = create_questionnaire(1, 'Q5489', g1)
         create_questionnaire_language(
-            q1,
+            q1, settings.BASE_DIR + '/experiments/tests/questionnaire7.csv',
+            'en'
+        )
+        create_questionnaire_responses(
+            q1, p1,
             settings.BASE_DIR +
-            '/experiments/tests/questionnaire1_pt-br.csv',
-            'pt-br'
+            '/experiments/tests/response_questionnaire7.json'
         )
-
-        ##
-        # Create participants data collection
-        ##
-        eeg_setting = create_eeg_setting(1, self.experiment)
-        eeg_step = create_eeg_step(g1, eeg_setting)
-        create_eeg_data(eeg_setting, eeg_step, p1)
-
-        create_download_dir_structure_and_files(
-            self.experiment, TEMP_MEDIA_ROOT
+        q1.parent = root_step1
+        q1.save()
+        q2 = create_questionnaire(1, 'Q5345', g1)
+        create_questionnaire_language(
+            q2, settings.BASE_DIR + '/experiments/tests/questionnaire7.csv',
+            'en'
         )
+        create_questionnaire_responses(
+            q2, p1,
+            settings.BASE_DIR +
+            '/experiments/tests/response_questionnaire7.json'
+        )
+        q2.parent = root_step1
+        q2.save()
+
+        download_create(self.experiment.id, '')
 
         # Josileine accesses Experiment Detail Downloads tab
         self.access_downloads_tab_content(self.experiment)

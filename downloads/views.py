@@ -2,6 +2,8 @@ import os
 import re
 import tempfile
 import shutil
+import subprocess
+import zipfile
 
 from os import path
 from shutil import rmtree
@@ -40,6 +42,129 @@ def create_export_instance():
     return export_instance
 
 
+def remove_files(request, experiment):
+    """Remove experiment data from
+    settings.MEDIA_ROOT/download/<experiment.id>/download.zip based on user
+    choices
+    :param request: request object
+    :param experiment: Experiment model object
+    :return:
+    """
+    temp_file = os.path.join(tempfile.mkdtemp(), 'partial_download.zip')
+    try:
+        shutil.copyfile(
+            os.path.join(
+                settings.MEDIA_ROOT, 'download', str(experiment.id),
+                'download.zip'
+            ), temp_file
+        )
+    except FileNotFoundError:
+        messages.error(request, DOWNLOAD_ERROR_MESSAGE)
+        return HttpResponseRedirect(
+            reverse('experiment-detail', kwargs={'slug': experiment.slug})
+        )
+
+    subdirs = [
+        os.path.join('EXPERIMENT_DOWNLOAD', 'Experiment.csv'),
+        os.path.join('EXPERIMENT_DOWNLOAD', 'LICENSE.txt'),
+        os.path.join('EXPERIMENT_DOWNLOAD', 'CITATION.txt')
+    ]
+    for subdir in request.POST.getlist('download_selected'):
+        # take the group title to copy subdirs/files to temp location
+        group_str = re.search("g[0-9]+", subdir)
+        group_id = int(group_str.group(0)[1:])
+        group = Group.objects.get(pk=group_id)
+        group_title_slugifyed = slugify(group.title)
+        # Options values in templates has group and/or participants id's as
+        # substrings, so use regex to determine if they were selected.
+        pattern_exp_protocol = re.compile("experimental_protocol_g[0-9]+$")
+        pattern_questionnaires = re.compile("questionnaires_g[0-9]+$")
+        pattern_participant = re.compile("participant_p[0-9]+_g[0-9]+$")
+
+        if pattern_exp_protocol.match(subdir):
+            subdirs.append(
+                os.path.join(
+                    'EXPERIMENT_DOWNLOAD',
+                    'Group_' + group_title_slugifyed,
+                    'Experimental_protocol'
+                )
+            )
+        if pattern_questionnaires.match(subdir):
+            subdirs.append(
+                os.path.join(
+                    'EXPERIMENT_DOWNLOAD',
+                    'Group_' + group_title_slugifyed,
+                    'Per_questionnaire_data'
+                )
+            )
+            subdirs.append(
+                os.path.join(
+                    'EXPERIMENT_DOWNLOAD',
+                    'Group_' + group_title_slugifyed,
+                    'Participants.csv'
+                )
+            )
+        if pattern_participant.match(subdir):
+            # Add Per_participant_data subdir for the specific group in temp
+            # dir.
+            participant_str = re.search("p[0-9]+", subdir)
+            participant_id = int(participant_str.group(0)[1:])
+            participant = Participant.objects.get(pk=participant_id)
+            # If g1 == g2 in test_views, this subtree may already has been
+            # created.
+            # TODO: fix test. Probably chosing participants from
+            # TODO: diferent groups, as it's the case when selecting
+            # TODO: participants to download in UI.
+            subdirs.append(
+                os.path.join(
+                    'EXPERIMENT_DOWNLOAD',
+                    'Group_' + group_title_slugifyed,
+                    'Per_participant_data',
+                    'Participant_' + participant.code
+                )
+            )
+
+    # questionnaire_metadata goes for all groups that have questionnaires
+    for group in experiment.groups.all():
+        if group.steps.filter(type=Step.QUESTIONNAIRE).count() > 0:
+            group_title_slugifyed = slugify(group.title)
+            subdirs.append(
+                os.path.join(
+                    'EXPERIMENT_DOWNLOAD',
+                    'Group_' + group_title_slugifyed,
+                    'Questionnaire_metadata'
+                )
+            )
+
+    # subtracts files that will not go in compressed file based in user choices
+    zip_file = zipfile.ZipFile(temp_file)
+    zip_file_set = set(zip_file.namelist())
+    for subdir in subdirs:
+        r = re.compile(subdir)
+        sub_set = set(filter(r.match, zip_file_set))
+        if not sub_set:
+            shutil.rmtree(os.path.dirname(temp_file))
+            return ''
+        zip_file_set -= sub_set
+    cmd = ['zip', '-d', temp_file] + list(zip_file_set)
+
+    # if testing, redirects stdout to a tem file
+    if 'test' in sys.argv or 'runserver' in sys.argv:
+        outfile = \
+            open(os.path.join(os.path.dirname(temp_file), 'ndb_output.txt'), "w")
+    else:
+        outfile = sys.stdout
+    try:
+        subprocess.check_call(cmd, stdout=outfile)
+    except subprocess.CalledProcessError:
+        messages.error(request, DOWNLOAD_ERROR_MESSAGE)
+        return HttpResponseRedirect(
+            reverse('experiment-detail', kwargs={'slug': experiment.slug})
+        )
+
+    return temp_file
+
+
 def download_view(request, experiment_id):
     experiment = get_object_or_404(Experiment, pk=experiment_id)
 
@@ -49,201 +174,28 @@ def download_view(request, experiment_id):
         compressed_file = os.path.join(
             settings.MEDIA_ROOT, 'download', str(experiment.id), 'download.zip'
         )
-        try:
-            file = open(compressed_file, 'rb')
-        except FileNotFoundError:
-            messages.error(request, DOWNLOAD_ERROR_MESSAGE)
+    else:
+        # If user selected nothing, just redirect to experiment detail view
+        # with warning message
+        if 'download_selected' not in request.POST:
+            messages.warning(request, _('Please select item(s) to download'))
             return HttpResponseRedirect(
                 reverse('experiment-detail', kwargs={'slug': experiment.slug})
             )
 
-        # Workaround to test serving compressed file. We are using Apache
-        # module to serve file imediatally by Apache instead of streaming it
-        # through Django.
-        if 'test' in sys.argv or 'runserver' in sys.argv:
-            response = HttpResponse(file, content_type='application/zip')
-            response['Content-Length'] = path.getsize(compressed_file)
-        else:
-            response = HttpResponse(content_type='application/force-download')
-            response['X-Sendfile'] = smart_str(compressed_file)
-            response['Content-Length'] = path.getsize(compressed_file)
-            response['Set-Cookie'] = 'fileDownload=true; path=/'
-
-        response['Content-Disposition'] = \
-            'attachment; filename=%s' % smart_str('download.zip')
-
-        file.close()
-
-        experiment.downloads += 1
-        experiment.save()
-
-        return response
-
-    # If user selected nothing, just redirect to experiment detail view with
-    # warning message.
-    if 'download_selected' not in request.POST:
-        messages.warning(request, _('Please select item(s) to download'))
-        return HttpResponseRedirect(
-            reverse('experiment-detail', kwargs={'slug': experiment.slug})
-        )
-
-    ##
-    # Create compressed file with elements chosen by user
-    # ---------------------------------------------------
-    # TODO: if experiment has no groups return response with only
-    # TODO: Experiments.csv
-    # Create temporary dir to aggregate subdirs/files for further
-    # incorporate in compacted file.
-    temp_dir = tempfile.mkdtemp()
-    # Experiment.csv always will be in compressed file
+        compressed_file = remove_files(request, experiment)
     try:
-        shutil.copyfile(os.path.join(
-            settings.MEDIA_ROOT, 'download', str(experiment.id),
-            'Experiment.csv'
-        ), os.path.join(temp_dir, 'Experiment.csv')
-        )
+        file = open(compressed_file, 'rb')
     except FileNotFoundError:
         messages.error(request, DOWNLOAD_ERROR_MESSAGE)
         return HttpResponseRedirect(
             reverse('experiment-detail', kwargs={'slug': experiment.slug})
         )
 
-    # License.txt always will be in compressed file
-    try:
-        shutil.copyfile(os.path.join(
-            settings.MEDIA_ROOT, 'download', 'LICENSE.txt'
-        ), os.path.join(temp_dir, 'LICENSE.txt')
-        )
-    except FileNotFoundError:
-        messages.error(request, DOWNLOAD_ERROR_MESSAGE)
-        return HttpResponseRedirect(
-            reverse('experiment-detail', kwargs={'slug': experiment.slug})
-        )
-
-    # CITATION.txt always will be in compressed file
-    try:
-        shutil.copyfile(os.path.join(
-            settings.MEDIA_ROOT, 'download', str(experiment.id), 'CITATION.txt'
-        ), os.path.join(temp_dir, 'CITATION.txt')
-        )
-    except FileNotFoundError:
-        messages.error(request, DOWNLOAD_ERROR_MESSAGE)
-        return HttpResponseRedirect(
-            reverse('experiment-detail', kwargs={'slug': experiment.slug})
-        )
-
-    # Copy experiment data from settings.MEDIA_ROOT/download/<experiment.id>,
-    # based on user selection, to a temp dir.
-    for item in request.POST.getlist('download_selected'):
-        # take the group title to copy subdirs/files to temp location
-        group_str = re.search("g[0-9]+", item)
-        group_id = int(group_str.group(0)[1:])
-        group = Group.objects.get(pk=group_id)
-        group_title_slugifyed = slugify(group.title)
-        # Options values in templates has group and/or participants id's as
-        # substrings, so use regex to determine if they were selected.
-        pattern_exp_protocol = re.compile("experimental_protocol_g[0-9]+$")
-        pattern_questionnaires = re.compile("questionnaires_g[0-9]+$")
-        pattern_participant = re.compile("participant_p[0-9]+_g[0-9]+$")
-        if pattern_exp_protocol.match(item):
-            # Add Experimental_protocol subdir for the specific group in temp
-            # dir
-            try:
-                shutil.copytree(os.path.join(
-                    settings.MEDIA_ROOT, 'download', str(experiment.id),
-                    'Group_' + group_title_slugifyed, 'Experimental_protocol'
-                ), os.path.join(temp_dir, 'Group_' + group_title_slugifyed,
-                                'Experimental_protocol')
-                )
-            except FileNotFoundError:
-                messages.error(request, DOWNLOAD_ERROR_MESSAGE)
-                return HttpResponseRedirect(
-                    reverse('experiment-detail',
-                            kwargs={'slug': experiment.slug})
-                )
-        if pattern_questionnaires.match(item):
-            # Add Per_questionnaire_data subdir for the specific group in temp
-            # dir
-            try:
-                shutil.copytree(os.path.join(
-                    settings.MEDIA_ROOT, 'download', str(experiment.id),
-                    'Group_' + group_title_slugifyed, 'Per_questionnaire_data'
-                ), os.path.join(temp_dir, 'Group_' + group_title_slugifyed,
-                                'Per_questionnaire_data')
-                )
-            except FileNotFoundError:
-                messages.error(request, DOWNLOAD_ERROR_MESSAGE)
-                return HttpResponseRedirect(
-                    reverse('experiment-detail',
-                            kwargs={'slug': experiment.slug})
-                )
-            # add Participants.csv file for the specific group in temp dir
-            try:
-                shutil.copyfile(os.path.join(
-                    settings.MEDIA_ROOT, 'download', str(experiment.id),
-                    'Group_' + group_title_slugifyed, 'Participants.csv'
-                ), os.path.join(temp_dir, 'Group_' + group_title_slugifyed,
-                                'Participants.csv')
-                )
-            except FileNotFoundError:
-                messages.error(request, DOWNLOAD_ERROR_MESSAGE)
-                return HttpResponseRedirect(
-                    reverse('experiment-detail',
-                            kwargs={'slug': experiment.slug})
-                )
-        if pattern_participant.match(item):
-            # Add Per_participant_data subdir for the specific group in temp
-            # dir.
-            participant_str = re.search("p[0-9]+", item)
-            participant_id = int(participant_str.group(0)[1:])
-            participant = Participant.objects.get(pk=participant_id)
-            # If g1 == g2 in test_views, this subtree may already has been
-            # created.
-            # TODO: fix test. Probably chosing participants from
-            # TODO: diferent groups, as it's the case when selecting
-            # TODO: participants to download in UI.
-            try:
-                shutil.copytree(os.path.join(
-                    settings.MEDIA_ROOT, 'download', str(experiment.id),
-                    'Group_' + group_title_slugifyed, 'Per_participant_data',
-                    'Participant_' + participant.code
-                ), os.path.join(temp_dir, 'Group_' + group_title_slugifyed,
-                                'Per_participant_data', 'Participant_' +
-                                participant.code)
-                )
-            except FileNotFoundError:
-                messages.error(request, DOWNLOAD_ERROR_MESSAGE)
-                return HttpResponseRedirect(
-                    reverse('experiment-detail',
-                            kwargs={'slug': experiment.slug})
-                )
-
-    # Put Questionnaire_metadata subdir in temp dir for all groups that have
-    # questionnaires.
-    for group in experiment.groups.all():
-        if group.steps.filter(type=Step.QUESTIONNAIRE).count() > 0:
-            group_title_slugifyed = slugify(group.title)
-            try:
-                shutil.copytree(os.path.join(
-                    settings.MEDIA_ROOT, 'download', str(experiment.id),
-                    'Group_' + group_title_slugifyed, 'Questionnaire_metadata'
-                ), os.path.join(temp_dir, 'Group_' + group_title_slugifyed,
-                                'Questionnaire_metadata')
-                )
-            except FileNotFoundError:
-                messages.error(request, DOWNLOAD_ERROR_MESSAGE)
-                return HttpResponseRedirect(
-                    reverse('experiment-detail',
-                            kwargs={'slug': experiment.slug})
-                )
-
-    # make compressed file and return response to client
-    compressed_file = shutil.make_archive(os.path.join(
-        tempfile.mkdtemp(), 'download'), 'zip', temp_dir
-    )
-    # workaround to unit test serving compressed file, besides jenkins
-    if 'test' in sys.argv or 'runserver' or 'jenkins' in sys.argv:
-        file = open(os.path.join(temp_dir, compressed_file), 'rb')
+    # Workaround to test serving compressed file. We are using Apache
+    # module to serve file imediatally by Apache instead of streaming it
+    # through Django.
+    if 'test' in sys.argv or 'runserver' in sys.argv:
         response = HttpResponse(file, content_type='application/zip')
         response['Content-Length'] = path.getsize(compressed_file)
     else:
@@ -255,10 +207,15 @@ def download_view(request, experiment_id):
     response['Content-Disposition'] = \
         'attachment; filename=%s' % smart_str('download.zip')
 
+    file.close()
+    # If is GET request the file downloaded is the full download, have to
+    # keep it, otherwise is the partial download, so remove it.
+    if request.method != 'GET':
+        shutil.rmtree(os.path.dirname(compressed_file))
+
+    # TODO: updates download counter only if not logged in
     experiment.downloads += 1
     experiment.save()
-
-    shutil.rmtree(temp_dir)
 
     return response
 
@@ -277,7 +234,7 @@ def update_export_instance(input_file, output_export, export_instance):
 
 def download_create(experiment_id, template_name):
     try:
-        export_instance = create_export_instance()
+        export_instance = create_export_instance()  # TODO: remove this method
         input_export_file = path.join(
             EXPORT_DIRECTORY, str(export_instance.id), str(JSON_FILENAME)
         )
