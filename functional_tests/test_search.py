@@ -56,7 +56,7 @@ class SearchTest(FunctionalTest):
         self.trustee1 = create_trustee_user('claudia')
         self.trustee2 = create_trustee_user('roque')
         super(SearchTest, self).setUp()
-        # search works only with approved experiments
+        # search searches only by approved experiments
         self.experiment.status = Experiment.APPROVED
         self.experiment.save()
 
@@ -1311,8 +1311,9 @@ class SearchTest(FunctionalTest):
         )
 
     def test_search_questionnaire_data_returns_correct_objects_1(self):
-        experiment = Experiment.objects.last()
-        create_valid_questionnaires(experiment)
+        g1 = create_group(1, self.experiment)
+        g2 = create_group(1, self.experiment)
+        create_valid_questionnaires([g1, g2])
         haystack.connections.reload('default')
         self.haystack_index('rebuild_index')
 
@@ -1344,8 +1345,9 @@ class SearchTest(FunctionalTest):
         self.assertIn('Histoire de la fracture', questionnaire_text)
 
     def test_search_questionnaire_data_returns_correct_objects_2(self):
-        experiment = Experiment.objects.last()
-        create_valid_questionnaires(experiment)
+        g1 = create_group(1, self.experiment)
+        g2 = create_group(1, self.experiment)
+        create_valid_questionnaires([g1, g2])
         haystack.connections.reload('default')
         self.haystack_index('rebuild_index')
 
@@ -1377,8 +1379,9 @@ class SearchTest(FunctionalTest):
         self.assertIn('História de fratura', questionnaire_text)
 
     def test_search_questionnaire_data_returns_correct_objects_3(self):
-        experiment = Experiment.objects.last()
-        create_valid_questionnaires(experiment)
+        g1 = create_group(1, self.experiment)
+        g2 = create_group(1, self.experiment)
+        create_valid_questionnaires([g1, g2])
         haystack.connections.reload('default')
         self.haystack_index('rebuild_index')
 
@@ -1410,8 +1413,9 @@ class SearchTest(FunctionalTest):
         self.assertIn('Welche Seite der Verletzung', questionnaire_text)
 
     def test_search_questionnaire_data_returns_correct_objects_4(self):
-        experiment = Experiment.objects.last()
-        create_valid_questionnaires(experiment)
+        g1 = create_group(1, self.experiment)
+        g2 = create_group(1, self.experiment)
+        create_valid_questionnaires([g1, g2])
         haystack.connections.reload('default')
         self.haystack_index('rebuild_index')
 
