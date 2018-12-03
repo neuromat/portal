@@ -1,18 +1,19 @@
 import os
 import random
 import shutil
+import tempfile
+import zipfile
 from datetime import datetime
 from random import randint, choice
 
-from django.utils.text import slugify
-from faker import Factory
-
-from django.contrib.auth.models import User
+from django.conf import settings
 # TODO: remove import above making the use of User model directly not
 # TODO: model.User
 from django.contrib.auth import models
+from django.contrib.auth.models import User
+from django.utils.text import slugify
+from faker import Factory
 
-from nep import settings
 from experiments.helpers import generate_image_file
 from experiments.models import Experiment, Study, Group, Researcher, \
     Participant, Gender, ExperimentalProtocol, \
@@ -30,7 +31,7 @@ from experiments.models import Experiment, Study, Group, Researcher, \
     QuestionnaireResponse, ExperimentResearcher
 # TODO: not protected any more. Fix this!
 from experiments.views import _get_q_default_language_or_first
-import time
+
 # the password used for trustees in tests
 PASSWORD = 'labX'
 
@@ -776,12 +777,12 @@ def create_generic_data_collection_data(gdc_step, participant):
     )
 
 
-def create_valid_questionnaires(experiment):
-    g1 = create_group(1, experiment)
-    q1 = create_questionnaire(1, 'q1', g1)
-    q2 = create_questionnaire(1, 'q2', g1)
-    g2 = create_group(1, experiment)
-    q3 = create_questionnaire(1, 'q3', g2)
+def create_valid_questionnaires(groups):
+    # TODO: create_valid_questionnaire (one for one group). Create csv's
+    #  files on the fly
+    q1 = create_questionnaire(1, 'q1', groups[0])
+    q2 = create_questionnaire(1, 'q2', groups[0])
+    q3 = create_questionnaire(1, 'q3', groups[1])
 
     # create questionnaire language data pt-br for questionnaire1
     create_questionnaire_language(
@@ -981,12 +982,10 @@ def create_experiment_related_objects(experiment):
         email='belchior@example.com', study=study,
         citation_name='BELCHIOR, Negro'
     )
-    gender1 = Gender.objects.create(name='male')
-    gender2 = Gender.objects.create(name='female')
     for group in experiment.groups.all():
         create_participant(
             randint(2, 6), group,
-            gender1 if randint(1, 2) == 1 else gender2
+            Gender.objects.get(name='female')
         )
         create_experimental_protocol(group)
 
@@ -1154,44 +1153,70 @@ def remove_selected_subdir(selected, experiment, participant, group,
     # Define download experiment data root. This and subdirs created
     # below has to be the same as defined in
     # create_download_dir_structure_and_files.
-    experiment_download_dir = os.path.join(
-        temp_media_root, 'download', str(experiment.pk)
+    temp_dir = tempfile.mkdtemp()
+    temp_file = os.path.join(temp_dir, 'download.zip')
+    shutil.copy(
+        os.path.join(
+            temp_media_root, 'download', str(experiment.pk), 'download.zip'
+        ),
+        temp_dir
     )
+    # extract files from download.zip
+    zip_file = zipfile.ZipFile(temp_file)
+    zip_file.extractall(temp_dir)
+
+    ##
+    # Remove subdirs from temp_file
     group_title_slugifyed = slugify(group.title)
     if 'experimental_protocol_g' in selected:
         shutil.rmtree(os.path.join(
-            experiment_download_dir, 'Group_' + group_title_slugifyed,
+            temp_dir, 'EXPERIMENT_DOWNLOAD',
+            'Group_' + group_title_slugifyed,
             'Experimental_protocol'
         ))
     if 'questionnaires_g' in selected:
         shutil.rmtree(os.path.join(
-            experiment_download_dir, 'Group_' + group_title_slugifyed,
+            temp_dir, 'EXPERIMENT_DOWNLOAD',
+            'Group_' + group_title_slugifyed,
             'Per_questionnaire_data'
         ))
     if 'participant_p' in selected:
         shutil.rmtree(os.path.join(
-            experiment_download_dir, 'Group_' + group_title_slugifyed,
+            temp_dir, 'EXPERIMENT_DOWNLOAD',
+            'Group_' + group_title_slugifyed,
             'Per_participant_data', 'Participant_' + str(participant.code)
         ))
     # If group has questionnaires remove 'Questionnaire_metadata' subdir
-    # randomly.
+    # randomly
     if group.steps.filter(type=Step.QUESTIONNAIRE).count() > 0:
         if randint(0, 1):
             shutil.rmtree(os.path.join(
-                experiment_download_dir, 'Group_' + group_title_slugifyed,
+                temp_dir, 'EXPERIMENT_DOWNLOAD',
+                'Group_' + group_title_slugifyed,
                 'Questionnaire_metadata'
             ))
-
-    # Remove Experiments.csv and Participants.csv randomly
-    if randint(0, 1) == 1:
+    # remove Experiments.csv and Participants.csv randomly
+    if randint(0, 1):
         os.remove(os.path.join(
-            experiment_download_dir, 'Experiment.csv'
+            temp_dir, 'EXPERIMENT_DOWNLOAD', 'Experiment.csv'
         ))
-    if randint(0, 1) == 1:
+    if randint(0, 1):
         os.remove(os.path.join(
-            experiment_download_dir, 'Group_' + group_title_slugifyed,
+            temp_dir, 'EXPERIMENT_DOWNLOAD',
+            'Group_' + group_title_slugifyed,
             'Participants.csv'
         ))
+
+    # remove old download.zip from temp_dir and make new zip file
+    os.remove(os.path.join(temp_dir, 'download.zip'))
+    shutil.make_archive(
+        os.path.join(
+            temp_media_root, 'download', str(experiment.pk), 'download'
+        ),
+        'zip', os.path.join(temp_dir)
+    )
+
+    shutil.rmtree(temp_dir)
 
 
 def random_utf8_string(length):

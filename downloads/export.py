@@ -364,7 +364,7 @@ class ExportExecution:
                     )
 
                     image_protocol = path.join(
-                        path.join(settings.BASE_DIR, "media/"),
+                        settings.MEDIA_ROOT,
                         experimental_protocol_image_filename
                     )
                     with open(image_protocol, 'rb') as f:

@@ -4,7 +4,6 @@ import random
 import re
 import sys
 import tempfile
-import zipfile
 from unittest import skip
 
 import haystack
@@ -15,7 +14,6 @@ from django.core import mail
 from django.core.management import call_command
 from django.test import TestCase, override_settings
 from django.urls import reverse, resolve
-from django.utils.encoding import smart_str
 from django.utils.text import slugify
 from haystack.query import SearchQuerySet
 
@@ -24,17 +22,17 @@ from experiments.forms import ChangeSlugForm
 from experiments.models import Experiment, Step, \
     QuestionnaireDefaultLanguage, QuestionnaireLanguage, Group, ContextTree, \
     EEGSetting, EMGSetting, EEGElectrodePosition, ElectrodeModel, \
-    SurfaceElectrode, IntramuscularElectrode, Instruction
+    SurfaceElectrode, IntramuscularElectrode, Instruction, Gender
 from experiments.tests.tests_helper import create_experiment_related_objects, \
     create_download_dir_structure_and_files, \
-    remove_selected_subdir, create_experiment, create_trustee_user, \
+    create_experiment, create_trustee_user, \
     create_next_version_experiment, random_utf8_string, create_context_tree, \
     create_eeg_electrodenet, create_eeg_solution, create_eeg_filter_setting, \
     create_eeg_electrode_localization_system, \
     create_emg_digital_filter_setting, create_group, create_questionnaire, \
     create_questionnaire_language, create_valid_questionnaires, \
     create_publication, create_experiment_researcher, create_study, \
-    create_researcher, PASSWORD
+    create_researcher, PASSWORD, create_genders
 from experiments.views import change_slug
 from functional_tests import test_search
 from nep import settings
@@ -202,6 +200,10 @@ TEST_HAYSTACK_CONNECTIONS = {
 class ExperimentDetailTest(TestCase):
 
     def setUp(self):
+        # TODO: it's created in other tests suites, so was breaking here
+        if not Gender.objects.all():
+            create_genders()
+
         owner = User.objects.create_user(
             username='labor3', password='nep-labor3'
         )
@@ -440,7 +442,10 @@ class ExperimentDetailTest(TestCase):
 
     def test_access_experiment_detail_returns_questionnaire_data_for_default_or_first_language(self):
         experiment = Experiment.objects.last()
-        create_valid_questionnaires(experiment)
+        g1 = create_group(1, experiment)
+        g2 = create_group(1, experiment)
+        create_experiment_related_objects(experiment)
+        create_valid_questionnaires([g1, g2])
 
         response = self.client.get('/experiments/' + experiment.slug + '/')
 
@@ -751,6 +756,7 @@ class SearchTest(TestCase):
         # during tests.
         # TODO: see:
         # TODO: https://github.com/django-haystack/django-haystack/issues/1142
+        # TODO: path.join
         stderr_backup, sys.stderr = sys.stderr, \
                                     open('/tmp/haystack_errors.txt', 'w+')
         call_command(action, verbosity=0, interactive=False)
@@ -1102,24 +1108,26 @@ class SearchTest(TestCase):
 
 class DownloadExperimentTest(TestCase):
 
-    TEMP_MEDIA_ROOT = os.path.join(tempfile.mkdtemp(), 'media')
+    TEMP_MEDIA_ROOT = os.path.join(tempfile.mkdtemp())
 
-    @classmethod
-    def setUpClass(cls):
+    def setUp(self):
+        # TODO: it's created in other tests suites, so was breaking here
+        if not Gender.objects.all():
+            create_genders()
         owner = User.objects.create_user(
             username='labor1', password='nep-labor1'
         )
         experiment = create_experiment(1, owner, Experiment.APPROVED)
-        create_valid_questionnaires(experiment)
+        g1 = create_group(1, experiment)
+        g2 = create_group(1, experiment)
         create_experiment_related_objects(experiment)
+        create_valid_questionnaires([g1, g2])
         create_download_dir_structure_and_files(
-            experiment, cls.TEMP_MEDIA_ROOT
+            experiment, self.TEMP_MEDIA_ROOT
         )
 
-    @classmethod
-    def tearDownClass(cls):
-        shutil.rmtree(cls.TEMP_MEDIA_ROOT)
-        User.objects.last().delete()
+    def tearDown(self):
+        shutil.rmtree(self.TEMP_MEDIA_ROOT)
 
     def asserts_experimental_protocol(self, ep_value, group1, group2,
                                       zipped_file):
@@ -1341,7 +1349,7 @@ class DownloadExperimentTest(TestCase):
 
         self.assertEqual(experiment.downloads, 1)
 
-        # Request the url do download compacted file again
+        # Request the url to download compacted file again
         url = reverse('download-view', kwargs={'experiment_id': experiment.id})
         self.client.get(url)
 
@@ -1352,92 +1360,6 @@ class DownloadExperimentTest(TestCase):
 
         # Remove fake download.zip file
         os.remove(settings.BASE_DIR + experiment.download_url.url)
-
-    @override_settings(MEDIA_ROOT=TEMP_MEDIA_ROOT)
-    def test_POSTing_download_experiment_data_returns_correct_content(self):
-        # TODO: too large, divide!
-        experiment = Experiment.objects.last()
-
-        # get groups and participants for tests below
-        g1 = experiment.groups.order_by('?').first()
-        g2 = experiment.groups.order_by('?').first()  # can be equal to g1
-        if g1 == g2:
-            participants = list(g1.participants.order_by('?'))
-            p1 = participants[0]
-            p2 = participants[len(participants) - 1]
-        else:
-            p1 = g1.participants.order_by('?').first()
-            p2 = g2.participants.order_by('?').first()
-
-        url = reverse('download-view', kwargs={'experiment_id': experiment.id})
-
-        # random select items, simulating user posting items to download
-        all_items = {
-            'ep': 'experimental_protocol_g' + str(g1.id),
-            'q': 'questionnaires_g' + str(g2.id),
-            'p_g1': 'participant_p' + str(p1.id) + '_g' + str(g1.id),
-            'p_g2': 'participant_p' + str(p2.id) + '_g' + str(g2.id)
-        }
-        selected_items = {}
-        for i in range(3):
-            random_choice = random.choice(list(all_items.keys()))
-            selected_items[random_choice] = all_items[random_choice]
-            all_items.pop(random_choice, 0)
-        response = self.client.post(
-            url, {'download_selected': selected_items.values()}
-        )
-
-        self.assertEqual(response.status_code, 200)
-        self.assertEquals(
-            response.get('Content-Disposition'),
-            'attachment; filename=%s' % smart_str('download.zip')
-        )
-
-        # get the zipped file to test against its content
-        file = io.BytesIO(response.content)
-        zipped_file = zipfile.ZipFile(file, 'r')
-        self.assertIsNone(zipped_file.testzip())
-
-        # compressed file must always contain License.txt file
-        self.assertTrue(
-            any('LICENSE.txt'
-                in element for element in zipped_file.namelist()),
-            'LICENSE.txt not in ' + str(zipped_file.namelist())
-        )
-
-        # compressed file must always contain CITATION.txt file
-        self.assertTrue(
-            any('CITATION.txt'
-                in element for element in zipped_file.namelist()),
-            'CITATION.txt not in ' + str(zipped_file.namelist())
-        )
-
-        # compressed file must always contain Experiments.csv
-        self.assertTrue(
-            any('Experiment.csv'
-                in element for element in zipped_file.namelist()),
-            'Experiment.csv not in ' + str(zipped_file.namelist())
-        )
-
-        # test for compressed folders based on items selected by user
-        self.user_choices_based_asserts(
-            selected_items, g1, g2, p1, p2, zipped_file
-        )
-
-        # For each group, if it has questionnaire(s) in its experimental
-        # protocol, it must contain questionnaire(s) metadata in group
-        # subdir of the compressed file.
-        for group in [g1, g2]:
-            if group.steps.filter(type=Step.QUESTIONNAIRE).count() > 0:
-                group_title_slugifyed = slugify(group.title)
-                self.assertTrue(
-                    any('Group_' + group_title_slugifyed +
-                        '/Questionnaire_metadata'
-                        in element for element in zipped_file.namelist()),
-                    '"Group_' + group_title_slugifyed +
-                    '/Questionnaire_metadata" subdir not in: ' +
-                    str(zipped_file.namelist())
-                )
 
     def test_POSTing_download_experiment_data_without_choices_redirects_to_experiment_detail_view(self):
         experiment = Experiment.objects.last()
@@ -1456,38 +1378,6 @@ class DownloadExperimentTest(TestCase):
         # we are prevent submit data in detail.html with JQuery by now
         # TODO: possible implementation masking javascript
         pass
-
-    @override_settings(MEDIA_ROOT=TEMP_MEDIA_ROOT)
-    def test_POSTing_option_data_has_not_correspondent_subdir_redirects_to_experiment_detail_view(self):
-        experiment = Experiment.objects.last()
-
-        group = experiment.groups.order_by('?').first()
-        participant = group.participants.order_by('?').first()
-
-        options = [
-            'experimental_protocol_g' + str(group.id),
-            'questionnaires_g' + str(group.id),
-            'participant_p' + str(participant.id) + '_g' + str(group.id)
-        ]
-
-        selected = random.choice(options)
-        # Remove the selected option corresponded subdir simulated that the
-        # subdir does not exist.
-        remove_selected_subdir(
-            selected, experiment, participant, group, self.TEMP_MEDIA_ROOT
-        )
-
-        url = reverse('download-view', kwargs={'experiment_id': experiment.id})
-        response = self.client.post(
-            url, {
-                'download_selected': selected
-            }
-        )
-
-        self.assertRedirects(
-            response,
-            reverse('experiment-detail', kwargs={'slug': experiment.slug})
-        )
 
     @override_settings(MEDIA_ROOT=TEMP_MEDIA_ROOT)
     def test_GETing_download_experiment_view_without_compressed_file_redirects_to_experiment_detail_view(self):
