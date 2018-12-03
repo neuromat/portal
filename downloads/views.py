@@ -148,8 +148,8 @@ def remove_files(request, experiment):
         zip_file_set -= sub_set
     cmd = ['zip', '-d', temp_file] + list(zip_file_set)
 
-    # if testing, redirects stdout to a tem file
-    if 'test' in sys.argv or 'runserver' in sys.argv:
+    # if testing or running jenkins, redirects stdout to a temp file
+    if 'test' in sys.argv or 'jenkins' in sys.argv or 'runserver' in sys.argv:
         outfile = \
             open(os.path.join(os.path.dirname(temp_file), 'ndb_output.txt'), "w")
     else:
@@ -192,10 +192,10 @@ def download_view(request, experiment_id):
             reverse('experiment-detail', kwargs={'slug': experiment.slug})
         )
 
-    # Workaround to test serving compressed file. We are using Apache
-    # module to serve file imediatally by Apache instead of streaming it
-    # through Django.
-    if 'test' in sys.argv or 'runserver' in sys.argv:
+    # Use Apache module to serve file immediatally by Apache instead of
+    # streaming it through Django.
+    # Workaround: if testing or using jenkins stream file through Django.
+    if 'test' in sys.argv or 'jenkins' in sys.argv or 'runserver' in sys.argv:
         response = HttpResponse(file, content_type='application/zip')
         response['Content-Length'] = path.getsize(compressed_file)
     else:
