@@ -147,12 +147,13 @@ def remove_files(archive, request, experiment):
     cmd = ['zip', '-d', partial_download] + list(zip_file_set)
 
     # if testing or running jenkins, redirects stdout to a temp file
-    if 'test' in sys.argv or 'jenkins' in sys.argv or 'runserver' in sys.argv:
-        outfile = tempfile.NamedTemporaryFile(suffix='.txt')
-    else:
-        outfile = sys.stdout
     try:
-        subprocess.check_call(cmd, stdout=outfile)
+        if 'test' in sys.argv or 'jenkins' in sys.argv or 'runserver' in sys.argv:
+            subprocess.check_call(
+                cmd, stdout=tempfile.NamedTemporaryFile(suffix='.txt')
+            )
+        else:
+            subprocess.check_call(cmd)
     except subprocess.CalledProcessError:
         messages.error(request, DOWNLOAD_ERROR_MESSAGE)
         return HttpResponseRedirect(
