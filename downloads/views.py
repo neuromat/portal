@@ -3,6 +3,7 @@ import re
 import tempfile
 import shutil
 import subprocess
+import time
 import zipfile
 
 from os import path
@@ -42,22 +43,19 @@ def create_export_instance():
     return export_instance
 
 
-def remove_files(request, experiment):
-    """Remove experiment data from
-    settings.MEDIA_ROOT/download/<experiment.id>/download.zip based on user
-    choices
+def remove_files(archive, request, experiment):
+    """Remove experiment data from archive
+    :param archive: compressed file from what build partial download
     :param request: request object
     :param experiment: Experiment model object
-    :return:
+    :return: archive with entries reduced
     """
-    temp_file = os.path.join(tempfile.mkdtemp(), 'partial_download.zip')
+    partial_download = os.path.join(
+        path.dirname(archive),
+        'partial_download_' + str(int(time.time())) + '.zip'
+    )
     try:
-        shutil.copyfile(
-            os.path.join(
-                settings.MEDIA_ROOT, 'download', str(experiment.id),
-                'download.zip'
-            ), temp_file
-        )
+        shutil.copyfile(archive, partial_download)
     except FileNotFoundError:
         messages.error(request, DOWNLOAD_ERROR_MESSAGE)
         return HttpResponseRedirect(
@@ -137,21 +135,20 @@ def remove_files(request, experiment):
             )
 
     # subtracts files that will not go in compressed file based in user choices
-    zip_file = zipfile.ZipFile(temp_file)
+    zip_file = zipfile.ZipFile(partial_download)
     zip_file_set = set(zip_file.namelist())
     for subdir in subdirs:
         r = re.compile(subdir)
         sub_set = set(filter(r.match, zip_file_set))
         if not sub_set:
-            shutil.rmtree(os.path.dirname(temp_file))
+            shutil.rmtree(os.path.dirname(partial_download))
             return ''
         zip_file_set -= sub_set
-    cmd = ['zip', '-d', temp_file] + list(zip_file_set)
+    cmd = ['zip', '-d', partial_download] + list(zip_file_set)
 
     # if testing or running jenkins, redirects stdout to a temp file
     if 'test' in sys.argv or 'jenkins' in sys.argv or 'runserver' in sys.argv:
-        outfile = \
-            open(os.path.join(os.path.dirname(temp_file), 'ndb_output.txt'), "w")
+        outfile = tempfile.NamedTemporaryFile(suffix='.txt')
     else:
         outfile = sys.stdout
     try:
@@ -162,19 +159,16 @@ def remove_files(request, experiment):
             reverse('experiment-detail', kwargs={'slug': experiment.slug})
         )
 
-    return temp_file
+    return partial_download
 
 
 def download_view(request, experiment_id):
     experiment = get_object_or_404(Experiment, pk=experiment_id)
+    compressed_file = os.path.join(
+        settings.MEDIA_ROOT, 'download', str(experiment.id), 'download.zip'
+    )
 
-    # If it's a get request, serve file with all experiment data imediatelly
-    # for download.
-    if request.method == 'GET':
-        compressed_file = os.path.join(
-            settings.MEDIA_ROOT, 'download', str(experiment.id), 'download.zip'
-        )
-    else:
+    if request.method == 'POST':
         # If user selected nothing, just redirect to experiment detail view
         # with warning message
         if 'download_selected' not in request.POST:
@@ -183,7 +177,12 @@ def download_view(request, experiment_id):
                 reverse('experiment-detail', kwargs={'slug': experiment.slug})
             )
 
-        compressed_file = remove_files(request, experiment)
+        compressed_file = remove_files(compressed_file, request, experiment)
+        if not compressed_file:
+            messages.error(request, DOWNLOAD_ERROR_MESSAGE)
+            return HttpResponseRedirect(
+                reverse('experiment-detail', kwargs={'slug': experiment.slug})
+            )
     try:
         file = open(compressed_file, 'rb')
     except FileNotFoundError:
@@ -192,26 +191,19 @@ def download_view(request, experiment_id):
             reverse('experiment-detail', kwargs={'slug': experiment.slug})
         )
 
-    # Use Apache module to serve file immediatally by Apache instead of
-    # streaming it through Django.
-    # Workaround: if testing or using jenkins stream file through Django.
     if 'test' in sys.argv or 'jenkins' in sys.argv or 'runserver' in sys.argv:
         response = HttpResponse(file, content_type='application/zip')
         response['Content-Length'] = path.getsize(compressed_file)
     else:
-        response = HttpResponse(content_type='application/force-download')
+        response = HttpResponse(
+            content=file, content_type='application/force-download'
+        )
         response['X-Sendfile'] = smart_str(compressed_file)
         response['Content-Length'] = path.getsize(compressed_file)
         response['Set-Cookie'] = 'fileDownload=true; path=/'
-
     response['Content-Disposition'] = \
         'attachment; filename=%s' % smart_str('download.zip')
-
     file.close()
-    # If is GET request the file downloaded is the full download, have to
-    # keep it, otherwise is the partial download, so remove it.
-    if request.method != 'GET':
-        shutil.rmtree(os.path.dirname(compressed_file))
 
     # TODO: updates download counter only if not logged in
     experiment.downloads += 1
