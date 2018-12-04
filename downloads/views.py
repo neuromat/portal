@@ -48,7 +48,7 @@ def remove_files(archive, request, experiment):
     :param archive: compressed file from what build partial download
     :param request: request object
     :param experiment: Experiment model object
-    :return: archive with entries reduced
+    :return: archive with entries reduced if success else empty string
     """
     partial_download = os.path.join(
         path.dirname(archive),
@@ -57,10 +57,7 @@ def remove_files(archive, request, experiment):
     try:
         shutil.copyfile(archive, partial_download)
     except FileNotFoundError:
-        messages.error(request, DOWNLOAD_ERROR_MESSAGE)
-        return HttpResponseRedirect(
-            reverse('experiment-detail', kwargs={'slug': experiment.slug})
-        )
+        return ''
 
     subdirs = [
         os.path.join('EXPERIMENT_DOWNLOAD', 'Experiment.csv'),
@@ -156,9 +153,7 @@ def remove_files(archive, request, experiment):
             subprocess.check_call(cmd)
     except subprocess.CalledProcessError:
         messages.error(request, DOWNLOAD_ERROR_MESSAGE)
-        return HttpResponseRedirect(
-            reverse('experiment-detail', kwargs={'slug': experiment.slug})
-        )
+        return ''
 
     return partial_download
 
