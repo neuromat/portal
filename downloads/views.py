@@ -191,8 +191,7 @@ def download_view(request, experiment_id):
         response = HttpResponse(file, content_type='application/zip')
         response['Content-Length'] = path.getsize(compressed_file)
     else:
-        response = HttpResponse(
-            content=file, content_type='application/force-download'
+        response = HttpResponse(content_type='application/force-download'
         )
         response['X-Sendfile'] = smart_str(compressed_file)
         response['Content-Length'] = path.getsize(compressed_file)
