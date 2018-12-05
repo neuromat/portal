@@ -138,7 +138,7 @@ def remove_files(archive, request, experiment):
         r = re.compile(subdir)
         sub_set = set(filter(r.match, zip_file_set))
         if not sub_set:
-            shutil.rmtree(os.path.dirname(partial_download))
+            os.remove(partial_download)
             return ''
         zip_file_set -= sub_set
     cmd = ['zip', '-d', partial_download] + list(zip_file_set)
@@ -191,8 +191,7 @@ def download_view(request, experiment_id):
         response = HttpResponse(file, content_type='application/zip')
         response['Content-Length'] = path.getsize(compressed_file)
     else:
-        response = HttpResponse(content_type='application/force-download'
-        )
+        response = HttpResponse(content_type='application/force-download')
         response['X-Sendfile'] = smart_str(compressed_file)
         response['Content-Length'] = path.getsize(compressed_file)
         response['Set-Cookie'] = 'fileDownload=true; path=/'
