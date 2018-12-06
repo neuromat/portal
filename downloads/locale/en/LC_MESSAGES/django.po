@@ -19,40 +19,40 @@ msgstr ""
 
 #: downloads/export.py:33
 msgid "Code"
-msgstr ""
+msgstr "Código"
 
 #: downloads/export.py:34
 msgid "Description"
-msgstr ""
+msgstr "Descrição"
 
 #: downloads/export.py:36
 msgid "Abbreviated description"
-msgstr ""
+msgstr "Descrição abreviada"
 
 #: downloads/export.py:580 downloads/export.py:1732
 msgid "Yes"
-msgstr ""
+msgstr "Sim"
 
 #: downloads/export.py:580 downloads/export.py:1732
 msgid "No"
-msgstr ""
+msgstr "Não"
 
 #: downloads/export.py:607
 msgid "Participant code"
-msgstr ""
+msgstr "Código do participante"
 
 #: downloads/export.py:608
 msgid "Age"
-msgstr ""
+msgstr "Idade"
 
 #: downloads/export.py:610
 msgid "Gender"
-msgstr ""
+msgstr "Gênero"
 
 #: downloads/views.py:31
 msgid "There was a problem downloading your experiment data"
-msgstr ""
+msgstr "Houve um problema ao fazer o download dos dados do experimento"
 
 #: downloads/views.py:85
 msgid "Please select item(s) to download"
-msgstr ""
+msgstr "Por favor selecione o(s) item(ns) para download"

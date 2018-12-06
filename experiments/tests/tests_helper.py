@@ -1150,40 +1150,26 @@ def create_download_dir_structure_and_files(experiment, temp_media_root):
 
 def remove_selected_subdir(selected, experiment, participant, group,
                            temp_media_root):
-    # Define download experiment data root. This and subdirs created
-    # below has to be the same as defined in
-    # create_download_dir_structure_and_files.
-    temp_dir = tempfile.mkdtemp()
-    temp_file = os.path.join(temp_dir, 'download.zip')
-    shutil.copy(
-        os.path.join(
-            temp_media_root, 'download', str(experiment.pk), 'download.zip'
-        ),
-        temp_dir
+    experiment_download_dir = os.path.join(
+        temp_media_root, 'download', str(experiment.pk)
     )
-    # extract files from download.zip
-    zip_file = zipfile.ZipFile(temp_file)
-    zip_file.extractall(temp_dir)
 
     ##
     # Remove subdirs from temp_file
     group_title_slugifyed = slugify(group.title)
     if 'experimental_protocol_g' in selected:
         shutil.rmtree(os.path.join(
-            temp_dir, 'EXPERIMENT_DOWNLOAD',
-            'Group_' + group_title_slugifyed,
+            experiment_download_dir, 'Group_' + group_title_slugifyed,
             'Experimental_protocol'
         ))
     if 'questionnaires_g' in selected:
         shutil.rmtree(os.path.join(
-            temp_dir, 'EXPERIMENT_DOWNLOAD',
-            'Group_' + group_title_slugifyed,
+            experiment_download_dir, 'Group_' + group_title_slugifyed,
             'Per_questionnaire_data'
         ))
     if 'participant_p' in selected:
         shutil.rmtree(os.path.join(
-            temp_dir, 'EXPERIMENT_DOWNLOAD',
-            'Group_' + group_title_slugifyed,
+            experiment_download_dir, 'Group_' + group_title_slugifyed,
             'Per_participant_data', 'Participant_' + str(participant.code)
         ))
     # If group has questionnaires remove 'Questionnaire_metadata' subdir
@@ -1191,32 +1177,17 @@ def remove_selected_subdir(selected, experiment, participant, group,
     if group.steps.filter(type=Step.QUESTIONNAIRE).count() > 0:
         if randint(0, 1):
             shutil.rmtree(os.path.join(
-                temp_dir, 'EXPERIMENT_DOWNLOAD',
-                'Group_' + group_title_slugifyed,
+                experiment_download_dir, 'Group_' + group_title_slugifyed,
                 'Questionnaire_metadata'
             ))
     # remove Experiments.csv and Participants.csv randomly
     if randint(0, 1):
-        os.remove(os.path.join(
-            temp_dir, 'EXPERIMENT_DOWNLOAD', 'Experiment.csv'
-        ))
+        os.remove(os.path.join(experiment_download_dir, 'Experiment.csv'))
     if randint(0, 1):
         os.remove(os.path.join(
-            temp_dir, 'EXPERIMENT_DOWNLOAD',
-            'Group_' + group_title_slugifyed,
+            experiment_download_dir, 'Group_' + group_title_slugifyed,
             'Participants.csv'
         ))
-
-    # remove old download.zip from temp_dir and make new zip file
-    os.remove(os.path.join(temp_dir, 'download.zip'))
-    shutil.make_archive(
-        os.path.join(
-            temp_media_root, 'download', str(experiment.pk), 'download'
-        ),
-        'zip', os.path.join(temp_dir)
-    )
-
-    shutil.rmtree(temp_dir)
 
 
 def random_utf8_string(length):

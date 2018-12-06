@@ -1,6 +1,8 @@
 import os
 
 import shutil
+import sys
+
 from django.contrib.auth.models import User
 from django.core.management import BaseCommand, CommandError
 
@@ -28,6 +30,7 @@ class Command(BaseCommand):
         uploads_path = os.path.join(settings.MEDIA_ROOT, 'uploads')
         for root, dirs, files in os.walk(uploads_path):
             if not dirs and not files:
+                # TODO: BUG: remover apenas subdiretórios, isso removendo tudo
                 shutil.rmtree(os.path.join(settings.MEDIA_ROOT, 'uploads'))
 
     def remove_experiment_and_media_subdirs(self, experiment):
@@ -53,6 +56,15 @@ class Command(BaseCommand):
         )
 
     def handle(self, *args, **options):
+        ##
+        # TODO: remove when fixed
+        if (not 'test' in sys.argv) and (not 'jenkins' in sys.argv) and \
+                (not 'runserver' in sys.argv):
+            print('Fix removing uploads subdir first!')
+            return
+        #
+        # TODO: remove when fixed
+        ##
         try:
             owner = User.objects.get(username=options['owner'])
             experiment = Experiment.lastversion_objects.all().get(
