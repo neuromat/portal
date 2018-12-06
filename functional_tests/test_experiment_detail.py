@@ -458,7 +458,7 @@ class ExperimentDetailTest(FunctionalTest):
         )
         for q in questionnaires:
             q.click()
-
+        time.sleep(0.3)  # to catch all content
         questionnaires_content = self.browser.find_element_by_id(
             'questionnaires_tab').text
 
