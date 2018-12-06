@@ -795,19 +795,9 @@ class SearchTest(TestCase):
         experiment.status = Experiment.APPROVED
         experiment.save()
 
-        # We are calling method directly without delay method. Test is not
-        # recognizing the result, although celery log reports success.
-        # rebuild_haystack_index()
-        # When calling 'rebuild_haystack_index()' in tests that boring
-        # warning message from haystack pop in tests results, so we redirect
-        # sys.stderr to a temp file and call_command manually, like we did in
-        # functional tests
         self.haystack_index('rebuild_index')
 
-        # Tests helper creates an experiment UNDER_ANALYSIS with 'Experiment
-        # 2' as experiment title
         results = SearchQuerySet().filter(content=experiment.title)
-        # TODO: by now we have 4 models being indexed
         self.assertEqual(results.count(), 1)
         self.assertEqual(results[0].model_name, 'experiment')
         self.assertEqual(results[0].object.title, experiment.title)
