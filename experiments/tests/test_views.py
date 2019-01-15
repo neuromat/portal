@@ -47,6 +47,15 @@ class HomePageTest(TestCase):
         response = self.client.get('/')
         self.assertTemplateUsed(response, 'experiments/home.html')
 
+    def test_there_is_not_experiments_approved_display_nothing(self):
+        create_experiment(1, self.experiment.owner, Experiment.UNDER_ANALYSIS)
+        create_experiment(1, self.experiment.owner, Experiment.NOT_APPROVED)
+        create_experiment(1, self.experiment.owner, Experiment.RECEIVING)
+
+        response = self.client.get('/')
+
+        self.assertFalse(response.context['experiments'].exists())
+
     def test_when_new_version_of_experiment_was_not_approved_display_last_approved_version(self):
         self.experiment.status = Experiment.APPROVED
         self.experiment.save()
@@ -757,8 +766,7 @@ class SearchTest(TestCase):
         # TODO: see:
         # TODO: https://github.com/django-haystack/django-haystack/issues/1142
         # TODO: path.join
-        stderr_backup, sys.stderr = sys.stderr, \
-                                    open('/tmp/haystack_errors.txt', 'w+')
+        stderr_backup, sys.stderr = sys.stderr, open('/dev/null', 'w+')
         call_command(action, verbosity=0, interactive=False)
         sys.stderr.close()
         sys.stderr = stderr_backup

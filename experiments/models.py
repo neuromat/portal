@@ -65,9 +65,11 @@ class LastVersionExperimentQuerySet(models.QuerySet):
     def _q_statement(queryset):
         q_statement = Q()
         for experiment in queryset:
-            q_statement |= (Q(owner=experiment['owner']) &
-                            Q(nes_id=experiment['nes_id']) &
-                            Q(version=experiment['max_version']))
+            q_statement |= (
+                    Q(owner=experiment['owner']) &
+                    Q(nes_id=experiment['nes_id']) &
+                    Q(version=experiment['max_version'])
+            )
         return q_statement
 
     def all(self):
@@ -84,9 +86,10 @@ class LastVersionExperimentQuerySet(models.QuerySet):
             Experiment.objects.filter(status=Experiment.APPROVED).values(
                 'owner', 'nes_id'
             ).annotate(max_version=Max('version'))
-        q_statement = self._q_statement(max_version_set)
+        if max_version_set:
+            return self.filter(self._q_statement(max_version_set))
 
-        return self.filter(q_statement)
+        return max_version_set
 
     # Implement methods for other experiment statuses if necessary
 
