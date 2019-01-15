@@ -246,6 +246,7 @@ def download_view(request, experiment_id):
         file = open(os.path.join(temp_dir, compressed_file), 'rb')
         response = HttpResponse(file, content_type='application/zip')
         response['Content-Length'] = path.getsize(compressed_file)
+        # TODO: close file
     else:
         response = HttpResponse(content_type='application/force-download')
         response['X-Sendfile'] = smart_str(compressed_file)
