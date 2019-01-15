@@ -111,7 +111,7 @@ class ExperimentAPITest(APITestCase):
             '" has arrived in NEDP portal.'
         )
         self.assertEqual(self.from_email, 'noreplay@nep.prp.usp.br')
-        self.assertEqual(self.to, emails)
+        self.assertListEqual(sorted(self.to), sorted(emails))
 
     def test_POSTing_experiment_generates_new_version(self):
         # post experiment already sended to portal

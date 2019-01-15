@@ -55,6 +55,7 @@ def _isvalid(source_path):
     # tests for column titles
     with open(source_path, 'r') as source:
         reader = csv.reader(source, skipinitialspace=True)
+        # headers = next(reader)  # TODO: better way
         for row in reader:
             if row[0] != 'questionnaire_code' or \
                     row[1] != 'questionnaire_title' or \

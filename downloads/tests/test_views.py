@@ -440,6 +440,7 @@ class DownloadCreateViewTest(TestCase):
         )
         f = open(participants_file, 'r')
         self.assertNotIn('age (years)', f.read())
+        f.close()
 
     def test_do_not_write_age_column_in_csv_file_if_participants_has_date_null_3(self):
         # example file:
@@ -532,8 +533,7 @@ class DownloadCreateViewTest(TestCase):
 
         # compressed file must always contain License.txt file
         self.assertTrue(
-            any('LICENSE.txt'
-                in element for element in zipped_file.namelist()),
+            any('LICENSE.txt' in element for element in zipped_file.namelist()),
             'LICENSE.txt not in ' + str(zipped_file.namelist())
         )
 
