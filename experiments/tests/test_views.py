@@ -32,7 +32,8 @@ from experiments.tests.tests_helper import create_experiment_related_objects, \
     create_emg_digital_filter_setting, create_group, create_questionnaire, \
     create_questionnaire_language, create_valid_questionnaires, \
     create_publication, create_experiment_researcher, create_study, \
-    create_researcher, PASSWORD, create_genders
+    create_researcher, PASSWORD, create_genders, create_emg_setting, \
+    create_emg_step
 from experiments.views import change_slug
 from functional_tests import test_search
 from nep import settings
@@ -838,9 +839,6 @@ class SearchTest(TestCase):
             step.identification = search_text
             step.save()
         self.haystack_index('rebuild_index')
-        # TODO: Objects created in global_setup_ut().
-        # TODO: Remove global_setup_ut() and
-        # TODO: make model instances created by demand in each test.
         self.check_matches_on_response(3, search_text)
 
     def test_search_stimulus_step_returns_correct_objects(self):
@@ -1011,6 +1009,38 @@ class SearchTest(TestCase):
 
         self.haystack_index('rebuild_index')
         self.check_matches_on_response(3, 'FilterTyp')
+
+    def test_search_with_filter_returns_correct_objects(self):
+        group = create_group(1, self.experiment)
+        emg_setting = create_emg_setting(self.experiment)
+        create_emg_step(group, emg_setting)
+        create_experiment(1, self.owner, Experiment.APPROVED)
+
+        self.haystack_index('rebuild_index')
+        response = self.client.get('/search/', {'q': '', 'filter': 'emg'})
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, '<tr', 1)
+
+    def test_search_with_term_and_filter_returns_correct_objects(self):
+        search_text = 'plexus'
+        self.experiment.description = 'plexus'
+        self.experiment.save()
+        group = create_group(1, self.experiment)
+        group.title = search_text
+        group.save()
+        emg_setting = create_emg_setting(self.experiment)
+        emg_step = create_emg_step(group, emg_setting)
+        emg_step.identification = search_text
+        emg_step.save()
+        # create new experiment without steps (and groups)
+        create_experiment(1, self.owner, Experiment.TO_BE_ANALYSED)
+
+        self.haystack_index('rebuild_index')
+        response = self.client.get(
+            '/search/', {'q': search_text, 'filter': 'emg'}
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, '<tr', 1)  # 2: group and step
 
     def test_search_emgdigitalfiltersetting_returns_correct_objects(self):
         test_search.SearchTest().create_objects_to_test_search_emgsetting()
