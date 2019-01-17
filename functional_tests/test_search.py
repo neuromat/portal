@@ -501,7 +501,9 @@ class SearchTest(FunctionalTest):
         group.title = 'Brachial Plexus'
         group.save()
         emg_setting = create_emg_setting(e2)
-        create_emg_step(group, emg_setting)
+        emg_step = create_emg_step(group, emg_setting)
+        emg_step.identification = 'Brachial Plexus'
+        emg_step.save()
 
         haystack.connections.reload('default')
         self.haystack_index('rebuild_index')
@@ -531,11 +533,24 @@ class SearchTest(FunctionalTest):
         # As there are 2 experiments with 'Brachial Plexus' in title,
         # it's expected that Joselina sees only one Experiment search
         # result, given that she chosen to filter experiments that has EMG
-        # Setting.
+        # Setting. Nevertheless, there are a group and a step with
+        # 'Brachial Plexus'
+        # in some text field, but she doesn't see that matching lines because
+        # when user searches with filters the terms searched only are searched
+        # in experiment model instance.
         # The page refreshes displaying the results.
         ##
         self.verify_n_objects_in_table_rows(1, 'experiment-matches')
-        self.verify_n_objects_in_table_rows(1, 'group-matches')
+        # TODO: refactors this form of test by verifying if that is only one
+        #  row in the table, like in tests that has:
+        #  num_table_rows = \
+        #      len(
+        #          self.browser.find_element_by_id(
+        #              'search_table').find_elements_by_tag_name('tr')
+        #      )
+        #  self.assertEqual(num_table_rows, 1)
+        self.verify_n_objects_in_table_rows(0, 'group-matches')
+        self.verify_n_objects_in_table_rows(0, 'step-matches')
 
     def test_search_with_two_filters_returns_correct_objects(self):
         ##
@@ -589,7 +604,12 @@ class SearchTest(FunctionalTest):
         # one of the two groups.
         ##
         self.verify_n_objects_in_table_rows(1, 'experiment-matches')
-        self.verify_n_objects_in_table_rows(1, 'group-matches')
+        num_table_rows = \
+            len(
+                self.browser.find_element_by_id(
+                    'search_table').find_elements_by_tag_name('tr')
+            )
+        self.assertEqual(num_table_rows, 1)
 
     def test_search_with_AND_modifier_returns_correct_objects(self):
         ##
@@ -837,19 +857,13 @@ class SearchTest(FunctionalTest):
 
     def test_search_only_with_one_filter_returns_correct_results_1(self):
         ##
-        # Create objects to search below
+        # Create objects to test search below
         ##
         group1 = create_group(1, self.experiment)
-        emg_setting = create_emg_setting(self.experiment)
-        create_emg_step(group1, emg_setting)
-        e2 = create_experiment(1, self.trustee1, Experiment.APPROVED)
-        e2.title = 'Experiment changed to test filter only'
-        e2.save()
-        group2 = create_group(1, e2)
-        emg_setting = create_emg_setting(e2)
-        create_emg_step(group2, emg_setting)
-        eeg_setting = create_eeg_setting(1, e2)
-        create_eeg_step(group2, eeg_setting)
+        eeg_setting = create_eeg_setting(1, self.experiment)
+        create_eeg_step(group1, eeg_setting)
+        # new experiment without steps (and without groups)
+        create_experiment(1, self.owner, Experiment.APPROVED)
 
         haystack.connections.reload('default')
         self.haystack_index('rebuild_index')
@@ -873,15 +887,12 @@ class SearchTest(FunctionalTest):
         # As we have only one experiment with EEG step, Joselina
         # gets only one row that corresponds to that the experiment
         self.verify_n_objects_in_table_rows(1, 'experiment-matches')
-        self.verify_n_objects_in_table_rows(0, 'study-matches')
-        self.verify_n_objects_in_table_rows(0, 'group-matches')
-        self.verify_n_objects_in_table_rows(0, 'experimentalprotocol-matches')
-        experiment_text = self.browser.find_element_by_class_name(
-            'experiment-matches'
-        ).text
-        self.assertIn(
-            'Experiment changed to test filter only', experiment_text
-        )
+        num_table_rows = \
+            len(
+                self.browser.find_element_by_id(
+                    'search_table').find_elements_by_tag_name('tr')
+            )
+        self.assertEqual(num_table_rows, 1)
 
     def test_search_only_with_one_filter_returns_correct_results_2(self):
         ##
