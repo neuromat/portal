@@ -6,7 +6,7 @@ from functional_tests.base import FunctionalTest
 
 class NewVisitorTest(FunctionalTest):
 
-    def test_can_view_initial_page_basic(self):
+    def test_can_view_home_page_basic(self):
         # In top of page she sees a link to login in the system
         login_link = self.browser.find_element_by_id('login-language').text
         self.assertIn('Log In', login_link)
@@ -131,7 +131,7 @@ class NewVisitorTest(FunctionalTest):
         self.assertIn('This site content is licensed under a Creative Commons '
                       'Attributions 4.0', footer_license_text)
 
-    def test_can_view_initial_page_when_there_is_new_version_not_approved(self):
+    def test_can_view_home_page_when_there_is_new_version_not_approved(self):
         ##
         # Create a new version for self.experiment
         ##
@@ -141,8 +141,8 @@ class NewVisitorTest(FunctionalTest):
         exp_new_version.save()
 
         ##
-        # We have to refresh page to include reflects the inclusion of the
-        # new experiment version
+        # We have to refresh page to reflect the inclusion of the new
+        # experiment version
         ##
         self.browser.refresh()
 
@@ -171,3 +171,14 @@ class NewVisitorTest(FunctionalTest):
             any(row.find_elements_by_tag_name('td')[3].text ==
                 str(self.experiment.version) for row in rows)
         )
+
+    def test_when_trying_to_access_not_existent_detail_page_display_404_not_found_page(self):
+        # Josenilda is trying to access her experiment that she recently
+        # sent to Portal, but she types the URL address incorrectly in
+        # Browser, so she sees the 404 error page
+        broken_url = self.experiment.slug[:-3]
+        self.browser.get(self.live_server_url + '/experiments/' + broken_url)
+        body = self.browser.find_element_by_tag_name('body')
+        self.assertIn('404 - Not Found', body.text)
+        self.assertIn('Neuroscience Experiments Database', body.text)
+        self.assertIn('RELATED PROJECTS', body.text)

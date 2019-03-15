@@ -133,20 +133,10 @@ class ExperimentDetailTest(FunctionalTest):
         study_start_date = self.browser.find_element_by_id(
             'study_startdate').text
         self.assertIn('Start date:', study_start_date)
-        ##
-        # To conform to study_start_date format in template. For month
-        # September (9) we have to do something more.
-        # TODO: search for better solution
-        ##
-        if self.experiment.study.start_date.month == 9:
-            strdate = self.experiment.study.start_date.strftime(
-                "%b. %d, %Y"
-            ).lstrip("0").replace(". ", "t. ")
-        else:
-            strdate = self.experiment.study.start_date.strftime(
-                "%b. %d, %Y"
-            ).lstrip("0").replace(" 0", " ")
-        self.assertIn(strdate, study_start_date)
+        self.assertIn(
+            self.experiment.study.start_date.strftime("%B %d, %Y"),
+            study_start_date
+        )
         study_end_date = self.browser.find_element_by_id(
             'study_enddate').text
         self.assertIn('End date:', study_end_date)
@@ -202,7 +192,8 @@ class ExperimentDetailTest(FunctionalTest):
         # expands displaying textual representation of the experimental
         # protocol.
         group = self.experiment.groups.first()
-        link_details = self.browser.find_element_by_link_text('Details')
+        link_details = self.browser.find_element_by_xpath(
+            "//a[@href='#collapse_group" + str(group.id) + "']")
         link_details.click()
 
         self.wait_for(lambda: self.assertIn(
@@ -1478,13 +1469,6 @@ class DownloadExperimentTest(FunctionalTest):
         # In the modal there is also how to cite that experiment in her own
         # work
         self.assertIn('How to cite this experiment:', license_modal.text)
-        ##
-        # this is to mimic how datetime is displayed in template by default
-        ##
-        sent_date = \
-            self.experiment.sent_date.strftime("%b. %d, %Y").lstrip("0").replace(
-                " 0", " "
-            )
         self.assertIn(
             'das Dores'.upper() + ', Anibal', license_modal.text
         )
@@ -1495,7 +1479,8 @@ class DownloadExperimentTest(FunctionalTest):
             'Farias'.upper() + ', Antônio', license_modal.text
         )
         self.assertIn(
-            self.experiment.title + '. Sent date: ' + str(sent_date),
+            self.experiment.title + '. Sent date: ' + str(
+                self.experiment.sent_date.strftime('%B %d, %Y')),
             license_modal.text
         )
         self.assertNotIn(
@@ -1532,20 +1517,14 @@ class DownloadExperimentTest(FunctionalTest):
         # In the modal there is also how to cite that experiment in her own
         # work
         self.assertIn('How to cite this experiment:', license_modal.text)
-        ##
-        # this is to mimic how datetime is displayed in template by default
-        ##
-        sent_date = \
-            self.experiment.sent_date.strftime("%b. %d, %Y").lstrip("0").replace(
-                " 0", " ")
-
         self.assertIn(
             self.experiment.study.researcher.last_name.upper() + ', ' +
             self.experiment.study.researcher.first_name,
             license_modal.text
         )
         self.assertIn(
-            self.experiment.title + '. Sent date: ' + str(sent_date) + '.',
+            self.experiment.title + '. Sent date: ' +
+            self.experiment.sent_date.strftime('%B %d, %Y') + '.',
             license_modal.text
         )
 
@@ -1613,9 +1592,7 @@ class DownloadExperimentTest(FunctionalTest):
         self.assertIn(
             'SORIANO, Valdick. ' + self.experiment.title
             + '. Sent date: '
-            + str(self.experiment.sent_date.strftime('%b. %d, %Y').lstrip('0').replace(
-                ' 0', ' '
-            )),
+            + self.experiment.sent_date.strftime('%B %d, %Y'),
             license_modal.text
         )
 
@@ -1672,9 +1649,7 @@ class DownloadExperimentTest(FunctionalTest):
         self.assertIn(
             'COSTA, Edimilson; ROSS B., Diana; BOULOS, Guilherme. '
             + self.experiment.title + '. Sent date: '
-            + str(self.experiment.sent_date.strftime('%b. %d, %Y').lstrip('0').replace(
-                ' 0', ' '
-            )),
+            + self.experiment.sent_date.strftime('%B %d, %Y'),
             license_modal.text
         )
 

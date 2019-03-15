@@ -10,7 +10,7 @@ from django.contrib.auth.views import LoginView, PasswordResetView, \
 from django.core.exceptions import PermissionDenied
 from django.core.mail import send_mail
 from django.db.models import Count
-from django.http import HttpResponseRedirect, HttpResponse
+from django.http import HttpResponseRedirect, HttpResponse, Http404
 from django.shortcuts import render
 from django.template.loader import render_to_string
 from django.utils.text import slugify
@@ -214,7 +214,10 @@ def experiment_detail(request, slug):
         to_be_analysed_count = all_experiments.filter(
             status=Experiment.TO_BE_ANALYSED).count()
 
-    experiment = Experiment.objects.get(slug=slug)
+    try:
+        experiment = Experiment.objects.get(slug=slug)
+    except Experiment.DoesNotExist:
+        raise Http404('404 - Not Found')
 
     gender_grouping = {}
     age_grouping = {}

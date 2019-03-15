@@ -1,0 +1,41 @@
+{% extends 'experiments/base.html' %}
+
+{% block style %}
+    {% load static %}
+    {# define id to functional tests #}
+    <link id="id_bs_select_css" rel="stylesheet" href="{% static 'bootstrap-select-1.12.4-dist/css/bootstrap-select.min.css' %}">
+{% endblock %}
+
+{% block header %}
+    {% load i18n %}
+    {% include 'experiments/header_home.html' %}
+{% endblock %}
+
+{% block content %}
+    <section class="container nep-content">
+        {% if messages %}
+            {% include 'experiments/messages.html' %}
+        {% endif %}
+        <h1 align="center">404 - Not Found</h1>
+    </section>
+{% endblock %}
+
+{% block script %}
+    <script src="{% url 'javascript-catalog' %}"></script>
+    {##}
+    {## Scripts related to experiments/header_home.html #}
+    {##}
+    {% load static %}
+    {# define id for functional tests #}
+    <script id="id_bs_select_js" src="{% static 'bootstrap-select-1.12.4-dist/js/bootstrap-select.js' %}"></script>
+    {##}
+    {## Script related to experiments/top.html #}
+    {##}
+    <script>
+        let to_be_analysed_count = {{ to_be_analysed_count }};
+        if (to_be_analysed_count) {
+            $('head').append('<style>.badger::after{content:"' +
+                to_be_analysed_count + '"}</style>');
+        }
+    </script>
+{% endblock %}
