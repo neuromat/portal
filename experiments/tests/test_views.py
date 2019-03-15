@@ -447,6 +447,11 @@ class ExperimentDetailTest(TestCase):
         slug = str(Experiment.objects.first().slug)[:-3]
         response = self.client.get('/experiments/' + slug + '/')
         self.assertEqual(response.status_code, 404)
+        self.assertIn('404 - Not Found', response.content.decode())
+        self.assertIn(
+            'Neuroscience Experiments Database', response.content.decode(),
+        )
+        self.assertIn('Related Projects', response.content.decode())
 
     def test_uses_detail_template(self):
         slug = str(Experiment.objects.first().slug)

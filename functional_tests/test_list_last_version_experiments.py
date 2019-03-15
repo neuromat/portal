@@ -172,11 +172,13 @@ class NewVisitorTest(FunctionalTest):
                 str(self.experiment.version) for row in rows)
         )
 
-    def test_view_404_http_status_code_when_trying_access_not_existent_page(self):
+    def test_when_trying_to_access_not_existent_detail_page_display_404_not_found_page(self):
         # Josenilda is trying to access her experiment that she recently
         # sent to Portal, but she types the URL address incorrectly in
-        # Browser, so she sees a 404 error page
+        # Browser, so she sees the 404 error page
         broken_url = self.experiment.slug[:-3]
         self.browser.get(self.live_server_url + '/experiments/' + broken_url)
         body = self.browser.find_element_by_tag_name('body')
-        self.assertIn('Not Found', body.text)
+        self.assertIn('404 - Not Found', body.text)
+        self.assertIn('Neuroscience Experiments Database', body.text)
+        self.assertIn('RELATED PROJECTS', body.text)
