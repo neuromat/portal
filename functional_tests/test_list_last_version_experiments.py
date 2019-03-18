@@ -180,5 +180,9 @@ class NewVisitorTest(FunctionalTest):
         self.browser.get(self.live_server_url + '/experiments/' + broken_url)
         body = self.browser.find_element_by_tag_name('body')
         self.assertIn('404 - Not Found', body.text)
+        self.assertIn(
+            'Ops... It seems you tried to access an inexistent page.',
+            body.text
+        )
         self.assertIn('Neuroscience Experiments Database', body.text)
         self.assertIn('RELATED PROJECTS', body.text)

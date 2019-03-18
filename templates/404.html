@@ -1,14 +1,12 @@
 {% extends 'experiments/base.html' %}
 
-{% block style %}
-    {% load static %}
-    {# define id to functional tests #}
-    <link id="id_bs_select_css" rel="stylesheet" href="{% static 'bootstrap-select-1.12.4-dist/css/bootstrap-select.min.css' %}">
-{% endblock %}
-
 {% block header %}
     {% load i18n %}
-    {% include 'experiments/header_home.html' %}
+    <header class="container header-home">
+        {% load i18n %}
+        <h1>{% trans "Neuroscience Experiments Database" %}</h1>
+        <h4>{% trans "Open Platform for Experiments in Neuroscience" %}</h4>
+    </header>
 {% endblock %}
 
 {% block content %}
@@ -16,18 +14,13 @@
         {% if messages %}
             {% include 'experiments/messages.html' %}
         {% endif %}
-        <h1 align="center">404 - Not Found</h1>
+        <h1 align="center">{% trans '404 - Not Found' %}</h1>
+        <p align="center">{% trans 'Ops... It seems you tried to access an inexistent page.' %}</p>
     </section>
 {% endblock %}
 
 {% block script %}
     <script src="{% url 'javascript-catalog' %}"></script>
-    {##}
-    {## Scripts related to experiments/header_home.html #}
-    {##}
-    {% load static %}
-    {# define id for functional tests #}
-    <script id="id_bs_select_js" src="{% static 'bootstrap-select-1.12.4-dist/js/bootstrap-select.js' %}"></script>
     {##}
     {## Script related to experiments/top.html #}
     {##}

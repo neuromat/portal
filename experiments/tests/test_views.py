@@ -449,6 +449,10 @@ class ExperimentDetailTest(TestCase):
         self.assertEqual(response.status_code, 404)
         self.assertIn('404 - Not Found', response.content.decode())
         self.assertIn(
+            'Ops... It seems you tried to access an inexistent page.',
+            response.content.decode()
+        )
+        self.assertIn(
             'Neuroscience Experiments Database', response.content.decode(),
         )
         self.assertIn('Related Projects', response.content.decode())
