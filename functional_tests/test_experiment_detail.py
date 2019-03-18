@@ -190,7 +190,7 @@ class ExperimentDetailTest(FunctionalTest):
         # Finally, at right of each group information there is a button
         # written 'Details'. She clicks on the first link and the panel
         # expands displaying textual representation of the experimental
-        # protocol.
+        # protocol
         group = self.experiment.groups.first()
         link_details = self.browser.find_element_by_xpath(
             "//a[@href='#collapse_group" + str(group.id) + "']")
