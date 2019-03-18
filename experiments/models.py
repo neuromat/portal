@@ -127,7 +127,7 @@ class Experiment(models.Model):  # indexed for search
     nes_id = models.PositiveIntegerField()
     version = models.PositiveIntegerField()
 
-    title = models.CharField(max_length=150)
+    title = models.CharField(max_length=255)
     description = models.TextField()
     data_acquisition_done = models.BooleanField(default=False)
     sent_date = models.DateField(auto_now_add=True)
@@ -150,10 +150,10 @@ class Experiment(models.Model):  # indexed for search
         User, null=True, blank=True, related_name='experiments'
     )
     # TODO: We want slug field do not save empty string.
-    # TODO: This implies that the experiments are being
-    # TODO: saved in tests, with slug='', what we don't want. The tests should
-    # TODO: regret when saving experiments with slug=''.
-    slug = models.SlugField(max_length=100, unique=True)
+    #  This implies that the experiments are being
+    #  saved in tests, with slug='', what we don't want. The tests should
+    #  regret when saving experiments with slug=''.
+    slug = models.SlugField(max_length=255, unique=True)
     release_notes = models.TextField(blank=True, default='')
 
     objects = models.Manager()
