@@ -204,9 +204,7 @@ TEST_HAYSTACK_CONNECTIONS = {
 }
 
 
-# TODO:
-# we are testing only questionnaire view part. Complete with other tests:
-# groups, studies, settings etc
+# TODO: complete with other tests: groups, studies, settings etc
 class ExperimentDetailTest(TestCase):
 
     def setUp(self):
@@ -429,7 +427,7 @@ class ExperimentDetailTest(TestCase):
     @staticmethod
     def _get_q_default_language_or_first(questionnaire):
         # TODO: correct this to adapt to unique QuestionnaireDefaultLanguage
-        # TODO: model with OneToOne with Questionnaire
+        #  model with OneToOne with Questionnaire
         qdl = QuestionnaireDefaultLanguage.objects.filter(
             questionnaire=questionnaire
         ).first()
@@ -444,6 +442,20 @@ class ExperimentDetailTest(TestCase):
         slug = str(Experiment.objects.first().slug)
         response = self.client.get('/experiments/' + slug + '/')
         self.assertEqual(response.status_code, 200)
+
+    def test_access_experiment_detail_with_wrong_url_returns_404_http_status_code(self):
+        slug = str(Experiment.objects.first().slug)[:-3]
+        response = self.client.get('/experiments/' + slug + '/')
+        self.assertEqual(response.status_code, 404)
+        self.assertIn('404 - Not Found', response.content.decode())
+        self.assertIn(
+            'Ops... It seems you tried to access an inexistent page.',
+            response.content.decode()
+        )
+        self.assertIn(
+            'Neuroscience Experiments Database', response.content.decode(),
+        )
+        self.assertIn('Related Projects', response.content.decode())
 
     def test_uses_detail_template(self):
         slug = str(Experiment.objects.first().slug)
@@ -762,8 +774,7 @@ class SearchTest(TestCase):
     @staticmethod
     def haystack_index(action):
         # Redirect sys.stderr to avoid display
-        # "GET http://127.0.0.1:9200/haystack/_mapping"
-        # during tests.
+        # "GET http://127.0.0.1:9200/haystack/_mapping" during tests
         # TODO: see:
         # TODO: https://github.com/django-haystack/django-haystack/issues/1142
         # TODO: path.join
